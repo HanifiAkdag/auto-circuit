@@ -11,7 +11,9 @@ from auto_circuit.prune_algos.circuit_probing import circuit_probing_prune_score
 from auto_circuit.prune_algos.edge_attribution_patching import (
     edge_attribution_patching_prune_scores,
 )
+from auto_circuit.prune_algos.edge_pruning import edge_pruning_prune_scores
 from auto_circuit.prune_algos.ground_truth import ground_truth_prune_scores
+
 from auto_circuit.prune_algos.mask_gradient import mask_gradient_prune_scores
 from auto_circuit.prune_algos.random_edges import random_prune_scores
 from auto_circuit.prune_algos.subnetwork_probing import subnetwork_probing_prune_scores
@@ -334,4 +336,24 @@ PRUNE_ALGOS: List[PruneAlgo] = [
     MSE_CIRCUIT_TREE_PROBING_PRUNE_ALGO,
     OPPOSITE_TREE_PROBING_PRUNE_ALGO,
 ]
+
+EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
+    key="Edge Pruning",
+    name="Edge Pruning (L0)",
+    _short_name="EP",
+    func=partial(
+        edge_pruning_prune_scores,
+        learning_rate=0.8,
+        lambda_learning_rate=0.8,
+        steps=3000,
+        target_edge_sparsity=1.1,
+        target_node_sparsity=0.72,
+        sparsity_warmup_steps=2500,
+        use_node_masks=True,
+        show_train_graph=True,
+    ),
+)
+
+PRUNE_ALGOS.append(EDGE_PRUNING_PRUNE_ALGO)
 PRUNE_ALGO_DICT: Dict[AlgoKey, PruneAlgo] = {algo.key: algo for algo in PRUNE_ALGOS}
+
