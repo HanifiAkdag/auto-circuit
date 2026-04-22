@@ -222,7 +222,7 @@ SUBNETWORK_EDGE_PROBING_PRUNE_ALGO = PruneAlgo(
         epochs=200,
         regularize_lambda=0.5,
         mask_fn="hard_concrete",
-        show_train_graph=True,
+        show_train_graph=False,
     ),
 )
 CIRCUIT_PROBING_PRUNE_ALGO = PruneAlgo(

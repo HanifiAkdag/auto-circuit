@@ -23,7 +23,7 @@ Paper hyperparameters (from Appendix B, Table 4):
 Usage:
     python experiments/edge_pruning/reproduce_ep_results.py
 """
-#%%
+
 import json
 from collections import defaultdict
 from datetime import datetime
@@ -34,7 +34,6 @@ from typing import Dict, List, Optional, Tuple
 import plotly.graph_objects as go
 import torch as t
 
-from auto_circuit.metrics.prune_metrics.kl_div import kl_div_metric
 from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
     measure_prune_metrics,
     measurement_figs,
@@ -179,6 +178,7 @@ prune_metric_measurements = measure_prune_metrics(
     task_prune_scores=task_prune_scores,
     patch_type=PatchType.EDGE_PATCH,
     reverse_clean_corrupt=False,
+    test_edge_counts=test_edge_counts,
 )
 
 # ============================================================================
@@ -215,9 +215,6 @@ for i, fig in enumerate(figs):
     fig.write_image(str(filepath))
     print(f"Saved: {filepath}")
 
-for fig in figs:
-    fig.show()
-
 # ============================================================================
 # Step 5: Save results
 # ============================================================================
@@ -236,4 +233,3 @@ for algo_name, ps in all_prune_scores.items():
 
 print("\nDone!")
 
-#%%

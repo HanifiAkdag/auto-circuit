@@ -10,7 +10,7 @@ This script:
 Usage:
     python experiments/validate_edge_pruning.py
 """
-#%%
+
 import json
 import os
 from collections import defaultdict
@@ -27,9 +27,11 @@ from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
 from auto_circuit.metrics.prune_metrics.prune_metrics import (
     CLEAN_KL_DIV_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
+    CORRECT_ANSWER_PERCENT_METRIC,
     PruneMetric,
 )
 from auto_circuit.prune_algos.prune_algos import (
+    ACDC_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,
     EDGE_PRUNING_PRUNE_ALGO,
     RANDOM_PRUNE_ALGO,
@@ -54,6 +56,7 @@ from auto_circuit.utils.misc import repo_path_to_abs_path, save_cache
 ALGOS: List[PruneAlgo] = [
     RANDOM_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,          # Fast, one-pass baseline
+    ACDC_PRUNE_ALGO,
     SUBNETWORK_EDGE_PROBING_PRUNE_ALGO,  # Closest existing multi-epoch method
     EDGE_PRUNING_PRUNE_ALGO,             # Our integration
 ]
@@ -70,6 +73,7 @@ ABLATION_TYPES: List[AblationType] = [
 PRUNE_METRICS: List[PruneMetric] = [
     CLEAN_KL_DIV_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
+    CORRECT_ANSWER_PERCENT_METRIC,
 ]
 
 # Save configuration
@@ -105,12 +109,10 @@ if SAVE_PRUNE_SCORES:
     cache_folder = ".prune_scores_cache"
     base_filename = "ep-validation"
     save_cache(task_prune_scores, cache_folder, base_filename)
-    print(f"Prune scores saved to {cache_folder}/")
 
 # ============================================================================
 # Step 3: Evaluate with prune metrics
 # ============================================================================
-print("\nComputing prune metrics...")
 prune_metric_measurements: TaskMeasurements = measure_prune_metrics(
     ablation_types=ABLATION_TYPES,
     metrics=PRUNE_METRICS,
@@ -133,9 +135,6 @@ if SAVE_FIGURES:
         fig.write_image(str(filepath))
         print(f"Saved: {filepath}")
 
-for fig in figs:
-    fig.show()
-
 # ============================================================================
 # Step 5: Print summary statistics
 # ============================================================================
@@ -146,10 +145,8 @@ for task_key, algo_prune_scores in task_prune_scores.items():
     task = TASK_DICT[task_key]
     print(f"\nTask: {task.name} ({task.model.n_edges} total edges)")
     for algo_key, prune_scores in algo_prune_scores.items():
-        total_score = sum(ps.abs().sum().item() for ps in prune_scores.values())
         nonzero = sum((ps.abs() > 1e-6).sum().item() for ps in prune_scores.values())
-        print(f"  {algo_key:40s} | non-zero edges: {nonzero:5d} | total score: {total_score:.2f}")
+        sparsity_pct = 100.0 * (1.0 - nonzero / task.model.n_edges)
+        print(f"  {algo_key:40s} | Hard-Pruned: {sparsity_pct:>5.1f}% | Non-zero continuous scores: {nonzero:5d}/{task.model.n_edges}")
 
 print("\nDone!")
-
-#%%

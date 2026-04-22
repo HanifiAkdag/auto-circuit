@@ -5,7 +5,7 @@ This module adds evaluation-time discretization and related utilities that are s
 to the Edge-Pruning algorithm's binary search thresholding approach.
 
 Reference: https://arxiv.org/abs/2406.16778
-Based on: Edge-Pruning/src/modeling/l0.py
+Based on: https://github.com/princeton-nlp/Edge-Pruning/blob/main/src/modeling/l0.py
 """
 import math
 

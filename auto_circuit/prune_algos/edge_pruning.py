@@ -39,6 +39,7 @@ from auto_circuit.utils.l0_utils import (
 )
 from auto_circuit.utils.patchable_model import PatchableModel
 from auto_circuit.utils.tensor_ops import multibatch_kl_div, sample_hard_concrete
+from auto_circuit.utils.patch_wrapper import PatchWrapperImpl
 
 EP = "Edge Pruning"
 
@@ -287,6 +288,7 @@ def edge_pruning_prune_scores(
                         "mask_fn": wrapper.mask_fn,
                         "batch_size": wrapper.batch_size,
                     }
+                    del wrapper.patch_mask
                     wrapper.patch_mask = effective_masks[mod_name]
                     wrapper.mask_fn = None
                     wrapper.batch_size = batch_size
@@ -295,6 +297,7 @@ def edge_pruning_prune_scores(
 
                 # Restore original state immediately
                 for mod_name, wrapper in dest_wrapper_dict.items():
+                    del wrapper.patch_mask
                     wrapper.patch_mask = orig_state[mod_name]["patch_mask"]
                     wrapper.mask_fn = orig_state[mod_name]["mask_fn"]
                     wrapper.batch_size = orig_state[mod_name]["batch_size"]
@@ -355,32 +358,41 @@ def edge_pruning_prune_scores(
             fig.add_trace(go.Scatter(y=node_sparsity_hist, name="Node Sparsity"))
             fig.add_trace(go.Scatter(y=node_reg_hist, name="Node Regularisation"))
         fig.update_layout(title="Edge Pruning Training", xaxis_title="Step")
-        fig.show()
+        
+        try:
+            filename = "edge_pruning_train_graph.html"
+            fig.write_html(filename)
+        except Exception:
+            pass
 
     # ============================================================
     # Step 8: Extract PruneScores via deterministic discretisation
     # ============================================================
     # Use deterministic_z (binary search thresholding) from the paper.
-    # In AC convention: high mask value = edge ablated = UNimportant.
-    # PruneScores convention: high score = important.
-    # So: score = 1 - effective_ablation_mask
     prune_scores: PruneScores = {}
-    for mod_name, ela in edge_log_alphas.items():
-        edge_z = deterministic_z(ela)  # AC convention: high = ablated
-
+    
+    with t.no_grad():
+        # Precompute deterministic masks for nodes ONCE to avoid O(N^2) loop
+        deterministic_node_zs: Dict[int, float] = {}
         if use_node_masks:
-            wrapper = dest_wrapper_dict[mod_name]
-            if wrapper.in_srcs is not None:
-                in_srcs = wrapper.in_srcs
-                # Build deterministic node mask and combine with edge mask
-                for i, global_idx in enumerate(range(in_srcs.start, in_srcs.stop)):
-                    if global_idx in node_log_alphas:
-                        nz = deterministic_z(node_log_alphas[global_idx]).item()
-                        # Combine: effective_ablation = 1 - (1-edge)*(1-node)
-                        # Index [..., i] selects source i across all other dims
-                        edge_z[..., i] = 1.0 - (1.0 - edge_z[..., i]) * (1.0 - nz)
+            for idx, nla in node_log_alphas.items():
+                deterministic_node_zs[idx] = deterministic_z(nla).item()
 
-        # score = 1.0 - ablation_value: kept edges (low z) get high scores
-        prune_scores[mod_name] = (1.0 - edge_z).detach().clone()
+        for mod_name, ela in edge_log_alphas.items():
+            edge_z = deterministic_z(ela)  # AC convention: high = ablated
+
+            if use_node_masks:
+                wrapper = dest_wrapper_dict[mod_name]
+                if wrapper.in_srcs is not None:
+                    in_srcs = wrapper.in_srcs
+                    # Build deterministic node mask and combine with edge mask
+                    for i, global_idx in enumerate(range(in_srcs.start, in_srcs.stop)):
+                        if global_idx in deterministic_node_zs:
+                            nz = deterministic_node_zs[global_idx]
+                            # Combine: effective_ablation = 1 - (1-edge)*(1-node)
+                            edge_z[..., i] = 1.0 - (1.0 - edge_z[..., i]) * (1.0 - nz)
+
+            # score = 1.0 - ablation_value: kept edges (low z) get high scores
+            prune_scores[mod_name] = (1.0 - edge_z).detach().clone()
 
     return prune_scores

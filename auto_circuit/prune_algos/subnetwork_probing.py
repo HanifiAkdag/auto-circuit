@@ -142,7 +142,7 @@ def subnetwork_probing_prune_scores(
     set_all_masks(model, val=init_val if tree_optimisation else -init_val)
     with train_mask_mode(model) as patch_masks, mask_fn_mode(model, mask_fn, dropout_p):
         mask_params = patch_masks.values()
-        optim = t.optim.adam.Adam(mask_params, lr=learning_rate)
+        optim = t.optim.Adam(mask_params, lr=learning_rate)
         for epoch in (epoch_pbar := tqdm(range(epochs))):
             faith_str = f"{faithfulness_target}: {faiths[-1]:.3f}" if epoch > 0 else ""
             desc = f"Loss: {losses[-1]:.3f}, {faith_str}" if epoch > 0 else ""
@@ -236,7 +236,11 @@ def subnetwork_probing_prune_scores(
         )
         fig.add_trace(go.Scatter(y=regularizes, name="Regularization"))
         fig.update_layout(title="Subnetwork Probing", xaxis_title="Step")
-        fig.show()
+        try:
+            filename = "subnetwork_probing_train_graph.html"
+            fig.write_html(filename)
+        except Exception:
+            pass
 
     sign = -1 if tree_optimisation else 1
     prune_scores: PruneScores = {}
