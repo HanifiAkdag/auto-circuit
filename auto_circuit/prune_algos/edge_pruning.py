@@ -372,23 +372,25 @@ def edge_pruning_prune_scores(
     prune_scores: PruneScores = {}
     
     with t.no_grad():
-        # Precompute deterministic masks for nodes ONCE to avoid O(N^2) loop
-        deterministic_node_zs: Dict[int, float] = {}
+        # Precompute continuous soft masks for nodes ONCE to avoid O(N^2) loop
+        continuous_node_zs: Dict[int, float] = {}
         if use_node_masks:
             for idx, nla in node_log_alphas.items():
-                deterministic_node_zs[idx] = deterministic_z(nla).item()
+                # TEMPERATURE = 2/3, FACTOR = 0.8 (matching l0_utils.py)
+                continuous_node_zs[idx] = t.sigmoid(nla / (2/3) * 0.8).item()
 
         for mod_name, ela in edge_log_alphas.items():
-            edge_z = deterministic_z(ela)  # AC convention: high = ablated
+            # Continuous edge mask
+            edge_z = t.sigmoid(ela / (2/3) * 0.8)  # AC convention: high = ablated
 
             if use_node_masks:
                 wrapper = dest_wrapper_dict[mod_name]
                 if wrapper.in_srcs is not None:
                     in_srcs = wrapper.in_srcs
-                    # Build deterministic node mask and combine with edge mask
+                    # Build continuous node mask and combine with edge mask
                     for i, global_idx in enumerate(range(in_srcs.start, in_srcs.stop)):
-                        if global_idx in deterministic_node_zs:
-                            nz = deterministic_node_zs[global_idx]
+                        if global_idx in continuous_node_zs:
+                            nz = continuous_node_zs[global_idx]
                             # Combine: effective_ablation = 1 - (1-edge)*(1-node)
                             edge_z[..., i] = 1.0 - (1.0 - edge_z[..., i]) * (1.0 - nz)
 

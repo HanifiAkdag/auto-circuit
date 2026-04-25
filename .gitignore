@@ -10,3 +10,7 @@ figure*/
 .gitignore.swp
 *.interactive
 /*.png
+*.html
+*.pdf
+logs/
+*.sh
