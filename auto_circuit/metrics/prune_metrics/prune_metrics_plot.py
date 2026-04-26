@@ -45,6 +45,10 @@ def edge_patching_plot(
     Returns:
         A plotly figure.
     """
+    n_tasks = (
+        len(set(d["Task"] for d in data)) if data else len(task_measurements)
+    )
+
     if len(data) > 0:
         data = sorted(data, key=lambda x: (x["Algorithm"], x["Task"]))
         fig = px.line(
@@ -56,13 +60,13 @@ def edge_patching_plot(
             log_x=log_x,
             log_y=log_y,
             range_y=None if y_max is None else [y_min, y_max * 0.8],
-            # range_y=[-45, 120],
             facet_col_spacing=0.03 if y_axes_match else 0.06,
             markers=True,
         )
     else:
         fig = subplots.make_subplots(rows=1, cols=len(task_measurements))
 
+    # Add single-point markers for algorithms with only one measurement
     task_measurements = dict(sorted(task_measurements.items(), key=lambda x: x[0]))
     for task_idx, algo_measurements in enumerate(task_measurements.values()):
         for algo_key, measurements in algo_measurements.items():
@@ -84,24 +88,49 @@ def edge_patching_plot(
                     name=algo.short_name,
                 )
 
+    # --- Layout -----------------------------------------------------------
+    # Put the metric name and ablation type on separate lines so the y-axis
+    # label never gets truncated, even for long names like
+    # "Correct Answer Percent (Resample)".
+    y_title = f"{metric_name}<br><sup>({ablation_type})</sup>"
+
+    fig_width = max(450 * n_tasks + 80, 700)
+    fig_height = 550
+
     fig.update_layout(
-        # title=f"{main_title}: {metric_name} vs. Patched Edges",
-        yaxis_title=f"{metric_name} ({ablation_type})",
-        # yaxis_title=f"{metric_name}",
+        yaxis_title=y_title,
         template="plotly",
-        # width=335 * len(set([d["Task"] for d in data])) + 280,
-        width=max(365 * len(set([d["Task"] for d in data])) - 10, 500),
-        height=500,
+        width=fig_width,
+        height=fig_height,
+        # Generous margins: left for the y-label, bottom for the legend,
+        # top/right for breathing room.
+        margin=dict(l=120, r=30, t=60, b=100),
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=-0.7,
-            xanchor="left",
-            x=0.0,
-            entrywidthmode="fraction",
-            entrywidth=0.25,
+            yanchor="top",
+            y=-0.18,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=12),
         ),
     )
-    fig.update_yaxes(matches=None, showticklabels=True) if not y_axes_match else None
-    fig.update_xaxes(matches=None, title="Circuit Edges")
+
+    if not y_axes_match:
+        fig.update_yaxes(matches=None, showticklabels=True, automargin=True)
+    else:
+        fig.update_yaxes(automargin=True)
+
+    # --- Axis Formatting --------------------------------------------------
+    common_x_axes = dict(matches=None, title="Circuit Edges", ticks="outside")
+    if log_x:
+        common_x_axes.update(dict(type="log", dtick=1, minor_ticks="outside", exponentformat="power"))
+    fig.update_xaxes(**common_x_axes)
+
+    common_y_axes = dict(automargin=True, ticks="outside")
+    if not y_axes_match:
+        common_y_axes.update(dict(matches=None, showticklabels=True))
+    if log_y:
+        common_y_axes.update(dict(type="log", dtick=1, minor_ticks="outside", exponentformat="power"))
+    fig.update_yaxes(**common_y_axes)
+
     return fig

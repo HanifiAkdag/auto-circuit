@@ -184,7 +184,7 @@ prune_metric_measurements = measure_prune_metrics(
 # ============================================================================
 # Step 4: Generate figures
 # ============================================================================
-figs = list(measurement_figs(prune_metric_measurements))
+fig_pairs = list(measurement_figs(prune_metric_measurements))
 
 # Custom comparison plot: sparsity target vs achieved faithfulness
 fig_custom = go.Figure()
@@ -204,14 +204,22 @@ fig_custom.update_layout(
     xaxis_title="Sparsity (%)",
     yaxis_title="KL Divergence",
 )
-figs.append(fig_custom)
+fig_pairs.append((fig_custom, {
+    "ablation_type": "custom",
+    "metric_name": "sparsity_vs_algorithm",
+    "metric_key": "custom",
+    "is_auc": False,
+}))
 
 # Save
-fig_dir = Path(repo_path_to_abs_path(FIGURES_DIR))
-fig_dir.mkdir(parents=True, exist_ok=True)
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-for i, fig in enumerate(figs):
-    filepath = fig_dir / f"ep_reproduce_{i}_{timestamp}.pdf"
+fig_dir = Path(repo_path_to_abs_path(FIGURES_DIR)) / f"run_{timestamp}"
+fig_dir.mkdir(parents=True, exist_ok=True)
+for fig, meta in fig_pairs:
+    abl = meta["ablation_type"].replace(" ", "_").lower()
+    metric = meta["metric_name"].replace(" ", "_").lower()
+    auc = "_auc" if meta.get("is_auc") else ""
+    filepath = fig_dir / f"ep_reproduce_{abl}_{metric}{auc}.pdf"
     fig.write_image(str(filepath))
     print(f"Saved: {filepath}")
 

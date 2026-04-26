@@ -289,7 +289,7 @@ def edge_pruning_prune_scores(
                         "batch_size": wrapper.batch_size,
                     }
                     del wrapper.patch_mask
-                    wrapper.patch_mask = effective_masks[mod_name]
+                    wrapper.patch_mask = effective_masks[mod_name]  # type: ignore
                     wrapper.mask_fn = None
                     wrapper.batch_size = batch_size
 

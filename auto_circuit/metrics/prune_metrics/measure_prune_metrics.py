@@ -97,9 +97,12 @@ def measure_prune_metrics(
     return measurements
 
 
+FigMeta = Dict[str, Any]
+
+
 def measurement_figs(
     measurements: AblationMeasurements, auc_plots: bool = False
-) -> Tuple[go.Figure, ...]:
+) -> Tuple[Tuple[go.Figure, FigMeta], ...]:
     """
     Plot the measurements from
     [`measure_prune_metrics`][auto_circuit.metrics.prune_metrics.measure_prune_metrics]
@@ -112,9 +115,13 @@ def measurement_figs(
         auc_plots: Whether to include the average AUC plots.
 
     Returns:
-        A tuple of Plotly figures.
+        A tuple of (figure, metadata) pairs. Each metadata dict contains:
+            - ``ablation_type`` (str): The ablation type used.
+            - ``metric_name`` (str): Human-readable metric name.
+            - ``metric_key`` (str): The metric's unique key.
+            - ``is_auc`` (bool): Whether this is an AUC summary plot.
     """
-    figs = []
+    figs: List[Tuple[go.Figure, FigMeta]] = []
     for ablation_type, metric_measurements in measurements.items():
         for metric_key, task_measurements in metric_measurements.items():
             token_circuit = TASK_DICT[list(task_measurements.keys())[0]].token_circuit
@@ -146,7 +153,13 @@ def measurement_figs(
                             # Also, why are the x-values not quite right?
                             y_max = max(y_max, y)
             y_max = None if metric.y_min is None or not metric.y_axes_match else y_max
-            figs.append(
+            meta: FigMeta = {
+                "ablation_type": str(ablation_type),
+                "metric_name": metric.name,
+                "metric_key": metric.key,
+                "is_auc": False,
+            }
+            figs.append((
                 edge_patching_plot(
                     data=data,
                     task_measurements=task_measurements,
@@ -157,16 +170,24 @@ def measurement_figs(
                     y_axes_match=metric.y_axes_match,
                     y_max=y_max,
                     y_min=metric.y_min,
-                )
-            )
+                ),
+                meta,
+            ))
             if auc_plots:
-                figs.append(
+                auc_meta: FigMeta = {
+                    "ablation_type": str(ablation_type),
+                    "metric_name": metric.name,
+                    "metric_key": metric.key,
+                    "is_auc": True,
+                }
+                figs.append((
                     average_auc_plot(
                         task_measurements=task_measurements,
                         log_x=metric.log_x,
                         log_y=metric.log_y,
                         y_min=metric.y_min,
                         inverse=metric.lower_better,
-                    )
-                )
+                    ),
+                    auc_meta,
+                ))
     return tuple(figs)

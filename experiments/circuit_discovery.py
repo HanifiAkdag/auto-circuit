@@ -259,7 +259,7 @@ if load_prune_metric_measurements:
     prune_metric_measurements = load_cache(cache_folder_name, filename)
 
 if prune_metric_measurements is not None:
-    figs += list(measurement_figs(prune_metric_measurements))
+    figs += [fig for fig, _meta in measurement_figs(prune_metric_measurements)]
 
 # -------------------------------------- Figures ---------------------------------------
 

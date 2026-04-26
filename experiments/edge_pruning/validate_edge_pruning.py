@@ -56,7 +56,7 @@ from auto_circuit.utils.misc import repo_path_to_abs_path, save_cache
 ALGOS: List[PruneAlgo] = [
     RANDOM_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,          # Fast, one-pass baseline
-    ACDC_PRUNE_ALGO,
+    # ACDC_PRUNE_ALGO,
     SUBNETWORK_EDGE_PROBING_PRUNE_ALGO,  # Closest existing multi-epoch method
     EDGE_PRUNING_PRUNE_ALGO,             # Our integration
 ]
@@ -124,14 +124,17 @@ prune_metric_measurements: TaskMeasurements = measure_prune_metrics(
 # ============================================================================
 # Step 4: Generate and display figures
 # ============================================================================
-figs = list(measurement_figs(prune_metric_measurements))
+fig_pairs = list(measurement_figs(prune_metric_measurements))
 
 if SAVE_FIGURES:
-    fig_dir = Path(repo_path_to_abs_path(FIGURES_DIR))
-    fig_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    for i, fig in enumerate(figs):
-        filepath = fig_dir / f"ep_validation_{i}_{timestamp}.pdf"
+    fig_dir = Path(repo_path_to_abs_path(FIGURES_DIR)) / f"run_{timestamp}"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    for fig, meta in fig_pairs:
+        abl = meta["ablation_type"].replace(" ", "_").lower()
+        metric = meta["metric_name"].replace(" ", "_").lower()
+        auc = "_auc" if meta.get("is_auc") else ""
+        filepath = fig_dir / f"ep_validation_{abl}_{metric}{auc}.pdf"
         fig.write_image(str(filepath))
         print(f"Saved: {filepath}")
 
