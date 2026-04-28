@@ -47,6 +47,7 @@ from auto_circuit.prune import run_circuits
 from auto_circuit.prune_algos.edge_pruning import edge_pruning_prune_scores
 from auto_circuit.prune_algos.prune_algos import (
     EDGE_ATTR_PATCH_PRUNE_ALGO,
+    PRUNE_ALGO_DICT,
     PruneAlgo,
     run_prune_algos,
 )
@@ -139,6 +140,15 @@ for target_sparsity in SPARSITY_TARGETS:
         **SHARED_HPARAMS,
     )
     ep_variants_prune_scores[target_sparsity] = ps
+    
+    # Register the algorithm dynamically so it gets evaluated
+    all_prune_scores[run_name] = ps
+    PRUNE_ALGO_DICT[run_name] = PruneAlgo(
+        key=run_name,
+        name=run_name,
+        _short_name=run_name,
+        func=lambda *args: ps,
+    )
 
     # Quick stats
     nonzero = sum((v.abs() > 1e-6).sum().item() for v in ps.values())
