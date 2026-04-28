@@ -117,13 +117,14 @@ print()
 # ============================================================================
 
 all_prune_scores: Dict[str, PruneScores] = {}
+ep_variants_prune_scores: Dict[float, PruneScores] = {}
 
 # Run EAP as baseline (fast, single pass)
 print("Running EAP baseline...")
 eap_ps = EDGE_ATTR_PATCH_PRUNE_ALGO.func(
     task.model, task.train_loader, task.true_edges
 )
-all_prune_scores["EAP"] = eap_ps
+all_prune_scores["Edge Attribution Patching"] = eap_ps
 
 # Run EP at each sparsity target
 for target_sparsity in SPARSITY_TARGETS:
@@ -137,7 +138,7 @@ for target_sparsity in SPARSITY_TARGETS:
         target_node_sparsity=NODE_SPARSITY_TARGET,
         **SHARED_HPARAMS,
     )
-    all_prune_scores[run_name] = ps
+    ep_variants_prune_scores[target_sparsity] = ps
 
     # Quick stats
     nonzero = sum((v.abs() > 1e-6).sum().item() for v in ps.values())
@@ -163,6 +164,7 @@ test_edge_counts = sorted(set([
 ]))
 
 # Build task_prune_scores structure for measure_prune_metrics
+# Only include algorithms that are registered in PRUNE_ALGO_DICT
 task_prune_scores: TaskPruneScores = {
     task.key: {k: v for k, v in all_prune_scores.items()}
 }
@@ -235,6 +237,15 @@ print("=" * 60)
 print(f"{'Algorithm':40s} | {'Non-zero edges':>15s} | {'Sparsity %':>10s}")
 print("-" * 75)
 for algo_name, ps in all_prune_scores.items():
+    nonzero = sum((v.abs() > 1e-6).sum().item() for v in ps.values())
+    sparsity_pct = 100.0 * (1.0 - nonzero / n_edges)
+    print(f"{algo_name:40s} | {nonzero:15.0f} | {sparsity_pct:10.2f}%")
+
+# Print EP variants
+print()
+for target_sparsity in sorted(ep_variants_prune_scores.keys()):
+    ps = ep_variants_prune_scores[target_sparsity]
+    algo_name = f"EP (s={target_sparsity})"
     nonzero = sum((v.abs() > 1e-6).sum().item() for v in ps.values())
     sparsity_pct = 100.0 * (1.0 - nonzero / n_edges)
     print(f"{algo_name:40s} | {nonzero:15.0f} | {sparsity_pct:10.2f}%")
