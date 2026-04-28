@@ -93,7 +93,7 @@ def train_model(
                 param.requires_grad = True
                 train_params.append(param)
 
-    optim = t.optim.adam.Adam(train_params, lr=learning_rate)
+    optim = t.optim.Adam(train_params, lr=learning_rate)
 
     loss_history, kl_loss_history, regularize_loss_history = [], [], []
     for epoch in (epoch_pbar := tqdm(range(n_epochs))):
@@ -265,7 +265,10 @@ for col, title in enumerate(column_titles, start=1):
 # Adding row titles
 for row, title in enumerate(row_titles):
     fig.update_yaxes(title_text=title, row=row_count - row, col=1)
-fig.show()
+try:
+    fig.write_html("task_projector_loss.html")
+except Exception:
+    pass
 
 # %%
 eigvals, eigvectors = [], []
@@ -329,6 +332,9 @@ for col, title in enumerate(column_titles, start=1):
 
 for row, title in enumerate(row_titles):
     fig.update_yaxes(title_text=title, row=row_count - row, col=1)
-fig.show()
+try:
+    fig.write_html("task_projector_val.html")
+except Exception:
+    pass
 
 # %%
