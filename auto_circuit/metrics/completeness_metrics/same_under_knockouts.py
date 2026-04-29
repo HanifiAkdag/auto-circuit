@@ -63,35 +63,69 @@ def same_under_knockouts_fig(
     titles = [TASK_DICT[task].name for task in task_completeness_scores.keys()]
     fig = subplots.make_subplots(rows=1, cols=n_cols, subplot_titles=titles)
     for col, algo_comp_scores in enumerate(task_completeness_scores.values(), start=1):
-        xs = []
+        xs, ys = [], []
         for algo_key, completeness_scores in algo_comp_scores.items():
             for (circ_size, n_knockouts, x, y) in completeness_scores:
-                new_xs = [x, (x + y) / 2]
-                xs.extend(new_xs)
+                xs.append(x)
+                ys.append(y)
                 scatter = go.Scatter(
-                    x=new_xs,
-                    y=[y, (x + y) / 2],
+                    x=[x],
+                    y=[y],
                     name=PRUNE_ALGO_DICT[algo_key].name,
                     hovertext=[f"circ size: {circ_size}<br>n_knockouts: {n_knockouts}"],
-                    mode="lines+markers",
+                    mode="markers",
+                    marker=dict(size=14, symbol="circle", line=dict(width=1, color='DarkSlateGrey')),
                     showlegend=(col == 1),
                 )
                 fig.add_trace(scatter, row=1, col=col)
-        # Add line y=x without changing the axis limits
-        scatter = go.Scatter(
-            x=[min(xs), max(xs)],
-            y=[min(xs), max(xs)],
-            name="y=x",
-            mode="lines",
-            line=dict(dash="dash"),
-            showlegend=(col == 1),
-        )
-        fig.add_trace(scatter, row=1, col=col)
+        
+        # Add line y=x spanning the data range with a bit more buffer
+        if xs and ys:
+            max_val = max(max(xs), max(ys))
+            line_range = [0, max_val * 1.2]
+            scatter = go.Scatter(
+                x=line_range,
+                y=line_range,
+                name="y=x (Perfect Completeness)",
+                mode="lines",
+                line=dict(dash="dash", color="rgba(100,100,100,0.5)", width=2),
+                showlegend=(col == 1),
+            )
+            fig.add_trace(scatter, row=1, col=col)
+
+    fig.update_xaxes(constrain="domain", gridcolor='lightgray', zerolinecolor='gray', nticks=10)
+    fig.update_yaxes(scaleanchor="x", scaleratio=1, constrain="domain", gridcolor='lightgray', zerolinecolor='gray', nticks=10)
+    
+    # Calculate dimensions based on number of subplots
+    plot_width = 500
+    total_width = (plot_width * n_cols) + 200 # Space for labels and legend
+    
     fig.update_layout(
-        title="Same Under Knockouts",
-        xaxis_title="KL Div",
-        yaxis_title="Knockout KL Div",
-        width=1300,
+        template="plotly_white",
+        title=dict(
+            text="<b>Same Under Knockouts (Circuit Completeness)</b>",
+            x=0.5,
+            y=0.97,
+            xanchor='center',
+            font=dict(size=22)
+        ),
+        xaxis_title="Standard Faithfulness (Normal KL)",
+        yaxis_title="Completeness Test (Knockout KL)",
+        width=total_width,
+        height=600,
+        legend=dict(
+            yanchor="top",
+            y=0.9,
+            xanchor="left",
+            x=1.02,
+            bgcolor="rgba(255, 255, 255, 0.7)",
+            bordercolor="LightGray",
+            borderwidth=1,
+            font=dict(size=13)
+        ),
+        margin=dict(l=80, r=20, t=100, b=80),
+        # Ensure the subplot title (task name) is correctly positioned
+        annotations=[dict(font=dict(size=16), y=1.05)] if n_cols == 1 else None
     )
     return fig
 
