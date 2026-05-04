@@ -29,7 +29,7 @@ def measure_roc(task_prune_scores: TaskPruneScores) -> TaskMeasurements:
         algo_measurements: AlgoMeasurements = {}
         for algo_key, prune_scores in (algo_pbar := tqdm(algo_prune_scores.items())):
             algo_pbar.set_description_str(f"Measuring ROC Pruning with {algo_key}")
-            official_edge = task.model.true_edges
+            official_edge = task.true_edges
             if official_edge is None:
                 raise ValueError("This task does not have a true edge function")
             algo_measurement = measure_task_roc(task.model, official_edge, prune_scores)
