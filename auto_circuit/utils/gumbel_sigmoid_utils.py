@@ -89,7 +89,7 @@ def schedule_epoch_lambda(
     """
     if epoch < n_epoch_warmup:
         # Linear ramp-up
-        return lambda_0 + lambda_0 * (max_times - 1) * epoch / max(n_epoch_cooldown, 1)
+        return lambda_0 + lambda_0 * (max_times - 1) * epoch / max(n_epoch_warmup, 1)
     elif epoch < n_epoch_warmup + n_epoch_cooldown:
         # Linear ramp-down
         return (

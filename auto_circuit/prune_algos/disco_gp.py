@@ -14,7 +14,7 @@ Key differences from Subnetwork Probing / Edge Pruning in this library:
 """
 
 import gc
-from typing import Dict, List, Literal, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 import plotly.graph_objects as go
 import torch as t
@@ -133,14 +133,13 @@ def disco_gp_prune_scores(
     # =========================================================
     # Step 1: Cache clean logits and compute target argmax
     # =========================================================
-    clean_logits: Dict[BatchKey, t.Tensor] = {}
-    clean_targets: Dict[BatchKey, t.Tensor] = {}  # argmax = CE target
-    with t.inference_mode():
+    # Use no_grad (not inference_mode) so the resulting tensors can be used
+    # in autograd computations later (inference-mode tensors cannot).
+    clean_targets: Dict[BatchKey, t.Tensor] = {}
+    with t.no_grad():
         for batch in dataloader:
-            logits = model(batch.clean)[out_slice]  # (B, vocab) or (B, seq, vocab)
-            clean_logits[batch.key] = logits.detach()
-            # CE target: class index with highest logit in the clean model
-            clean_targets[batch.key] = logits.argmax(dim=-1).detach()  # (B,) or (B, seq)
+            logits = model(batch.clean)[out_slice]
+            clean_targets[batch.key] = logits.argmax(dim=-1).clone()
 
     # =========================================================
     # Step 2: Snapshot original model weights for later restoration
@@ -148,7 +147,7 @@ def disco_gp_prune_scores(
     original_state: Dict[str, t.Tensor] = {}
     for name, param in model.named_parameters():
         if _is_maskable_weight(name):
-            original_state[name] = param.detach().clone()
+            original_state[name] = param.data.clone()
 
     # =========================================================
     # Phase 1: Weight mask optimisation
@@ -186,19 +185,18 @@ def disco_gp_prune_scores(
                 w_pbar.set_description_str(
                     f"{DISCO_GP} W Epoch {epoch} "
                     f"loss={w_losses[-1]:.4f} faith={w_faith_hist[-1]:.4f} "
-                    f"λ_s={lambda_sparse:.2f}"
+                    f"sparse={w_sparse_hist[-1]:.4f} λ_s={lambda_sparse:.2f}"
                 )
 
             for batch in dataloader:
                 # --- Sample binary weight masks and apply in-place ---
                 sampled_masks: Dict[str, t.Tensor] = {}
                 for name, logit in weight_mask_logits.items():
-                    sampled_masks[name] = gumbel_sigmoid(logit, gs_temp=gs_temp_weight, hard=True)
+                    sampled_masks[name] = gumbel_sigmoid(logit, gs_temp=gs_temp_weight, hard=False)
 
-                with t.no_grad():
-                    for name, param in model.named_parameters():
-                        if name in weight_mask_logits:
-                            param.copy_(sampled_masks[name] * original_state[name])
+                for name, param in model.named_parameters():
+                    if name in weight_mask_logits:
+                        param.copy_(sampled_masks[name] * original_state[name])
 
                 # Faithfulness forward pass (with masked weights, no edge masking)
                 train_logits = model(batch.clean)[out_slice]
@@ -211,18 +209,28 @@ def disco_gp_prune_scores(
 
                 loss = faith_loss + lambda_sparse * sparse_loss
 
-                # --- Completeness backward pass (reversed masks, separate step) ---
-                if lambda_complete > 0:
-                    loss.backward()
-                    w_optimizer.step()
-                    w_optimizer.zero_grad()
+                loss.backward()
+                w_optimizer.step()
+                w_optimizer.zero_grad()
 
-                    # Restore original weights, then apply reversed masks
-                    with t.no_grad():
-                        for name, param in model.named_parameters():
-                            if name in weight_mask_logits:
-                                rev_mask = 1.0 - sampled_masks[name].detach()
-                                param.copy_(rev_mask * original_state[name])
+                # Restore original weights (matching original turn_off_weight_masks)
+                with t.no_grad():
+                    for name, param in model.named_parameters():
+                        if name in original_state:
+                            param.copy_(original_state[name])
+                            param.detach_()
+
+                # --- Completeness backward (reversed masks, separate step) ---
+                if lambda_complete > 0:
+                    rev_sampled: Dict[str, t.Tensor] = {}
+                    for name, logit in weight_mask_logits.items():
+                        rev_sampled[name] = 1.0 - gumbel_sigmoid(
+                            logit, gs_temp=gs_temp_weight, hard=False
+                        )
+
+                    for name, param in model.named_parameters():
+                        if name in weight_mask_logits:
+                            param.copy_(rev_sampled[name] * original_state[name])
 
                     rev_logits = model(batch.clean)[out_slice]
                     n_classes = rev_logits.shape[-1]
@@ -234,16 +242,13 @@ def disco_gp_prune_scores(
                     (complete_loss * lambda_complete).backward()
                     w_optimizer.step()
                     w_optimizer.zero_grad()
-                else:
-                    loss.backward()
-                    w_optimizer.step()
-                    w_optimizer.zero_grad()
 
-                # Restore original weights after every batch
-                with t.no_grad():
-                    for name, param in model.named_parameters():
-                        if name in original_state:
-                            param.copy_(original_state[name])
+                    # Restore again
+                    with t.no_grad():
+                        for name, param in model.named_parameters():
+                            if name in original_state:
+                                param.copy_(original_state[name])
+                                param.detach_()
 
                 w_losses.append(loss.item())
                 w_faith_hist.append(faith_loss.item())
@@ -255,6 +260,7 @@ def disco_gp_prune_scores(
                 if name in weight_mask_logits:
                     det_mask = (weight_mask_logits[name] > 0).float()
                     param.copy_(det_mask * original_state[name])
+                    param.detach_()
 
         del w_optimizer
         gc.collect()
@@ -269,17 +275,14 @@ def disco_gp_prune_scores(
     # =========================================================
     # Phase 2: Edge mask optimisation
     # =========================================================
-    # Zero-ablation patch values: mask=1 → contribution replaced by zeros
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
         model, dataloader, ablation_type=AblationType.ZERO
     )
 
-    # Build dest_wrapper lookup
     dest_wrapper_dict: Dict[str, PatchWrapperImpl] = {
         w.module_name: w for w in model.dest_wrappers
     }
 
-    # Learnable edge mask logits (one per PatchWrapperImpl mask element)
     edge_logits: Dict[str, nn.Parameter] = {}
     N_edge = 0
     for mod_name, wrapper in dest_wrapper_dict.items():
@@ -312,11 +315,11 @@ def disco_gp_prune_scores(
                 e_pbar.set_description_str(
                     f"{DISCO_GP} E Epoch {epoch} "
                     f"loss={e_losses[-1]:.4f} faith={e_faith_hist[-1]:.4f} "
+                    f"sparse={e_sparse_hist[-1]:.4f} "
                     f"λ_s={lambda_sparse:.3f} λ_c={lambda_complete:.3f}"
                 )
 
             for batch in dataloader:
-                batch_size = batch.clean.shape[0]
                 patch_outs = src_outs[batch.key].clone().detach()
 
                 # --- Faithfulness pass: sample binary edge masks (mask=1 → ablated) ---
@@ -325,29 +328,28 @@ def disco_gp_prune_scores(
                 # DiscoGP convention: mask=1 keeps, mask=0 ablates.
                 # We negate: AC_mask = 1 - DiscoGP_mask, so ablated edges have AC_mask=1.
                 faith_masks = _sample_edge_masks(
-                    edge_logits, dest_wrapper_dict, gs_temp_edge,
-                    batch_size, device, reverse=False
+                    edge_logits, gs_temp_edge, reverse=False
                 )
                 train_logits = _forward_with_masks(
-                    model, batch.clean, patch_outs, faith_masks, dest_wrapper_dict, out_slice
+                    model, batch.clean, patch_outs,
+                    faith_masks, dest_wrapper_dict, out_slice
                 )
                 faith_loss = _faith_loss(train_logits, clean_targets[batch.key])
 
-                # Sparsity: penalise sigmoid(logit) (high logit → keep edge → less sparse)
-                # We want to push logits low (prune edges), so use sigmoid(logit).sum()
+                # Sparsity
                 sparse_loss = t.cat(
                     [t.sigmoid(l).flatten() for l in edge_logits.values()]
                 ).sum() / max(N_edge, 1)
 
-                # --- Completeness pass: reversed masks ---
+                # --- Completeness pass (reversed masks) ---
                 complete_loss_val = t.tensor(0.0, device=device)
                 if lambda_complete > 0:
                     rev_masks = _sample_edge_masks(
-                        edge_logits, dest_wrapper_dict, gs_temp_edge,
-                        batch_size, device, reverse=True
+                        edge_logits, gs_temp_edge, reverse=True
                     )
                     rev_logits = _forward_with_masks(
-                        model, batch.clean, patch_outs, rev_masks, dest_wrapper_dict, out_slice
+                        model, batch.clean, patch_outs,
+                        rev_masks, dest_wrapper_dict, out_slice
                     )
                     n_classes = rev_logits.shape[-1]
                     uniform_target = t.full_like(rev_logits, 1.0 / n_classes)
@@ -393,6 +395,7 @@ def disco_gp_prune_scores(
         for name, param in model.named_parameters():
             if name in original_state:
                 param.copy_(original_state[name])
+                param.detach_()
                 param.requires_grad_(False)
 
     del original_state
@@ -411,7 +414,6 @@ def disco_gp_prune_scores(
     prune_scores: PruneScores = {}
     with t.no_grad():
         for mod_name, logit in edge_logits.items():
-            # sigmoid: kept edges (logit > 0) score > 0.5, pruned < 0.5
             prune_scores[mod_name] = t.sigmoid(logit).detach().clone()
 
     return prune_scores
@@ -436,42 +438,20 @@ def _faith_loss(train_logits: t.Tensor, clean_targets: t.Tensor) -> t.Tensor:
 
 def _sample_edge_masks(
     edge_logits: Dict[str, nn.Parameter],
-    dest_wrapper_dict: Dict[str, PatchWrapperImpl],
     gs_temp: float,
-    batch_size: int,
-    device: t.device,
     reverse: bool,
 ) -> Dict[str, t.Tensor]:
-    """Sample binary edge masks from logits for all dest wrappers.
+    """Sample edge masks and convert to AutoCircuit convention.
 
-    AutoCircuit convention: ``patch_mask=1`` means *ablate* (patch) the edge,
-    ``patch_mask=0`` means *keep* the original activation.
-
-    DiscoGP convention: sampled mask 1 = keep, 0 = ablate.
-
-    We therefore map: ``AC_mask = 1 - gumbel_sigmoid(logit)``.
-
-    When ``reverse=True`` (completeness pass), we flip: kept becomes ablated.
-
-    Args:
-        edge_logits: Per-wrapper learnable logit parameters.
-        dest_wrapper_dict: Mapping from module name to PatchWrapperImpl.
-        gs_temp: Gumbel-sigmoid temperature.
-        batch_size: Current batch size (unused here, masks are not batch-expanded).
-        device: Target device.
-        reverse: If True, invert the masks for the completeness evaluation.
-
-    Returns:
-        Dict mapping module name to mask tensor with same shape as ``patch_mask``.
+    DiscoGP: mask=1 means keep.  AutoCircuit: mask=1 means ablate.
+    So: ``AC_mask = 1 - disco_mask``.
+    When ``reverse=True``: ``AC_mask = disco_mask`` (kept edges get ablated).
     """
     masks: Dict[str, t.Tensor] = {}
     for mod_name, logit in edge_logits.items():
-        # DiscoGP: sigmoid-based keep probability → AC patch mask = ablation indicator
-        disco_mask = gumbel_sigmoid(logit, gs_temp=gs_temp, hard=True)
+        disco_mask = gumbel_sigmoid(logit, gs_temp=gs_temp, hard=False)
         if reverse:
-            # Completeness: flip keep/ablate
             disco_mask = 1.0 - disco_mask
-        # Convert DiscoGP keep-mask → AC ablate-mask
         masks[mod_name] = 1.0 - disco_mask
     return masks
 
