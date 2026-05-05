@@ -352,6 +352,11 @@ DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
     _short_name="DiscoGP-E",
     func=partial(
         disco_gp_prune_scores,
+        e_train_epochs=500,
+        e_n_epoch_warmup=400,
+        e_n_epoch_cooldown=100,
+        e_min_times_lambda_sparse=1.0,
+        e_lambda_complete_init=0.0,
         use_weight_masks=False,
         use_edge_masks=True,
         show_train_graph=True,

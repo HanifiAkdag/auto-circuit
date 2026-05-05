@@ -72,6 +72,7 @@ def disco_gp_prune_scores(
     e_n_epoch_cooldown: int = 20,
     # ---- Misc ----
     show_train_graph: bool = False,
+    hard: bool = False,
 ) -> PruneScores:
     """Discover a sparse circuit via joint weight and edge pruning with Gumbel-sigmoid masks.
 
@@ -97,29 +98,29 @@ def disco_gp_prune_scores(
         dataloader: Provides ``(clean, corrupt)`` input pairs.
         official_edges: Unused (present for AutoCircuit API compatibility).
         use_weight_masks: Whether to run Phase 1 weight optimisation.
-        gs_temp_weight: Gumbel-sigmoid temperature for weight masks (low ≈ binary).
+        gs_temp_weight: Gumbel-sigmoid temperature. Lower values (e.g., 0.01) approximate hard binary masks.
         logits_w_init: Initial value for weight mask logits.
         w_lr: AdamW learning rate for weight mask logits.
-        w_lambda_sparse_init: Base sparsity coefficient for weight pruning.
-        w_lambda_complete_init: Base completeness coefficient for weight pruning
-            (0 disables the completeness pass during weight pruning).
-        w_max_times_lambda_sparse: Peak multiplier for weight sparsity schedule.
-        w_min_times_lambda_sparse: Final multiplier for weight sparsity schedule.
-        w_train_epochs: Number of epochs for weight pruning.
-        w_n_epoch_warmup: Warm-up epochs for weight lambda schedule.
-        w_n_epoch_cooldown: Cool-down epochs for weight lambda schedule.
+        w_lambda_sparse_init: Base sparsity coefficient. Drives the network to prune weights.
+        w_lambda_complete_init: Base completeness coefficient. Forces the pruned weights to be uninformative (0 disables).
+        w_max_times_lambda_sparse: Peak sparsity multiplier reached at end of warmup (creates strong pressure to prune).
+        w_min_times_lambda_sparse: Final sparsity multiplier after cooldown (relaxes pressure for fine-tuning).
+        w_train_epochs: Total epochs for Phase 1.
+        w_n_epoch_warmup: Epochs to ramp up the sparsity penalty multiplier to max_times.
+        w_n_epoch_cooldown: Epochs to decay the sparsity penalty multiplier down to min_times.
         use_edge_masks: Whether to run Phase 2 edge optimisation.
-        gs_temp_edge: Gumbel-sigmoid temperature for edge masks.
+        gs_temp_edge: Gumbel-sigmoid temperature. Typically 1.0 for softer edge gating.
         logits_e_init: Initial value for edge mask logits.
         e_lr: AdamW learning rate for edge mask logits.
-        e_lambda_sparse_init: Base sparsity coefficient for edge pruning.
-        e_lambda_complete_init: Base completeness coefficient for edge pruning.
-        e_max_times_lambda_sparse: Peak multiplier for edge sparsity schedule.
-        e_min_times_lambda_sparse: Final multiplier for edge sparsity schedule.
-        e_train_epochs: Number of epochs for edge pruning.
-        e_n_epoch_warmup: Warm-up epochs for edge lambda schedule.
-        e_n_epoch_cooldown: Cool-down epochs for edge lambda schedule.
+        e_lambda_sparse_init: Base sparsity coefficient for edges.
+        e_lambda_complete_init: Base completeness coefficient for edges.
+        e_max_times_lambda_sparse: Peak sparsity multiplier for edges.
+        e_min_times_lambda_sparse: Final sparsity multiplier for edges.
+        e_train_epochs: Total epochs for Phase 2.
+        e_n_epoch_warmup: Epochs to ramp up the edge sparsity penalty.
+        e_n_epoch_cooldown: Epochs to decay the edge sparsity penalty.
         show_train_graph: Save training curves to HTML files.
+        hard: Whether to use hard (binary STE) or soft Gumbel-sigmoid sampling.
 
     Returns:
         :class:`~auto_circuit.types.PruneScores` mapping destination-wrapper module
@@ -192,7 +193,7 @@ def disco_gp_prune_scores(
                 # --- Sample binary weight masks and apply in-place ---
                 sampled_masks: Dict[str, t.Tensor] = {}
                 for name, logit in weight_mask_logits.items():
-                    sampled_masks[name] = gumbel_sigmoid(logit, gs_temp=gs_temp_weight, hard=False)
+                    sampled_masks[name] = gumbel_sigmoid(logit, gs_temp=gs_temp_weight, hard=hard)
 
                 for name, param in model.named_parameters():
                     if name in weight_mask_logits:
@@ -225,7 +226,7 @@ def disco_gp_prune_scores(
                     rev_sampled: Dict[str, t.Tensor] = {}
                     for name, logit in weight_mask_logits.items():
                         rev_sampled[name] = 1.0 - gumbel_sigmoid(
-                            logit, gs_temp=gs_temp_weight, hard=False
+                            logit, gs_temp=gs_temp_weight, hard=hard
                         )
 
                     for name, param in model.named_parameters():
@@ -328,7 +329,7 @@ def disco_gp_prune_scores(
                 # DiscoGP convention: mask=1 keeps, mask=0 ablates.
                 # We negate: AC_mask = 1 - DiscoGP_mask, so ablated edges have AC_mask=1.
                 faith_masks = _sample_edge_masks(
-                    edge_logits, gs_temp_edge, reverse=False
+                    edge_logits, gs_temp_edge, reverse=False, hard=hard
                 )
                 train_logits = _forward_with_masks(
                     model, batch.clean, patch_outs,
@@ -345,7 +346,7 @@ def disco_gp_prune_scores(
                 complete_loss_val = t.tensor(0.0, device=device)
                 if lambda_complete > 0:
                     rev_masks = _sample_edge_masks(
-                        edge_logits, gs_temp_edge, reverse=True
+                        edge_logits, gs_temp_edge, reverse=True, hard=hard
                     )
                     rev_logits = _forward_with_masks(
                         model, batch.clean, patch_outs,
@@ -440,6 +441,7 @@ def _sample_edge_masks(
     edge_logits: Dict[str, nn.Parameter],
     gs_temp: float,
     reverse: bool,
+    hard: bool,
 ) -> Dict[str, t.Tensor]:
     """Sample edge masks and convert to AutoCircuit convention.
 
@@ -449,7 +451,7 @@ def _sample_edge_masks(
     """
     masks: Dict[str, t.Tensor] = {}
     for mod_name, logit in edge_logits.items():
-        disco_mask = gumbel_sigmoid(logit, gs_temp=gs_temp, hard=False)
+        disco_mask = gumbel_sigmoid(logit, gs_temp=gs_temp, hard=hard)
         if reverse:
             disco_mask = 1.0 - disco_mask
         masks[mod_name] = 1.0 - disco_mask

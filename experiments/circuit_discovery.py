@@ -100,8 +100,8 @@ if compute_prune_scores:
         # CIRCUIT_TREE_PROBING_PRUNE_ALGO,
         # MSE_CIRCUIT_TREE_PROBING_PRUNE_ALGO,
         DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-        DISCO_GP_PRUNE_ALGO,
-        EDGE_PRUNING_PRUNE_ALGO,
+        # DISCO_GP_PRUNE_ALGO,
+        # EDGE_PRUNING_PRUNE_ALGO,
     ]
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:
