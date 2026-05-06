@@ -34,6 +34,9 @@ from auto_circuit.prune_algos.prune_algos import (
     LOGIT_DIFF_GRAD_PRUNE_ALGO,
     PRUNE_ALGO_DICT,
     RANDOM_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    DISCO_GP_PRUNE_ALGO,
+    EDGE_PRUNING_PRUNE_ALGO,
     PruneAlgo,
     run_prune_algos,
 )
@@ -57,9 +60,9 @@ figs = []
 
 # ------------------------------------ Prune Scores ------------------------------------
 
-compute_prune_scores = False
-save_prune_scores = False
-load_prune_scores = True
+compute_prune_scores = True
+save_prune_scores = True
+load_prune_scores = False
 
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
@@ -94,14 +97,17 @@ if compute_prune_scores:
         # SUBNETWORK_EDGE_PROBING_PRUNE_ALGO,
         # CIRCUIT_PROBING_PRUNE_ALGO,
         # SUBNETWORK_TREE_PROBING_PRUNE_ALGO,
-        CIRCUIT_TREE_PROBING_PRUNE_ALGO,
+        # CIRCUIT_TREE_PROBING_PRUNE_ALGO,
         # MSE_CIRCUIT_TREE_PROBING_PRUNE_ALGO,
+        DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+        # DISCO_GP_PRUNE_ALGO,
+        # EDGE_PRUNING_PRUNE_ALGO,
     ]
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:
     # 2000 epoch IOI Docstring tensor prune_scores post-kv-cache-fix
     # batch_size=128, batch_count=2, default seed (for both)
-    filename = "task-prune-scores-16-02-2024_23-27-49.pkl"
+    filename = "task-prune-scores-04-05-2026_15-44-46.pkl"
 
     # 1000 epoch Sport Players tensor prune_scores post-kv-cache-fix
     # batch_size=(10, 20), batch_count=(10, 5), default seed
@@ -124,7 +130,7 @@ for task, algo_prune_scores in task_prune_scores.items():
 
 # -------------------------------- Draw Circuit Graphs ---------------------------------
 
-if False:
+if True:
     for task_key, algo_prune_scores in task_prune_scores.items():
         # if not task_key.startswith("Docstring"):
         #     continue
@@ -207,7 +213,7 @@ if completeness_prune_scores:
 
 # ---------------------------------------- ROC -----------------------------------------
 
-if False:
+if True:
     roc_measurements: TaskMeasurements = measure_roc(task_prune_scores)
     roc_fig = roc_plot(roc_measurements)
     figs.append(roc_fig)
@@ -224,6 +230,7 @@ if compute_prune_metric_measurements:
     ABLATION_TYPES: List[AblationType] = [
         AblationType.RESAMPLE,  # Docstring
         AblationType.TOKENWISE_MEAN_CORRUPT,  # IOI and Sports Players
+        AblationType.ZERO,
     ]
     PRUNE_METRICS: List[PruneMetric] = [
         CLEAN_KL_DIV_METRIC,
@@ -264,9 +271,9 @@ if prune_metric_measurements is not None:
 # -------------------------------------- Figures ---------------------------------------
 
 for i, fig in enumerate(figs):
-    fig.show()
+    # fig.show()
     folder: Path = repo_path_to_abs_path("figures-12")
     # Save figure as pdf in figures folder
-    # fig.write_image(str(folder / f"new {i}.pdf"))
+    fig.write_image(str(folder / f"new {i}.pdf"))
 
 #%%

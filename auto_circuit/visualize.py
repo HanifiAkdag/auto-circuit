@@ -203,7 +203,7 @@ def draw_seq_graph(
     seq_labels: Optional[List[str]] = None,
     layer_spacing: bool = False,
     orientation: Literal["h", "v"] = "h",
-    display_ipython: bool = True,
+    display_ipython: bool = False,
     file_path: Optional[str] = None,
 ) -> go.Figure:
     """

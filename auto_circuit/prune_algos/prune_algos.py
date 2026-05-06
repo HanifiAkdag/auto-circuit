@@ -12,6 +12,7 @@ from auto_circuit.prune_algos.edge_attribution_patching import (
     edge_attribution_patching_prune_scores,
 )
 from auto_circuit.prune_algos.edge_pruning import edge_pruning_prune_scores
+from auto_circuit.prune_algos.disco_gp import disco_gp_prune_scores
 from auto_circuit.prune_algos.ground_truth import ground_truth_prune_scores
 
 from auto_circuit.prune_algos.mask_gradient import mask_gradient_prune_scores
@@ -316,6 +317,52 @@ OPPOSITE_TREE_PROBING_PRUNE_ALGO = PruneAlgo(
     ),
 )
 
+EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
+    key="Edge Pruning",
+    name="Edge Pruning (L0)",
+    _short_name="EP",
+    func=partial(
+        edge_pruning_prune_scores,
+        learning_rate=0.8,
+        lambda_learning_rate=0.8,
+        steps=3000,
+        target_edge_sparsity=1.1,
+        target_node_sparsity=0.72,
+        sparsity_warmup_steps=2500,
+        use_node_masks=True,
+        show_train_graph=True,
+    ),
+)
+
+DISCO_GP_PRUNE_ALGO = PruneAlgo(
+    key="DiscoGP",
+    name="DiscoGP (Sheaf Discovery)",
+    _short_name="DiscoGP",
+    func=partial(
+        disco_gp_prune_scores,
+        use_weight_masks=True,
+        use_edge_masks=True,
+        show_train_graph=True,
+    ),
+)
+
+DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
+    key="DiscoGP Edge Only",
+    name="DiscoGP (Edge Only)",
+    _short_name="DiscoGP-E",
+    func=partial(
+        disco_gp_prune_scores,
+        e_train_epochs=500,
+        e_n_epoch_warmup=400,
+        e_n_epoch_cooldown=100,
+        e_min_times_lambda_sparse=1.0,
+        e_lambda_complete_init=0.0,
+        use_weight_masks=False,
+        use_edge_masks=True,
+        show_train_graph=True,
+    ),
+)
+
 PRUNE_ALGOS: List[PruneAlgo] = [
     GROUND_TRUTH_PRUNE_ALGO,
     ACT_MAG_PRUNE_ALGO,
@@ -335,25 +382,10 @@ PRUNE_ALGOS: List[PruneAlgo] = [
     MSE_SUBNETWORK_TREE_PROBING_PRUNE_ALGO,
     MSE_CIRCUIT_TREE_PROBING_PRUNE_ALGO,
     OPPOSITE_TREE_PROBING_PRUNE_ALGO,
+    EDGE_PRUNING_PRUNE_ALGO,
+    DISCO_GP_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO
 ]
 
-EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
-    key="Edge Pruning",
-    name="Edge Pruning (L0)",
-    _short_name="EP",
-    func=partial(
-        edge_pruning_prune_scores,
-        learning_rate=0.8,
-        lambda_learning_rate=0.8,
-        steps=3000,
-        target_edge_sparsity=1.1,
-        target_node_sparsity=0.72,
-        sparsity_warmup_steps=2500,
-        use_node_masks=True,
-        show_train_graph=True,
-    ),
-)
-
-PRUNE_ALGOS.append(EDGE_PRUNING_PRUNE_ALGO)
 PRUNE_ALGO_DICT: Dict[AlgoKey, PruneAlgo] = {algo.key: algo for algo in PRUNE_ALGOS}
 

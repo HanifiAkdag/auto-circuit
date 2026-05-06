@@ -60,11 +60,14 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
     LOGIT_DIFF_PERCENT_METRIC,
     PruneMetric,
 )
-from auto_circuit.prune_algos.edge_pruning import edge_pruning_prune_scores
 from auto_circuit.prune_algos.prune_algos import (
     CIRCUIT_TREE_PROBING_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,
+    EDGE_PRUNING_PRUNE_ALGO,
     GROUND_TRUTH_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    DISCO_GP_PRUNE_ALGO,
+    RANDOM_PRUNE_ALGO,
     PruneAlgo,
     run_prune_algos,
 )
@@ -84,11 +87,12 @@ from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cach
 # --- Task ---
 TASK: Task = IOI_COMPONENT_CIRCUIT_TASK
 
-# --- Algorithms (base set, EP is always added separately) ---
-BASE_ALGOS: List[PruneAlgo] = [
+# --- Algorithms ---
+PRUNE_ALGOS: List[PruneAlgo] = [
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    DISCO_GP_PRUNE_ALGO,
     GROUND_TRUTH_PRUNE_ALGO,
-    EDGE_ATTR_PATCH_PRUNE_ALGO,
-    CIRCUIT_TREE_PROBING_PRUNE_ALGO,
+    RANDOM_PRUNE_ALGO
 ]
 
 # --- Knockout training hyperparameters ---
@@ -96,22 +100,6 @@ KNOCKOUT_LR: float = 0.02
 KNOCKOUT_EPOCHS: int = 300
 KNOCKOUT_REG_LAMBDA: float = 0.0
 KNOCKOUT_FAITHFULNESS_TARGET: str = "kl_div"
-
-# --- Edge Pruning hyperparameters ---
-EP_HPARAMS = dict(
-    learning_rate=0.8,
-    lambda_learning_rate=0.8,
-    steps=3000,
-    warmup_steps=0,
-    start_edge_sparsity=0.0,
-    start_node_sparsity=0.0,
-    sparsity_warmup_steps=2500,
-    target_edge_sparsity=1.1,
-    target_node_sparsity=0.72,
-    use_node_masks=True,
-    init_log_alpha=10.0,
-    show_train_graph=False,
-)
 
 # --- Faithfulness metrics ---
 PRUNE_METRICS: List[PruneMetric] = [
@@ -218,24 +206,10 @@ def main():
     task_prune_scores: TaskPruneScores = defaultdict(dict)
 
     if compute_prune_scores:
-        # Run base algorithms (GT, EAP, TP)
-        print(f"\nRunning {len(BASE_ALGOS)} base algorithms...")
-        task_prune_scores = run_prune_algos([task], BASE_ALGOS)
+        # Run discovery algorithms
+        print(f"\nRunning {len(PRUNE_ALGOS)} discovery algorithms...")
+        task_prune_scores = run_prune_algos([task], PRUNE_ALGOS)
 
-        # Always run Edge Pruning
-        print("\nRunning Edge Pruning (L0)...")
-        ep_ps: PruneScores = edge_pruning_prune_scores(
-            model=task.model,
-            dataloader=task.train_loader,
-            official_edges=task.true_edges,
-            **EP_HPARAMS,
-        )
-        task_prune_scores[task.key]["Edge Pruning"] = ep_ps
-
-        nonzero = sum((v.abs() > 1e-6).sum().item() for v in ep_ps.values())
-        total = task.model.n_edges
-        print(f"  EP non-zero edges: {nonzero}/{total} "
-              f"({100 * nonzero / total:.1f}%)")
 
         # Ensure float32
         for tk, algo_ps in task_prune_scores.items():
