@@ -330,6 +330,7 @@ EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
         target_node_sparsity=0.72,
         sparsity_warmup_steps=2500,
         use_node_masks=True,
+        disable_node_loss=True,   # matches original IOI sweep (--disable_node_loss)
         show_train_graph=True,
     ),
 )
