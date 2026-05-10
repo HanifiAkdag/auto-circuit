@@ -123,14 +123,20 @@ def prune_score_similarities_plotly(
     row_count = len(sims)
     col_count = len(edge_counts) + (1 if ground_truths else 0)
     algo_count = 0
+    col_titles = []
+    if ground_truths and len(sims) > 0:
+        first_task_sims = list(sims.values())[0]
+        gt_size = list(first_task_sims.keys())[0]
+        col_titles.append(f"GT ({gt_size}) Edges")
+    col_titles.extend([f"{edge_count} Edges" for edge_count in edge_counts])
+
     fig = subplots.make_subplots(
         rows=row_count,
         cols=col_count,
         shared_xaxes=True,
         shared_yaxes=True,
         row_titles=[TASK_DICT[task_key].name for task_key in sims.keys()],
-        column_titles=(["|Ground Truth| Edges"] if ground_truths else [])
-        + [f"{edge_count} Edges" for edge_count in edge_counts],
+        column_titles=col_titles,
     )
     for task_idx, edge_count_sims in enumerate(sims.values()):
         for count_idx, algo_sims in enumerate(edge_count_sims.values()):
