@@ -14,3 +14,5 @@ figure*/
 *.pdf
 logs/
 *.sh
+CLAUDE.md
+*.pkl

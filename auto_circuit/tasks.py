@@ -298,7 +298,7 @@ IOI_COMPONENT_CIRCUIT_TASK: Task = Task(
     _model_def="gpt2-small",
     _dataset_name="ioi/ioi_prompts",
     batch_size=64,
-    batch_count=2,
+    batch_count=(2, 1),
     _true_edge_func=ioi_true_edges,
     token_circuit=False,
 )

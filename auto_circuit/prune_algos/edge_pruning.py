@@ -29,6 +29,7 @@ Known structural difference from the original EP implementation:
 from __future__ import annotations
 
 import math
+from itertools import cycle
 from typing import Dict, List, Optional, Set
 
 import plotly.graph_objects as go
@@ -55,20 +56,10 @@ EP = "Edge Pruning"
 
 
 def _soft_mask(log_alpha: t.Tensor) -> t.Tensor:
-    """Continuous soft mask from a log_alpha parameter.
+    """Ablation probability for an edge: σ(log_alpha / T * F) ∈ (0, 1).
 
-    Computes ``σ(log_alpha / TEMPERATURE * FACTOR)``, the expected value of the
-    hard-concrete distribution *before* binary-search discretisation. This is
-    identical to the first step of :func:`~auto_circuit.utils.l0_utils.deterministic_z`
-    but skips the top-k zeroing so the output remains a continuous value in (0, 1),
-    suitable for downstream ranking/threshold sweeps.
-
-    In AutoCircuit convention:
-      - Values near **0** → edge is *kept* (high importance).
-      - Values near **1** → edge is *ablated* (low importance).
-
-    Returns scores as ``1 - soft_mask`` so that **higher = more important**, matching
-    the :class:`~auto_circuit.types.PruneScores` contract.
+    High value → edge tends to be ablated (low importance).
+    Used only for score extraction; training uses stochastic HC sampling.
     """
     return t.sigmoid(log_alpha / TEMPERATURE * FACTOR)
 
@@ -90,7 +81,7 @@ def edge_pruning_prune_scores(
     sparsity_warmup_steps: int = 2500,
     # --- Node pruning ---
     use_node_masks: bool = True,
-    disable_node_loss: bool = True,
+    disable_node_loss: bool = False,
     # --- Misc ---
     show_train_graph: bool = False,
     init_log_alpha: float = 10.0,
@@ -110,8 +101,9 @@ def edge_pruning_prune_scores(
         learning_rate: Learning rate for edge and node mask log_alpha parameters.
         lambda_learning_rate: Learning rate for Lagrangian multiplier parameters
             (``maximize=True``).
-        steps: Total number of training epochs (passes over the full dataloader).
-            Total optimiser steps = ``steps * len(dataloader)``.
+        steps: Total number of optimizer steps (one step = one forward-backward pass
+            over one batch). Matches the original EP trainer's ``--max_steps``.
+            The dataloader is cycled as needed.
         warmup_steps: Number of *global optimiser steps* for linear LR warmup
             (0 → ``learning_rate``).  Matches HuggingFace Trainer convention.
         target_edge_sparsity: Target edge sparsity at end of sparsity warmup.
@@ -127,7 +119,7 @@ def edge_pruning_prune_scores(
         use_node_masks: Whether to create per-source-node masks alongside edge masks.
             This is a core part of the paper; it accelerates convergence to high
             sparsity.  When ``False``, only edge masks are trained.
-        disable_node_loss: When ``True`` (default), node masks are created and applied
+        disable_node_loss: When ``True``, node masks are created and applied
             (they can still prune nodes implicitly via gradient from the KL loss) but
             the Lagrangian regularisation on node sparsity is disabled — the node λ
             parameters are frozen buffers at 0.  This matches the default IOI sweep in
@@ -179,18 +171,18 @@ def edge_pruning_prune_scores(
     # Stored as -init_log_alpha so HC samples start near 0 (= keep in AC convention).
     edge_log_alphas: Dict[str, nn.Parameter] = {}
     for mod_name, pm in model.patch_masks.items():
-        edge_log_alphas[mod_name] = nn.Parameter(
-            t.full_like(pm, -init_log_alpha, device=device)
-        )
+        param = t.empty_like(pm, device=device)
+        nn.init.normal_(param, mean=-init_log_alpha, std=0.01)
+        edge_log_alphas[mod_name] = nn.Parameter(param)
 
     # --- Node mask log_alphas (one scalar per source node) ---
     # Created whenever use_node_masks=True, regardless of disable_node_loss.
     node_log_alphas: Dict[int, nn.Parameter] = {}
     if use_node_masks:
         for src in sorted(model.srcs, key=lambda s: s.src_idx):
-            node_log_alphas[src.src_idx] = nn.Parameter(
-                t.full((1,), -init_log_alpha, device=device, dtype=t.float32)
-            )
+            param = t.empty((1,), device=device, dtype=t.float32)
+            nn.init.normal_(param, mean=-init_log_alpha, std=0.01)
+            node_log_alphas[src.src_idx] = nn.Parameter(param)
 
     # --- Lagrangian multiplier parameters ---
     # λ₁ (linear): frozen buffer when disable_linear_regularization=True.
@@ -217,10 +209,6 @@ def edge_pruning_prune_scores(
     #   Group 1: edge λs           (maximize)
     #   Group 2: node log_alphas   (minimize)   — only if use_node_masks
     #   Group 3: node λs           (maximize)   — only if use_node_masks & !disable_node_loss
-    #
-    # weight_decay=0.0: matches HuggingFace Trainer default (original EP uses 0.0).
-    # PyTorch AdamW defaults to weight_decay=0.01, which would bias log_alphas toward
-    # 0 and oppose the sparsity objective.
     param_groups: List[dict] = [
         {"params": list(edge_log_alphas.values()), "lr": learning_rate},
     ]
@@ -244,9 +232,8 @@ def edge_pruning_prune_scores(
                 {"params": lambda_params_node, "lr": lambda_learning_rate, "maximize": True}
             )
 
-    total_training_steps = steps * len(dataloader)
-    optimizer = AdamW(param_groups, lr=learning_rate, weight_decay=0.0)
-    scheduler = get_linear_schedule_with_warmup(optimizer, warmup_steps, total_training_steps)
+    optimizer = AdamW(param_groups, lr=learning_rate, weight_decay=0.01)
+    scheduler = get_linear_schedule_with_warmup(optimizer, warmup_steps, steps)
 
     # ============================================================
     # Step 5: Build module-name → dest-wrapper lookup
@@ -265,12 +252,12 @@ def edge_pruning_prune_scores(
     edge_reg_hist: List[float] = []
     node_reg_hist: List[float] = []
 
-    # global_step counts individual optimizer steps (one per batch), matching the
-    # original EP trainer's `state.global_step` used for sparsity warmup scheduling.
-    global_step = 0
+    # Cycle the dataloader so we can pull exactly `steps` batches regardless of
+    # dataloader length — matches the original EP trainer's step-based loop.
+    batch_cycle = cycle(dataloader)
 
     model.eval()
-    for step in (step_pbar := tqdm(range(steps))):
+    for global_step in (step_pbar := tqdm(range(steps))):
         desc_parts = []
         if losses_hist:
             desc_parts.append(f"Loss: {losses_hist[-1]:.4f}")
@@ -278,136 +265,135 @@ def edge_pruning_prune_scores(
             desc_parts.append(f"EdgeSp: {edge_sparsity_hist[-1]:.3f}")
             if use_node_masks:
                 desc_parts.append(f"NodeSp: {node_sparsity_hist[-1]:.3f}")
-        step_pbar.set_description_str(f"{EP} Step {step} " + ", ".join(desc_parts))
+        step_pbar.set_description_str(f"{EP} Step {global_step} " + ", ".join(desc_parts))
 
-        for batch in dataloader:
-            # --- Sparsity warmup: ramp targets based on global optimizer steps ---
-            # This matches the original's get_current_edge_target_sparsity(global_step).
-            warmup_frac = min(global_step / max(sparsity_warmup_steps, 1), 1.0)
-            t_edge = start_edge_sparsity + (target_edge_sparsity - start_edge_sparsity) * warmup_frac
-            t_node = start_node_sparsity + (target_node_sparsity - start_node_sparsity) * warmup_frac
+        # --- Sparsity warmup: ramp targets based on optimizer step count ---
+        # Matches original's get_current_edge_target_sparsity(state.global_step).
+        warmup_frac = min(global_step / max(sparsity_warmup_steps, 1), 1.0)
+        t_edge = start_edge_sparsity + (target_edge_sparsity - start_edge_sparsity) * warmup_frac
+        t_node = start_node_sparsity + (target_node_sparsity - start_node_sparsity) * warmup_frac
 
-            batch_size = batch.clean.shape[0]
-            patch_outs = src_outs[batch.key].clone().detach()
+        batch = next(batch_cycle)
+        batch_size = batch.clean.shape[0]
+        patch_outs = src_outs[batch.key].clone().detach()
 
-            # --- Sample edge masks (stochastic HC, gradient tracked) ---
-            sampled_edge_z: Dict[str, t.Tensor] = {}
-            all_edge_z_flat: List[t.Tensor] = []
-            for mod_name, ela in edge_log_alphas.items():
-                z = sample_hard_concrete(ela, batch_size)  # (batch, *mask_shape)
-                sampled_edge_z[mod_name] = z
-                all_edge_z_flat.append(z.mean(dim=0).flatten())  # avg over batch
+        # --- Sample edge masks (stochastic HC, gradient tracked) ---
+        sampled_edge_z: Dict[str, t.Tensor] = {}
+        all_edge_z_flat: List[t.Tensor] = []
+        for mod_name, ela in edge_log_alphas.items():
+            z = sample_hard_concrete(ela, batch_size)  # (batch, *mask_shape)
+            sampled_edge_z[mod_name] = z
+            all_edge_z_flat.append(z.mean(dim=0).flatten())  # avg over batch
 
-            # --- Sample node masks (stochastic HC, gradient tracked) ---
-            sampled_node_z: Dict[int, t.Tensor] = {}
-            all_node_z_flat: List[t.Tensor] = []
-            if use_node_masks:
-                for src_idx, nla in node_log_alphas.items():
-                    z = sample_hard_concrete(nla, batch_size)  # (batch, 1)
-                    sampled_node_z[src_idx] = z
-                    all_node_z_flat.append(z.mean(dim=0).flatten())
+        # --- Sample node masks (stochastic HC, gradient tracked) ---
+        sampled_node_z: Dict[int, t.Tensor] = {}
+        all_node_z_flat: List[t.Tensor] = []
+        if use_node_masks:
+            for src_idx, nla in node_log_alphas.items():
+                z = sample_hard_concrete(nla, batch_size)  # (batch, 1)
+                sampled_node_z[src_idx] = z
+                all_node_z_flat.append(z.mean(dim=0).flatten())
 
-            # --- Compose effective masks (edge ∨ node in ablation space) ---
-            # AC convention: z = 0 → keep, z = 1 → ablate.
-            # For an edge to be kept, BOTH its edge mask AND its node mask must be 0.
-            # De Morgan dual: effective_ablation = 1 - (1-z_edge)*(1-z_node).
-            effective_masks: Dict[str, t.Tensor] = {}
+        # --- Compose effective masks (edge ∨ node in ablation space) ---
+        # AC convention: z = 0 → keep, z = 1 → ablate.
+        # For an edge to be kept, BOTH its edge mask AND its node mask must be 0.
+        # De Morgan dual: effective_ablation = 1 - (1-z_edge)*(1-z_node).
+        effective_masks: Dict[str, t.Tensor] = {}
+        for mod_name, wrapper in dest_wrapper_dict.items():
+            m_edge = sampled_edge_z[mod_name]  # (batch, *mask_shape)
+
+            if use_node_masks and wrapper.in_srcs is not None:
+                in_srcs = wrapper.in_srcs
+                # Stack node z values for every src this wrapper reads from.
+                node_z_parts: List[t.Tensor] = [
+                    sampled_node_z.get(
+                        global_idx,
+                        t.zeros(batch_size, 1, device=device),
+                    )
+                    for global_idx in range(in_srcs.start, in_srcs.stop)
+                ]
+                node_z = t.cat(node_z_parts, dim=-1)  # (batch, n_local_srcs)
+
+                # Broadcast node_z to match m_edge: insert singleton dims between
+                # batch dim and src dim.
+                # m_edge: (batch, [seq], [head], src)
+                # node_z: (batch,              src) → add extra middle dims
+                for _ in range(m_edge.ndim - node_z.ndim):
+                    node_z = node_z.unsqueeze(1)
+
+                effective = 1.0 - (1.0 - m_edge) * (1.0 - node_z)
+            else:
+                effective = m_edge
+
+            effective_masks[mod_name] = effective
+
+        # --- Apply effective masks and run forward pass ---
+        # Temporarily swap the wrapper's patch_mask for our pre-computed
+        # differentiable mask, run the forward, then restore immediately.
+        orig_state: Dict[str, dict] = {}
+        with patch_mode(model, patch_outs):
             for mod_name, wrapper in dest_wrapper_dict.items():
-                m_edge = sampled_edge_z[mod_name]  # (batch, *mask_shape)
+                orig_state[mod_name] = {
+                    "patch_mask": wrapper.patch_mask,
+                    "mask_fn": wrapper.mask_fn,
+                    "batch_size": wrapper.batch_size,
+                }
+                del wrapper.patch_mask
+                wrapper.patch_mask = effective_masks[mod_name]  # type: ignore
+                wrapper.mask_fn = None
+                wrapper.batch_size = batch_size
 
-                if use_node_masks and wrapper.in_srcs is not None:
-                    in_srcs = wrapper.in_srcs
-                    # Stack node z values for every src this wrapper reads from.
-                    node_z_parts: List[t.Tensor] = [
-                        sampled_node_z.get(
-                            global_idx,
-                            t.zeros(batch_size, 1, device=device),
-                        )
-                        for global_idx in range(in_srcs.start, in_srcs.stop)
-                    ]
-                    node_z = t.cat(node_z_parts, dim=-1)  # (batch, n_local_srcs)
+            train_logits = model(batch.clean)[out_slice]
 
-                    # Broadcast node_z to match m_edge: insert singleton dims between
-                    # batch dim and src dim.
-                    # m_edge: (batch, [seq], [head], src)
-                    # node_z: (batch,              src) → add extra middle dims
-                    for _ in range(m_edge.ndim - node_z.ndim):
-                        node_z = node_z.unsqueeze(1)
+            for mod_name, wrapper in dest_wrapper_dict.items():
+                del wrapper.patch_mask
+                wrapper.patch_mask = orig_state[mod_name]["patch_mask"]
+                wrapper.mask_fn = orig_state[mod_name]["mask_fn"]
+                wrapper.batch_size = orig_state[mod_name]["batch_size"]
 
-                    effective = 1.0 - (1.0 - m_edge) * (1.0 - node_z)
-                else:
-                    effective = m_edge
+        # --- KL divergence loss ---
+        kl_loss = multibatch_kl_div(
+            log_softmax(train_logits, dim=-1),
+            log_softmax(clean_logits[batch.key], dim=-1),
+        )
 
-                effective_masks[mod_name] = effective
+        # --- Edge sparsity & regularisation ---
+        # sparsity = mean sampled z (0 = keep, 1 = ablate) → equals 1 - kept_frac,
+        # matching original's `model_edge_sparsity = 1 - z_sum/n_edges` (z=1→keep).
+        all_edge_z = t.cat(all_edge_z_flat)
+        edge_sparsity = all_edge_z.sum() / n_edges
+        edge_reg = lambda_edge_1 * (edge_sparsity - t_edge) + lambda_edge_2 * (
+            edge_sparsity - t_edge
+        ) ** 2
 
-            # --- Apply effective masks and run forward pass ---
-            # Temporarily swap the wrapper's patch_mask for our pre-computed
-            # differentiable mask, run the forward, then restore immediately.
-            orig_state: Dict[str, dict] = {}
-            with patch_mode(model, patch_outs):
-                for mod_name, wrapper in dest_wrapper_dict.items():
-                    orig_state[mod_name] = {
-                        "patch_mask": wrapper.patch_mask,
-                        "mask_fn": wrapper.mask_fn,
-                        "batch_size": wrapper.batch_size,
-                    }
-                    del wrapper.patch_mask
-                    wrapper.patch_mask = effective_masks[mod_name]  # type: ignore
-                    wrapper.mask_fn = None
-                    wrapper.batch_size = batch_size
-
-                train_logits = model(batch.clean)[out_slice]
-
-                for mod_name, wrapper in dest_wrapper_dict.items():
-                    del wrapper.patch_mask
-                    wrapper.patch_mask = orig_state[mod_name]["patch_mask"]
-                    wrapper.mask_fn = orig_state[mod_name]["mask_fn"]
-                    wrapper.batch_size = orig_state[mod_name]["batch_size"]
-
-            # --- KL divergence loss ---
-            kl_loss = multibatch_kl_div(
-                log_softmax(train_logits, dim=-1),
-                log_softmax(clean_logits[batch.key], dim=-1),
-            )
-
-            # --- Edge sparsity & regularisation ---
-            # sparsity = mean sampled z (0 = keep, 1 = ablate) → equals 1 - kept_frac,
-            # matching original's `model_edge_sparsity = 1 - z_sum/n_edges` (z=1→keep).
-            all_edge_z = t.cat(all_edge_z_flat)
-            edge_sparsity = all_edge_z.sum() / n_edges
-            edge_reg = lambda_edge_1 * (edge_sparsity - t_edge) + lambda_edge_2 * (
-                edge_sparsity - t_edge
+        # --- Node sparsity & regularisation ---
+        # node_reg stays 0 when disable_node_loss=True (frozen λ buffers).
+        node_reg = t.tensor(0.0, device=device)
+        node_sparsity_val = 0.0
+        if use_node_masks:
+            all_node_z = t.cat(all_node_z_flat)
+            node_sparsity = all_node_z.sum() / n_srcs
+            node_sparsity_val = node_sparsity.item()
+            node_reg = lambda_node_1 * (node_sparsity - t_node) + lambda_node_2 * (
+                node_sparsity - t_node
             ) ** 2
 
-            # --- Node sparsity & regularisation ---
-            # node_reg stays 0 when disable_node_loss=True (frozen λ buffers).
-            node_reg = t.tensor(0.0, device=device)
-            node_sparsity_val = 0.0
-            if use_node_masks:
-                all_node_z = t.cat(all_node_z_flat)
-                node_sparsity = all_node_z.sum() / n_srcs
-                node_sparsity_val = node_sparsity.item()
-                node_reg = lambda_node_1 * (node_sparsity - t_node) + lambda_node_2 * (
-                    node_sparsity - t_node
-                ) ** 2
+        # --- Total loss & optimiser step ---
+        loss = kl_loss + edge_reg + node_reg
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
 
-            # --- Total loss & optimiser step ---
-            loss = kl_loss + edge_reg + node_reg
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            scheduler.step()
-            global_step += 1
-
-            # --- Logging ---
-            losses_hist.append(loss.item())
-            kl_hist.append(kl_loss.item())
-            edge_sparsity_hist.append(edge_sparsity.item())
-            node_sparsity_hist.append(node_sparsity_val)
-            edge_reg_hist.append(edge_reg.item())
-            node_reg_hist.append(
-                node_reg.item() if isinstance(node_reg, t.Tensor) else 0.0
-            )
+        # --- Logging ---
+        losses_hist.append(loss.item())
+        kl_hist.append(kl_loss.item())
+        edge_sparsity_hist.append(edge_sparsity.item())
+        node_sparsity_hist.append(node_sparsity_val)
+        edge_reg_hist.append(edge_reg.item())
+        node_reg_hist.append(
+            node_reg.item() if isinstance(node_reg, t.Tensor) else 0.0
+        )
 
     # ============================================================
     # Step 7: Show training graph (optional)
@@ -430,39 +416,32 @@ def edge_pruning_prune_scores(
     # ============================================================
     # Step 8: Extract PruneScores — continuous soft mask
     # ============================================================
-    # We deliberately use the *continuous* soft mask σ(log_alpha / T * F) rather than
-    # deterministic_z's binary-search-thresholded variant.  Keeping scores continuous
-    # gives AutoCircuit's downstream threshold sweep a smooth ranking to work with;
-    # the binary discretisation that deterministic_z applies is only needed when you
-    # want the model itself to run with hard 0/1 masks at eval time.
+    # We use the continuous soft mask σ(log_alpha / T * F) rather than the
+    # binary-search-thresholded deterministic_z, giving AutoCircuit's downstream
+    # threshold sweep a smooth ranking to work with.
     #
-    # In AC convention high z → ablated, so score = 1 - z gives high scores to kept
-    # (important) edges, matching the PruneScores contract.
+    # In AC convention z=1 → ablated, so score = 1 - z gives high scores to
+    # kept (important) edges, matching the PruneScores contract.
     prune_scores: PruneScores = {}
 
     with t.no_grad():
-        # Precompute soft node masks once: shape (1,) scalar per source.
+        # Precompute soft node ablation probabilities once.
         soft_node_z: Dict[int, float] = {}
         if use_node_masks:
             for idx, nla in node_log_alphas.items():
                 soft_node_z[idx] = _soft_mask(nla).item()
 
         for mod_name, ela in edge_log_alphas.items():
-            # Continuous edge ablation probability in (0, 1).
-            edge_z = _soft_mask(ela)  # same shape as ela / patch_mask
+            edge_z = _soft_mask(ela)
 
             if use_node_masks:
                 wrapper = dest_wrapper_dict[mod_name]
                 if wrapper.in_srcs is not None:
                     in_srcs = wrapper.in_srcs
-                    # Combine edge and node masks with the same OR formula used during
-                    # training.  This ensures score extraction is consistent with the
-                    # forward pass seen by the optimizer.
                     for i, global_idx in enumerate(range(in_srcs.start, in_srcs.stop)):
                         nz = soft_node_z.get(global_idx, 0.0)
                         edge_z[..., i] = 1.0 - (1.0 - edge_z[..., i]) * (1.0 - nz)
 
-            # score = 1 - ablation probability: high score → important (kept) edge.
             prune_scores[mod_name] = (1.0 - edge_z).detach().clone()
 
     return prune_scores

@@ -330,7 +330,7 @@ EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
         target_node_sparsity=0.72,
         sparsity_warmup_steps=2500,
         use_node_masks=True,
-        disable_node_loss=True,   # matches original IOI sweep (--disable_node_loss)
+        disable_node_loss=True,    # matches original IOI sweep (--disable_node_loss)
         show_train_graph=True,
     ),
 )
@@ -364,6 +364,24 @@ DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
     ),
 )
 
+DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO = PruneAlgo(
+    key="DiscoGP Edge Only Hard",
+    name="DiscoGP (Edge Only, Hard)",
+    _short_name="DiscoGP-EH",
+    func=partial(
+        disco_gp_prune_scores,
+        e_train_epochs=500,
+        e_n_epoch_warmup=400,
+        e_n_epoch_cooldown=100,
+        e_min_times_lambda_sparse=1.0,
+        e_lambda_complete_init=0.0,
+        use_weight_masks=False,
+        use_edge_masks=True,
+        hard=True,
+        show_train_graph=True,
+    ),
+)
+
 PRUNE_ALGOS: List[PruneAlgo] = [
     GROUND_TRUTH_PRUNE_ALGO,
     ACT_MAG_PRUNE_ALGO,
@@ -385,7 +403,8 @@ PRUNE_ALGOS: List[PruneAlgo] = [
     OPPOSITE_TREE_PROBING_PRUNE_ALGO,
     EDGE_PRUNING_PRUNE_ALGO,
     DISCO_GP_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_PRUNE_ALGO
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
 ]
 
 PRUNE_ALGO_DICT: Dict[AlgoKey, PruneAlgo] = {algo.key: algo for algo in PRUNE_ALGOS}

@@ -1,5 +1,6 @@
 #%%
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
@@ -29,20 +30,22 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
 )
 from auto_circuit.metrics.prune_scores_similarity import prune_score_similarities_plotly
 from auto_circuit.prune_algos.prune_algos import (
-    CIRCUIT_TREE_PROBING_PRUNE_ALGO,
     GROUND_TRUTH_PRUNE_ALGO,
-    LOGIT_DIFF_GRAD_PRUNE_ALGO,
     PRUNE_ALGO_DICT,
     RANDOM_PRUNE_ALGO,
     DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
     DISCO_GP_PRUNE_ALGO,
     EDGE_PRUNING_PRUNE_ALGO,
+    EDGE_ATTR_PATCH_PRUNE_ALGO,
+    ACDC_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
     PruneAlgo,
     run_prune_algos,
 )
 from auto_circuit.tasks import (
     DOCSTRING_TOKEN_CIRCUIT_TASK,
     SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK,
+    IOI_COMPONENT_CIRCUIT_TASK,
     TASK_DICT,
     Task,
 )
@@ -71,10 +74,10 @@ if compute_prune_scores:
         # Token Circuits
         # SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK,
         # IOI_TOKEN_CIRCUIT_TASK,
-        DOCSTRING_TOKEN_CIRCUIT_TASK,
+        # DOCSTRING_TOKEN_CIRCUIT_TASK,
         # Component Circuits
         # SPORTS_PLAYERS_COMPONENT_CIRCUIT_TASK,
-        # IOI_COMPONENT_CIRCUIT_TASK,
+        IOI_COMPONENT_CIRCUIT_TASK,
         # DOCSTRING_COMPONENT_CIRCUIT_TASK,
         # GREATERTHAN_COMPONENT_CIRCUIT_TASK,
         # Autoencoder Component Circuits
@@ -85,29 +88,19 @@ if compute_prune_scores:
     ]
     PRUNE_ALGOS: List[PruneAlgo] = [
         GROUND_TRUTH_PRUNE_ALGO,
-        # ACT_MAG_PRUNE_ALGO,
         RANDOM_PRUNE_ALGO,
-        # EDGE_ATTR_PATCH_PRUNE_ALGO,
-        # ACDC_PRUNE_ALGO,
-        # INTEGRATED_EDGE_GRADS_LOGIT_DIFF_PRUNE_ALGO,
-        # LOGPROB_GRAD_PRUNE_ALGO,
-        # LOGPROB_DIFF_GRAD_PRUNE_ALGO,
-        LOGIT_DIFF_GRAD_PRUNE_ALGO,  # Fast implementation of Edge Attribution Patchng
-        # LOGIT_MSE_GRAD_PRUNE_ALGO,
-        # SUBNETWORK_EDGE_PROBING_PRUNE_ALGO,
-        # CIRCUIT_PROBING_PRUNE_ALGO,
-        # SUBNETWORK_TREE_PROBING_PRUNE_ALGO,
-        # CIRCUIT_TREE_PROBING_PRUNE_ALGO,
-        # MSE_CIRCUIT_TREE_PROBING_PRUNE_ALGO,
+        EDGE_ATTR_PATCH_PRUNE_ALGO,
+        ACDC_PRUNE_ALGO,
         DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-        # DISCO_GP_PRUNE_ALGO,
-        # EDGE_PRUNING_PRUNE_ALGO,
+        DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
+        # DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
+        EDGE_PRUNING_PRUNE_ALGO,
     ]
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:
     # 2000 epoch IOI Docstring tensor prune_scores post-kv-cache-fix
     # batch_size=128, batch_count=2, default seed (for both)
-    filename = "task-prune-scores-04-05-2026_15-44-46.pkl"
+    filename = "task-prune-scores-09-05-2026_18-08-12.pkl"
 
     # 1000 epoch Sport Players tensor prune_scores post-kv-cache-fix
     # batch_size=(10, 20), batch_count=(10, 5), default seed
@@ -142,7 +135,6 @@ if True:
             continue
         for algo_key, ps in algo_prune_scores.items():
             algo = PRUNE_ALGO_DICT[algo_key]
-            # keys = [GROUND_TRUTH_PRUNE_ALGO.key, CIRCUIT_TREE_PROBING_PRUNE_ALGO.key]
             keys = [GROUND_TRUTH_PRUNE_ALGO.key]
             if algo_key not in keys:
                 continue
@@ -164,7 +156,7 @@ if True:
 
 if True:
     prune_scores_similartity_fig = prune_score_similarities_plotly(
-        task_prune_scores, [], ground_truths=True
+        task_prune_scores, [10, 100, 1000, 10000], ground_truths=True
     )
     figs.append(prune_scores_similartity_fig)
 
@@ -270,10 +262,15 @@ if prune_metric_measurements is not None:
 
 # -------------------------------------- Figures ---------------------------------------
 
+# Create a unique identifier for this experiment run using timestamp
+experiment_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+base_folder: Path = repo_path_to_abs_path("figures/circuit_discovery")
+experiment_folder = base_folder / experiment_id
+experiment_folder.mkdir(parents=True, exist_ok=True)
+
 for i, fig in enumerate(figs):
     # fig.show()
-    folder: Path = repo_path_to_abs_path("figures-12")
-    # Save figure as pdf in figures folder
-    fig.write_image(str(folder / f"new {i}.pdf"))
+    # Save figure as pdf in experiment subfolder
+    fig.write_image(str(experiment_folder / f"figure_{i}.pdf"))
 
 #%%
