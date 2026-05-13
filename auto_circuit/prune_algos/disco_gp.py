@@ -7,14 +7,18 @@ Implements joint weight + edge pruning via Gumbel-sigmoid masks, as described in
 Key differences from Subnetwork Probing / Edge Pruning in this library:
   - Uses Gumbel-sigmoid straight-through estimator (not Hard Concrete)
   - Joint two-phase optimisation: weight masks first, then edge masks
-  - Faithfulness loss = cross-entropy against the clean model's argmax prediction
-  - Completeness loss = cross-entropy against uniform distribution (reversed masks)
+  - Two faith / complete loss modes (``loss_mode``):
+      * ``argmax_ce`` (default): full-vocab CE against the clean model's argmax;
+        completeness = CE against uniform over the full vocab.
+      * ``answer_margin_ce`` (paper-faithful): 2-class CE on
+        (mean correct logit, mean wrong logit) from ``batch.answers`` /
+        ``batch.wrong_answers``; completeness uses the same pair vs. uniform 0.5.
   - Zero ablation for edge patching
   - Original model weights are RESTORED after the algorithm returns — no in-place mutation
 """
 
 import gc
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import Callable, Dict, List, Literal, Optional, Set, Tuple
 
 import plotly.graph_objects as go
 import torch as t
@@ -72,7 +76,8 @@ def disco_gp_prune_scores(
     e_n_epoch_cooldown: int = 20,
     # ---- Misc ----
     show_train_graph: bool = False,
-    hard: bool = False,
+    hard: bool = True,
+    loss_mode: Literal["argmax_ce", "answer_margin_ce"] = "argmax_ce",
     # ---- Multi-fidelity HPO hooks (no-op when None) ----
     eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
     eval_every: Optional[int] = None,
@@ -85,13 +90,13 @@ def disco_gp_prune_scores(
     **Phase 1 — Weight Pruning** (if ``use_weight_masks=True``):
       Creates per-element learnable logits for all linear-layer weights (excluding
       embeddings, layer-norms, and bias terms).  Optimises them to minimise
-      ``CE(masked_output, clean_argmax) + lambda_sparse * sparsity``.
+      ``faith_loss + lambda_sparse * sparsity`` (loss form picked by ``loss_mode``).
       After training, weight masks are frozen deterministically (``logit > 0``).
 
     **Phase 2 — Edge Pruning** (if ``use_edge_masks=True``):
       With weight masks baked in, optimises per-edge logits on the AutoCircuit
       ``PatchWrapperImpl`` modules using the same faithfulness loss plus a
-      completeness term (CE against uniform with *reversed* masks).
+      completeness term applied with *reversed* masks.
 
     The original model weights are **restored** before the function returns, so the
     caller's model is not modified.
@@ -124,6 +129,12 @@ def disco_gp_prune_scores(
         e_n_epoch_cooldown: Epochs to decay the edge sparsity penalty.
         show_train_graph: Save training curves to HTML files.
         hard: Whether to use hard (binary STE) or soft Gumbel-sigmoid sampling.
+        loss_mode: Faithfulness / completeness loss formulation. ``"argmax_ce"``
+            uses full-vocab CE vs. the unmasked model's argmax (and uniform 1/V
+            for completeness). ``"answer_margin_ce"`` uses 2-class CE on
+            (mean correct logit, mean wrong logit) from ``batch.answers`` /
+            ``batch.wrong_answers`` (paper-faithful for IOI; aligns with the
+            standard logit-diff metric for Greater-Than / Docstring).
 
     Returns:
         :class:`~auto_circuit.types.PruneScores` mapping destination-wrapper module
@@ -137,13 +148,14 @@ def disco_gp_prune_scores(
     # =========================================================
     # Step 1: Cache clean logits and compute target argmax
     # =========================================================
-    # Use no_grad (not inference_mode) so the resulting tensors can be used
-    # in autograd computations later (inference-mode tensors cannot).
+    # Only needed for loss_mode="argmax_ce". The answer-margin-CE mode reads
+    # supervision directly from batch.answers / batch.wrong_answers each step.
     clean_targets: Dict[BatchKey, t.Tensor] = {}
-    with t.no_grad():
-        for batch in dataloader:
-            logits = model(batch.clean)[out_slice]
-            clean_targets[batch.key] = logits.argmax(dim=-1).clone()
+    if loss_mode == "argmax_ce":
+        with t.no_grad():
+            for batch in dataloader:
+                logits = model(batch.clean)[out_slice]
+                clean_targets[batch.key] = logits.argmax(dim=-1).clone()
 
     # =========================================================
     # Step 2: Snapshot original model weights for later restoration
@@ -204,7 +216,9 @@ def disco_gp_prune_scores(
 
                 # Faithfulness forward pass (with masked weights, no edge masking)
                 train_logits = model(batch.clean)[out_slice]
-                faith_loss = _faith_loss(train_logits, clean_targets[batch.key])
+                faith_loss = _faith_loss_dispatch(
+                    train_logits, batch, clean_targets, loss_mode
+                )
 
                 # Sparsity: sigmoid(logit).mean() averaged over all weight elements
                 sparse_loss = t.cat(
@@ -237,11 +251,8 @@ def disco_gp_prune_scores(
                             param.copy_(rev_sampled[name] * original_state[name])
 
                     rev_logits = model(batch.clean)[out_slice]
-                    n_classes = rev_logits.shape[-1]
-                    uniform_target = t.full_like(rev_logits, 1.0 / n_classes)
-                    complete_loss = F.cross_entropy(
-                        rev_logits.reshape(-1, n_classes),
-                        uniform_target.reshape(-1, n_classes),
+                    complete_loss = _complete_loss_dispatch(
+                        rev_logits, batch, loss_mode
                     )
                     (complete_loss * lambda_complete).backward()
                     w_optimizer.step()
@@ -338,7 +349,9 @@ def disco_gp_prune_scores(
                     model, batch.clean, patch_outs,
                     faith_masks, dest_wrapper_dict, out_slice
                 )
-                faith_loss = _faith_loss(train_logits, clean_targets[batch.key])
+                faith_loss = _faith_loss_dispatch(
+                    train_logits, batch, clean_targets, loss_mode
+                )
 
                 # Sparsity
                 sparse_loss = t.cat(
@@ -355,11 +368,8 @@ def disco_gp_prune_scores(
                         model, batch.clean, patch_outs,
                         rev_masks, dest_wrapper_dict, out_slice
                     )
-                    n_classes = rev_logits.shape[-1]
-                    uniform_target = t.full_like(rev_logits, 1.0 / n_classes)
-                    complete_loss_val = F.cross_entropy(
-                        rev_logits.reshape(-1, n_classes),
-                        uniform_target.reshape(-1, n_classes),
+                    complete_loss_val = _complete_loss_dispatch(
+                        rev_logits, batch, loss_mode
                     )
 
                 loss = (
@@ -452,6 +462,79 @@ def _faith_loss(train_logits: t.Tensor, clean_targets: t.Tensor) -> t.Tensor:
     return F.cross_entropy(
         train_logits.reshape(-1, train_logits.shape[-1]),
         clean_targets.reshape(-1),
+    )
+
+
+def _gather_mean(logits: t.Tensor, idxs) -> t.Tensor:
+    """Per-prompt mean of ``logits`` gathered at ``idxs``.
+
+    Mirrors the indexing pattern used by
+    :func:`auto_circuit.utils.tensor_ops.batch_answer_diffs`, which supports both
+    fixed-width ``(B, n)`` tensors and per-prompt variable-length lists.
+
+    Args:
+        logits: ``(B, V)`` logits after ``out_slice``.
+        idxs: Either a ``(B, n)`` tensor or a list of 1D tensors (variable ``n``).
+    Returns:
+        ``(B,)`` — per-prompt mean logit across the indexed set.
+    """
+    if isinstance(idxs, t.Tensor):
+        return t.gather(logits, -1, idxs).mean(-1)
+    return t.stack([logits[i].index_select(-1, a).mean() for i, a in enumerate(idxs)])
+
+
+def _faith_loss_margin(logits: t.Tensor, batch) -> t.Tensor:
+    """Paper-faithful 2-class CE: ``softplus(mean_wrong - mean_correct).mean()``.
+
+    Pulls correct-answer logits above wrong-answer logits at the answer position,
+    averaging over any multi-token answer / distractor sets.
+    """
+    pair = t.stack(
+        [_gather_mean(logits, batch.answers),
+         _gather_mean(logits, batch.wrong_answers)],
+        -1,
+    )
+    target = t.zeros(pair.size(0), dtype=t.long, device=pair.device)
+    return F.cross_entropy(pair, target)
+
+
+def _complete_loss_margin(logits: t.Tensor, batch) -> t.Tensor:
+    """Paper-faithful 2-class CE against uniform 0.5/0.5 on (correct, wrong).
+
+    Forces the (mean_correct, mean_wrong) margin to zero under reversed masks
+    — i.e. destroys the binary preference without flattening the entire vocab.
+    """
+    pair = t.stack(
+        [_gather_mean(logits, batch.answers),
+         _gather_mean(logits, batch.wrong_answers)],
+        -1,
+    )
+    return F.cross_entropy(pair, t.full_like(pair, 0.5))
+
+
+def _faith_loss_dispatch(
+    logits: t.Tensor,
+    batch,
+    clean_targets: Dict[BatchKey, t.Tensor],
+    loss_mode: str,
+) -> t.Tensor:
+    if loss_mode == "answer_margin_ce":
+        return _faith_loss_margin(logits, batch)
+    return _faith_loss(logits, clean_targets[batch.key])
+
+
+def _complete_loss_dispatch(
+    rev_logits: t.Tensor,
+    batch,
+    loss_mode: str,
+) -> t.Tensor:
+    if loss_mode == "answer_margin_ce":
+        return _complete_loss_margin(rev_logits, batch)
+    n_classes = rev_logits.shape[-1]
+    uniform_target = t.full_like(rev_logits, 1.0 / n_classes)
+    return F.cross_entropy(
+        rev_logits.reshape(-1, n_classes),
+        uniform_target.reshape(-1, n_classes),
     )
 
 

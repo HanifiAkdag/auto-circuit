@@ -360,24 +360,26 @@ DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
         e_lambda_complete_init=0.0,
         use_weight_masks=False,
         use_edge_masks=True,
+        hard=True,
         show_train_graph=True,
     ),
 )
 
-DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO = PruneAlgo(
-    key="DiscoGP Edge Only Hard",
-    name="DiscoGP (Edge Only, Hard)",
-    _short_name="DiscoGP-EH",
+DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO = PruneAlgo(
+    key="DiscoGP Edge Only Paper",
+    name="DiscoGP (Edge Only, Paper-Faithful)",
+    _short_name="DiscoGP-EP",
     func=partial(
         disco_gp_prune_scores,
         e_train_epochs=500,
         e_n_epoch_warmup=400,
         e_n_epoch_cooldown=100,
         e_min_times_lambda_sparse=1.0,
-        e_lambda_complete_init=0.0,
+        e_lambda_complete_init=1.0,
         use_weight_masks=False,
         use_edge_masks=True,
         hard=True,
+        loss_mode="answer_margin_ce",
         show_train_graph=True,
     ),
 )
@@ -404,7 +406,7 @@ PRUNE_ALGOS: List[PruneAlgo] = [
     EDGE_PRUNING_PRUNE_ALGO,
     DISCO_GP_PRUNE_ALGO,
     DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
 ]
 
 PRUNE_ALGO_DICT: Dict[AlgoKey, PruneAlgo] = {algo.key: algo for algo in PRUNE_ALGOS}

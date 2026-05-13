@@ -38,7 +38,7 @@ from auto_circuit.prune_algos.prune_algos import (
     EDGE_PRUNING_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,
     ACDC_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
     PruneAlgo,
     run_prune_algos,
 )
@@ -90,11 +90,11 @@ if compute_prune_scores:
         GROUND_TRUTH_PRUNE_ALGO,
         RANDOM_PRUNE_ALGO,
         EDGE_ATTR_PATCH_PRUNE_ALGO,
-        ACDC_PRUNE_ALGO,
+        # ACDC_PRUNE_ALGO,
         DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-        DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
-        # DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
-        EDGE_PRUNING_PRUNE_ALGO,
+        DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
+        DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
+        # EDGE_PRUNING_PRUNE_ALGO,
     ]
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:

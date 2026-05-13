@@ -42,7 +42,7 @@ class SearchSpace:
 
 
 # ---------------------------------------------------------------------------
-# DiscoGP — edge-only (soft Gumbel-sigmoid, continuous scores)
+# DiscoGP — edge-only (hard straight-through Gumbel-sigmoid)
 # ---------------------------------------------------------------------------
 def _suggest_disco_edge_only(trial: optuna.Trial) -> Dict[str, Any]:
     return dict(
@@ -57,17 +57,17 @@ def _suggest_disco_edge_only(trial: optuna.Trial) -> Dict[str, Any]:
         logits_e_init=trial.suggest_float("logits_e_init", -2.0, 2.0),
         e_n_epoch_warmup=trial.suggest_int("e_n_epoch_warmup", 20, 400),
         e_n_epoch_cooldown=trial.suggest_int("e_n_epoch_cooldown", 10, 200),
-        hard=False,
+        hard=True,
         show_train_graph=False,
     )
 
 
 # ---------------------------------------------------------------------------
-# DiscoGP — edge-only hard (binary STE)
+# DiscoGP — edge-only, paper-faithful (2-class answer-margin CE)
 # ---------------------------------------------------------------------------
-def _suggest_disco_edge_only_hard(trial: optuna.Trial) -> Dict[str, Any]:
+def _suggest_disco_edge_only_paper(trial: optuna.Trial) -> Dict[str, Any]:
     hparams = _suggest_disco_edge_only(trial)
-    hparams["hard"] = True
+    hparams["loss_mode"] = "answer_margin_ce"
     return hparams
 
 
@@ -137,9 +137,9 @@ SEARCH_SPACES: Dict[str, SearchSpace] = {
         supports_intermediate=True,
         eval_ablation_type=AblationType.ZERO,
     ),
-    "DiscoGP Edge Only Hard": SearchSpace(
+    "DiscoGP Edge Only Paper": SearchSpace(
         base_func=disco_gp_prune_scores,
-        suggest=_suggest_disco_edge_only_hard,
+        suggest=_suggest_disco_edge_only_paper,
         fidelity_param="e_train_epochs",
         supports_intermediate=True,
         eval_ablation_type=AblationType.ZERO,

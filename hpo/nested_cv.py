@@ -58,7 +58,6 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
 )
 from auto_circuit.prune_algos.prune_algos import (
     ACDC_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
     DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
     DISCO_GP_PRUNE_ALGO,
     EDGE_ATTR_PATCH_PRUNE_ALGO,
@@ -102,7 +101,6 @@ DEFAULT_COMPARISON_ALGOS = [
     ACDC_PRUNE_ALGO,
     EDGE_PRUNING_PRUNE_ALGO,
     DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO,
     DISCO_GP_PRUNE_ALGO,
 ]
 
