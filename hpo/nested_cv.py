@@ -606,7 +606,8 @@ def main() -> None:
                 roc_measurements = measure_roc(combined)
                 fig_roc = roc_plot(roc_measurements)
                 fig_roc.write_image(str(fig_dir / "roc.pdf"))
-                print("[nested_cv] Saved roc.pdf")
+                fig_roc.write_html(str(fig_dir / "roc.html"))
+                print("[nested_cv] Saved roc.pdf and roc.html")
         except Exception as e:
             print(f"[nested_cv] ROC figure skipped: {e}")
 
@@ -641,9 +642,10 @@ def main() -> None:
                             prune_measurements[abl][mk][tk].update(gt_measurements[abl][mk][tk])
 
             for i, (fig, meta) in enumerate(measurement_figs(prune_measurements)):
-                fname = f"metric_{meta['metric_key'].replace(' ', '_')}_{i}.pdf"
-                fig.write_image(str(fig_dir / fname))
-            print(f"[nested_cv] Saved metric figures to {fig_dir}")
+                base = f"metric_{meta['metric_key'].replace(' ', '_')}_{i}"
+                fig.write_image(str(fig_dir / f"{base}.pdf"))
+                fig.write_html(str(fig_dir / f"{base}.html"))
+            print(f"[nested_cv] Saved metric figures (pdf + html) to {fig_dir}")
         except Exception as e:
             print(f"[nested_cv] Metric figures skipped: {e}")
 
