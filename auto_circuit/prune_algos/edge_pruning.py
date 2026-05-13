@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import math
 from itertools import cycle
-from typing import Dict, List, Optional, Set
+from typing import Callable, Dict, List, Optional, Set
 
 import plotly.graph_objects as go
 import torch as t
@@ -86,6 +86,9 @@ def edge_pruning_prune_scores(
     show_train_graph: bool = False,
     init_log_alpha: float = 10.0,
     disable_linear_regularization: bool = False,
+    # --- Multi-fidelity HPO hooks (no-op when None) ---
+    eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
+    eval_every: Optional[int] = None,
 ) -> PruneScores:
     """Discover a circuit using L0-regularised edge pruning with Lagrangian duality.
 
@@ -394,6 +397,32 @@ def edge_pruning_prune_scores(
         node_reg_hist.append(
             node_reg.item() if isinstance(node_reg, t.Tensor) else 0.0
         )
+
+        # Multi-fidelity callback: snapshot current scores and report to Optuna.
+        if (
+            eval_callback is not None
+            and eval_every is not None
+            and (global_step + 1) % eval_every == 0
+        ):
+            with t.no_grad():
+                snap_node_z: Dict[int, float] = {}
+                if use_node_masks:
+                    for idx, nla in node_log_alphas.items():
+                        snap_node_z[idx] = _soft_mask(nla).item()
+                snapshot: "PruneScores" = {}
+                for mod_name, ela in edge_log_alphas.items():
+                    edge_z = _soft_mask(ela)
+                    if use_node_masks:
+                        wrapper = dest_wrapper_dict[mod_name]
+                        if wrapper.in_srcs is not None:
+                            for i, gidx in enumerate(
+                                range(wrapper.in_srcs.start, wrapper.in_srcs.stop)
+                            ):
+                                nz = snap_node_z.get(gidx, 0.0)
+                                edge_z[..., i] = 1.0 - (1.0 - edge_z[..., i]) * (1.0 - nz)
+                    snapshot[mod_name] = (1.0 - edge_z).detach().clone()
+            if eval_callback(global_step, snapshot):
+                break
 
     # ============================================================
     # Step 7: Show training graph (optional)

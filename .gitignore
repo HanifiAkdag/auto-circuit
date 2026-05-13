@@ -16,3 +16,4 @@ logs/
 *.sh
 CLAUDE.md
 *.pkl
+hpo/results/

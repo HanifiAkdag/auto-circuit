@@ -14,7 +14,7 @@ Key differences from Subnetwork Probing / Edge Pruning in this library:
 """
 
 import gc
-from typing import Dict, List, Optional, Set
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 import plotly.graph_objects as go
 import torch as t
@@ -73,6 +73,9 @@ def disco_gp_prune_scores(
     # ---- Misc ----
     show_train_graph: bool = False,
     hard: bool = False,
+    # ---- Multi-fidelity HPO hooks (no-op when None) ----
+    eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
+    eval_every: Optional[int] = None,
 ) -> PruneScores:
     """Discover a sparse circuit via joint weight and edge pruning with Gumbel-sigmoid masks.
 
@@ -373,6 +376,21 @@ def disco_gp_prune_scores(
                 e_faith_hist.append(faith_loss.item())
                 e_sparse_hist.append(sparse_loss.item())
                 e_complete_hist.append(complete_loss_val.item())
+
+            # Multi-fidelity callback: snapshot current scores, report to Optuna.
+            # Returning True from the callback means the trial should be pruned.
+            if (
+                eval_callback is not None
+                and eval_every is not None
+                and (epoch + 1) % eval_every == 0
+            ):
+                with t.no_grad():
+                    snapshot: PruneScores = {
+                        mod: t.sigmoid(logit).detach().clone()
+                        for mod, logit in edge_logits.items()
+                    }
+                if eval_callback(epoch, snapshot):
+                    break
 
         del e_optimizer
         gc.collect()
