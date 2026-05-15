@@ -297,8 +297,8 @@ IOI_COMPONENT_CIRCUIT_TASK: Task = Task(
     name="Indirect Object Identification",
     _model_def="gpt2-small",
     _dataset_name="ioi/ioi_prompts",
-    batch_size=64,
-    batch_count=(4, 2),  # 256 train + 128 test (1000 prompts available)
+    batch_size=128,
+    batch_count=(6, 1),
     _true_edge_func=ioi_true_edges,
     token_circuit=False,
 )
