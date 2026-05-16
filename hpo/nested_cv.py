@@ -1,29 +1,35 @@
 """Nested cross-validation with multi-fidelity HPO for circuit-discovery algorithms.
 
-Usage (single GPU):
+This script runs trial-only HPO workers. Refit, outer-test evaluation, and
+comparison figures are produced by ``hpo/finalize.py`` after all parallel
+workers have exited.
+
+Usage (single GPU, single worker):
     python hpo/nested_cv.py --algo "DiscoGP Edge Only" --task IOI
 
-Usage (multi-GPU, 4 workers sharing one study):
+Usage (multi-GPU, 4 workers sharing one study via JournalStorage):
     #SBATCH --gres=gpu:4
+    OUT_DIR=runs/disco_ioi
     for i in 0 1 2 3; do
         CUDA_VISIBLE_DEVICES=$i python hpo/nested_cv.py \\
             --algo "DiscoGP Edge Only" --task IOI \\
-            --output-dir runs/disco_ioi \\
-            --worker-id $i &
+            --output-dir $OUT_DIR --worker-id $i &
     done
     wait
+    python hpo/finalize.py --output-dir $OUT_DIR
 
-The script:
+The worker script:
   1. Loads a base prune-scores cache (or runs other algos fresh).
   2. Strips the target algo from the cache so it can be tuned from scratch.
-  3. Builds outer K-fold splits over task.train_loader.
+  3. Builds outer K-fold splits over ``task.train_loader``.
   4. For each outer fold:
-       a. Splits outer_train into inner_train / inner_val (holdout or K-fold).
-       b. Runs an Optuna study with Hyperband (or configured pruner).
-       c. Refits the best hyperparameters on full outer_train.
-       d. Evaluates on outer_test (once — avoids selection bias).
-  5. Saves per-fold best_hparams, PruneScores, Optuna CSV, and combined pkl.
-  6. Generates comparison figures (ROC + AUC metric plots) alongside baseline algos.
+       a. Splits ``outer_train`` into ``inner_train`` / ``inner_val``.
+       b. Runs an Optuna study (Hyperband by default) up to ``--n-trials``
+          globally across all workers. Stops contributing once the global
+          count of completed/pruned trials is reached.
+
+The finalize script then loads each fold's study, picks ``best_params``,
+refits, evaluates on ``outer_test``, and generates ROC / metric figures.
 """
 from __future__ import annotations
 
@@ -32,9 +38,8 @@ import json
 import sys
 from collections import defaultdict
 from datetime import datetime
-from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import optuna
 import torch as t
@@ -42,20 +47,11 @@ from optuna.pruners import HyperbandPruner, MedianPruner, NopPruner, SuccessiveH
 from optuna.samplers import TPESampler
 from optuna.storages import JournalStorage
 from optuna.storages.journal import JournalFileBackend
+from optuna.trial import TrialState
 
 # Repo root on sys.path so we can always import auto_circuit
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from auto_circuit.metrics.official_circuits.measure_roc import measure_roc
-from auto_circuit.metrics.official_circuits.roc_plot import roc_plot
-from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
-    measure_prune_metrics,
-    measurement_figs,
-)
-from auto_circuit.metrics.prune_metrics.prune_metrics import (
-    CLEAN_KL_DIV_METRIC,
-    LOGIT_DIFF_PERCENT_METRIC,
-)
 from auto_circuit.prune_algos.prune_algos import (
     ACDC_PRUNE_ALGO,
     DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
@@ -72,10 +68,9 @@ from auto_circuit.tasks import (
     DOCSTRING_TOKEN_CIRCUIT_TASK,
     GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
-    TASK_DICT,
     Task,
 )
-from auto_circuit.types import AblationType, PatchType, PruneScores, TaskPruneScores
+from auto_circuit.types import AblationType, PruneScores, TaskPruneScores
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
 
 from hpo.cv_utils import holdout_split, kfold_prompt_loaders, register_fold_kv_caches
@@ -139,7 +134,9 @@ def _parse_args() -> argparse.Namespace:
 
     # HPO
     p.add_argument("--n-trials", type=int, default=30,
-                   help="Total Optuna trials per outer fold.")
+                   help="Target total trials per outer fold across ALL workers "
+                        "(complete+pruned). Idempotent: on SLURM requeue, existing trials "
+                        "in the journal are counted, and only the remainder is run.")
     p.add_argument("--selection-metric",
                    choices=["kl_div_auc", "logit_diff_auc", "roc_auc"],
                    default="kl_div_auc",
@@ -175,8 +172,6 @@ def _parse_args() -> argparse.Namespace:
                    help="GPU worker index. Added to --seed for per-worker sampling diversity.")
     p.add_argument("--storage-backend", choices=["sqlite", "journal"], default="journal",
                    help="Optuna study storage backend. Default: journal (recommended for multi-process).")
-    p.add_argument("--no-figs", action="store_true",
-                   help="Skip generating comparison figures (faster).")
 
     return p.parse_args()
 
@@ -210,26 +205,15 @@ def _make_pruner(args: argparse.Namespace, max_resource: int) -> optuna.pruners.
         return NopPruner()
 
 
-def _make_storage(storage_dir: Path, fold_idx: int, algo_key: str, task_key: str,
-                  backend: str) -> str:
-    safe_algo = algo_key.replace(" ", "_").replace("/", "-")
-    safe_task = task_key.replace(" ", "_").replace("/", "-")
-    study_name = f"{safe_algo}_{safe_task}_outer{fold_idx}"
-    if backend == "sqlite":
-        db_path = storage_dir / f"optuna_outer{fold_idx}.db"
-        return f"sqlite:///{db_path}"
-    else:  # journal
-        log_path = storage_dir / f"optuna_outer{fold_idx}.log"
-        return optuna.storages.JournalStorage(
-            optuna.storages.JournalFileBackend(str(log_path))
-        )
-
-
 def _make_eval_callback(trial, model, val_loader, true_edges, edge_counts, ablation_type,
                         selection_metric: str):
-    """Build the per-epoch callback that reports to Optuna and checks should_prune()."""
-    lower_better = METRIC_REGISTRY[selection_metric][1]
+    """Per-epoch callback that reports intermediate scores to Optuna.
 
+    Returning False keeps the algo training; the actual TrialPruned raise is
+    done by the caller after the algo returns (see objective()), which lets
+    the algo finish its weight-restoration cleanup before the exception
+    propagates.
+    """
     def callback(step: int, prune_scores: PruneScores) -> bool:
         scores = score_all(model, prune_scores, val_loader, true_edges,
                            edge_counts, ablation_type)
@@ -357,15 +341,14 @@ def main() -> None:
             for algo_key, ps in fresh.get(task.key, {}).items():
                 task_prune_scores[task.key][algo_key] = ps
 
-    # Save the baseline copy (stripped of target algo)
-    baseline_path = out_root / "baseline_prune_scores.pkl"
-    save_cache(dict(task_prune_scores), cache_folder, "baseline_prune_scores")
+    # Save the baseline copy (stripped of target algo) and config — worker 0 only,
+    # to avoid concurrent writes from parallel SLURM workers to the same path.
+    if args.worker_id == 0:
+        save_cache(dict(task_prune_scores), cache_folder, "baseline_prune_scores")
+        config = vars(args)
+        config["max_resource"] = max_resource
+        (out_root / "config.json").write_text(json.dumps(config, indent=2))
     print(f"[nested_cv] Baseline algos: {list(task_prune_scores.get(task.key, {}).keys())}")
-
-    # Save config
-    config = vars(args)
-    config["max_resource"] = max_resource
-    (out_root / "config.json").write_text(json.dumps(config, indent=2))
 
     # ------------------------------------------------------------------
     # Outer folds
@@ -382,12 +365,11 @@ def main() -> None:
         # Use the full train/test split as one fold
         outer_folds = [(task.train_loader, task.test_loader)]
 
-    outer_scores: Dict[str, Dict[str, Optional[float]]] = {}
-    best_hparams_per_fold: List[Dict[str, Any]] = []
-    fold_prune_scores: Dict[str, PruneScores] = {}
-
     # ------------------------------------------------------------------
-    # Outer fold loop
+    # Outer fold loop — workers only contribute trials. Refit, outer-test
+    # evaluation, aggregation, and figures are handled by hpo/finalize.py
+    # after the SLURM `wait` barrier, so that the refit's `study.best_params`
+    # reflects every trial completed by every worker.
     # ------------------------------------------------------------------
     for fold_idx, (outer_train, outer_test) in enumerate(outer_folds):
         print(f"\n[nested_cv] === Outer fold {fold_idx + 1}/{len(outer_folds)} ===")
@@ -471,12 +453,18 @@ def main() -> None:
 
                 try:
                     ps = ss.base_func(model, in_train, true_edges, **hparams, **extra)
-                except optuna.TrialPruned:
-                    raise
                 finally:
                     # Release the CUDA memory pool so successive Hyperband trials
                     # don't accumulate allocations (expandable_segments retains them).
                     t.cuda.empty_cache()
+
+                # Hyperband may have signalled should_prune mid-training: the algo's
+                # eval_callback honored it by breaking early, but Optuna only records
+                # the trial as PRUNED if we raise TrialPruned. Without this, every
+                # Hyperband-aborted trial is recorded as COMPLETE with a partial-
+                # training score, poisoning the TPE sampler.
+                if callback is not None and trial.should_prune():
+                    raise optuna.TrialPruned()
 
                 fold_scores = score_all(
                     model, ps, in_val, true_edges, eval_edge_counts, algo_eval_ablation
@@ -497,157 +485,45 @@ def main() -> None:
 
         # Bind fold-level variables into the objective (needed because Python closures
         # capture by reference and fold_idx / inner_splits / outer_train would change)
-        study.optimize(
-            objective,
-            n_trials=args.n_trials,
-            show_progress_bar=True,
-        )
-
-        # ------------------------------------------------------------------
-        # Save Optuna results
-        # ------------------------------------------------------------------
-        trials_df = study.trials_dataframe()
-        trials_df.to_csv(fold_dir / "optuna_trials.csv", index=False)
-
-        best_hparams = study.best_params
-        best_hparams_per_fold.append(best_hparams)
-        (fold_dir / "best_hparams.json").write_text(json.dumps(best_hparams, indent=2))
-        print(f"[nested_cv] Fold {fold_idx}: best inner score = {study.best_value:.4f}")
-        print(f"[nested_cv] Best hparams: {best_hparams}")
-
-        # ------------------------------------------------------------------
-        # Refit + outer-test evaluation: only worker 0 does this to avoid
-        # redundant re-training when multiple workers share the same study.
-        # ------------------------------------------------------------------
-        if args.worker_id != 0:
-            print(f"[nested_cv] Worker {args.worker_id}: skipping refit (worker 0 will do it).")
-            continue
-
-        print(f"[nested_cv] Refitting on full outer_train ({fold_idx})...")
-        refit_hparams = dict(best_hparams)
-        if fidelity_param is not None and args.max_epochs_cap is not None:
-            refit_hparams[fidelity_param] = args.max_epochs_cap
-        refit_ps = ss.base_func(model, outer_train, true_edges, **refit_hparams)
-
-        fold_key = f"{args.algo} / fold{fold_idx}"
-        fold_prune_scores[fold_key] = refit_ps
-        save_cache(
-            {task.key: {fold_key: refit_ps}},
-            cache_folder,
-            f"fold{fold_idx}_prune_scores",
-        )
-
-        # ------------------------------------------------------------------
-        # Evaluate refit model on outer_test (one-shot, unbiased estimate)
-        # ------------------------------------------------------------------
-        print(f"[nested_cv] Evaluating on outer_test ({fold_idx})...")
-        outer_fold_scores = score_all(
-            model, refit_ps, outer_test, true_edges, eval_edge_counts, algo_eval_ablation
-        )
-        outer_scores[f"fold{fold_idx}"] = outer_fold_scores
-        (fold_dir / "outer_test_scores.json").write_text(
-            json.dumps(outer_fold_scores, indent=2)
-        )
-        print(f"[nested_cv] Outer-test scores: {outer_fold_scores}")
-
-    # Non-primary workers only contributed HPO trials; refit and reporting
-    # are handled by worker 0 to avoid duplicate work.
-    if args.worker_id != 0:
-        print(f"\n[nested_cv] Worker {args.worker_id}: done contributing trials. Exiting.")
-        return
-
-    # ------------------------------------------------------------------
-    # Aggregate outer scores
-    # ------------------------------------------------------------------
-    summary: Dict[str, Any] = {
-        "per_fold": outer_scores,
-        "best_hparams_per_fold": best_hparams_per_fold,
-    }
-    # Compute mean ± std across folds for each metric
-    for metric_name in ["kl_div_auc", "logit_diff_auc", "roc_auc"]:
-        vals = [
-            outer_scores[f"fold{i}"].get(metric_name)
-            for i in range(len(outer_folds))
-            if outer_scores.get(f"fold{i}", {}).get(metric_name) is not None
-        ]
-        if vals:
-            mean = sum(vals) / len(vals)
-            std = (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
-            summary[f"{metric_name}_mean"] = mean
-            summary[f"{metric_name}_std"] = std
-    (out_root / "outer_scores.json").write_text(json.dumps(summary, indent=2))
-    print(f"\n[nested_cv] === Summary ===")
-    for k, v in summary.items():
-        if k not in ("per_fold", "best_hparams_per_fold"):
-            print(f"  {k}: {v:.4f}" if isinstance(v, float) else f"  {k}: {v}")
-
-    # ------------------------------------------------------------------
-    # Save combined prune scores (baseline + all fold refits)
-    # ------------------------------------------------------------------
-    _register_fold_algos(args.algo, fold_prune_scores)
-    combined: TaskPruneScores = {
-        task.key: {**task_prune_scores.get(task.key, {}), **fold_prune_scores}
-    }
-    save_cache(combined, cache_folder, "combined_prune_scores")
-    print(f"[nested_cv] Saved combined_prune_scores.pkl with keys: {list(combined[task.key].keys())}")
-
-    # ------------------------------------------------------------------
-    # Comparison figures
-    # ------------------------------------------------------------------
-    if not args.no_figs:
-        fig_dir = out_root / "comparison_figs"
-        fig_dir.mkdir(parents=True, exist_ok=True)
-
-        # ROC plot
-        try:
-            if true_edges is not None:
-                roc_measurements = measure_roc(combined)
-                fig_roc = roc_plot(roc_measurements)
-                fig_roc.write_image(str(fig_dir / "roc.pdf"))
-                fig_roc.write_html(str(fig_dir / "roc.html"))
-                print("[nested_cv] Saved roc.pdf and roc.html")
-        except Exception as e:
-            print(f"[nested_cv] ROC figure skipped: {e}")
-
-        # Prune metric plots
-        try:
-            _metrics = [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC]
-
-            # Non-GT algos: sweep over the configured edge counts
-            gt_key = GROUND_TRUTH_PRUNE_ALGO.key
-            non_gt = {task.key: {k: v for k, v in combined[task.key].items() if k != gt_key}}
-            prune_measurements = measure_prune_metrics(
-                ablation_types=ablation_types,
-                metrics=_metrics,
-                task_prune_scores=non_gt,
-                patch_type=PatchType.TREE_PATCH,
-                test_edge_counts=eval_edge_counts or None,
+        #
+        # Resumability: --n-trials is the GLOBAL target per outer fold (across all
+        # workers). On a fresh run the study is empty; on a SLURM requeue, Optuna
+        # loads the existing trials from the journal and we only run the remainder.
+        def _count_done() -> int:
+            return sum(
+                1 for trial_obj in study.get_trials(deepcopy=False)
+                if trial_obj.state in (TrialState.COMPLETE, TrialState.PRUNED)
             )
 
-            # GT algo: single edge count so it renders as a marker (black X), not a line
-            if gt_key in combined.get(task.key, {}) and task.true_edge_count is not None:
-                gt_only = {task.key: {gt_key: combined[task.key][gt_key]}}
-                gt_measurements = measure_prune_metrics(
-                    ablation_types=ablation_types,
-                    metrics=_metrics,
-                    task_prune_scores=gt_only,
-                    patch_type=PatchType.TREE_PATCH,
-                    test_edge_counts=[task.true_edge_count],
-                )
-                for abl in gt_measurements:
-                    for mk in gt_measurements[abl]:
-                        for tk in gt_measurements[abl][mk]:
-                            prune_measurements[abl][mk][tk].update(gt_measurements[abl][mk][tk])
+        def _stop_cb(study_inner, _trial) -> None:
+            if _count_done() >= args.n_trials:
+                study_inner.stop()
 
-            for i, (fig, meta) in enumerate(measurement_figs(prune_measurements)):
-                base = f"metric_{meta['metric_key'].replace(' ', '_')}_{i}"
-                fig.write_image(str(fig_dir / f"{base}.pdf"))
-                fig.write_html(str(fig_dir / f"{base}.html"))
-            print(f"[nested_cv] Saved metric figures (pdf + html) to {fig_dir}")
-        except Exception as e:
-            print(f"[nested_cv] Metric figures skipped: {e}")
+        already_done = _count_done()
+        remaining = max(0, args.n_trials - already_done)
+        print(
+            f"[nested_cv] Fold {fold_idx}: target={args.n_trials} completed/pruned trials, "
+            f"existing={already_done}, this worker will run up to {remaining}."
+        )
+        if remaining > 0:
+            study.optimize(
+                objective,
+                n_trials=remaining,
+                callbacks=[_stop_cb],
+                show_progress_bar=True,
+            )
 
-    print("\n[nested_cv] Done.")
+        # Live progress (no file writes here — hpo/finalize.py is the single
+        # writer for trials CSV, best_hparams.json, refit caches, and figures).
+        try:
+            print(f"[nested_cv] Fold {fold_idx}: best inner score so far = {study.best_value:.4f}")
+        except ValueError:
+            # No completed trials yet (e.g., worker started after `_stop_cb` already fired)
+            print(f"[nested_cv] Fold {fold_idx}: no completed trials by this worker.")
+
+    print(f"\n[nested_cv] Worker {args.worker_id}: done contributing trials.")
+    print(f"[nested_cv] Run `python hpo/finalize.py --output-dir {out_root}` after all "
+          f"workers exit to produce refit / outer-test eval / figures.")
 
 
 if __name__ == "__main__":
