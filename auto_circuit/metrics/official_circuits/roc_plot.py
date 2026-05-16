@@ -92,13 +92,13 @@ def roc_plot(
                 line=dict(
                     shape="hv",
                     width=line_width if variable_width else 2,
-                    color=COLOR_PALETTE[algo_idx],
+                    color=COLOR_PALETTE[algo_idx % len(COLOR_PALETTE)],
                 ),
                 textposition="middle right",
                 showlegend=task_idx == 0,
                 marker_line_width=2,
                 name=algo_name,
-                marker_color=COLOR_PALETTE[algo_idx],
+                marker_color=COLOR_PALETTE[algo_idx % len(COLOR_PALETTE)],
             )
 
     # ---- Axis styling ----
