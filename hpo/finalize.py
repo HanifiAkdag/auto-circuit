@@ -38,7 +38,7 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
     CLEAN_KL_DIV_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
 )
-from auto_circuit.prune_algos.prune_algos import GROUND_TRUTH_PRUNE_ALGO
+from auto_circuit.prune_algos.prune_algos import GROUND_TRUTH_PRUNE_ALGO, PRUNE_ALGO_DICT
 from auto_circuit.types import AblationType, PatchType, PruneScores, TaskPruneScores
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
 
@@ -267,7 +267,16 @@ def main() -> None:
     try:
         _metrics = [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC]
         gt_key = GROUND_TRUTH_PRUNE_ALGO.key
-        non_gt = {task.key: {k: v for k, v in combined[task.key].items() if k != gt_key}}
+        known = set(PRUNE_ALGO_DICT.keys())
+        stale = [k for k in combined[task.key] if k not in known]
+        if stale:
+            print(f"[finalize] Skipping unknown algos in metric figures: {stale}")
+        non_gt = {
+            task.key: {
+                k: v for k, v in combined[task.key].items()
+                if k != gt_key and k in known
+            }
+        }
         prune_measurements = measure_prune_metrics(
             ablation_types=ablation_types,
             metrics=_metrics,
@@ -294,7 +303,9 @@ def main() -> None:
             fig.write_html(str(fig_dir / f"{base}.html"))
         print(f"[finalize] Saved metric figures (pdf + html) to {fig_dir}")
     except Exception as e:
+        import traceback
         print(f"[finalize] Metric figures skipped: {e}")
+        traceback.print_exc()
 
     print("\n[finalize] Done.")
 
