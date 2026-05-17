@@ -39,7 +39,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import optuna
 import torch as t
@@ -209,19 +209,29 @@ def _make_eval_callback(trial, model, val_loader, true_edges, edge_counts, ablat
                         selection_metric: str):
     """Per-epoch callback that reports intermediate scores to Optuna.
 
-    Returning False keeps the algo training; the actual TrialPruned raise is
-    done by the caller after the algo returns (see objective()), which lets
-    the algo finish its weight-restoration cleanup before the exception
-    propagates.
+    Captures the prune decision in ``state["pruned"]`` at the moment
+    ``should_prune()`` first returns True, so the objective can definitively
+    raise ``TrialPruned()`` afterward. Re-querying ``should_prune()`` later is
+    NOT reliable with parallel workers: Hyperband's rung-promotion threshold
+    is recomputed from all trials in the journal each call, so other workers'
+    in-flight reports can flip a True back to False between the callback and
+    the post-algo re-check. That is exactly what produced 47/53 trials being
+    Hyperband-aborted but still recorded as COMPLETE in run 388147.
     """
+    state: Dict[str, Any] = {"pruned": False}
+
     def callback(step: int, prune_scores: PruneScores) -> bool:
         scores = score_all(model, prune_scores, val_loader, true_edges,
                            edge_counts, ablation_type)
         val_score = scores.get(selection_metric)
         if val_score is not None and not (val_score != val_score):  # not NaN
             trial.report(val_score, step)
-        return trial.should_prune()
+        if trial.should_prune():
+            state["pruned"] = True
+            return True
+        return False
 
+    callback.state = state  # let objective() inspect after the algo returns
     return callback
 
 
@@ -458,12 +468,14 @@ def main() -> None:
                     # don't accumulate allocations (expandable_segments retains them).
                     t.cuda.empty_cache()
 
-                # Hyperband may have signalled should_prune mid-training: the algo's
-                # eval_callback honored it by breaking early, but Optuna only records
-                # the trial as PRUNED if we raise TrialPruned. Without this, every
-                # Hyperband-aborted trial is recorded as COMPLETE with a partial-
-                # training score, poisoning the TPE sampler.
-                if callback is not None and trial.should_prune():
+                # If the eval_callback saw should_prune()==True at any point during
+                # training, raise TrialPruned now so Optuna records the trial as
+                # PRUNED. We rely on the callback's captured flag (callback.state)
+                # rather than re-querying trial.should_prune() — with parallel
+                # workers, Hyperband's rung threshold can shift between calls and
+                # flip a True back to False, which is exactly what caused run
+                # 388147 to record 47/53 Hyperband-aborted trials as COMPLETE.
+                if callback is not None and callback.state["pruned"]:
                     raise optuna.TrialPruned()
 
                 fold_scores = score_all(
