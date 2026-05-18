@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import optuna
+import torch as t
 from optuna.storages import JournalStorage
 from optuna.storages.journal import JournalFileBackend
 
@@ -182,6 +183,7 @@ def main() -> None:
 
         # Refit
         print(f"[finalize] Refitting on full outer_train ({fold_idx})...")
+        t.manual_seed(seed + fold_idx)
         refit_hparams = dict(best_hparams)
         if fidelity_param is not None and max_epochs_cap is not None:
             refit_hparams[fidelity_param] = max_epochs_cap
