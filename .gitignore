@@ -17,3 +17,4 @@ logs/
 CLAUDE.md
 *.pkl
 hpo/results/
+docs/related_work/

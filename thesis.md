@@ -1,5 +1,43 @@
 # Thesis Notes
 
+## Related Work
+
+### Non-identifiability of circuit discovery and hydra effects — 2026-05-28
+
+- **Context:** Reading Méloux et al. (2025), "The Dead Salmons of AI Interpretability" (arXiv 2512.18792), while framing the multi-algorithm comparison chapter.
+- **Observation:**
+  - Circuit discovery is formally **non-identifiable**: multiple mutually incompatible circuits can explain the same observed model behavior equally well. The paper formalises this via a statistical-causal framework where an interpretability task is identifiable only when the query space, surrogate class, and discrepancy measure jointly determine a unique explanation.
+  - Each algorithm's design choices (ablation type, loss function, optimization regime) constitute a different surrogate class and discrepancy measure, so EP, DiscoGP, ACDC, and EAP are formally answering slightly different causal queries — not approximating the same ground truth.
+  - **Hydra effects**: models contain redundant causal pathways. Ablating edge A causes edge B to compensate, making A appear unimportant — until B is removed first. Edge importance is therefore context-dependent on what else remains active during measurement.
+  - Comparison against a random baseline is a low bar. The meaningful test is whether a discovered circuit outperforms *other non-trivial computational explanations* of the same behavior (i.e., circuits from competing algorithms at the same sparsity level).
+  - Faithfulness metrics (KL divergence, logit diff) measure how well a circuit reproduces the full model's output — not whether it identifies the correct mechanism. A faithful circuit is not necessarily causally correct.
+- **Significance:** Provides theoretical grounding for why EP and DiscoGP return different circuits on IOI/GT/Docstring — the divergence is expected and does not indicate one algorithm is broken. Frames the multi-algorithm comparison as exploring the solution space of valid circuit explanations rather than a race to a unique ground truth. Directly relevant to the Discussion chapter when interpreting disagreements between algorithms.
+- **Code pointer:** `docs/related_work/dead_salmon_interpretability.md`
+
+### Faithfulness metrics are methodology-relative; AutoCircuit library origin — 2026-05-28
+
+- **Context:** Reading Miller et al. (2024), "Transformer Circuit Faithfulness Metrics are not Robust" (arXiv 2407.08734, CoLM 2024), the paper that introduced the AutoCircuit library this thesis extends.
+- **Observation:**
+  - Faithfulness scores are not stable properties of a circuit — they are co-determined by six ablation dimensions: granularity (head/MLP/neuron), component type (node/edge/branch), ablation value (zero/mean/resample), token positions, ablation direction (circuit vs. complement), and component set selection.
+  - IOI faithfulness under node ablation is ~87% logit difference; the same circuit under different ablation choices produces statistically significantly different values (mean vs. resample: p = 1e-5). IQR up to 50% within a single dataset.
+  - Tracr ground-truth experiment: all three algorithms (ACDC, SP, HISP) achieve perfect circuit recovery when discovery and evaluation use the same ablation methodology — methodology alignment matters more than algorithm choice in the ideal case.
+  - Zero vs. resample ablation on the X-Proportion Tracr model yield circuits with different compositions — circuits are ablation-relative objects, not unique ground truths.
+  - AutoCircuit library released with the paper: efficient edge-patching, zero/mean/resample ablations, TransformerLens integration, faster than official ACDC. This is the codebase this thesis extends.
+- **Significance:** Provides the methodological grounding for why EP (resample) and DiscoGP (zero ablation) produce different circuits by construction — the divergence is predicted by the framework, not evidence of a bug. Also frames why cross-algorithm faithfulness comparisons without ablation-type caveats are misleading. Primary citation for the AutoCircuit library in the Implementation chapter.
+- **Code pointer:** `docs/related_work/faithfulness_metrics_not_robust.md`
+
+### EAP-IG exhibits high structural variance and hyperparameter sensitivity — 2026-05-28
+
+- **Context:** Reading Méloux et al. (2025), "Mechanistic Interpretability as Statistical Estimation: A Variance Analysis of EAP-IG" (arXiv 2510.00845), the empirical companion to the Dead Salmon paper, while assessing reliability of EAP as a comparison baseline.
+- **Observation:**
+  - Circuit discovery is a statistical estimation problem built on CMA. CMA scores are intrinsically volatile random variables, not stable properties — instability is not solely caused by approximation shortcuts but exists at the base layer.
+  - EAP-IG bootstrap resampling yields Jaccard similarity ≈ **0.561** (CV = 0.335) — barely better than chance structural agreement. Meta-dataset and paraphrased prompts give Jaccard ≈ 0.79, showing data distribution matters more than within-distribution sampling noise.
+  - Hyperparameter sensitivity spans Jaccard **0.086–1.0** across EAP variant × aggregation method × intervention type — nearly the full possible range.
+  - Bootstrap samples cluster into **distinct circuit modes** rather than noise around one answer — empirical confirmation of the non-identifiability predicted by the Dead Salmon paper.
+  - Larger models (Llama-3.2-1B) are more unstable than GPT-2-small.
+- **Significance:** Single-run EAP results in the thesis are a point estimate in a high-variance landscape. Disagreements between EAP and EP/DiscoGP are ambiguous evidence — both the algorithm difference and EAP's own variance contribute. Optimization-based methods (EP, DiscoGP) train over epochs and may produce structurally more stable circuits than attribution-based EAP — a motivated hypothesis worth raising in Discussion if not tested directly. Must flag as a limitations caveat.
+- **Code pointer:** `docs/related_work/eap_ig_variance_stability.md`
+
 ## Results
 
 ### DiscoGP edge-only variants: KL collapse despite strong logit-difference (IOI, zero ablation) — 2026-05-15
