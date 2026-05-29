@@ -96,15 +96,40 @@ def head_importance_heatmap(
         )
     )
 
+    title_text = (
+        f"{algo_name} — {task_name}"
+        f"<br><sup>Head Importance ({aggregation})</sup>"
+    )
     fig.update_layout(
-        title=f"{algo_name} — {task_name}: Head Importance ({aggregation})",
-        xaxis=dict(title="Head", tickmode="linear", dtick=1),
-        yaxis=dict(title="Layer", tickmode="linear", dtick=1, autorange="reversed"),
-        width=500,
-        height=450,
+        title=dict(
+            text=title_text,
+            x=0.5,
+            xanchor="center",
+            font=dict(size=18),
+        ),
+        xaxis=dict(
+            title=dict(text="Head", font=dict(size=15)),
+            tickmode="linear",
+            dtick=1,
+            tickfont=dict(size=12),
+            constrain="domain",
+        ),
+        yaxis=dict(
+            title=dict(text="Layer", font=dict(size=15)),
+            tickmode="linear",
+            dtick=1,
+            tickfont=dict(size=12),
+            autorange="reversed",
+            scaleanchor="x",
+            constrain="domain",
+        ),
+        font=dict(size=13),
+        width=600,
+        height=540,
         template="plotly",
         paper_bgcolor="white",
         plot_bgcolor="white",
+        margin=dict(l=65, r=40, t=90, b=65),
     )
 
     if output_dir is not None:
