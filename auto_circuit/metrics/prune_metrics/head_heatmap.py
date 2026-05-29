@@ -68,6 +68,13 @@ def head_importance_heatmap(
     arxiv 2211.00593). Works with any task/algorithm combination whose prune
     scores have already been computed.
 
+    Note:
+        Plots the raw signed score, but importance is the absolute value:
+        circuit selection ranks edges by ``|score|`` (see ``desc_prune_scores``
+        and ``prune.py``). A negative score is as important as a positive one of
+        equal magnitude. The sign only conveys direction of effect (e.g. EAP's
+        suppression heads); mask-based scores (DiscoGP/EP) are non-negative.
+
     Args:
         prune_scores: Edge importance scores from any prune algorithm.
         model: The patchable model the scores were computed on.
