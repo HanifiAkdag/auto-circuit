@@ -16,6 +16,7 @@ from auto_circuit.metrics.completeness_metrics.train_same_under_knockouts import
 )
 from auto_circuit.metrics.official_circuits.measure_roc import measure_roc
 from auto_circuit.metrics.official_circuits.roc_plot import roc_plot
+from auto_circuit.metrics.prune_metrics.head_heatmap import head_importance_heatmap
 from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
     measure_prune_metrics,
     measurement_figs,
@@ -46,6 +47,7 @@ from auto_circuit.tasks import (
     DOCSTRING_TOKEN_CIRCUIT_TASK,
     SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
+    GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     TASK_DICT,
     Task,
 )
@@ -59,13 +61,13 @@ from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cach
 from auto_circuit.utils.tensor_ops import prune_scores_threshold
 from auto_circuit.visualize import draw_seq_graph
 
-figs = []
+figs: list = []  # list of (fig, name) tuples
 
 # ------------------------------------ Prune Scores ------------------------------------
 
-compute_prune_scores = True
-save_prune_scores = True
-load_prune_scores = False
+compute_prune_scores = False
+save_prune_scores = False
+load_prune_scores = True
 
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
@@ -91,8 +93,8 @@ if compute_prune_scores:
         RANDOM_PRUNE_ALGO,
         EDGE_ATTR_PATCH_PRUNE_ALGO,
         # ACDC_PRUNE_ALGO,
-        DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
-        DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
+        # DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+        # DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
         DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
         # EDGE_PRUNING_PRUNE_ALGO,
     ]
@@ -100,7 +102,7 @@ if compute_prune_scores:
 if load_prune_scores:
     # 2000 epoch IOI Docstring tensor prune_scores post-kv-cache-fix
     # batch_size=128, batch_count=2, default seed (for both)
-    filename = "task-prune-scores-09-05-2026_18-08-12.pkl"
+    filename = "task-prune-scores-28-05-2026_23-29-07.pkl"
 
     # 1000 epoch Sport Players tensor prune_scores post-kv-cache-fix
     # batch_size=(10, 20), batch_count=(10, 5), default seed
@@ -120,6 +122,28 @@ for task, algo_prune_scores in task_prune_scores.items():
 
 # docstring_key = DOCSTRING_TOKEN_CIRCUIT_TASK.key
 # task_prune_scores = {docstring_key: task_prune_scores[docstring_key]}
+
+# Create a unique experiment folder once, shared by all output sections below
+experiment_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+base_folder: Path = repo_path_to_abs_path("figures/circuit_discovery")
+experiment_folder = base_folder / experiment_id
+experiment_folder.mkdir(parents=True, exist_ok=True)
+
+# ---------------------------------- Head Heatmaps -------------------------------------
+
+for task_key, algo_prune_scores in task_prune_scores.items():
+    task = TASK_DICT[task_key]
+    for algo_key, ps in algo_prune_scores.items():
+        algo = PRUNE_ALGO_DICT[algo_key]
+        head_importance_heatmap(
+            prune_scores=ps,
+            model=task.model,
+            algo_name=algo.name,
+            task_name=task.name,
+            aggregation="sum",
+            output_dir=experiment_folder / "head_heatmaps",
+            file_formats=("html", "png"),
+        )
 
 # -------------------------------- Draw Circuit Graphs ---------------------------------
 
@@ -158,7 +182,7 @@ if True:
     prune_scores_similartity_fig = prune_score_similarities_plotly(
         task_prune_scores, [10, 100, 1000, 10000], ground_truths=True
     )
-    figs.append(prune_scores_similartity_fig)
+    figs.append((prune_scores_similartity_fig, "prune_scores_similarity"))
 
 # ------------------------------------ Completeness ------------------------------------
 
@@ -201,14 +225,14 @@ if completeness_prune_scores:
         knockout_ps=completeness_prune_scores,
     )
     completeness_fig = same_under_knockouts_fig(task_completeness_scores)
-    figs.append(completeness_fig)
+    figs.append((completeness_fig, f"completeness_{faithfulness_target}"))
 
 # ---------------------------------------- ROC -----------------------------------------
 
 if True:
     roc_measurements: TaskMeasurements = measure_roc(task_prune_scores)
     roc_fig = roc_plot(roc_measurements)
-    figs.append(roc_fig)
+    figs.append((roc_fig, "roc"))
 
 # ----------------------------- Prune Metric Measurements ------------------------------
 
@@ -258,19 +282,19 @@ if load_prune_metric_measurements:
     prune_metric_measurements = load_cache(cache_folder_name, filename)
 
 if prune_metric_measurements is not None:
-    figs += [fig for fig, _meta in measurement_figs(prune_metric_measurements)]
+    for fig, meta in measurement_figs(prune_metric_measurements):
+        metric_slug = meta["metric_key"].lower().replace(" ", "_")
+        ablation = str(meta["ablation_type"]).split(".")[-1].lower()
+        name = f"metric_{metric_slug}_{ablation}"
+        if meta["is_auc"]:
+            name += "_auc"
+        figs.append((fig, name))
 
 # -------------------------------------- Figures ---------------------------------------
 
-# Create a unique identifier for this experiment run using timestamp
-experiment_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-base_folder: Path = repo_path_to_abs_path("figures/circuit_discovery")
-experiment_folder = base_folder / experiment_id
-experiment_folder.mkdir(parents=True, exist_ok=True)
-
-for i, fig in enumerate(figs):
+for fig, name in figs:
     # fig.show()
     # Save figure as pdf in experiment subfolder
-    fig.write_image(str(experiment_folder / f"figure_{i}.pdf"))
+    fig.write_image(str(experiment_folder / f"{name}.pdf"))
 
 #%%
