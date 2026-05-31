@@ -83,7 +83,7 @@ SAVE_PRUNE_SCORES = True
 SAVE_FIGURES = True
 SAVE_TOP_EDGES = True
 TOP_N_EDGES = 100
-FIGURES_DIR = "figures/edge_pruning_validation"
+FIGURES_DIR = "results/edge_pruning_validation"
 SIMILARITY_EDGE_COUNTS = [10, 50, 100, 500]
 
 # ============================================================================

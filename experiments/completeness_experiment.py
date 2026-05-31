@@ -108,7 +108,7 @@ PRUNE_METRICS: List[PruneMetric] = [
 ]
 
 # --- Output directories ---
-FIGURES_DIR = "figures/completeness_experiment"
+FIGURES_DIR = "results/completeness_experiment"
 PRUNE_SCORES_CACHE = ".prune_scores_cache"
 MEASUREMENT_CACHE = ".measurement_cache"
 

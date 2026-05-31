@@ -1,10 +1,13 @@
 #%%
+import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
 import torch as t
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.completeness_metrics.same_under_knockouts import (
     TaskCompletenessScores,
@@ -60,17 +63,19 @@ from auto_circuit.types import (
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
 from auto_circuit.utils.tensor_ops import prune_scores_threshold
 from auto_circuit.visualize import draw_seq_graph
+from experiment_utils import git_state, write_manifest
 
 figs: list = []  # list of (fig, name) tuples
 
 # ------------------------------------ Prune Scores ------------------------------------
 
-compute_prune_scores = False
-save_prune_scores = False
-load_prune_scores = True
+compute_prune_scores = True
+save_prune_scores = True
+load_prune_scores = False
 
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
+_loaded_prune_scores_file: str | None = None
 if compute_prune_scores:
     TASKS: List[Task] = [
         # Token Circuits
@@ -108,6 +113,7 @@ if load_prune_scores:
     # batch_size=(10, 20), batch_count=(10, 5), default seed
     # filename = "task-prune-scores-16-02-2024_22-22-43.pkl"
 
+    _loaded_prune_scores_file = filename
     loaded_cache = load_cache(cache_folder_name, filename)
     task_prune_scores = {k: v | task_prune_scores[k] for k, v in loaded_cache.items()}
 if save_prune_scores:
@@ -125,9 +131,21 @@ for task, algo_prune_scores in task_prune_scores.items():
 
 # Create a unique experiment folder once, shared by all output sections below
 experiment_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-base_folder: Path = repo_path_to_abs_path("figures/circuit_discovery")
+base_folder: Path = repo_path_to_abs_path("results/circuit_discovery")
 experiment_folder = base_folder / experiment_id
 experiment_folder.mkdir(parents=True, exist_ok=True)
+_manifest: dict = {
+    "experiment_id": experiment_id,
+    "started_at": datetime.now().isoformat(timespec="seconds"),
+    "git": git_state(),
+    "flags": {
+        "compute_prune_scores": compute_prune_scores,
+        "save_prune_scores": save_prune_scores,
+        "load_prune_scores": load_prune_scores,
+    },
+    "loaded_prune_scores_file": _loaded_prune_scores_file,
+}
+write_manifest(experiment_folder / "manifest.json", _manifest)
 
 # ---------------------------------- Head Heatmaps -------------------------------------
 
@@ -173,7 +191,6 @@ if True:
                 model=task.model,
                 prune_scores=circ,
                 seq_labels=task.test_loader.seq_labels,
-                show_all_edges=False,
             )
 
 # ------------------------------ Prune Scores Similarity -------------------------------
@@ -242,6 +259,9 @@ load_prune_metric_measurements = False
 
 cache_folder_name = ".measurement_cache"
 prune_metric_measurements = None
+_loaded_measurements_file: str | None = None
+_metrics: list = []
+_ablation_types: list = []
 if compute_prune_metric_measurements:
     ABLATION_TYPES: List[AblationType] = [
         AblationType.RESAMPLE,  # Docstring
@@ -259,6 +279,8 @@ if compute_prune_metric_measurements:
         LOGIT_DIFF_PERCENT_METRIC,  # IOI
         CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # Sports Players
     ]
+    _metrics = [m.key for m in PRUNE_METRICS]
+    _ablation_types = list(ABLATION_TYPES)
     prune_metric_measurements = measure_prune_metrics(
         ablation_types=ABLATION_TYPES,
         metrics=PRUNE_METRICS,
@@ -279,6 +301,7 @@ if load_prune_metric_measurements:
     # batch_size=(10, 20), batch_count=(10, 5), default seed
     # filename="seq-circuit-18-02-2024_22-09-26.pkl"
 
+    _loaded_measurements_file = filename
     prune_metric_measurements = load_cache(cache_folder_name, filename)
 
 if prune_metric_measurements is not None:
@@ -292,9 +315,30 @@ if prune_metric_measurements is not None:
 
 # -------------------------------------- Figures ---------------------------------------
 
+figure_names: list = []
 for fig, name in figs:
-    # fig.show()
-    # Save figure as pdf in experiment subfolder
     fig.write_image(str(experiment_folder / f"{name}.pdf"))
+    figure_names.append(f"{name}.pdf")
+
+_manifest.update({
+    "completed_at": datetime.now().isoformat(timespec="seconds"),
+    "flags": {
+        **_manifest["flags"],
+        "compute_prune_metric_measurements": compute_prune_metric_measurements,
+        "save_prune_metric_measurements": save_prune_metric_measurements,
+        "load_prune_metric_measurements": load_prune_metric_measurements,
+        "compute_task_completeness_scores": compute_task_completeness_scores,
+        "save_task_completeness_scores": save_task_completeness_scores,
+        "load_task_completeness_scores": load_task_completeness_scores,
+    },
+    "loaded_measurements_file": _loaded_measurements_file,
+    "tasks": [{"key": k, "name": TASK_DICT[k].name} for k in task_prune_scores],
+    "algos": sorted({a for ps in task_prune_scores.values() for a in ps}),
+    "metrics": _metrics,
+    "ablation_types": _ablation_types,
+    "patch_type": PatchType.TREE_PATCH,
+    "figures_saved": figure_names,
+})
+write_manifest(experiment_folder / "manifest.json", _manifest)
 
 #%%

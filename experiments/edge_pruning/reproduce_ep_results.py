@@ -96,7 +96,7 @@ SHARED_HPARAMS = dict(
 # Node sparsity target (fixed across edge sparsity sweep)
 NODE_SPARSITY_TARGET = 0.72
 
-FIGURES_DIR = "figures/edge_pruning_reproduction"
+FIGURES_DIR = "results/edge_pruning_reproduction"
 
 # ============================================================================
 # Step 1: Load task
