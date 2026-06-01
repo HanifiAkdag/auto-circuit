@@ -43,6 +43,7 @@ def net_viz(
     seq_idx: Optional[int] = None,
     score_threshold: float = 1e-2,
     layer_spacing: bool = False,
+    layer_order: bool = False,
     orientation: Literal["h", "v"] = "h",
 ) -> Tuple[go.Sankey, int]:
     """
@@ -71,6 +72,9 @@ def net_viz(
         layer_spacing: If `True`, all nodes are spaced according to the layer they in.
             Otherwise, the Plotly automatic spacing is used and nodes in later layers
             may appear to the left of nodes in earlier layers.
+        layer_order: If `True`, nodes are pinned to explicit positions ordered by layer
+            (`Embed -> A0 -> MLP0 -> A1 -> ... -> Unembed`) using `arrangement="snap"`.
+            Overrides the automatic left-to-right ordering.
         orientation: The orientation of the sankey diagram. Can be either `"h"` for
             horizontal or `"v"` for vertical.
 
@@ -176,9 +180,40 @@ def net_viz(
             labels.append("")
             colors.append("rgba(0,255,0,0.0)")
 
+    # Pin nodes to explicit positions ordered by layer (Embed -> A0 -> MLP0 -> ...).
+    # Plotly silently ignores explicit node positions when many nodes are unconnected,
+    # so drop nodes that have no link and reindex the remaining ones.
+    arrangement = "perpendicular"
+    if layer_order:
+        arrangement = "fixed"
+        used = sorted(set(sources) | set(targets))
+        remap = {old: new for new, old in enumerate(used)}
+        idx_to_node = {node_idxs[nm]: nd for nm, nd in viz_nodes.items()}
+        max_layer = max((n.layer for n in viz_nodes.values()), default=1) or 1
+        layer_to_used: Dict[int, List[int]] = defaultdict(list)
+        for old in used:
+            layer_to_used[idx_to_node[old].layer].append(old)
+        eps = 0.01
+        node_x = [0.0] * len(used)
+        node_y = [0.0] * len(used)
+        for lyr, olds in layer_to_used.items():
+            x = eps + (lyr / max_layer) * (1 - 2 * eps)
+            for rank, old in enumerate(sorted(olds)):
+                node_x[remap[old]] = x
+                node_y[remap[old]] = eps + (rank + 0.5) / len(olds) * (1 - 2 * eps)
+        graph_nodes = {
+            "label": [graph_nodes["label"][old] for old in used],
+            "color": [graph_nodes["color"][old] for old in used],
+            "line": dict(width=0.0),
+            "x": node_x,
+            "y": node_y,
+        }
+        sources = [remap[s] for s in sources]
+        targets = [remap[d] for d in targets]
+
     return (
         go.Sankey(
-            arrangement="perpendicular",
+            arrangement=arrangement,
             node=graph_nodes,
             link={
                 "arrowlen": 25,

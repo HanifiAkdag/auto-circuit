@@ -5,8 +5,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-import torch as t
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.completeness_metrics.same_under_knockouts import (
@@ -48,7 +46,6 @@ from auto_circuit.prune_algos.prune_algos import (
 )
 from auto_circuit.tasks import (
     DOCSTRING_TOKEN_CIRCUIT_TASK,
-    SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
     GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     TASK_DICT,
@@ -61,17 +58,16 @@ from auto_circuit.types import (
     TaskPruneScores,
 )
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
-from auto_circuit.utils.tensor_ops import prune_scores_threshold
-from auto_circuit.visualize import draw_seq_graph
+from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
 from experiment_utils import git_state, write_manifest
 
 figs: list = []  # list of (fig, name) tuples
 
 # ------------------------------------ Prune Scores ------------------------------------
 
-compute_prune_scores = True
-save_prune_scores = True
-load_prune_scores = False
+compute_prune_scores = False
+save_prune_scores = False
+load_prune_scores = True
 
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
@@ -165,33 +161,23 @@ for task_key, algo_prune_scores in task_prune_scores.items():
 
 # -------------------------------- Draw Circuit Graphs ---------------------------------
 
+circuit_graph_paths: list = []
 if True:
     for task_key, algo_prune_scores in task_prune_scores.items():
-        # if not task_key.startswith("Docstring"):
-        #     continue
         task = TASK_DICT[task_key]
-        if (
-            task.key != SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK.key
-            or task.true_edge_count is None
-        ):
-            continue
         for algo_key, ps in algo_prune_scores.items():
             algo = PRUNE_ALGO_DICT[algo_key]
-            keys = [GROUND_TRUTH_PRUNE_ALGO.key]
-            if algo_key not in keys:
-                continue
-            th = prune_scores_threshold(ps, task.true_edge_count)
-            circ_edges = dict([(d, (m.abs() >= th).float()) for d, m in ps.items()])
-            print("circ_edge_count", sum([m.sum() for m in circ_edges.values()]))
-            circ = dict(
-                [(d, t.where(m.abs() >= th, m, t.zeros_like(m))) for d, m in ps.items()]
-            )
-            print("task:", task.name, "algo:", algo.name)
-            draw_seq_graph(
+            html_path = save_circuit_sankey_slider(
+                prune_scores=ps,
                 model=task.model,
-                prune_scores=circ,
+                algo_name=algo.name,
+                task_name=task.name,
+                output_dir=experiment_folder / "circuit_graphs",
+                max_edges=10000,
+                true_edge_count=task.true_edge_count,
                 seq_labels=task.test_loader.seq_labels,
             )
+            circuit_graph_paths.append(html_path.name)
 
 # ------------------------------ Prune Scores Similarity -------------------------------
 
@@ -338,6 +324,7 @@ _manifest.update({
     "ablation_types": _ablation_types,
     "patch_type": PatchType.TREE_PATCH,
     "figures_saved": figure_names,
+    "circuit_graphs": circuit_graph_paths,
 })
 write_manifest(experiment_folder / "manifest.json", _manifest)
 
