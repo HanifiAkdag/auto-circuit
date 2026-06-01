@@ -44,6 +44,7 @@ def net_viz(
     score_threshold: float = 1e-2,
     layer_spacing: bool = False,
     layer_order: bool = False,
+    highlight_complete_paths: bool = False,
     orientation: Literal["h", "v"] = "h",
 ) -> Tuple[go.Sankey, int]:
     """
@@ -101,8 +102,9 @@ def net_viz(
         "line": dict(width=0.0),
     }
 
+    base_opacity = 0.15 if highlight_complete_paths else 0.3
     # Define the sankey edges
-    sources, targets, values, labels, colors = [], [], [], [], []
+    sources, targets, values, labels, colors, signs = [], [], [], [], [], []
     included_layer_nodes: Dict[int, List[str]] = defaultdict(list)
     for e in seq_edges:
         if prune_scores is None:
@@ -142,10 +144,11 @@ def net_viz(
         if edge_score == 0:
             edge_color = "rgba(0,0,0,0.1)"
         elif edge_score > 0:
-            edge_color = "rgba(0,0,255,0.3)"
+            edge_color = f"rgba(0,0,255,{base_opacity})"
         else:
-            edge_color = "rgba(255,0,0,0.3)"
+            edge_color = f"rgba(255,0,0,{base_opacity})"
         colors.append(edge_color)
+        signs.append(edge_score > 0)
         included_layer_nodes[e.src.layer].append(e.src.name)
         included_layer_nodes[e.dest.layer].append(e.dest.name)
 
@@ -210,6 +213,36 @@ def net_viz(
         }
         sources = [remap[s] for s in sources]
         targets = [remap[d] for d in targets]
+
+        if highlight_complete_paths:
+            # BFS forward from min-layer nodes (Embed), backward from max-layer (Resid End).
+            new_idx_to_layer = {remap[old]: idx_to_node[old].layer for old in used}
+            min_lyr = min(new_idx_to_layer.values())
+            max_lyr = max(new_idx_to_layer.values())
+            embed_set = {i for i, l in new_idx_to_layer.items() if l == min_lyr}
+            resid_set = {i for i, l in new_idx_to_layer.items() if l == max_lyr}
+            fwd: Dict[int, List[int]] = defaultdict(list)
+            bwd: Dict[int, List[int]] = defaultdict(list)
+            for s, d in zip(sources, targets):
+                fwd[s].append(d)
+                bwd[d].append(s)
+            def _bfs(starts: set, adj: Dict[int, List[int]]) -> set:
+                visited = set(starts)
+                queue = list(starts)
+                while queue:
+                    n = queue.pop()
+                    for nb in adj[n]:
+                        if nb not in visited:
+                            visited.add(nb)
+                            queue.append(nb)
+                return visited
+            fwd_reach = _bfs(embed_set, fwd)
+            bwd_reach = _bfs(resid_set, bwd)
+            for i, (s, d) in enumerate(zip(sources, targets)):
+                if s in fwd_reach and d in bwd_reach:
+                    colors[i] = "rgba(220,0,0,0.35)" if not signs[i] else "rgba(0,0,220,0.35)"
+                else:
+                    colors[i] = "rgba(160,160,160,0.12)"
 
     return (
         go.Sankey(

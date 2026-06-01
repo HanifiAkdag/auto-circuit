@@ -123,6 +123,7 @@ def save_circuit_sankey_slider(
                 seq_idx=seq_idx,
                 score_threshold=step_threshold,
                 layer_order=True,
+                highlight_complete_paths=True,
                 orientation=orientation,
             )
             if k > label_max_edges:
