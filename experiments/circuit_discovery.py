@@ -154,7 +154,7 @@ for task_key, algo_prune_scores in task_prune_scores.items():
             model=task.model,
             algo_name=algo.name,
             task_name=task.name,
-            aggregation="sum",
+            aggregation="mean",
             output_dir=experiment_folder / "head_heatmaps",
             file_formats=("html", "png"),
         )

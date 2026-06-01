@@ -16,12 +16,21 @@ def _slug(name: str) -> str:
 def aggregate_scores_by_head(
     prune_scores: PruneScores,
     model: PatchableModel,
-    aggregation: Literal["sum", "max", "mean"] = "sum",
+    aggregation: Literal["sum", "max", "mean"] = "mean",
 ) -> torch.Tensor:
     """Aggregate edge prune scores into a (n_transformer_layers, n_heads) grid.
 
     AutoCircuit attention layers are odd integers (1, 3, 5 … for GPT-2 Small).
     Transformer layer index = (dest.layer - 1) // 2.
+
+    Each cell (l, h) aggregates all incoming edges to head h at layer l — across
+    every source node (Embed, all earlier attention heads, all earlier MLPs) and
+    across all three input types (Q, K, V).
+
+    Warning:
+        ``"sum"`` has a layer-depth bias: a head at layer l has ~(1 + 13l) incoming
+        edges in a factorised GPT-2 Small, so summed scores grow mechanically with
+        depth even for GT or random scores. Use ``"mean"`` to remove this artifact.
     """
     attn_edges = [e for e in model.edges if e.dest.head_idx is not None]
     if not attn_edges:
@@ -58,22 +67,34 @@ def head_importance_heatmap(
     model: PatchableModel,
     algo_name: str,
     task_name: str,
-    aggregation: Literal["sum", "max", "mean"] = "sum",
+    aggregation: Literal["sum", "max", "mean"] = "mean",
     output_dir: Optional[Path] = None,
     file_formats: Tuple[str, ...] = ("html", "png"),
 ) -> go.Figure:
     """Layer × head heatmap of aggregated edge prune scores.
 
-    Styled after Figure 3(b) of the IOI paper (Interpretability in the Wild,
-    arxiv 2211.00593). Works with any task/algorithm combination whose prune
-    scores have already been computed.
+    Each cell shows the aggregated prune score of all edges arriving at that
+    attention head (Q, K, and V inputs from every earlier source node).  The
+    colour encodes the raw signed score — blue = positive, red = negative:
+
+    - **EAP**: signed gradient attribution.  Positive = head contributes to the
+      metric; negative = head suppresses the wrong answer (negative mover, e.g.
+      10.7 in IOI).  Circuit selection uses ``|score|``, so negative movers are
+      as important as positive ones of equal magnitude.
+    - **DiscoGP / EP**: trained mask probabilities ∈ (0, 1).  Always positive;
+      higher = more incoming connections retained by the circuit.
+    - **GT**: count (sum) or fraction (mean) of circuit-included incoming edges.
+    - **Random**: expected near zero; variance grows with edge count under sum.
 
     Note:
-        Plots the raw signed score, but importance is the absolute value:
-        circuit selection ranks edges by ``|score|`` (see ``desc_prune_scores``
-        and ``prune.py``). A negative score is as important as a positive one of
-        equal magnitude. The sign only conveys direction of effect (e.g. EAP's
-        suppression heads); mask-based scores (DiscoGP/EP) are non-negative.
+        The default ``aggregation="sum"`` has a layer-depth bias — a head at
+        layer l has ~(1 + 13l) incoming edges in a factorised GPT-2 Small, so
+        summed scores grow with depth even for GT or random.  Pass
+        ``aggregation="mean"`` to remove this artifact.
+
+    This visualisation is inspired by Figure 3(b) of the IOI paper (Wang et al.,
+    2022, arxiv 2211.00593) but is **not** path patching: it aggregates
+    pre-computed prune scores rather than measuring direct causal effects.
 
     Args:
         prune_scores: Edge importance scores from any prune algorithm.
