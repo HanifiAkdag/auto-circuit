@@ -185,7 +185,7 @@ def net_viz(
     # so drop nodes that have no link and reindex the remaining ones.
     arrangement = "perpendicular"
     if layer_order:
-        arrangement = "fixed"
+        arrangement = "snap"
         used = sorted(set(sources) | set(targets))
         remap = {old: new for new, old in enumerate(used)}
         idx_to_node = {node_idxs[nm]: nd for nm, nd in viz_nodes.items()}

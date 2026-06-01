@@ -128,7 +128,7 @@ def save_circuit_sankey_slider(
             if k > label_max_edges:
                 viz.link["label"] = []
                 viz.link["hoverinfo"] = "skip"
-            viz.node["pad"] = 8
+            viz.node["pad"] = 15
             viz.node["thickness"] = 10
             viz.textfont = dict(size=node_font_size)
             sankeys.append(viz)
