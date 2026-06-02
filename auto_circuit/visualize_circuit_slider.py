@@ -171,7 +171,7 @@ def save_circuit_sankey_slider(
         layout=go.Layout(
             autosize=True,
             title=dict(text=title),
-            margin=dict(t=60, b=80),
+            margin=dict(t=60, b=80, r=100),
             sliders=[
                 dict(
                     active=default_step,

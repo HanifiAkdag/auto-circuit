@@ -18,7 +18,7 @@ from auto_circuit.utils.patchable_model import PatchableModel
 
 def node_name(n: str, unembed: bool = False) -> str:
     if n == "Resid End":
-        return "Unembed" if unembed else ""
+        return "Unembed" if unembed else "Resid End"
     elif n == "Resid Start":
         return "Embed"
     else:
@@ -88,23 +88,26 @@ def net_viz(
 
     """
     nodes: OrderedSet[Node] = OrderedSet(model.nodes)
+    # unembed=True swaps "Resid End" label to "Unembed" for vertical orientation
     un = False if orientation == "h" else True
 
-    # Define the sankey nodes
     viz_nodes: Dict[str, Node] = dict([(node_name(n.name, un), n) for n in nodes])
     node_idxs: Dict[str, int] = dict([(n, i) for i, n in enumerate(viz_nodes.keys())])
+    # All model nodes grouped by layer — used for ghost edges (layer_spacing) and x-positions (layer_order)
     lyr_nodes: Dict[int, List[str]] = defaultdict(list)
     for n in viz_nodes.values():
         lyr_nodes[n.layer].append(n.name)
+    # Start all nodes invisible; labels/colors are set only for nodes that appear in an edge
     graph_nodes = {
         "label": ["" for _, _ in viz_nodes.items()],
         "color": ["rgba(0,0,0,0.0)" for _, _ in viz_nodes.items()],
         "line": dict(width=0.0),
     }
 
+    # Dim base edges when complete-path highlighting is on so on-path edges stand out
     base_opacity = 0.15 if highlight_complete_paths else 0.3
-    # Define the sankey edges
     sources, targets, values, labels, colors, signs = [], [], [], [], [], []
+    # Tracks which layers have at least one connected node (used for ghost-edge span)
     included_layer_nodes: Dict[int, List[str]] = defaultdict(list)
     for e in seq_edges:
         if prune_scores is None:
@@ -137,10 +140,15 @@ def net_viz(
         graph_nodes["color"][node_idxs[node_name(e.dest.name, un)]] = COLOR_PALETTE[
             color_idx
         ]
+        # Edge width proportional to |score|; fixed 0.8 in live patch mode
         values.append(0.8 if prune_scores is None else abs(edge_score))
-        lbl = t_fmt(lbl, model.seq_dim, seq_idx, "<br>")
-        lbl = e.name + "<br>" + lbl + f"<br>{edge_score:.2f}"
+        if prune_scores is None:
+            act = t_fmt(lbl, model.seq_dim, seq_idx, "<br>")
+            lbl = f"{e.name}<br>Activation: {act}<br>Score: {edge_score:+.4f}"
+        else:
+            lbl = f"{e.name}<br>Score: {edge_score:+.4f}"
         labels.append(lbl)
+        # Blue = promotes target behaviour (+), red = suppresses (-)
         if edge_score == 0:
             edge_color = "rgba(0,0,0,0.1)"
         elif edge_score > 0:
@@ -153,7 +161,7 @@ def net_viz(
         included_layer_nodes[e.dest.layer].append(e.dest.name)
 
     included_layer_count = len(included_layer_nodes)
-    # Add ghost edges to horizontally align nodes to the correct layer
+    # Ensure every layer has a representative node so ghost edges span the full width
     for i in lyr_nodes.keys():
         if i not in included_layer_nodes:
             included_layer_nodes[i] = [lyr_nodes[i][0]]
@@ -162,10 +170,10 @@ def net_viz(
 
     ordered_lyr_nodes = [nodes for _, nodes in sorted(included_layer_nodes.items())]
 
-    # Don't add ghost edges if layer_spacing is False
     if not layer_spacing:
         ordered_lyr_nodes = []
 
+    # Ghost edges (value≈0, invisible) nudge Plotly into spacing nodes by layer
     ghost_edge_val = 1e-6
     for lyr_1_nodes, lyr_2_nodes in zip(ordered_lyr_nodes[:-1], ordered_lyr_nodes[1:]):
         first_lyr_1_node = lyr_1_nodes[0]
@@ -183,11 +191,10 @@ def net_viz(
             labels.append("")
             colors.append("rgba(0,255,0,0.0)")
 
-    # Pin nodes to explicit positions ordered by layer (Embed -> A0 -> MLP0 -> ...).
-    # Plotly silently ignores explicit node positions when many nodes are unconnected,
-    # so drop nodes that have no link and reindex the remaining ones.
     arrangement = "perpendicular"
     if layer_order:
+        # Plotly ignores node.x/y when many nodes are unconnected, so prune to only
+        # nodes that appear in at least one link, then reindex sources/targets.
         arrangement = "snap"
         used = sorted(set(sources) | set(targets))
         remap = {old: new for new, old in enumerate(used)}
@@ -197,10 +204,17 @@ def net_viz(
         for old in used:
             layer_to_used[idx_to_node[old].layer].append(old)
         eps = 0.01
+        # Widen the gap before the last column so its left-side label ("Resid End")
+        # doesn't overlap MLP11. Plotly always labels nodes with x > 0.5 on the left
+        # and there is no per-node override.
+        terminal_gap = 0.03
         node_x = [0.0] * len(used)
         node_y = [0.0] * len(used)
         for lyr, olds in layer_to_used.items():
-            x = eps + (lyr / max_layer) * (1 - 2 * eps)
+            if lyr == max_layer:
+                x = 1.0 - eps
+            else:
+                x = eps + (lyr / max_layer) * (1 - 2 * eps - terminal_gap)
             for rank, old in enumerate(sorted(olds)):
                 node_x[remap[old]] = x
                 node_y[remap[old]] = eps + (rank + 0.5) / len(olds) * (1 - 2 * eps)
@@ -215,7 +229,8 @@ def net_viz(
         targets = [remap[d] for d in targets]
 
         if highlight_complete_paths:
-            # BFS forward from min-layer nodes (Embed), backward from max-layer (Resid End).
+            # Edges on a path from Embed (min layer) to Resid End (max layer) are
+            # highlighted; all others are dimmed to gray.
             new_idx_to_layer = {remap[old]: idx_to_node[old].layer for old in used}
             min_lyr = min(new_idx_to_layer.values())
             max_lyr = max(new_idx_to_layer.values())
@@ -255,6 +270,8 @@ def net_viz(
                 "value": values,
                 "label": labels,
                 "color": colors,
+                # Suppress Plotly's auto-appended SI-formatted value (e.g. "876m")
+                "hovertemplate": "%{label}<extra></extra>",
             },
             orientation=orientation,
             domain={"y": vert_interval},
