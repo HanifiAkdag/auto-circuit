@@ -77,7 +77,7 @@ def disco_gp_prune_scores(
     # ---- Misc ----
     show_train_graph: bool = False,
     hard: bool = True,
-    loss_mode: Literal["argmax_ce", "answer_margin_ce"] = "argmax_ce",
+    loss_mode: Literal["argmax_ce", "answer_margin_ce"] = "answer_margin_ce",
     # ---- Multi-fidelity HPO hooks (no-op when None) ----
     eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
     eval_every: Optional[int] = None,

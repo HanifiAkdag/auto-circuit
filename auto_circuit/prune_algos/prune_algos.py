@@ -326,6 +326,7 @@ EDGE_PRUNING_PRUNE_ALGO = PruneAlgo(
         learning_rate=0.8,
         lambda_learning_rate=0.8,
         steps=3000,
+        warmup_steps=200,          # matches original IOI sweep (--warmup_steps 200)
         target_edge_sparsity=1.1,
         target_node_sparsity=0.72,
         sparsity_warmup_steps=2500,
@@ -343,6 +344,7 @@ DISCO_GP_PRUNE_ALGO = PruneAlgo(
         disco_gp_prune_scores,
         use_weight_masks=True,
         use_edge_masks=True,
+        loss_mode="argmax_ce",
         show_train_graph=True,
     ),
 )
@@ -358,7 +360,7 @@ DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
         e_n_epoch_cooldown=20,
         e_lr=0.1,
         e_lambda_sparse_init=1.0,
-        e_lambda_complete_init=0.0,
+        e_lambda_complete_init=1.0,
         e_max_times_lambda_sparse=100.0,
         e_min_times_lambda_sparse=0.01,
         gs_temp_edge=1.0,
@@ -366,6 +368,7 @@ DISCO_GP_EDGE_ONLY_PRUNE_ALGO = PruneAlgo(
         use_weight_masks=False,
         use_edge_masks=True,
         hard=True,
+        loss_mode="argmax_ce",
         show_train_graph=True,
     ),
 )

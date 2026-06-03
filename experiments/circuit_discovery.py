@@ -28,6 +28,7 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
     CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
     CORRECT_ANSWER_PERCENT_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
+    PROB_DIFF_METRIC,
     PruneMetric,
 )
 from auto_circuit.metrics.prune_scores_similarity import prune_score_similarities_plotly
@@ -65,9 +66,9 @@ figs: list = []  # list of (fig, name) tuples
 
 # ------------------------------------ Prune Scores ------------------------------------
 
-compute_prune_scores = False
-save_prune_scores = False
-load_prune_scores = True
+compute_prune_scores = True
+save_prune_scores = True
+load_prune_scores = False
 
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
@@ -93,11 +94,11 @@ if compute_prune_scores:
         GROUND_TRUTH_PRUNE_ALGO,
         RANDOM_PRUNE_ALGO,
         EDGE_ATTR_PATCH_PRUNE_ALGO,
-        # ACDC_PRUNE_ALGO,
+        ACDC_PRUNE_ALGO,
         # DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
         # DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
         DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
-        # EDGE_PRUNING_PRUNE_ALGO,
+        EDGE_PRUNING_PRUNE_ALGO,
     ]
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:
@@ -251,7 +252,7 @@ _ablation_types: list = []
 if compute_prune_metric_measurements:
     ABLATION_TYPES: List[AblationType] = [
         AblationType.RESAMPLE,  # Docstring
-        AblationType.TOKENWISE_MEAN_CORRUPT,  # IOI and Sports Players
+        # AblationType.TOKENWISE_MEAN_CORRUPT,  # IOI and Sports Players
         AblationType.ZERO,
     ]
     PRUNE_METRICS: List[PruneMetric] = [
@@ -264,6 +265,7 @@ if compute_prune_metric_measurements:
         CORRECT_ANSWER_PERCENT_METRIC,  # Docstring
         LOGIT_DIFF_PERCENT_METRIC,  # IOI
         CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # Sports Players
+        PROB_DIFF_METRIC,
     ]
     _metrics = [m.key for m in PRUNE_METRICS]
     _ablation_types = list(ABLATION_TYPES)
