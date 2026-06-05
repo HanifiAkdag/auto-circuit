@@ -38,6 +38,41 @@
 - **Significance:** Single-run EAP results in the thesis are a point estimate in a high-variance landscape. Disagreements between EAP and EP/DiscoGP are ambiguous evidence — both the algorithm difference and EAP's own variance contribute. Optimization-based methods (EP, DiscoGP) train over epochs and may produce structurally more stable circuits than attribution-based EAP — a motivated hypothesis worth raising in Discussion if not tested directly. Must flag as a limitations caveat.
 - **Code pointer:** `docs/related_work/eap_ig_variance_stability.md`
 
+### DiscoGP: joint weight+edge pruning via Gumbel-sigmoid; sheaf discovery — 2026-06-03
+
+- **Context:** Reading Yu et al. (2025), "Sheaf Discovery with Joint Computation Graph Pruning and Flexible Granularity" (EMNLP 2025, arXiv 2407.03779) — the paper this thesis ports to AutoCircuit as `disco_gp.py`.
+- **Observation:**
+  - DiscoGP's objective is `ℒ = ℒ_fidelity + λ_c · ℒ_completeness + λ_sparsity`. The **completeness term** (CE of the complement circuit against uniform) is what differentiates it from EP and ACDC — it explicitly forces removed components to be uninformative, not just that the kept components are faithful.
+  - **Two-phase sequential training**: Phase 1 optimises per-element weight mask logits (excluding embeddings, layer norms); after convergence, masks are frozen via `logit > 0` threshold and baked into weights before Phase 2. Phase 2 optimises per-edge logits on the weight-sparse model. This is *sequential*, not simultaneous joint optimisation.
+  - **Gumbel-sigmoid STE**: `s_i = σ(l_i - log(log U₁ / log U₂) / τ)` with hard binary mask via STE. Temperature τ = 0.01 for weights (near-deterministic), τ = 1.0 for edges (softer gradients). Lambda schedule with warmup + cooldown controls sparsity pressure.
+  - **Zero ablation** is the deliberate choice: the paper argues that zero ablation makes sheaves *self-contained* (functional in isolation) whereas mean/resample ablation only identifies components that are *important relative to some counterfactual*. This is a philosophical design choice with direct implications for comparing DiscoGP circuits against EP (resample) circuits.
+  - **Mask convention is inverted**: paper uses mask=1 → keep, mask=0 → ablate. AutoCircuit uses mask=1 → ablate. The port negates (`1 - disco_mask`) in `_sample_edge_masks` — a non-obvious correctness-critical detail.
+  - **Results**: IOI = 100% accuracy at 1.79% weights / 2.03% edges. ACDC on PARAREL = only 1% accuracy vs. DiscoGP 93.1% — attributed to greedy threshold approach and mean ablation failing on complex tasks.
+  - **QKV split**: Paper applies separate Q/K/V edge masks; the AutoCircuit port **matches this** by default (`separate_qkv=True`). The only granularity the port omits is *neuron-level* masking, which lives in the unused weight phase (see edge-only audit below).
+  - **Composability**: Two sheaves from different tasks can be composed while maintaining 80–100% accuracy. Validates the modular-unit framing; not reproduced in thesis but motivates DiscoGP's design.
+  - **Faithfulness audit of the port (vs. `frankniujc/disco_gp` @ `54aef81`), edge-only scope**: the thesis uses DiscoGP **edge-only** (`use_weight_masks=False`). For that path the port is a faithful reproduction — `gumbel_sigmoid`, `schedule_epoch_lambda`, all edge-phase defaults, zero ablation, the Q/K/V-split edge graph, and the `answer_margin_ce` faith/completeness losses are **exact/equivalent** to the original. Q/K/V splitting is on by default (`separate_qkv=True`, [tasks.py:95](auto_circuit/tasks.py#L95)), matching the original's separate `edge_mask_attention_{q,k,v}_logits` — an earlier note claiming "no QKV split" was wrong.
+  - The original "fidelity = NLL of predicted label" is actually supervised CE against the *dataset* label (good=class 0 / `answer_idx`), not distribution distillation — so `answer_margin_ce` is the faithful mode and `argmax_ce` is a port-introduced task-agnostic relaxation.
+  - **Edge-only divergences**: (1) port defaults to non-paper `argmax_ce` (fixed by `-EP`); (2) PARAREL multi-class loss not ported (moot — not a thesis task); (3) original reimplements blocks threading `prev_head_idx`, port wraps a frozen model (same math, enables AutoCircuit's eval pipeline). The only granularity the port lacks is *neuron-level* masking, which lives in the unused weight phase.
+  - **Registration (clean single-axis contrast)**: `DISCO_GP_EDGE_ONLY` (`-E`) and `DISCO_GP_EDGE_ONLY_PAPER` (`-EP`) now both use `e_lambda_complete_init=1.0`, so they differ **only** on `loss_mode` (argmax_ce vs answer_margin_ce). Completeness is held fixed, so the `-E`/`-EP` contrast cleanly isolates the loss-form axis (updated 2026-06-03; an earlier version differed on completeness too).
+  - **Weight phase (unused, for completeness)**: joint `DISCO_GP_PRUNE_ALGO` diverges from paper defaults (w_lr 1.0→0.1, weight-completeness 1.0→0.0, argmax_ce) but is out of scope.
+- **Significance:**
+  - The completeness objective and zero ablation together mean DiscoGP is answering a *different causal query* than EP/ACDC/EAP — "what is the minimal self-sufficient circuit?" vs. "what edges matter most relative to a corrupt baseline?". This is the primary framing for interpreting algorithm disagreements in the Discussion chapter.
+  - The edge-only variants (`DISCO_GP_EDGE_ONLY_PRUNE_ALGO`) implemented in this thesis allow a controlled comparison against ACDC/EAP at the same edge-only level; the joint variant is a DiscoGP-exclusive condition.
+  - The argmax_ce vs. answer_margin_ce loss-mode distinction (thesis-specific, not in paper) allows isolating loss-form effects from method effects — relevant to RQ2/RQ3 analysis.
+- **Code pointer:** `docs/related_work/disco_gp_sheaf_discovery.md`, `auto_circuit/prune_algos/disco_gp.py`
+
+### Edge Pruning: gradient-based L0 edge discovery; the EP baseline — 2026-06-03
+
+- **Context:** Reading Bhaskar et al. (2024), "Finding Transformer Circuits with Edge Pruning" (NeurIPS 2024 Spotlight, arXiv 2406.16778) — the paper this thesis ports as `edge_pruning.py`. Verified against `princeton-nlp/Edge-Pruning` source (`src/modeling/l0.py`).
+- **Observation:**
+  - **Method**: frame circuit discovery as optimization. Learn a **hard-concrete L0** mask (Louizos; temp 2/3, stretch [-0.1,1.1]) over every edge, with sparsity enforced by a **Lagrangian dual** `λ₁(t−s)+λ₂(t−s)²` (λ maximized by gradient ascent, target sparsity `t` ramped). Faithfulness = **KL divergence** to the full model. **No completeness term; frozen weights; separate Q/K/V edges.**
+  - **Ablation = interchange/resample**: a cut edge injects the corrupted-input activation `ỹ_j`, not zero — `f_i(Σ_j [z_ji·y_j + (1−z_ji)·ỹ_j])`. This is the defining contrast with DiscoGP's zero ablation. Port uses `AblationType.RESAMPLE` ([edge_pruning.py:165](auto_circuit/prune_algos/edge_pruning.py#L165)).
+  - **Results**: 2.65× fewer edges than ACDC at equal faithfulness on IOI; faster and far more faithful than EAP at 100K examples (KL 0.20 vs 3.78); perfect Tracr ground-truth recovery; scales to CodeLlama-13B at >99.96% sparsity.
+  - **DiscoGP Appendix C** calls EP "equivalent to our edge pruning setting" — true only at the family level (edge-only, frozen-weight, gradient-based, disentangled residual, Q/K/V-split). They differ on mask distribution (hard-concrete L0 vs Gumbel-sigmoid), **ablation (resample vs zero)**, sparsity (Lagrangian L0 vs scheduled L1-style), and objective (KL vs label-CE+completeness).
+  - **Port specifics**: `EDGE_PRUNING_PRUNE_ALGO` uses `use_node_masks=True`, `disable_node_loss=True` (matches original IOI sweep), `target_edge_sparsity=1.1`, `steps=3000`, lr=0.8; returns soft mask `σ(log_alpha/β·F)` for AutoCircuit's threshold sweep rather than EP's binary-search `deterministic_z`. Known difference: edge/node masks are pre-composed before patching rather than applied sequentially.
+- **Significance:** EP and DiscoGP are *genuinely different* edge-only methods (resample/KL vs zero/CE+completeness), so the EP-vs-DiscoGP comparison is not redundant — it contrasts two causal queries. EP's resample ablation and KL objective align it with AutoCircuit's `CLEAN_KL_DIV_METRIC`; its Tracr ground-truth recovery makes it the strong optimization baseline against ACDC (search) and EAP (attribution). Primary input for the RQ2 algorithm-comparison framing.
+- **Code pointer:** `docs/related_work/edge_pruning.md`, `auto_circuit/prune_algos/edge_pruning.py`
+
 ## Results
 
 ### DiscoGP edge-only variants: KL collapse despite strong logit-difference (IOI, zero ablation) — 2026-05-15
@@ -238,6 +273,26 @@
 - *Have Faith in Faithfulness: Going Beyond Circuit Overlap When Finding Model Mechanisms.* (2024) arXiv:2403.17806.
 - *Certified Circuits: Stability Guarantees for Mechanistic Circuits.* (2026) arXiv:2602.22968 — vision domain; not a collision.
 - Tasks: Wang et al. (2022) IOI; Hanna et al. (2023) Greater-Than; Heimersheim & Janiak (2023) Docstring.
+
+## Limitations
+
+### Implementation design differences from the original algorithms — 2026-06-03
+
+- **Context:** Both EP and DiscoGP are re-implemented inside AutoCircuit's `PatchableModel`/wrapper infrastructure rather than each paper's bespoke codebase. Audited the ports against the original repos (`princeton-nlp/Edge-Pruning` @ `a918efd`, `frankniujc/disco_gp` @ `54aef81`). The cores are faithful; the differences below are deliberate adaptations or known gaps and should be stated as limitations.
+- **Observation — common to both ports:**
+  - **Single training run is faithful — the curve-tracing difference is evaluation-side, not a faithfulness gap.** EP and DiscoGP (like EAP) estimate edge importance from *one* optimization run; that run's continuous mask **is** the algorithm's native importance output, so returning it as `PruneScores` matches how each method decides which edges to keep — it is not a shortcut. AutoCircuit's `run_circuits` then traces the sparsity–faithfulness curve by top-k thresholding that single ranking (so the port's circuits are strictly nested). The EP paper instead runs independent per-target-sparsity training runs (`ioi_sweep.sh` bash loop; **no merge** — each checkpoint evaluated separately into one scatter point), so its circuits need not be nested. EP provides **no** mechanism to merge multiple runs; ACDC is the only algorithm that synthesizes a ranking across runs (~20 τ-values) and only because its per-τ output is a *binary* circuit with no continuous scores. The lone genuine design choice is the calibration of EP's single run via `target_edge_sparsity=1.1` (a tunable lever) — not whether single-run is correct, which it is.
+  - **Pre-composed masks vs. sequential forward-pass masking.** AutoCircuit's wrapper applies one effective mask per edge before patching; the originals thread edge (and EP node) masks sequentially through the forward pass. Same intended math, possibly different gradient dynamics.
+- **Observation — Edge Pruning specifics:**
+  - **Faithful**: hard-concrete L0 sampling (temp 2/3, stretch [−0.1, 1.1]), `KL(full ‖ circuit)` direction, resample/interchange ablation, Lagrangian `λ₁(s−t)+λ₂(s−t)²` with λ maximized, node-mask composition `1−(1−z_e)(1−z_n)` ≡ paper's `z_edge·z_node`, all run-script LRs = 0.8, `steps=3000`, `sparsity_warmup_steps=2500`, `target_node_sparsity=0.72`, and **`weight_decay=0.01`** (matches the original, which relies on `torch.optim.AdamW`'s default; setting 0 departs from the paper and breaks learning).
+  - **Aligned 2026-06-03**: added `warmup_steps=200` to the EP registration to match the original's `--warmup_steps 200` LR warmup (previously defaulted to 0).
+  - **Remaining gaps**: KL is computed at the last-token `out_slice` rather than the original's answer-span `[start:end]` (near-identical for single-token IOI); the four original LR groups (edge/node × log_alpha/λ) are collapsed to two shared knobs (no effect at the paper's all-0.8 values, but cannot reproduce edge≠node LR runs).
+- **Observation — DiscoGP specifics (edge-only scope):**
+  - The thesis uses DiscoGP **edge-only** (`use_weight_masks=False`); the weight-pruning phase and the paper's neuron-level "flexible granularity" are not exercised, so DiscoGP here is not the paper's full joint method.
+  - **Faithful** for the edge-only path: `gumbel_sigmoid` + `schedule_epoch_lambda` (verbatim), all edge-phase defaults, zero ablation, Q/K/V-split edges, and the `answer_margin_ce` faith/completeness losses.
+  - The default `loss_mode="argmax_ce"` is a port-introduced, task-agnostic relaxation with no counterpart in the original; only `DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO` (`-EP`) uses the paper-faithful `answer_margin_ce`.
+  - The `-E` vs `-EP` registrations now differ **only** on `loss_mode` (argmax_ce vs answer_margin_ce); both hold `e_lambda_complete_init=1.0`, so the contrast cleanly isolates the loss-form axis.
+- **Significance:** These are the caveats that bound how directly the thesis's EP/DiscoGP numbers map onto the original papers' reported results. Running each gradient method once is faithful to how it estimates importance *and* makes the multi-algorithm comparison apples-to-apples on a shared edge-count grid; the genuine caveats are the items above (ablation type, loss form, KL span, single-run calibration). Ties into the broader non-identifiability framing (Méloux 2025) and ablation-relativity framing (Miller 2024).
+- **Code pointer:** `docs/related_work/edge_pruning.md`, `docs/related_work/disco_gp_sheaf_discovery.md`, `auto_circuit/prune_algos/edge_pruning.py`, `auto_circuit/prune_algos/disco_gp.py`, `auto_circuit/prune_algos/prune_algos.py`
 
 ## Notes
 
