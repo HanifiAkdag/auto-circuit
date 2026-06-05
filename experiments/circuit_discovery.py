@@ -23,6 +23,7 @@ from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
     measurement_figs,
 )
 from auto_circuit.metrics.prune_metrics.prune_metrics import (
+    ANSWER_PAIR_KL_DIV_METRIC,
     ANSWER_PROB_METRIC,
     CLEAN_KL_DIV_METRIC,
     CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
@@ -60,7 +61,7 @@ from auto_circuit.types import (
 )
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
-from experiment_utils import git_state, write_manifest
+from experiment_utils import algo_hyperparams, git_state, write_manifest
 
 figs: list = []  # list of (fig, name) tuples
 
@@ -73,6 +74,7 @@ load_prune_scores = False
 task_prune_scores: TaskPruneScores = defaultdict(dict)
 cache_folder_name = ".prune_scores_cache"
 _loaded_prune_scores_file: str | None = None
+_algo_hyperparams: dict = {}
 if compute_prune_scores:
     TASKS: List[Task] = [
         # Token Circuits
@@ -93,13 +95,14 @@ if compute_prune_scores:
     PRUNE_ALGOS: List[PruneAlgo] = [
         GROUND_TRUTH_PRUNE_ALGO,
         RANDOM_PRUNE_ALGO,
-        EDGE_ATTR_PATCH_PRUNE_ALGO,
-        ACDC_PRUNE_ALGO,
+        # EDGE_ATTR_PATCH_PRUNE_ALGO,
+        # ACDC_PRUNE_ALGO,
         # DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
         # DISCO_GP_PRUNE_ALGO,  # full joint weight+edge variant
         DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
         EDGE_PRUNING_PRUNE_ALGO,
     ]
+    _algo_hyperparams = {a.key: algo_hyperparams(a) for a in PRUNE_ALGOS}
     task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
 if load_prune_scores:
     # 2000 epoch IOI Docstring tensor prune_scores post-kv-cache-fix
@@ -257,6 +260,7 @@ if compute_prune_metric_measurements:
     ]
     PRUNE_METRICS: List[PruneMetric] = [
         CLEAN_KL_DIV_METRIC,
+        ANSWER_PAIR_KL_DIV_METRIC,
         # CORRUPT_KL_DIV_METRIC,
         ANSWER_PROB_METRIC,
         # ANSWER_LOGIT_METRIC,
@@ -322,6 +326,7 @@ _manifest.update({
     "loaded_measurements_file": _loaded_measurements_file,
     "tasks": [{"key": k, "name": TASK_DICT[k].name} for k in task_prune_scores],
     "algos": sorted({a for ps in task_prune_scores.values() for a in ps}),
+    "algo_hyperparams": _algo_hyperparams,
     "metrics": _metrics,
     "ablation_types": _ablation_types,
     "patch_type": PatchType.TREE_PATCH,

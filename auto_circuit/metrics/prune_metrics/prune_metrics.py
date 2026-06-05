@@ -11,7 +11,10 @@ from auto_circuit.metrics.prune_metrics.answer_value import measure_answer_val
 from auto_circuit.metrics.prune_metrics.correct_answer_percent import (
     measure_correct_ans_percent,
 )
-from auto_circuit.metrics.prune_metrics.kl_div import measure_kl_div
+from auto_circuit.metrics.prune_metrics.kl_div import (
+    measure_answer_pair_kl_div,
+    measure_kl_div,
+)
 from auto_circuit.types import CircuitOutputs, Measurements, PruneMetricKey
 from auto_circuit.utils.patchable_model import PatchableModel
 
@@ -177,6 +180,16 @@ CORRECT_ANSWER_PERCENT_METRIC = PruneMetric(
     lower_better=False,
     y_axes_match=False,
 )
+ANSWER_PAIR_KL_DIV_METRIC = PruneMetric(
+    key="Answer Pair KL Div",
+    name="Answer-Pair KL Divergence",
+    metric_func=measure_answer_pair_kl_div,
+    log_x=True,
+    log_y=True,
+    lower_better=True,
+    y_axes_match=False,
+    y_min=1e-4,
+)
 CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC = PruneMetric(
     key="Correct Answer Greater Than Incorrect Percent",
     name="Correct Answer Greater Than Incorrect Percent",
@@ -204,6 +217,7 @@ PRUNE_METRICS: List[PruneMetric] = [
     LOBPROB_DIFF_PERCENT_METRIC,
     CORRECT_ANSWER_PERCENT_METRIC,
     CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
+    ANSWER_PAIR_KL_DIV_METRIC,
 ]
 PRUNE_METRIC_DICT: Dict[PruneMetricKey, PruneMetric] = {
     metric.key: metric for metric in PRUNE_METRICS
