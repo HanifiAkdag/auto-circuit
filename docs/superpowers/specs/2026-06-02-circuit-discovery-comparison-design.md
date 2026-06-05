@@ -1,7 +1,7 @@
 # Experimental Design — Comparing Circuit Discovery Methods (sub-RQ3)
 
-**Date:** 2026-06-02
-**Status:** Design approved in brainstorming; pending written-spec review.
+**Date:** 2026-06-02 (updated 2026-06-05)
+**Status:** Design finalized; foundation (#0) implementation pending.
 **Scope:** Defines the experimental core of sub-RQ3. Sub-RQ1 (EP/DiscoGP integration) and sub-RQ2 (Murano) are out of scope here except where a result doubles as a correctness check.
 
 ---
@@ -42,19 +42,33 @@ Gap verified 2026-06-02 against: EAP-IG variance (2510.00845v4), Dead Salmon (25
 
 No monolithic orchestrator. Each experiment cell is run **one at a time** with its own settings, and comparison happens **after the fact**:
 
-- **Discovery unit:** one job = one `(method, task, discovery-ablation, seed)` → one cached `PruneScores`, tagged with its settings + `git_state()` in the manifest. SLURM-array friendly (one cell per array task).
-- **Analysis pass:** a single post-hoc step loads all caches and produces the eval matrix, ROC overlay, stability/Jaccard, overlap heatmaps, and null p-values. Cheap; wants to see all circuits together.
-- **What this still requires from the foundation (#0):** the discovery-ablation + seed **parameters** must exist (they don't yet — see code realities below), cache keys must encode `(ablation, seed)` so runs don't overwrite each other, and the analysis utils must load + compare across separately-saved runs. What it removes is only the automated sweep loop.
+- **Immediate pre-step (no plumbing required):** run each method at its *native* discovery ablation (EP=resample, DiscoGP=zero, EAP=corrupt, ACDC=internal default) on all 3 tasks using the current `circuit_discovery.py` with just config changes (add all algos/tasks to the lists, add `TOKENWISE_MEAN_CORRUPT` to eval ablation types). This covers the **evaluation-relativity** result (same circuit, shifting eval methodology) and validates the pipeline end-to-end. No new code needed.
+- **Discovery unit (post-plumbing):** one job = one `(method, task, discovery-ablation, seed)` → one cached `PruneScores`, tagged with its settings + `git_state()` in the manifest. **Entry point:** a small CLI/script (e.g. `experiments/run_cell.py`) that accepts `--method`, `--task`, `--ablation`, `--seed` and runs exactly one cell. SLURM-array friendly (one cell per array task).
+- **Analysis pass:** a single post-hoc step loads all caches and produces the eval matrix, ROC overlay, stability/Jaccard, overlap heatmaps, and null p-values. Cheap; wants to see all circuits together. Lives in `auto_circuit/metrics/analysis_utils.py` (see §3 below).
+- **What the foundation (#0) still must build:** the discovery-ablation + seed **parameters** (they don't yet exist — see code realities below), cache keys encoding `(ablation, seed)` so runs don't overwrite each other, the per-cell CLI entry point, and the analysis utils. What it removes is only the automated sweep loop.
 
 ### Code realities that shape the foundation (verified 2026-06-02)
 
-- **Discovery ablation is hard-coded, not a parameter.** `edge_pruning.py:165` (`RESAMPLE`), `disco_gp.py:294` (`ZERO`); `PruneAlgo.func` is `(model, dataloader, official_edges) → PruneScores` with no ablation arg. Sweeping it means plumbing `ablation_type` into the algo functions (#0).
-- **EAP is corrupt/resample-only by construction** (`edge_attribution_patching.py:89` uses `corrupt_cache`), so it cannot cleanly sweep its discovery ablation — it contributes a single discovery row unless extended. The spine's discovery axis is effectively *EP/DiscoGP/ACDC × {zero, resample, mean}* **+ EAP × {corrupt}**, with GT/Random ablation-independent.
-- **`Task` has no seed field**, and `DATASET_CACHE` (`tasks.py:192`) is keyed without seed. The seed axis is genuinely new plumbing, so #0 is *extend + new wiring*, not pure parametrize.
+- **Discovery ablation is hard-coded, not a parameter.** `edge_pruning.py:165` (`RESAMPLE`), `disco_gp.py:294` (`ZERO`); `PruneAlgo.func` is `(model, dataloader, official_edges) → PruneScores` with no ablation arg. Fix: add `ablation_type: AblationType` param to both algo functions; expose at call site via `functools.partial` to produce ablation-tagged `PruneAlgo` variants with unique `key`/`name` (e.g. `"Edge Pruning [zero]"`), keeping the native variants as defaults.
+- **EAP/ACDC decision (resolved 2026-06-05):** **EAP stays corrupt-only** — extending it would require threading `src_ablations(...)` through `edge_attribution_patching.py:89–108`, adding noise for unclear gain. **ACDC gets `ablation_type` threaded** similarly to EP/DiscoGP. The spine's discovery axis is effectively *EP/DiscoGP/ACDC × {zero, resample, mean}* **+ EAP × {corrupt}**, with GT/Random ablation-independent (≈30 discovery cells).
+- **`Task` has no seed field**, and `DATASET_CACHE` (`tasks.py:192`) is keyed as `(dataset_name, batch_size, batch_count, token_circuit, device)` — excludes seed, so a new seed silently returns the cached loader. Fix: add seed to `DATASET_CACHE` key + `load_datasets_from_json(random_seed=seed)` call; also `torch.manual_seed(seed)` before EP/DiscoGP discovery (masks are randomly init'd). The seed axis is genuinely new plumbing.
+- **Null-test model hook:** `Task._model_def` accepts `nn.Module` (`tasks.py:149`) but that branch **skips** the cfg flags set at lines 173-177 (`use_attn_result`, `use_attn_in`, `use_split_qkv_input`, `use_hook_mlp_in`) and skips `eval()`. Set these manually on the randomly-initialized model before passing it.
+- **Cache identity:** encode `(discovery_ablation, seed)` into the cache filename (or algo key) so cells don't overwrite each other. The current timestamp-based naming in `save_cache` already prevents collisions in practice; the structured approach lets the analysis pass look up cells by identity rather than by timestamp.
+
+### Analysis layer (`auto_circuit/metrics/analysis_utils.py`)
+
+Post-hoc module used exclusively by the analysis pass. Functions needed (verified against issue #3):
+
+- `top_k_edge_set(prune_scores, k)` — reuses `.abs()` ranking via `desc_prune_scores`/`prune_scores_threshold` (`tensor_ops.py`), exactly as `run_circuits`/`prune.py` do. Returns a `Set[Edge]`.
+- `jaccard(a: Set[Edge], b: Set[Edge]) → float` — `|a ∩ b| / |a ∪ b|`.
+- `overlap_matrix(runs: List[PruneScores], k: int) → np.ndarray` — pairwise Jaccard across N runs at fixed budget k.
+- `matched_budgets(model, true_edge_count) → List[int]` — wraps `edge_counts_util` to return the representative grid points used for comparison.
+- `load_many_caches(paths: List[Path]) → List[Tuple[meta, TaskPruneScores]]` — loads separately-saved caches and returns them with their manifest metadata for cross-run aggregation.
+- `extract_metric(measurements: AblationMeasurements, ablation, metric_key, task_key, algo_key) → List[Tuple[int, float]]` — extracts the `(edge_count, score)` series from `measure_prune_metrics`'s nested return type.
 
 ## 4. Pillar 1 — Faithfulness spine (full discovery × eval matrix)
 
-- **Discovery axis:** train each method under each ablation ∈ {zero, resample, mean}. Cell count is **not** a clean 4×3×3: EP/DiscoGP/ACDC sweep all three ablations (9 cells/task), **EAP is corrupt-only** (1 cell/task), GT/Random are ablation-independent (1 each). So ≈ (3 methods × 3 ablations + EAP × 1) × 3 tasks ≈ **30 discovery cells** + anchors, not 36. (Optionally extend EAP to use `src_ablations` to recover the full sweep — see #0.)
+- **Discovery axis:** train each method under each ablation ∈ {zero, resample, mean}. Cell count is **not** a clean 4×3×3: EP/DiscoGP/ACDC sweep all three ablations (9 cells/task), **EAP is corrupt-only** (1 cell/task, decision locked in §3), GT/Random are ablation-independent (1 each). So ≈ (3 methods × 3 ablations + EAP × 1) × 3 tasks ≈ **30 discovery cells** + anchors.
 - **Evaluation axis (cached, free):** score every circuit across {zero, resample, mean} × {tree-patch, edge-patch}.
 - **Metrics:** task-primary/secondary above + completeness + sparsity, plus ROC-vs-ground-truth across the sweep.
 - **Headline results:**
@@ -120,6 +134,10 @@ Each "run" below is a **standalone job** (run-per-setting operating model); the 
 
 ## 11. Open items for spec review
 
-- Confirm N=5 / k=10 (vs higher) given the timing results.
-- Confirm `T` statistic for the null test (faithfulness at fixed sparsity vs AUC over the sweep).
-- Confirm whether the null test stays single-ablation (resample) or also runs zero.
+- Confirm N=5 / k=10 (vs higher) once a per-task ACDC timing result is available (see §8 ACDC wall-clock risk).
+- Confirm `T` statistic for the null test: faithfulness at a fixed representative sparsity (simpler, easier to report) vs AUC over the full sweep (more robust but needs all k×sweep combinations).
+- Confirm whether the null test stays single-ablation (resample) or also runs zero ablation.
+- Confirm `functools.partial` (no signature change to `PruneAlgo.func`) vs a thin `PruneAlgoAblation` wrapper class for ablation-aware variants. Partial is simpler; a wrapper lets you carry metadata (ablation name, native vs swept) without monkey-patching.
+
+**Resolved (2026-06-05):**
+- EAP extension: **closed** — EAP stays corrupt-only; ACDC gets ablation_type threaded (see §3 code realities).
