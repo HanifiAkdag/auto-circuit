@@ -73,6 +73,16 @@
 - **Significance:** EP and DiscoGP are *genuinely different* edge-only methods (resample/KL vs zero/CE+completeness), so the EP-vs-DiscoGP comparison is not redundant — it contrasts two causal queries. EP's resample ablation and KL objective align it with AutoCircuit's `CLEAN_KL_DIV_METRIC`; its Tracr ground-truth recovery makes it the strong optimization baseline against ACDC (search) and EAP (attribution). Primary input for the RQ2 algorithm-comparison framing.
 - **Code pointer:** `docs/related_work/edge_pruning.md`, `auto_circuit/prune_algos/edge_pruning.py`
 
+### Docstring circuit: origin of the benchmark task and its ground-truth — 2026-06-07
+
+- **Context:** Reading Heimersheim & Janiak (2023), "A circuit for Python docstrings in a 4-layer attention-only transformer" (SERI MATS, Neel Nanda) — the source of the Docstring benchmark task used in AutoCircuit.
+- **Observation:**
+  - Hand-found circuit in Neel Nanda's `attn-only-4l` toy model predicting repeated `:param` argument names. Found via **resample (corrupted→clean) activation patching** with a **logit-difference** metric over three corruptions (random answer / random def / random doc), batch of 50.
+  - Components: Argument Mover Heads **3.0, 3.6** (copy answer ≈ IOI Name Movers); Fuzzy Previous Token Heads **1.4, 2.0** + Induction subcircuit (**0.2**+**1.4**) move "B"-information; Duplicate Token Heads **0.5** (mostly embedding transform), **1.2** (suppresses docstring attention); causal-mask positional head **0.4**; multi-function head **1.4** (Prev-Token in def context, Induction in doc context).
+  - **Partial faithfulness:** resample-ablating everything outside the named head set recovers only **42%** (full model 56%, full minus negative heads 0.0/2.2 = 72%); adding 1.0/0.1/2.3 → 58%. Negative head **2.2** *improves* performance when patched.
+- **Significance:** Defines the Docstring task and its hand-labeled ground-truth circuit — the ROC reference for circuit-discovery evaluation. The reference circuit itself recovers only ~42–58% of performance, reinforcing the methodology-relative view of faithfulness (Miller 2024) and the redundancy/negative-head motifs (Dead Salmon) that complicate ROC scoring. Its resample-ablation + logit-diff provenance aligns the Docstring ground truth with EP's resample ablation and logit-difference metrics in sub-RQ3.
+- **Code pointer:** `docs/related_work/docstring_circuit.md`
+
 ## Results
 
 ### DiscoGP edge-only variants: KL collapse despite strong logit-difference (IOI, zero ablation) — 2026-05-15
@@ -229,6 +239,21 @@
 - **Significance:** (i) A discovered circuit is only faithful if its kept edges form unbroken paths from the embeddings to `resid_final`; a dangling in-circuit edge contributes only ablation-artifact signal (zero: a constant; resample: corrupt-prompt info), never prompt-relevant computation. (ii) EP (resample) and DiscoGP (zero) are tested against **different baselines** and solve different causal queries, so their faithfulness numbers are not directly comparable — this is the concrete mechanism behind Miller et al.'s "faithfulness is methodology-relative." Every cross-algorithm comparison table must state the ablation type. See [`faithfulness_metrics_not_robust.md`](docs/related_work/faithfulness_metrics_not_robust.md) (six-dimension ablation framework).
 
 ## Experiments
+
+### Model-sharing double-wrap when two tasks share a model — 2026-06-08
+
+- **Context:** Checking whether `faithfulness_comparison.py` handles per-task models correctly. IOI and Greater-Than both use `gpt2-small`; Docstring uses `attn-only-4l`.
+- **Observation:**
+  - `MODEL_CACHE` (`tasks.py`) keys on `(_model_def, dtype)`, so IOI and GT **shared one `gpt2-small` instance**. `patchable_model` **mutates the model in place** (injects `PatchWrapperImpl`s; its docstring says so), and its `assert not isinstance(model, PatchableModel)` guard misses this because the cache stores the raw `HookedTransformer`, not the `PatchableModel`.
+  - The second task to build (**GT**) re-ran `make_model_patchable` on IOI's already-wrapped model → `PatchWrapperImpl(module=PatchWrapperImpl(...))` (**double-wrapped**); both tasks then share that object. Forward passes still succeed (the non-activated inner wrapper is a passthrough), so it was **silent**.
+  - **Measured impact (controlled experiment, stash fix on/off, same seed):** the inner wrapper is effectively transparent, so the effect is *much smaller than the structure suggests*:
+    - **EAP discovery** (gradient-based, bypasses `patch_mode`): **bit-identical** (max\|diff\| = 0).
+    - **`run_circuits` evaluation** (official GT circuit, tree-patch): **bit-identical** (max\|diff\| = 0).
+    - **Edge Pruning discovery** (patch-based, backprops through wrappers): a **small but real, reproducible** perturbation — max\|diff\| ≈ **0.0098** on soft-mask scores (∈ 0..1), vs ~0.0025 run-to-run nondeterminism (≈4× noise, consistent across fixed-vs-buggy and fixed2-vs-buggy2). The extra passthrough layer perturbs FP rounding which compounds over training steps; it does not corrupt the patching logic.
+  - So: it is **not** a gross corruption — EAP/eval unaffected; patch-based discovery (EP/DiscoGP/ACDC) shifts at the ~1%-of-mask, near-noise level. The real problem is **non-reproducibility**: GT's patch-based scores depend on whether IOI was loaded first in the same process.
+- **Fix:** `tasks.py` `init_task` now wraps `copy.deepcopy(model)`, keeping `MODEL_CACHE` pristine and giving each task an independent model. Distinct `wrapped_model` ids and `double_wrapped=False` for all three tasks. Regression test: `tests/test_seed_dataloaders.py::test_tasks_sharing_model_def_get_independent_models` (slow).
+- **Significance:** Worth fixing for reproducibility, memory (avoids ~2× wrappers on the shared model), and clarity — but pre-fix GT results are *not invalid*, only slightly load-order-dependent for EP/DiscoGP/ACDC (EAP/eval identical). Re-running fresh with the fix is the clean choice (and the eval needed re-running anyway), not a rescue from corruption. Methodological note worth keeping: I initially overstated this as "silent corruption"; the controlled measurement showed the effect is ~4× noise on EP masks and zero on EAP/eval.
+- **Code pointer:** `auto_circuit/tasks.py` (`init_task`, the `copy.deepcopy(model)` in the `patchable_model` call).
 
 ### Docstring granularity: component for the spine, token as a sub-study — 2026-06-07
 

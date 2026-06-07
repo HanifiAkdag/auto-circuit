@@ -60,3 +60,38 @@ def test_task_seed_changes_dataloader_and_cache_key():
     assert t.equal(b42a.clean, b42b.clean)
     # Different seed -> different data (cache key must include seed, no collision).
     assert not t.equal(b42a.clean, b99.clean)
+
+
+@pytest.mark.slow
+def test_tasks_sharing_model_def_get_independent_models():
+    """Two tasks with the same _model_def must each get an independent model.
+
+    patchable_model mutates the model in place; if both tasks wrapped the same
+    MODEL_CACHE instance, the second would double-wrap the first's, silently
+    corrupting both. Guards the tasks.py deepcopy fix.
+    """
+    from auto_circuit.utils.graph_utils import module_by_name
+    from auto_circuit.utils.patch_wrapper import PatchWrapperImpl
+
+    def make(key: str) -> Task:
+        return Task(
+            key=key,
+            name=key,
+            _model_def="gpt2",
+            _dataset_name="ioi/ioi_prompts",
+            batch_size=4,
+            batch_count=1,
+            token_circuit=False,
+        )
+
+    a = make("share-test-a").model
+    b = make("share-test-b").model
+
+    # Independent underlying models (not the same mutated object).
+    assert a.wrapped_model is not b.wrapped_model
+    # Neither is double-wrapped (PatchWrapperImpl wrapping a PatchWrapperImpl).
+    for m in (a, b):
+        dw = next(iter(m.dest_wrappers))
+        inner = module_by_name(m.wrapped_model, dw.module_name)
+        assert isinstance(inner, PatchWrapperImpl)
+        assert not isinstance(inner.module, PatchWrapperImpl)

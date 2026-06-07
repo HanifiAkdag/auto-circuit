@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, get_args
 
@@ -235,7 +236,7 @@ class Task:
         diverge_idx = self._train_loader.diverge_idx
         kv_caches = self._train_loader.kv_cache, self._test_loader.kv_cache
         self._model = patchable_model(
-            model=model,
+            model=copy.deepcopy(model),
             factorized=self.factorized,
             slice_output=self.slice_output,
             seq_len=seq_len,
