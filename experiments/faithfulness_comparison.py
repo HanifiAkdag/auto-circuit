@@ -58,11 +58,10 @@ from experiment_utils import algo_hyperparams, git_state, write_manifest
 # Config — edit these to change what runs
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Full fresh discovery: the 2026-06-07 cache holds TOKEN-level Docstring scores, which
-# cannot be reused now that the spine uses component-level Docstring (see thesis.md
-# "Docstring granularity"). IOI/GT are component in both, but a clean single-experiment
-# run is simplest. (To reuse the cached IOI/GT and recompute only Docstring, ask for the
-# additive-merge variant.)
+# Fresh discovery: prior caches predate the model-sharing fix (tasks.py deepcopy).
+# IOI/GT shared one gpt2-small, double-wrapping GT's model. Measured effect is small
+# (EAP/eval bit-identical; EP/DiscoGP/ACDC shift ~1% on masks, ~4x run-to-run noise) —
+# not corruption, but load-order-dependent, so recompute for clean reproducible scores.
 compute_prune_scores = True
 save_prune_scores = True
 load_prune_scores = False
@@ -227,24 +226,29 @@ _PATCH_SEMANTICS = {
     PatchType.EDGE_PATCH: ("completeness", "ablate-circuit"),
 }
 # Run per task so each task uses only its compatible metrics (TASK_METRICS).
+# auc_plots=False: the AUC summary asserts a 0-edge baseline point, which binary-score
+# algos (Ground Truth: 2 score-groups -> edge_counts_util omits 0) don't produce.
 for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
     measure, ablated = _PATCH_SEMANTICS[patch_type]
     for task_key, algo_ps in task_prune_scores.items():
         task_slug = TASK_DICT[task_key].name.lower().replace(" ", "_")
         metrics = TASK_METRICS.get(task_key, _COMMON_METRICS)
-        measurements = measure_prune_metrics(
-            ablation_types=EVAL_ABLATION_TYPES,
-            metrics=metrics,
-            task_prune_scores={task_key: algo_ps},
-            patch_type=patch_type,
-        )
-        for fig, meta in measurement_figs(measurements, auc_plots=True):
-            metric_slug = meta["metric_key"].lower().replace(" ", "_")
-            ablation_slug = str(meta["ablation_type"]).split(".")[-1].lower()
-            suffix = "_auc" if meta["is_auc"] else ""
-            # e.g. docstring_completeness_ablate-circuit-with-zero_correct_answer_percent.pdf
-            name = f"{task_slug}_{measure}_{ablated}-with-{ablation_slug}_{metric_slug}{suffix}"
-            figs.append((fig, name))
+        try:
+            measurements = measure_prune_metrics(
+                ablation_types=EVAL_ABLATION_TYPES,
+                metrics=metrics,
+                task_prune_scores={task_key: algo_ps},
+                patch_type=patch_type,
+            )
+            for fig, meta in measurement_figs(measurements, auc_plots=False):
+                metric_slug = meta["metric_key"].lower().replace(" ", "_")
+                ablation_slug = str(meta["ablation_type"]).split(".")[-1].lower()
+                suffix = "_auc" if meta["is_auc"] else ""
+                # e.g. docstring_completeness_ablate-circuit-with-zero_correct_answer_percent.pdf
+                name = f"{task_slug}_{measure}_{ablated}-with-{ablation_slug}_{metric_slug}{suffix}"
+                figs.append((fig, name))
+        except Exception as e:
+            print(f"WARNING: metric figures failed for {task_slug} / {measure}: {e}")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Save figures + final manifest
@@ -252,9 +256,12 @@ for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
 
 figure_names = []
 for fig, name in figs:
-    path = experiment_folder / f"{name}.pdf"
-    fig.write_image(str(path))
-    figure_names.append(f"{name}.pdf")
+    try:
+        path = experiment_folder / f"{name}.pdf"
+        fig.write_image(str(path))
+        figure_names.append(f"{name}.pdf")
+    except Exception as e:
+        print(f"WARNING: failed to write figure {name}: {e}")
 
 _manifest.update({
     "completed_at": datetime.now().isoformat(timespec="seconds"),
