@@ -1,0 +1,203 @@
+"""Per-cell discovery entry point for sub-RQ3 experiments.
+
+Runs exactly one (method, task, discovery-ablation, seed) cell and saves the resulting
+PruneScores to a uniquely-named cache file alongside a manifest JSON.
+
+SLURM-array usage (one cell per array task):
+    srun python experiments/run_cell.py --task ioi --algo ep --ablation resample --seed 42
+
+For the null test (randomly-initialized model weights):
+    srun python experiments/run_cell.py --task ioi --algo ep --ablation resample \\
+        --seed 42 --null-test
+
+See docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md §3
+(Operating model) for the full design rationale.
+"""
+import argparse
+import json
+import random
+import sys
+from copy import deepcopy
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+import torch as t
+import transformer_lens as tl
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from auto_circuit.prune_algos.prune_algos import (
+    ACDC_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
+    DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    DISCO_GP_PRUNE_ALGO,
+    EDGE_ATTR_PATCH_PRUNE_ALGO,
+    EDGE_PRUNING_PRUNE_ALGO,
+    GROUND_TRUTH_PRUNE_ALGO,
+    RANDOM_PRUNE_ALGO,
+    PruneAlgo,
+    make_ablation_variant,
+    run_prune_algos,
+)
+from auto_circuit.tasks import (
+    DOCSTRING_TOKEN_CIRCUIT_TASK,
+    GREATERTHAN_COMPONENT_CIRCUIT_TASK,
+    IOI_COMPONENT_CIRCUIT_TASK,
+    Task,
+)
+from auto_circuit.types import AblationType
+from auto_circuit.utils.misc import repo_path_to_abs_path
+from experiment_utils import algo_hyperparams, git_state
+
+# Algos that accept an ablation_type parameter (EP, DiscoGP variants, ACDC).
+# EAP is corrupt-only by construction; GT and Random are ablation-independent.
+_ABLATION_AWARE_ALGOS = {"ep", "discogp", "discogp-e", "discogp-ep", "acdc"}
+
+_ALGO_MAP: dict[str, PruneAlgo] = {
+    "ep": EDGE_PRUNING_PRUNE_ALGO,
+    "discogp": DISCO_GP_PRUNE_ALGO,
+    "discogp-e": DISCO_GP_EDGE_ONLY_PRUNE_ALGO,
+    "discogp-ep": DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
+    "acdc": ACDC_PRUNE_ALGO,
+    "eap": EDGE_ATTR_PATCH_PRUNE_ALGO,
+    "gt": GROUND_TRUTH_PRUNE_ALGO,
+    "random": RANDOM_PRUNE_ALGO,
+}
+
+_ABLATION_MAP: dict[str, AblationType] = {
+    "zero": AblationType.ZERO,
+    "resample": AblationType.RESAMPLE,
+    "mean": AblationType.TOKENWISE_MEAN_CORRUPT,
+}
+
+# Task templates — seed and (optionally) _model_def are overridden at runtime.
+_TASK_TEMPLATES: dict[str, Task] = {
+    "ioi": IOI_COMPONENT_CIRCUIT_TASK,
+    "gt": GREATERTHAN_COMPONENT_CIRCUIT_TASK,
+    "docstring": DOCSTRING_TOKEN_CIRCUIT_TASK,
+}
+
+# Model strings for each task (used to build a random-weight model for the null test).
+_TASK_MODEL_DEF: dict[str, str] = {
+    "ioi": "gpt2-small",
+    "gt": "gpt2-small",
+    "docstring": "attn-only-4l",
+}
+
+
+def _serialize(obj: Any) -> Any:
+    import enum
+    if isinstance(obj, enum.Enum):
+        return str(obj).split(".")[-1]
+    if isinstance(obj, Path):
+        return str(obj)
+    return repr(obj)
+
+
+def _build_null_model(model_def: str, device: t.device) -> t.nn.Module:
+    """Load an architecture, randomize all weights, set required cfg flags."""
+    model = tl.HookedTransformer.from_pretrained(
+        model_def, device=device, fold_ln=True,
+        center_writing_weights=True, center_unembed=True,
+    )
+    # Randomize every parameter tensor in-place.
+    for param in model.parameters():
+        t.nn.init.normal_(param, mean=0.0, std=0.02)
+    # The nn.Module branch in Task.init_task skips these cfg flags — set them manually.
+    model.cfg.use_attn_result = True
+    model.cfg.use_attn_in = True
+    model.cfg.use_split_qkv_input = True
+    model.cfg.use_hook_mlp_in = True
+    model.eval()
+    return model
+
+
+def _build_task(task_short: str, seed: int, null_test: bool) -> Task:
+    """Construct a Task from the template, overriding seed (and model for null test)."""
+    tmpl = _TASK_TEMPLATES[task_short]
+    kwargs = {
+        "key": tmpl.key,
+        "name": tmpl.name,
+        "batch_size": tmpl.batch_size,
+        "batch_count": tmpl.batch_count,
+        "token_circuit": tmpl.token_circuit,
+        "_dataset_name": tmpl._dataset_name,
+        "factorized": tmpl.factorized,
+        "separate_qkv": tmpl.separate_qkv,
+        "_true_edge_func": tmpl._true_edge_func,
+        "slice_output": tmpl.slice_output,
+        "dtype": tmpl.dtype,
+        "seed": seed,
+    }
+    if null_test:
+        device = t.device("cuda" if t.cuda.is_available() else "cpu")
+        kwargs["_model_def"] = _build_null_model(_TASK_MODEL_DEF[task_short], device)
+    else:
+        kwargs["_model_def"] = tmpl._model_def
+    return Task(**kwargs)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run one (method, task, ablation, seed) discovery cell.")
+    parser.add_argument("--task", required=True, choices=list(_TASK_TEMPLATES), help="Task short name")
+    parser.add_argument("--algo", required=True, choices=list(_ALGO_MAP), help="Algorithm short name")
+    parser.add_argument("--ablation", required=True, choices=list(_ABLATION_MAP), help="Discovery ablation type")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed (data shuffle + mask init)")
+    parser.add_argument("--output-dir", default=".prune_scores_cache", help="Cache folder (relative to repo root)")
+    parser.add_argument("--null-test", action="store_true", help="Use randomly-initialized model weights (dead-salmon null)")
+    args = parser.parse_args()
+
+    # ── Seed everything before any model/data initialization ──
+    t.manual_seed(args.seed)
+    random.seed(args.seed)
+
+    ablation_type = _ABLATION_MAP[args.ablation]
+    base_algo = _ALGO_MAP[args.algo]
+
+    if args.algo in _ABLATION_AWARE_ALGOS:
+        algo = make_ablation_variant(base_algo, ablation_type)
+    else:
+        algo = base_algo  # EAP / GT / Random: ablation is inherent or irrelevant
+
+    task = _build_task(args.task, args.seed, args.null_test)
+
+    print(f"Running: task={args.task}  algo={algo.key}  ablation={args.ablation}  seed={args.seed}  null_test={args.null_test}")
+    task_prune_scores = run_prune_algos([task], [algo])
+
+    # ── Save cache + manifest ──
+    null_tag = "_null" if args.null_test else ""
+    algo_slug = args.algo.replace("-", "_")
+    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}"
+    dt_string = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    full_stem = f"{base_filename}-{dt_string}"
+
+    folder = repo_path_to_abs_path(args.output_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+
+    cache_path = folder / f"{full_stem}.pkl"
+    t.save(task_prune_scores, cache_path)
+    print(f"Saved cache to {cache_path}")
+
+    manifest = {
+        "cell": {
+            "task": args.task,
+            "algo": args.algo,
+            "algo_key": algo.key,
+            "ablation": args.ablation,
+            "seed": args.seed,
+            "null_test": args.null_test,
+        },
+        "cache_file": cache_path.name,
+        "saved_at": datetime.now().isoformat(timespec="seconds"),
+        "git": git_state(),
+        "algo_hyperparams": algo_hyperparams(algo),
+    }
+    manifest_path = folder / f"{full_stem}_manifest.json"
+    with open(manifest_path, "w") as f:
+        json.dump(manifest, f, indent=2, default=_serialize)
+    print(f"Saved manifest to {manifest_path}")
+
+
+if __name__ == "__main__":
+    main()
