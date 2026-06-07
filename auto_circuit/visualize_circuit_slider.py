@@ -50,6 +50,13 @@ def _panel_intervals(
         if show_all_seq_pos:
             sankey_heights[seq_idx] = max(sankey_heights.get(seq_idx, 0.0), min_height)
 
+    if not sankey_heights:
+        # No edge exceeds the threshold at any seq position (e.g. a near-empty or
+        # uniform-score circuit at the largest-count threshold). Fall back to uniform
+        # panels so the layout still renders instead of dividing by zero.
+        for seq_idx in model.edge_dict.keys():
+            sankey_heights[seq_idx] = 1.0
+
     margin_height = total_ps / ((n_figs := len(sankey_heights)) * 2)
     total_height = sum(sankey_heights.values()) + margin_height * (n_figs - 1)
     intervals: Dict[Optional[int], Tuple[float, float]] = {}
