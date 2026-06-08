@@ -185,6 +185,7 @@ write_manifest(experiment_folder / "manifest.json", _manifest)
 circuit_graph_paths: list = []
 for task_key, algo_prune_scores in task_prune_scores.items():
     task = TASK_DICT[task_key]
+    task_slug = task.name.lower().replace(" ", "_")
     for algo_key, ps in algo_prune_scores.items():
         algo = PRUNE_ALGO_DICT[algo_key]
         # A viz failure must never abort the run after discovery has completed.
@@ -194,12 +195,12 @@ for task_key, algo_prune_scores in task_prune_scores.items():
                 model=task.model,
                 algo_name=algo.name,
                 task_name=task.name,
-                output_dir=experiment_folder / "circuit_graphs",
+                output_dir=experiment_folder / task_slug / "circuit_graphs",
                 max_edges=10000,
                 true_edge_count=task.true_edge_count,
                 seq_labels=task.test_loader.seq_labels,
             )
-            circuit_graph_paths.append(html_path.name)
+            circuit_graph_paths.append(f"{task_slug}/circuit_graphs/{html_path.name}")
         except Exception as e:
             print(f"WARNING: circuit graph failed for {task.name} / {algo.name}: {e}")
 
@@ -207,11 +208,14 @@ for task_key, algo_prune_scores in task_prune_scores.items():
 # Evaluation — free sweep over eval ablations × patch types
 # ─────────────────────────────────────────────────────────────────────────────
 
-figs = []
+# Each entry is (fig, relative_path). Figures are organised as
+# <task>/<faithfulness|completeness>/<eval-ablation>/<metric>.pdf for easy navigation;
+# ROC (spans all tasks) stays at the experiment root.
+figs: list = []
 
 # ROC vs ground-truth circuits (patch-type independent).
 roc_measurements = measure_roc(task_prune_scores)
-figs.append((roc_plot(roc_measurements), "roc"))
+figs.append((roc_plot(roc_measurements), Path("roc.pdf")))
 
 # Metric curves: call once per patch type so faithfulness and completeness figures
 # are produced separately (measure_prune_metrics takes a single patch_type arg).
@@ -229,7 +233,7 @@ _PATCH_SEMANTICS = {
 # auc_plots=False: the AUC summary asserts a 0-edge baseline point, which binary-score
 # algos (Ground Truth: 2 score-groups -> edge_counts_util omits 0) don't produce.
 for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
-    measure, ablated = _PATCH_SEMANTICS[patch_type]
+    measure, _ablated = _PATCH_SEMANTICS[patch_type]  # _ablated documented in comment above
     for task_key, algo_ps in task_prune_scores.items():
         task_slug = TASK_DICT[task_key].name.lower().replace(" ", "_")
         metrics = TASK_METRICS.get(task_key, _COMMON_METRICS)
@@ -244,9 +248,10 @@ for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
                 metric_slug = meta["metric_key"].lower().replace(" ", "_")
                 ablation_slug = str(meta["ablation_type"]).split(".")[-1].lower()
                 suffix = "_auc" if meta["is_auc"] else ""
-                # e.g. docstring_completeness_ablate-circuit-with-zero_correct_answer_percent.pdf
-                name = f"{task_slug}_{measure}_{ablated}-with-{ablation_slug}_{metric_slug}{suffix}"
-                figs.append((fig, name))
+                # <task>/<measure>/<ablation>/<metric>.pdf  e.g.
+                # docstring/completeness/zero/correct_answer_percent.pdf
+                rel = Path(task_slug) / measure / ablation_slug / f"{metric_slug}{suffix}.pdf"
+                figs.append((fig, rel))
         except Exception as e:
             print(f"WARNING: metric figures failed for {task_slug} / {measure}: {e}")
 
@@ -255,13 +260,14 @@ for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
 # ─────────────────────────────────────────────────────────────────────────────
 
 figure_names = []
-for fig, name in figs:
+for fig, rel in figs:
     try:
-        path = experiment_folder / f"{name}.pdf"
+        path = experiment_folder / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
         fig.write_image(str(path))
-        figure_names.append(f"{name}.pdf")
+        figure_names.append(str(rel))
     except Exception as e:
-        print(f"WARNING: failed to write figure {name}: {e}")
+        print(f"WARNING: failed to write figure {rel}: {e}")
 
 _manifest.update({
     "completed_at": datetime.now().isoformat(timespec="seconds"),
