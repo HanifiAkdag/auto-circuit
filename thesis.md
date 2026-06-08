@@ -73,6 +73,16 @@
 - **Significance:** EP and DiscoGP are *genuinely different* edge-only methods (resample/KL vs zero/CE+completeness), so the EP-vs-DiscoGP comparison is not redundant — it contrasts two causal queries. EP's resample ablation and KL objective align it with AutoCircuit's `CLEAN_KL_DIV_METRIC`; its Tracr ground-truth recovery makes it the strong optimization baseline against ACDC (search) and EAP (attribution). Primary input for the RQ2 algorithm-comparison framing.
 - **Code pointer:** `docs/related_work/edge_pruning.md`, `auto_circuit/prune_algos/edge_pruning.py`
 
+### Docstring circuit: origin of the benchmark task and its ground-truth — 2026-06-07
+
+- **Context:** Reading Heimersheim & Janiak (2023), "A circuit for Python docstrings in a 4-layer attention-only transformer" (SERI MATS, Neel Nanda) — the source of the Docstring benchmark task used in AutoCircuit.
+- **Observation:**
+  - Hand-found circuit in Neel Nanda's `attn-only-4l` toy model predicting repeated `:param` argument names. Found via **resample (corrupted→clean) activation patching** with a **logit-difference** metric over three corruptions (random answer / random def / random doc), batch of 50.
+  - Components: Argument Mover Heads **3.0, 3.6** (copy answer ≈ IOI Name Movers); Fuzzy Previous Token Heads **1.4, 2.0** + Induction subcircuit (**0.2**+**1.4**) move "B"-information; Duplicate Token Heads **0.5** (mostly embedding transform), **1.2** (suppresses docstring attention); causal-mask positional head **0.4**; multi-function head **1.4** (Prev-Token in def context, Induction in doc context).
+  - **Partial faithfulness:** resample-ablating everything outside the named head set recovers only **42%** (full model 56%, full minus negative heads 0.0/2.2 = 72%); adding 1.0/0.1/2.3 → 58%. Negative head **2.2** *improves* performance when patched.
+- **Significance:** Defines the Docstring task and its hand-labeled ground-truth circuit — the ROC reference for circuit-discovery evaluation. The reference circuit itself recovers only ~42–58% of performance, reinforcing the methodology-relative view of faithfulness (Miller 2024) and the redundancy/negative-head motifs (Dead Salmon) that complicate ROC scoring. Its resample-ablation + logit-diff provenance aligns the Docstring ground truth with EP's resample ablation and logit-difference metrics in sub-RQ3.
+- **Code pointer:** `docs/related_work/docstring_circuit.md`
+
 ## Results
 
 ### DiscoGP edge-only variants: KL collapse despite strong logit-difference (IOI, zero ablation) — 2026-05-15
@@ -130,6 +140,18 @@
 - **Observation:** DiscoGP-EP scores comparably to DiscoGP-E on logit-difference percent, but near zero on answer probability (indistinguishable from Random). DiscoGP-E scores high on both.
 - **Mechanism:** `answer_margin_ce` is 2-class CE over `(logit_correct, logit_wrong)`. It constrains the *relative* ordering of those two tokens but not absolute scale. The circuit can satisfy `logit_IO > logit_S` while other tokens have higher logits still, giving near-zero full-vocab softmax probability on IO. `argmax_ce` is `-log P(argmax_token)` in the full-vocab softmax — to minimise it the circuit must suppress all other tokens, so high answer probability and good logit-diff both follow naturally.
 - **Significance:** The paper-faithful loss (-EP) is strictly worse than argmax loss (-E) on two of three metrics (answer probability and KL), while only outperforming on logit-diff at some circuit sizes. The loss choice determines which faithfulness axes the circuit is trained to satisfy — a clean axis for the sub-RQ on loss-form comparison.
+
+### Answer-pair KL: DiscoGP-EP circuit is real but AutoCircuit's top-k sweep misrepresents it — 2026-06-06
+
+- **Context:** Answer-pair KL metric (KL over {IO, S} 2-class distribution, zero ablation) showed DiscoGP-EP tracking the Random baseline at 0.5 for most circuit sizes. Training curve from `disco_gp_edge_train_graph.html` showed: Faithfulness = 0.041 at end (min 0.000014 mid-run), Sparsity = 0.07 (7% mean sigmoid), Completeness = 0.74 (≈ ln 2, complement is near-uniform).
+- **Observation:**
+  - Training DID converge: faithfulness = 0.041 → stochastic circuit achieves ~96% IO-preference confidence. Completeness → ln(2) → complement is uninformative. The algorithm found a real circuit.
+  - The U-shaped answer-pair KL (good at 200–1000 edges, bad elsewhere) is the expected behaviour of a **probabilistic mask model evaluated with a deterministic top-k sweep**. During training, edges with sigmoid = 0.2 are included 20% of the time; the model learns to be faithful given this probabilistic mixture. Top-k at k > the "core" set includes low-sigmoid marginal edges that were mostly excluded during training, breaking the circuit and pushing KL back to 0.5.
+  - The circuit's **correct evaluation point is at `logit > 0` threshold** (paper's protocol), not at the sweep's k that happens to match that count. AutoCircuit's sweep passes through this as a single point.
+  - **DiscoGP-EP DOES outperform EP under zero ablation**: DiscoGP-EP dips to KL ≈ 0.2 at 200–1000 edges; EP (trained with resample) stays at 0.5 throughout zero-ablation evaluation. This is the expected ablation-type ordering.
+  - The gap between 0.2 (port) and 0.02 (paper): (1) edge-only without weight pruning is harder — circuit needs more edges to be self-contained under zero ablation; (2) mid-run over-pruning (sparsity dropped to 3.4% at midpoint, then recovered to 7%) prevented full faithfulness convergence; (3) top-k vs logit>0 threshold: even at the right k, top-k ordering may not exactly match the binary threshold.
+- **Significance:** DiscoGP-EP is working as designed — it finds a real circuit visible at 200–1000 edges. The metric visualization is misleading because the top-k sweep buries the good operating point inside a U-shaped curve that looks random at large k. For thesis results, report the **minimum answer-pair KL** across the sweep (or the value at the logit>0 circuit size), not the full curve uncritically. The 0.02 paper number is not the right comparison target: it uses joint weight+edge pruning; the thesis uses edge-only.
+- **Code pointer:** `disco_gp_edge_train_graph.html` (in repo root, generated by `show_train_graph=True`), `auto_circuit/metrics/prune_metrics/kl_div.py:measure_answer_pair_kl_div`
 
 ### DiscoGP paper KL (0.02) vs AutoCircuit KL: not the same metric — 2026-06-05
 
@@ -218,6 +240,34 @@
 
 ## Experiments
 
+### Model-sharing double-wrap when two tasks share a model — 2026-06-08
+
+- **Context:** Checking whether `faithfulness_comparison.py` handles per-task models correctly. IOI and Greater-Than both use `gpt2-small`; Docstring uses `attn-only-4l`.
+- **Observation:**
+  - `MODEL_CACHE` (`tasks.py`) keys on `(_model_def, dtype)`, so IOI and GT **shared one `gpt2-small` instance**. `patchable_model` **mutates the model in place** (injects `PatchWrapperImpl`s; its docstring says so), and its `assert not isinstance(model, PatchableModel)` guard misses this because the cache stores the raw `HookedTransformer`, not the `PatchableModel`.
+  - The second task to build (**GT**) re-ran `make_model_patchable` on IOI's already-wrapped model → `PatchWrapperImpl(module=PatchWrapperImpl(...))` (**double-wrapped**); both tasks then share that object. Forward passes still succeed (the non-activated inner wrapper is a passthrough), so it was **silent**.
+  - **Measured impact (controlled experiment, stash fix on/off, same seed):** the inner wrapper is effectively transparent, so the effect is *much smaller than the structure suggests*:
+    - **EAP discovery** (gradient-based, bypasses `patch_mode`): **bit-identical** (max\|diff\| = 0).
+    - **`run_circuits` evaluation** (official GT circuit, tree-patch): **bit-identical** (max\|diff\| = 0).
+    - **Edge Pruning discovery** (patch-based, backprops through wrappers): a **small but real, reproducible** perturbation — max\|diff\| ≈ **0.0098** on soft-mask scores (∈ 0..1), vs ~0.0025 run-to-run nondeterminism (≈4× noise, consistent across fixed-vs-buggy and fixed2-vs-buggy2). The extra passthrough layer perturbs FP rounding which compounds over training steps; it does not corrupt the patching logic.
+  - So: it is **not** a gross corruption — EAP/eval unaffected; patch-based discovery (EP/DiscoGP/ACDC) shifts at the ~1%-of-mask, near-noise level. The real problem is **non-reproducibility**: GT's patch-based scores depend on whether IOI was loaded first in the same process.
+- **Fix:** `tasks.py` `init_task` now wraps `copy.deepcopy(model)`, keeping `MODEL_CACHE` pristine and giving each task an independent model. Distinct `wrapped_model` ids and `double_wrapped=False` for all three tasks. Regression test: `tests/test_seed_dataloaders.py::test_tasks_sharing_model_def_get_independent_models` (slow).
+- **Significance:** Worth fixing for reproducibility, memory (avoids ~2× wrappers on the shared model), and clarity — but pre-fix GT results are *not invalid*, only slightly load-order-dependent for EP/DiscoGP/ACDC (EAP/eval identical). Re-running fresh with the fix is the clean choice (and the eval needed re-running anyway), not a rescue from corruption. Methodological note worth keeping: I initially overstated this as "silent corruption"; the controlled measurement showed the effect is ~4× noise on EP masks and zero on EAP/eval.
+- **Code pointer:** `auto_circuit/tasks.py` (`init_task`, the `copy.deepcopy(model)` in the `patchable_model` call).
+
+### Docstring granularity: component for the spine, token as a sub-study — 2026-06-07
+
+- **Context:** Choosing between `DOCSTRING_TOKEN_CIRCUIT_TASK` and `DOCSTRING_COMPONENT_CIRCUIT_TASK` for the sub-RQ3 faithfulness spine (`experiments/faithfulness_comparison.py`). Read Heimersheim & Janiak (2023), "A circuit for Python docstrings in a 4-layer attention-only transformer."
+- **Observation:**
+  - The docstring circuit is **fundamentally position-specific**: heads are defined by query/key positions, information flows through specific residual-stream positions across layers (`B_def → ,_B → C_def → param_3`), head 1.4 does different jobs at different positions (fuzzy-prev-token vs. induction), and head 0.4 reads positional info off the causal mask. A component-level ground truth is therefore a *lossy projection* of the true circuit.
+  - **But** the authors themselves validated at the **coarse head (component) level** — "we could expand this to take into account the heads position … but stick to the more coarse-grained check" — using **resample ablation, corrupt→clean** (same direction AutoCircuit uses). So the canonical published circuit is the component one.
+  - **Decisive structural fact:** Greater-Than exists *only* as a component circuit (no `GREATERTHAN_TOKEN_CIRCUIT_TASK`). IOI and Docstring have both. So all-component is the *only* configuration with uniform granularity across the three spine tasks.
+- **Decision:**
+  - **Spine = component for all three tasks.** Granularity is held constant as a controlled variable (Miller et al. 2024 name token-position as one of six methodology dimensions that shift faithfulness). Mixing token-Docstring with component-IOI/GT would confound every cross-task comparison with a granularity difference.
+  - **Token-Docstring is promoted to a dedicated granularity sub-study**, not buried in the spine. It is the only one of the three tasks with a genuinely position-specific circuit, so it is the ideal (and only) probe for: (a) does discovery granularity change which algorithm wins; (b) do optimization methods (EP, DiscoGP) recover fine-grained positional/induction structure that attribution/greedy methods (EAP, ACDC) smear across positions — directly the sub-RQ3 hypothesis.
+- **Significance:** Turns an inherited template default into a defensible, paper-grounded design choice; isolates granularity as a studied axis rather than an accidental confound. Also explains the token-circuit-only viz failures (per-seq-position Sankey panels) seen on 2026-06-07.
+- **Code pointer:** `experiments/faithfulness_comparison.py` (TASKS, TASK_METRICS); circuits in `auto_circuit/metrics/official_circuits/circuits/docstring_official.py` (`docstring_true_edges` vs `docstring_node_based_official_edges`, `token_positions` flag).
+
 ### Benchmark task definitions and metric mapping — 2026-05-19
 
 - **Context:** Reviewing the three benchmark papers (IOI: Wang et al. 2022, Greater-Than: Hanna et al. 2023, Docstring: Heimersheim & Janiak 2023 blog / Conmy et al. 2023 ACDC paper) to choose appropriate evaluation metrics in AutoCircuit.
@@ -250,6 +300,19 @@
 | Docstring | `CLEAN_KL_DIV_METRIC` | `CORRECT_ANSWER_PERCENT_METRIC` | `LOGIT_DIFF_PERCENT_METRIC` (unstable) |
 
 - **Significance:** The choice of primary metric is task-dependent and grounded in each paper's own evaluation. Using `LOGIT_DIFF_PERCENT_METRIC` uniformly across tasks would misrepresent Docstring results. The `answer_margin_ce` DiscoGP loss (optimises mean logit diff on correct/wrong pairs) aligns well with IOI and GT but is misaligned with Docstring's KL-preferred criterion.
+
+### Foundation (#0) implemented: ablation × seed as swept parameters — 2026-06-05
+
+- **Context:** Implementing the prerequisite infrastructure for the three-pillar sub-RQ3 design; tracked in GitHub issue #3.
+- **Observation:**
+  - **Discovery ablation parameterized in EP, DiscoGP, ACDC.** Each function had `ablation_type` hard-coded (`edge_pruning.py:165` RESAMPLE, `disco_gp.py:294` ZERO, `ACDC.py:96` RESAMPLE). Added `ablation_type: AblationType` parameter with the original as default to all three — fully backward-compatible. `make_ablation_variant(base_algo, ablation_type)` in `prune_algos.py` composes a new `PruneAlgo` via `functools.partial` with the ablation pre-bound, allowing SLURM-array cells to differ only by ablation without touching registered algo defaults.
+  - **ACDC ablation insight:** unlike EP/DiscoGP which use `batch_src_ablations` (returns `Dict[BatchKey, Tensor]`), ACDC uses `src_ablations` directly on a single-batch tensor (for a plain tensor compatible with `patch_mode`). `src_ablations` already handles all AblationType variants via its hook logic (including ZERO → zeros, RESAMPLE → corrupt activations, TOKENWISE_MEAN → dataset iteration via `ablation_type.mean_over_dataset`), so parameterization required only: `sample = dataloader if ablation_type.mean_over_dataset else corrupt_batch; patch_outs_tensor = src_ablations(model, sample, ablation_type=ablation_type)`.
+  - **Seed plumbing:** `Task` dataclass got `seed: int = 42` field (backward-compatible). `DATASET_CACHE` key updated to 6-tuple (adds seed). `load_datasets_from_json(random_seed=self.seed)` is now threaded through `init_task`. Two Tasks with identical params but different seeds now produce different dataloaders.
+  - **EAP stays corpus-only** (no change): its `edge_attribution_patching_prune_scores` computes `grad × (corrupt_act − clean_act)` — this is a gradient-based attribution, not a patching operation. Adding `ablation_type` would be conceptually mismatched.
+  - **`run_cell.py`** (new): CLI accepting `--task {ioi,gt,docstring}`, `--algo {ep,discogp-e,discogp-ep,acdc,eap,...}`, `--ablation {zero,resample,mean}`, `--seed INT`, `--null-test`. Saves cache as `cell_{task}_{algo}_{ablation}_seed{N}-{timestamp}.pkl` with a sibling `_manifest.json` encoding the full cell identity + `git_state()` + `algo_hyperparams()`. Null-test mode loads the model architecture then randomizes all weights (normal init) and sets cfg flags manually (the `nn.Module` branch in `Task.init_task` skips them).
+  - **`analysis_utils.py`** (new, `auto_circuit/metrics/`): `top_k_edge_set`, `jaccard`, `overlap_matrix`, `matched_budgets`, `load_many_caches`, `extract_metric` — reuses `prune_scores_threshold` from `tensor_ops.py` and `edge_counts_util` from `graph_utils.py` to ensure edge budgets are identical to those used in `measure_prune_metrics`.
+- **Significance:** Unlocks all three pillars of the sub-RQ3 design. The ACDC `mean_over_dataset` insight is worth noting: TOKENWISE_MEAN ablation on ACDC iterates the whole dataloader once, which is cheap for ACDC's single-batch architecture but should be confirmed against wall-clock budgets before scheduling N=5 stability runs.
+- **Code pointer:** `experiments/run_cell.py`, `auto_circuit/metrics/analysis_utils.py`, `auto_circuit/prune_algos/{ACDC,edge_pruning,disco_gp}.py`, `auto_circuit/prune_algos/prune_algos.py`, `auto_circuit/tasks.py`
 
 ### Sub-RQ3 reframed: faithfulness + stability + null test; gap verified — 2026-06-02
 

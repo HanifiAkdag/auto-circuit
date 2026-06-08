@@ -89,6 +89,8 @@ def edge_pruning_prune_scores(
     # --- Multi-fidelity HPO hooks (no-op when None) ---
     eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
     eval_every: Optional[int] = None,
+    # --- Discovery ablation ---
+    ablation_type: AblationType = AblationType.RESAMPLE,
 ) -> PruneScores:
     """Discover a circuit using L0-regularised edge pruning with Lagrangian duality.
 
@@ -162,7 +164,7 @@ def edge_pruning_prune_scores(
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
         model,
         dataloader,
-        ablation_type=AblationType.RESAMPLE,
+        ablation_type=ablation_type,
         clean_corrupt="corrupt",
     )
 

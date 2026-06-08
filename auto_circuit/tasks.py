@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, get_args
 
@@ -100,6 +101,7 @@ class Task:
     autoencoder_pythia_size: Optional[str] = None
     autoencoder_prune_with_corrupt: Optional[bool] = None
     dtype: t.dtype = t.float32
+    seed: int = 42
     __init_complete__: bool = False
 
     @property
@@ -195,6 +197,7 @@ class Task:
             self.batch_count,
             self.token_circuit,
             self.device,
+            self.seed,
         )
         if dataset_cache_key in DATASET_CACHE:
             self._train_loader, self._test_loader = DATASET_CACHE[dataset_cache_key]
@@ -215,6 +218,7 @@ class Task:
                 return_seq_length=self.token_circuit,
                 tail_divergence=True if has_tokenizer else False,
                 pad=True,
+                random_seed=self.seed,
             )
             DATASET_CACHE[dataset_cache_key] = (train_loader, test_loader)
             self._train_loader, self._test_loader = (train_loader, test_loader)
@@ -232,7 +236,7 @@ class Task:
         diverge_idx = self._train_loader.diverge_idx
         kv_caches = self._train_loader.kv_cache, self._test_loader.kv_cache
         self._model = patchable_model(
-            model=model,
+            model=copy.deepcopy(model),
             factorized=self.factorized,
             slice_output=self.slice_output,
             seq_len=seq_len,

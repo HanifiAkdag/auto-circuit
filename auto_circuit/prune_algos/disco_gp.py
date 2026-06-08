@@ -81,6 +81,8 @@ def disco_gp_prune_scores(
     # ---- Multi-fidelity HPO hooks (no-op when None) ----
     eval_callback: Optional[Callable[[int, "PruneScores"], bool]] = None,
     eval_every: Optional[int] = None,
+    # ---- Discovery ablation ----
+    ablation_type: AblationType = AblationType.ZERO,
 ) -> PruneScores:
     """Discover a sparse circuit via joint weight and edge pruning with Gumbel-sigmoid masks.
 
@@ -291,7 +293,7 @@ def disco_gp_prune_scores(
     # Phase 2: Edge mask optimisation
     # =========================================================
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
-        model, dataloader, ablation_type=AblationType.ZERO
+        model, dataloader, ablation_type=ablation_type
     )
 
     dest_wrapper_dict: Dict[str, PatchWrapperImpl] = {

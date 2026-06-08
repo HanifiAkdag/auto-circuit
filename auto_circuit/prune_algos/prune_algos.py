@@ -20,6 +20,7 @@ from auto_circuit.prune_algos.random_edges import random_prune_scores
 from auto_circuit.prune_algos.subnetwork_probing import subnetwork_probing_prune_scores
 from auto_circuit.tasks import Task
 from auto_circuit.types import (
+    AblationType,
     AlgoKey,
     AlgoPruneScores,
     Edge,
@@ -55,6 +56,25 @@ class PruneAlgo:
     @property
     def short_name(self) -> str:
         return self._short_name if self._short_name is not None else self.name
+
+
+def make_ablation_variant(base_algo: PruneAlgo, ablation_type: AblationType) -> PruneAlgo:
+    """Create a PruneAlgo variant with a specific discovery ablation_type pre-bound.
+
+    Uses functools.partial composition, so it works even when base_algo.func is already
+    a partial (e.g. EDGE_PRUNING_PRUNE_ALGO, ACDC_PRUNE_ALGO). Preserves the base algo's
+    hyperparameters; only adds/overrides ablation_type.
+
+    Not meaningful for EAP (which is inherently corrupt-only) or GT/Random
+    (ablation-independent); call-site should skip those algos.
+    """
+    slug = str(ablation_type).split(".")[-1].lower()
+    return PruneAlgo(
+        key=f"{base_algo.key} [{slug}]",
+        name=f"{base_algo.name} [{slug}]",
+        func=partial(base_algo.func, ablation_type=ablation_type),
+        _short_name=f"{base_algo.short_name}[{slug[:3]}]",
+    )
 
 
 def run_prune_algos(tasks: List[Task], prune_algos: List[PruneAlgo]) -> TaskPruneScores:

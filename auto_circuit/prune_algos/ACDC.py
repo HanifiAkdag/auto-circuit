@@ -10,6 +10,7 @@ from torch.nn.functional import log_softmax, mse_loss
 
 from auto_circuit.data import PromptDataLoader
 from auto_circuit.types import (
+    AblationType,
     CircuitOutputs,
     Edge,
     PatchType,
@@ -37,6 +38,7 @@ def acdc_prune_scores(
     run_circuits_ref: Optional[Callable[..., CircuitOutputs]] = None,
     show_graphs: bool = False,
     draw_seq_graph_ref: Optional[Callable[..., go.Figure]] = None,
+    ablation_type: AblationType = AblationType.RESAMPLE,
 ) -> PruneScores:
     """
     Run the ACDC algorithm from the paper "Towards Automated Circuit Discovery for
@@ -93,7 +95,9 @@ def acdc_prune_scores(
         train_batch = next(iter(dataloader))
         clean_batch, corrupt_batch = train_batch.clean, train_batch.corrupt
 
-        patch_outs_tensor = src_ablations(model, corrupt_batch)
+        # For mean ablations, src_ablations needs the full dataloader; otherwise a single batch tensor.
+        sample = dataloader if ablation_type.mean_over_dataset else corrupt_batch
+        patch_outs_tensor = src_ablations(model, sample, ablation_type=ablation_type)
         src_outs_tensor = src_ablations(model, clean_batch)
 
         with t.inference_mode():
