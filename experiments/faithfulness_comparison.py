@@ -26,6 +26,7 @@ from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
 from auto_circuit.metrics.prune_metrics.prune_metrics import (
     ANSWER_PAIR_KL_DIV_METRIC,
     CLEAN_KL_DIV_METRIC,
+    CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
     CORRECT_ANSWER_PERCENT_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
     PROB_DIFF_METRIC,
@@ -97,8 +98,9 @@ EVAL_ABLATION_TYPES: List[AblationType] = [
 ]
 
 # Per-task metric selection (spec §3 + hard compatibility).
-# Hard incompatibility: CORRECT_ANSWER_PERCENT asserts batch.answers is a Tensor, which
-# fails on Greater-Than (list-valued answers: "any year > XX"). LOGIT_DIFF_PERCENT is
+# Hard incompatibility: CORRECT_ANSWER_PERCENT and CORRECT_ANSWER_GREATER_THAN_INCORRECT
+# both assert batch.answers is a Tensor (a single correct answer), which fails on
+# Greater-Than (list-valued answers: "any year > XX"). LOGIT_DIFF_PERCENT is
 # unstable/uninformative on Docstring (spec "avoid"). KL metrics and the answer-diff/val
 # metrics handle both tensor- and list-valued answers, so they run on every task.
 _COMMON_METRICS = [
@@ -110,14 +112,16 @@ TASK_METRICS: dict = {
         LOGIT_DIFF_PERCENT_METRIC,      # primary (IOI)
         PROB_DIFF_METRIC,
         CORRECT_ANSWER_PERCENT_METRIC,
+        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # correct > wrong (IO vs S)
     ],
     GREATERTHAN_COMPONENT_CIRCUIT_TASK.key: _COMMON_METRICS + [
         LOGIT_DIFF_PERCENT_METRIC,      # primary (GT)
         PROB_DIFF_METRIC,               # secondary (GT)
-        # CORRECT_ANSWER_PERCENT excluded — incompatible (list answers)
+        # CORRECT_ANSWER_PERCENT / _GREATER_THAN_INCORRECT excluded — incompatible (list answers)
     ],
     DOCSTRING_COMPONENT_CIRCUIT_TASK.key: _COMMON_METRICS + [
         CORRECT_ANSWER_PERCENT_METRIC,  # secondary (Docstring)
+        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # correct arg > other args
         # LOGIT_DIFF_PERCENT excluded — unstable on Docstring (spec "avoid")
     ],
 }
