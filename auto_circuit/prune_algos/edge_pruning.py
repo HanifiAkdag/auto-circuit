@@ -54,6 +54,14 @@ from auto_circuit.utils.patch_wrapper import PatchWrapperImpl
 
 EP = "Edge Pruning"
 
+# Ablations that need a per-batch clean/corrupt designation in batch_src_ablations.
+# (Must stay in sync with batch_src_ablations in ablation_activations.py.)
+_BATCH_SPECIFIC_ABLATIONS = (
+    AblationType.RESAMPLE,
+    AblationType.BATCH_TOKENWISE_MEAN,
+    AblationType.BATCH_ALL_TOK_MEAN,
+)
+
 
 def _soft_mask(log_alpha: t.Tensor) -> t.Tensor:
     """Ablation probability for an edge: σ(log_alpha / T * F) ∈ (0, 1).
@@ -159,13 +167,16 @@ def edge_pruning_prune_scores(
             clean_logits[batch.key] = model(batch.clean)[out_slice]
 
     # ============================================================
-    # Step 2: Compute corrupted source activations (resample ablation)
+    # Step 2: Compute ablation source activations for the chosen ablation type
     # ============================================================
+    # batch_src_ablations requires clean_corrupt set iff the ablation is batch-specific
+    # (per-batch corrupt activations); non-batch ablations (zero, dataset-mean) take None.
+    clean_corrupt = "corrupt" if ablation_type in _BATCH_SPECIFIC_ABLATIONS else None
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
         model,
         dataloader,
         ablation_type=ablation_type,
-        clean_corrupt="corrupt",
+        clean_corrupt=clean_corrupt,
     )
 
     # ============================================================
