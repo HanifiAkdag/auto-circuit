@@ -26,6 +26,17 @@
 - **Significance:** Provides the methodological grounding for why EP (resample) and DiscoGP (zero ablation) produce different circuits by construction — the divergence is predicted by the framework, not evidence of a bug. Also frames why cross-algorithm faithfulness comparisons without ablation-type caveats are misleading. Primary citation for the AutoCircuit library in the Implementation chapter.
 - **Code pointer:** `docs/related_work/faithfulness_metrics_not_robust.md`
 
+### Activation patching: direction = sufficiency/necessity, and metric pitfalls — 2026-06-09
+
+- **Context:** Reading Heimersheim & Nanda (2024), "How to use and interpret activation patching" (arXiv 2404.15255) — a practitioner's guide that complements Miller (2024) on the experiment-design and result-interpretation side.
+- **Observation:**
+  - Patching direction sets the question: **denoising (clean→corrupt) = sufficiency** (finds OR-gate / redundant components), **noising (corrupt→clean) = necessity** (finds AND-gate / serial components). The two are asymmetric; neither implies the other. EP/DiscoGP replace clean with ablated activations → *noising* → their masks recover **necessity**, matching the "keep = important" semantics of `PruneScores`.
+  - Metric pitfalls: logit-difference is the recommended exploratory metric (selective, ≈linear in residual stream, continuous). **KL divergence uniquely penalizes all deviations (both signs), so it prevents "completing" a circuit via negative components** — the principled reason to use KL for faithfulness rather than logit-diff/accuracy. Discrete metrics (accuracy/rank) are unsuitable for exploratory patching. Advice: report ≥2 continuous metrics; disagreements are informative.
+  - **Negative components** (e.g. IOI 10.7/11.10, Docstring 2.2) inflate apparent recovery under logit-diff/accuracy; KL is the partial mitigation. **Backup / hydra effects** give only ~70% restoration under ablation, so ablation understates a component's role. Patching recovers *sufficient*, not *minimal*, sets.
+  - Results are relative to the clean/corrupt pair, the metric, granularity, and corruption choice (incl. position-vs-value corruptions) — same "not absolute" thesis as Miller, but along the design axes rather than the ablation tuple.
+- **Significance:** Second pillar (with Miller 2024) of the methodology-relative faithfulness argument; justifies the pipeline's metric split (KL faithfulness spine vs. logit-diff/answer-% completeness), explains the negative-head and hydra interpretations of results, and frames the EP/DiscoGP ablation as a necessity test. Methodology-chapter citation for ablation direction, corrupt-pair design, and metric choice.
+- **Code pointer:** `docs/related_work/activation_patching_guide.md`
+
 ### EAP-IG exhibits high structural variance and hyperparameter sensitivity — 2026-05-28
 
 - **Context:** Reading Méloux et al. (2025), "Mechanistic Interpretability as Statistical Estimation: A Variance Analysis of EAP-IG" (arXiv 2510.00845), the empirical companion to the Dead Salmon paper, while assessing reliability of EAP as a comparison baseline.
