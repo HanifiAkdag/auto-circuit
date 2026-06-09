@@ -1,8 +1,8 @@
-"""Pillar 1 — Faithfulness spine ANALYSIS pass for sub-RQ3 (issue #4).
+"""Faithfulness spine — discovery x eval matrix ANALYSIS pass (sub-RQ3, issue #4).
 
 Discovery is run separately as a SLURM array of per-cell jobs
-(`pillar1_discovery.sh` -> `run_cell.py`), producing one cached `PruneScores` per
-(method, task, discovery-ablation) in `.prune_scores_cache/pillar1/`. This script
+(`faithfulness_discovery.sh` -> `run_cell.py`), producing one cached `PruneScores` per
+(method, task, discovery-ablation) in `.prune_scores_cache/faithfulness/`. This script
 LOADS those cells (no retraining), groups them by discovery-ablation, and produces the
 full discovery x eval matrix:
 
@@ -15,7 +15,7 @@ full discovery x eval matrix:
 Every number is tagged with its (discovery-ablation, eval-ablation, patch-direction)
 triple via the directory path and the summary-table columns (Miller 2024).
 
-Run discovery first:   sbatch pillar1_discovery.sh
+Run discovery first:   sbatch faithfulness_discovery.sh
 Then this analysis:    sbatch run_faithfulness.sh   (or: srun python experiments/faithfulness_comparison.py)
 
 Spec: docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md
@@ -61,14 +61,14 @@ from auto_circuit.utils.misc import repo_path_to_abs_path
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
 from experiment_utils import git_state, write_manifest
 
-from pillar1_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS
+from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS
 from run_cell import _ALGO_MAP, _TASK_TEMPLATES
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-PILLAR1_CACHE_DIR = ".prune_scores_cache/pillar1"
+FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness"
 RESULTS_DIR = "results/faithfulness_comparison"
 
 # Eval ablations swept for free (no retraining) on every discovered circuit.
@@ -113,7 +113,7 @@ TASK_METRICS: dict = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Short, filesystem-clean ablation slugs, consistent with the discovery-ablation names
-# used by pillar1_cells.py (zero/resample/mean). AblationType.__str__ is title-cased
+# used by faithfulness_cells.py (zero/resample/mean). AblationType.__str__ is title-cased
 # with spaces ("Tokenwise Mean Corrupt"), so normalise explicitly.
 _ABL_SHORT = {
     AblationType.ZERO: "zero",
@@ -146,7 +146,7 @@ def _experiment_folder(name: Optional[str], seed: int) -> Path:
     if name:
         folder = base / name
     else:
-        folder = base / f"pillar1_seed{seed}_{datetime.now():%Y-%m-%d}"
+        folder = base / f"faithfulness_seed{seed}_{datetime.now():%Y-%m-%d}"
         if folder.exists():  # same-day re-run: disambiguate, don't clobber
             folder = base / f"{folder.name}_{datetime.now():%H%M}"
     folder.mkdir(parents=True, exist_ok=True)
@@ -194,16 +194,16 @@ def _group_cells_by_discovery_ablation(loaded, seed: int):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Pillar-1 faithfulness analysis pass.")
-    parser.add_argument("--pillar1-dir", default=PILLAR1_CACHE_DIR, help="Discovery cache folder")
+    parser = argparse.ArgumentParser(description="Faithfulness spine analysis pass (sub-RQ3).")
+    parser.add_argument("--cache-dir", default=FAITHFULNESS_CACHE_DIR, help="Discovery cell cache folder")
     parser.add_argument("--seed", type=int, default=42, help="Seed of the cells to analyse")
-    parser.add_argument("--name", default=None, help="Experiment folder name (default: pillar1_seed<seed>_<date>)")
+    parser.add_argument("--name", default=None, help="Experiment folder name (default: faithfulness_seed<seed>_<date>)")
     parser.add_argument("--no-circuit-graphs", action="store_true", help="Skip circuit-graph HTML")
     args = parser.parse_args()
 
-    loaded = latest_per_cell(load_many_caches(args.pillar1_dir, "cell_"))
+    loaded = latest_per_cell(load_many_caches(args.cache_dir, "cell_"))
     groups, consumed = _group_cells_by_discovery_ablation(loaded, args.seed)
-    print(f"Loaded {len(consumed)} cells from {args.pillar1_dir} (seed {args.seed}).")
+    print(f"Loaded {len(consumed)} cells from {args.cache_dir} (seed {args.seed}).")
 
     experiment_folder = _experiment_folder(args.name, args.seed)
     print(f"Writing results to: {experiment_folder}")
@@ -212,7 +212,7 @@ def main():
         "experiment": experiment_folder.name,
         "started_at": datetime.now().isoformat(timespec="seconds"),
         "git": git_state(),
-        "pillar1_dir": args.pillar1_dir,
+        "discovery_cache_dir": args.cache_dir,
         "seed": args.seed,
         "discovery_ablations": DISCOVERY_ABLATIONS,
         "eval_ablation_types": EVAL_ABLATION_TYPES,
@@ -332,7 +332,7 @@ def _write_summary(folder: Path, rows: list) -> None:
 
     # Headline pivot (markdown): faithfulness KL at matched eval==discovery ablation,
     # rows=algo, cols=discovery-ablation, per task — the discovery-relativity table.
-    lines = ["# Pillar-1 faithfulness summary", "",
+    lines = ["# Faithfulness spine summary", "",
              f"Full tidy table: `summary.csv` ({len(rows)} rows).", "",
              "## Headline: Clean-KL faithfulness at the ground-truth edge count",
              "*(TREE-patch, eval-ablation matched to discovery-ablation)*", ""]

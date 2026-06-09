@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
 
-from pillar1_cells import (  # noqa: E402
+from faithfulness_cells import (  # noqa: E402
     ANCHOR_ABLATION,
     ANCHOR_ALGOS,
     CELLS,

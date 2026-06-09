@@ -1,8 +1,9 @@
-"""Single source of truth for the Pillar-1 discovery cell list (issue #4).
+"""Single source of truth for the faithfulness-spine discovery cell list (sub-RQ3, #4).
 
-Imported by the analysis pass (`faithfulness_comparison.py`) and printed one cell per
-line by the SLURM array launcher (`pillar1_discovery.sh`), so the launcher and the
-analysis can never disagree on what the matrix is.
+The faithfulness spine is the full discovery x evaluation matrix comparing circuit
+discovery methods. Imported by the analysis pass (`faithfulness_comparison.py`) and
+printed one cell per line by the SLURM array launcher (`faithfulness_discovery.sh`),
+so the launcher and the analysis can never disagree on what the matrix is.
 
 Full discovery x eval matrix (single seed): EP / DiscoGP-EP / ACDC are each trained
 under every discovery ablation {zero, resample, mean}. EAP (corrupt-only by
