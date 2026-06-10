@@ -41,7 +41,7 @@ from auto_circuit.prune_algos.prune_algos import (
     run_prune_algos,
 )
 from auto_circuit.tasks import (
-    DOCSTRING_TOKEN_CIRCUIT_TASK,
+    DOCSTRING_COMPONENT_CIRCUIT_TASK,
     GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
     Task,
@@ -75,7 +75,7 @@ _ABLATION_MAP: dict[str, AblationType] = {
 _TASK_TEMPLATES: dict[str, Task] = {
     "ioi": IOI_COMPONENT_CIRCUIT_TASK,
     "gt": GREATERTHAN_COMPONENT_CIRCUIT_TASK,
-    "docstring": DOCSTRING_TOKEN_CIRCUIT_TASK,
+    "docstring": DOCSTRING_COMPONENT_CIRCUIT_TASK,  # component, matches the spine (not token)
 }
 
 # Model strings for each task (used to build a random-weight model for the null test).

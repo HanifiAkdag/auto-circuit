@@ -99,6 +99,23 @@ def save_circuit_sankey_slider(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # ACDC assigns +inf to kept edges; non-finite values propagate to nan in the panel
+    # height / domain math. Map non-finite to a large finite value (inf stays at the top
+    # of the ranking) so the visualisation is numerically valid.
+    finite_max = max(
+        (
+            v[t.isfinite(v)].abs().max().item()
+            for v in prune_scores.values()
+            if t.isfinite(v).any()
+        ),
+        default=1.0,
+    )
+    posinf = finite_max * 10.0 + 1.0
+    prune_scores = {
+        k: t.nan_to_num(v, posinf=posinf, neginf=-posinf, nan=0.0)
+        for k, v in prune_scores.items()
+    }
+
     if edge_counts is None:
         edge_counts = edge_counts_util(
             edges=model.edges,
