@@ -22,6 +22,7 @@ Spec: docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md
 """
 import argparse
 import csv
+import pickle
 import sys
 from collections import defaultdict
 from datetime import datetime
@@ -60,9 +61,13 @@ from auto_circuit.types import AblationType, PatchType
 from auto_circuit.utils.misc import repo_path_to_abs_path
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
 from experiment_utils import git_state, write_manifest
+from interactive_curves import save_interactive_curves
 
 from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS
 from run_cell import _ALGO_MAP, _TASK_TEMPLATES
+
+# Base algo keys of the ablation-independent anchors (no discovery sweep).
+_ANCHOR_ALGO_KEYS = {_ALGO_MAP[a].key for a in ANCHOR_ALGOS}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Config
@@ -223,6 +228,9 @@ def main():
     write_manifest(experiment_folder / "manifest.json", manifest)
 
     summary_rows: list = []  # one row per (discovery, task, algo, measure, eval-ablation, metric)
+    # Overlay curves for the interactive HTML: one figure per (task, measure, metric),
+    # each holding every (algo x discovery-ablation x eval-ablation) series.
+    overlay: dict = defaultdict(list)  # (task_key, measure, metric_key) -> [CurveEntry]
 
     for d in DISCOVERY_ABLATIONS:
         tps_d = groups[d]
@@ -297,6 +305,11 @@ def main():
                                 series = extract_metric(measurements, ev, m.key, task_key, algo_key)
                             except KeyError:
                                 continue
+                            # Anchors have no discovery sweep → label "anchor" (stored once).
+                            disc_label = "anchor" if algo_key in _ANCHOR_ALGO_KEYS else d
+                            overlay[(task_key, measure, m.key)].append(
+                                (algo_key, disc_label, _ablation_slug(ev), series)
+                            )
                             summary_rows.append({
                                 "discovery_ablation": d,
                                 "task": task.name,
@@ -308,6 +321,9 @@ def main():
                                 "value": _value_at_budget(series, budget),
                             })
 
+    # ── Interactive overlay HTMLs (cross-cell comparison) ──
+    _write_interactive(experiment_folder, overlay)
+
     # ── Summary tables ──
     _write_summary(experiment_folder, summary_rows)
 
@@ -317,6 +333,44 @@ def main():
     })
     write_manifest(experiment_folder / "manifest.json", manifest)
     print(f"\nDone. {len(summary_rows)} summary rows. Results in: {experiment_folder}")
+
+
+def _write_interactive(folder: Path, overlay: dict) -> None:
+    """One interactive overlay HTML per (task, measure, metric) under interactive/.
+
+    Also dumps the raw curve data to interactive/overlay.pkl so the plots can be
+    re-styled later (replot_interactive.py) without re-measuring the metrics.
+    """
+    if not overlay:
+        print("WARNING: no overlay curves produced.")
+        return
+    interactive_dir = folder / "interactive"
+    interactive_dir.mkdir(parents=True, exist_ok=True)
+    with open(interactive_dir / "overlay.pkl", "wb") as f:
+        pickle.dump(dict(overlay), f)
+    eval_labels = [_ablation_slug(a) for a in EVAL_ABLATION_TYPES]
+    default_eval = _ablation_slug(AblationType.RESAMPLE)
+    algo_display = {k: v.short_name for k, v in PRUNE_ALGO_DICT.items()}
+    n = 0
+    for (task_key, measure, metric_key), entries in overlay.items():
+        metric_slug = metric_key.lower().replace(" ", "_")
+        out = folder / "interactive" / _task_slug(task_key) / measure / f"{metric_slug}.html"
+        try:
+            written = save_interactive_curves(
+                entries,
+                title=f"{TASK_DICT[task_key].name} · {measure} · {metric_key}",
+                x_title="edges",
+                y_title=metric_key,
+                eval_labels=eval_labels,
+                default_eval=default_eval,
+                out_path=out,
+                algo_display=algo_display,
+            )
+            if written is not None:
+                n += 1
+        except Exception as e:
+            print(f"WARNING: interactive plot failed {out}: {e}")
+    print(f"Wrote {n} interactive overlay HTMLs under {folder / 'interactive'}")
 
 
 def _write_summary(folder: Path, rows: list) -> None:
