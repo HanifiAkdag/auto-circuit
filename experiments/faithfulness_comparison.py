@@ -133,8 +133,12 @@ def _task_slug(task_key: str) -> str:
     return TASK_DICT[task_key].name.lower().replace(" ", "_")
 
 
+def _norm_slug(s: str) -> str:
+    return s.split(".")[-1].lower().replace(" ", "_")
+
+
 def _ablation_slug(ablation: AblationType) -> str:
-    return _ABL_SHORT.get(ablation, str(ablation).split(".")[-1].lower().replace(" ", "_"))
+    return _ABL_SHORT.get(ablation, _norm_slug(str(ablation)))
 
 
 def _value_at_budget(series, budget) -> Optional[float]:
@@ -286,8 +290,7 @@ def main():
                 for fig, meta in measurement_figs(measurements, auc_plots=False):
                     metric_slug = meta["metric_key"].lower().replace(" ", "_")
                     abl_slug = _ABL_SHORT_FROM_STR.get(
-                        meta["ablation_type"],
-                        str(meta["ablation_type"]).split(".")[-1].lower().replace(" ", "_"),
+                        meta["ablation_type"], _norm_slug(meta["ablation_type"])
                     )
                     rel = d_dir / _task_slug(task_key) / measure / abl_slug / f"{metric_slug}.pdf"
                     rel.parent.mkdir(parents=True, exist_ok=True)

@@ -10,6 +10,14 @@ from auto_circuit.types import AblationType, SrcNode
 from auto_circuit.utils.misc import remove_hooks
 from auto_circuit.utils.patchable_model import PatchableModel
 
+# Ablations whose patch activations are computed per-batch from a designated
+# clean/corrupt input, so `batch_src_ablations` requires `clean_corrupt` to be set.
+BATCH_SPECIFIC_ABLATIONS = (
+    AblationType.RESAMPLE,
+    AblationType.BATCH_TOKENWISE_MEAN,
+    AblationType.BATCH_ALL_TOK_MEAN,
+)
+
 
 def src_out_hook(
     module: t.nn.Module,
@@ -145,12 +153,7 @@ def batch_src_ablations(
             activations used to ablate each [`Edge`][auto_circuit.types.Edge] in the
             model on the corresponding batch.
     """
-    batch_specific_ablation = [
-        AblationType.RESAMPLE,
-        AblationType.BATCH_TOKENWISE_MEAN,
-        AblationType.BATCH_ALL_TOK_MEAN,
-    ]
-    assert (clean_corrupt is not None) == (ablation_type in batch_specific_ablation)
+    assert (clean_corrupt is not None) == (ablation_type in BATCH_SPECIFIC_ABLATIONS)
 
     patch_outs: Dict[BatchKey, t.Tensor] = {}
     if ablation_type.mean_over_dataset:

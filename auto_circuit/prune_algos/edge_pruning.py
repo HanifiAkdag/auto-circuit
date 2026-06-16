@@ -40,7 +40,10 @@ from torch.optim import AdamW
 
 from auto_circuit.data import PromptDataLoader
 from auto_circuit.types import AblationType, BatchKey, Edge, PruneScores
-from auto_circuit.utils.ablation_activations import batch_src_ablations
+from auto_circuit.utils.ablation_activations import (
+    BATCH_SPECIFIC_ABLATIONS,
+    batch_src_ablations,
+)
 from auto_circuit.utils.custom_tqdm import tqdm
 from auto_circuit.utils.graph_utils import patch_mode, set_all_masks
 from auto_circuit.utils.l0_utils import (
@@ -53,14 +56,6 @@ from auto_circuit.utils.tensor_ops import multibatch_kl_div, sample_hard_concret
 from auto_circuit.utils.patch_wrapper import PatchWrapperImpl
 
 EP = "Edge Pruning"
-
-# Ablations that need a per-batch clean/corrupt designation in batch_src_ablations.
-# (Must stay in sync with batch_src_ablations in ablation_activations.py.)
-_BATCH_SPECIFIC_ABLATIONS = (
-    AblationType.RESAMPLE,
-    AblationType.BATCH_TOKENWISE_MEAN,
-    AblationType.BATCH_ALL_TOK_MEAN,
-)
 
 
 def _soft_mask(log_alpha: t.Tensor) -> t.Tensor:
@@ -171,7 +166,7 @@ def edge_pruning_prune_scores(
     # ============================================================
     # batch_src_ablations requires clean_corrupt set iff the ablation is batch-specific
     # (per-batch corrupt activations); non-batch ablations (zero, dataset-mean) take None.
-    clean_corrupt = "corrupt" if ablation_type in _BATCH_SPECIFIC_ABLATIONS else None
+    clean_corrupt = "corrupt" if ablation_type in BATCH_SPECIFIC_ABLATIONS else None
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
         model,
         dataloader,
