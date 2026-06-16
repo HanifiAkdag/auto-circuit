@@ -41,7 +41,7 @@ from auto_circuit.prune_algos.prune_algos import (
     run_prune_algos,
 )
 from auto_circuit.tasks import (
-    DOCSTRING_TOKEN_CIRCUIT_TASK,
+    DOCSTRING_COMPONENT_CIRCUIT_TASK,
     GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
     Task,
@@ -75,7 +75,7 @@ _ABLATION_MAP: dict[str, AblationType] = {
 _TASK_TEMPLATES: dict[str, Task] = {
     "ioi": IOI_COMPONENT_CIRCUIT_TASK,
     "gt": GREATERTHAN_COMPONENT_CIRCUIT_TASK,
-    "docstring": DOCSTRING_TOKEN_CIRCUIT_TASK,
+    "docstring": DOCSTRING_COMPONENT_CIRCUIT_TASK,  # component, matches the spine (not token)
 }
 
 # Model strings for each task (used to build a random-weight model for the null test).
@@ -146,7 +146,24 @@ def main():
     parser.add_argument("--seed", type=int, default=42, help="Random seed (data shuffle + mask init)")
     parser.add_argument("--output-dir", default=".prune_scores_cache", help="Cache folder (relative to repo root)")
     parser.add_argument("--null-test", action="store_true", help="Use randomly-initialized model weights (dead-salmon null)")
+    parser.add_argument("--skip-if-exists", action="store_true", help="Skip if this cell is already cached (requeue-safe)")
+    parser.add_argument("--force", action="store_true", help="Recompute even if a cache exists")
     args = parser.parse_args()
+
+    # ── Cache identity (computed up front so we can skip/resume) ──
+    null_tag = "_null" if args.null_test else ""
+    algo_slug = args.algo.replace("-", "_")
+    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}"
+    folder = repo_path_to_abs_path(args.output_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+
+    # Requeue/restart-safe: a cancelled-then-requeued array task whose cell already
+    # finished exits immediately instead of recomputing.
+    if args.skip_if_exists and not args.force:
+        existing = sorted(folder.glob(f"{base_filename}-*.pkl"))
+        if existing:
+            print(f"Cell already cached ({existing[-1].name}); skipping. Use --force to recompute.")
+            return
 
     # ── Seed everything before any model/data initialization ──
     t.manual_seed(args.seed)
@@ -166,15 +183,8 @@ def main():
     task_prune_scores = run_prune_algos([task], [algo])
 
     # ── Save cache + manifest ──
-    null_tag = "_null" if args.null_test else ""
-    algo_slug = args.algo.replace("-", "_")
-    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}"
     dt_string = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     full_stem = f"{base_filename}-{dt_string}"
-
-    folder = repo_path_to_abs_path(args.output_dir)
-    folder.mkdir(parents=True, exist_ok=True)
-
     cache_path = folder / f"{full_stem}.pkl"
     t.save(task_prune_scores, cache_path)
     print(f"Saved cache to {cache_path}")

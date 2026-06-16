@@ -40,7 +40,10 @@ from torch.optim import AdamW
 
 from auto_circuit.data import PromptDataLoader
 from auto_circuit.types import AblationType, BatchKey, Edge, PruneScores
-from auto_circuit.utils.ablation_activations import batch_src_ablations
+from auto_circuit.utils.ablation_activations import (
+    BATCH_SPECIFIC_ABLATIONS,
+    batch_src_ablations,
+)
 from auto_circuit.utils.custom_tqdm import tqdm
 from auto_circuit.utils.graph_utils import patch_mode, set_all_masks
 from auto_circuit.utils.l0_utils import (
@@ -159,13 +162,16 @@ def edge_pruning_prune_scores(
             clean_logits[batch.key] = model(batch.clean)[out_slice]
 
     # ============================================================
-    # Step 2: Compute corrupted source activations (resample ablation)
+    # Step 2: Compute ablation source activations for the chosen ablation type
     # ============================================================
+    # batch_src_ablations requires clean_corrupt set iff the ablation is batch-specific
+    # (per-batch corrupt activations); non-batch ablations (zero, dataset-mean) take None.
+    clean_corrupt = "corrupt" if ablation_type in BATCH_SPECIFIC_ABLATIONS else None
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
         model,
         dataloader,
         ablation_type=ablation_type,
-        clean_corrupt="corrupt",
+        clean_corrupt=clean_corrupt,
     )
 
     # ============================================================

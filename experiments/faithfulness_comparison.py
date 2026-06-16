@@ -1,22 +1,41 @@
-"""Pillar 1 — Faithfulness spine for sub-RQ3.
+"""Faithfulness spine — discovery x eval matrix ANALYSIS pass (sub-RQ3, issue #4).
 
-Runs all four circuit discovery methods at their *native* discovery ablations:
-  EP   → RESAMPLE   DiscoGP-EP → ZERO   ACDC → RESAMPLE   EAP → CORRUPT
+Discovery is run separately as a SLURM array of per-cell jobs
+(`faithfulness_discovery.sh` -> `run_cell.py`), producing one cached `PruneScores` per
+(method, task, discovery-ablation) in `.prune_scores_cache/faithfulness/`. This script
+LOADS those cells (no retraining), groups them by discovery-ablation, and produces the
+full discovery x eval matrix:
 
-Then evaluates every discovered circuit across all eval ablation types and both
-patch directions.  This produces the full discovery × eval matrix needed to test
-evaluation-relativity (Miller 2024) and cross-method faithfulness comparisons.
+  results/faithfulness_comparison/<name>/discovery-<D>/<task>/
+      <faithfulness|completeness>/<eval-ablation>/<metric>.pdf
+      circuit_graphs/<algo>.html
+  results/faithfulness_comparison/<name>/discovery-<D>/roc.pdf
+  results/faithfulness_comparison/<name>/summary.{csv,md}
 
-Design spec: docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md §4
+Every number is tagged with its (discovery-ablation, eval-ablation, patch-direction)
+triple via the directory path and the summary-table columns (Miller 2024).
+
+Run discovery first:   sbatch faithfulness_discovery.sh
+Then this analysis:    sbatch run_faithfulness.sh   (or: srun python experiments/faithfulness_comparison.py)
+
+Spec: docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md
 """
+import argparse
+import csv
+import pickle
 import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from auto_circuit.metrics.analysis_utils import (
+    extract_metric,
+    latest_per_cell,
+    load_many_caches,
+)
 from auto_circuit.metrics.official_circuits.measure_roc import measure_roc
 from auto_circuit.metrics.official_circuits.roc_plot import roc_plot
 from auto_circuit.metrics.prune_metrics.measure_prune_metrics import (
@@ -30,255 +49,370 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
     CORRECT_ANSWER_PERCENT_METRIC,
     LOGIT_DIFF_PERCENT_METRIC,
     PROB_DIFF_METRIC,
-    PruneMetric,
 )
-from auto_circuit.prune_algos.prune_algos import (
-    ACDC_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
-    EDGE_ATTR_PATCH_PRUNE_ALGO,
-    EDGE_PRUNING_PRUNE_ALGO,
-    GROUND_TRUTH_PRUNE_ALGO,
-    PRUNE_ALGO_DICT,
-    RANDOM_PRUNE_ALGO,
-    PruneAlgo,
-    run_prune_algos,
-)
+from auto_circuit.prune_algos.prune_algos import PRUNE_ALGO_DICT
 from auto_circuit.tasks import (
     DOCSTRING_COMPONENT_CIRCUIT_TASK,
     GREATERTHAN_COMPONENT_CIRCUIT_TASK,
     IOI_COMPONENT_CIRCUIT_TASK,
     TASK_DICT,
-    Task,
 )
-from auto_circuit.types import AblationType, PatchType, TaskPruneScores
-from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
+from auto_circuit.types import AblationType, PatchType
+from auto_circuit.utils.misc import repo_path_to_abs_path
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
-from experiment_utils import algo_hyperparams, git_state, write_manifest
+from experiment_utils import git_state, write_manifest
+from interactive_curves import save_interactive_curves
+
+from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS
+from run_cell import _ALGO_MAP, _TASK_TEMPLATES
+
+# Base algo keys of the ablation-independent anchors (no discovery sweep).
+_ANCHOR_ALGO_KEYS = {_ALGO_MAP[a].key for a in ANCHOR_ALGOS}
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Config — edit these to change what runs
+# Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Fresh discovery: prior caches predate the model-sharing fix (tasks.py deepcopy).
-# IOI/GT shared one gpt2-small, double-wrapping GT's model. Measured effect is small
-# (EAP/eval bit-identical; EP/DiscoGP/ACDC shift ~1% on masks, ~4x run-to-run noise) —
-# not corruption, but load-order-dependent, so recompute for clean reproducible scores.
-compute_prune_scores = True
-save_prune_scores = True
-load_prune_scores = False
-load_prune_scores_file: str | None = None
+FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness"
+RESULTS_DIR = "results/faithfulness_comparison"
 
-# Component-level for all three tasks: granularity is held constant (Greater-Than only
-# exists as a component circuit, so this is the sole uniform option). Token-level
-# Docstring is reserved for a separate granularity sub-study — see thesis.md
-# "Docstring granularity" note. (Heimersheim & Janiak 2023; Miller et al. 2024.)
-TASKS: List[Task] = [
-    IOI_COMPONENT_CIRCUIT_TASK,
-    GREATERTHAN_COMPONENT_CIRCUIT_TASK,
-    DOCSTRING_COMPONENT_CIRCUIT_TASK,
-]
-
-# Native-ablation algos (Step 0).  EP=RESAMPLE, DiscoGP-EP=ZERO, ACDC=RESAMPLE,
-# EAP=CORRUPT.  GT and Random are ablation-independent anchors.
-PRUNE_ALGOS: List[PruneAlgo] = [
-    GROUND_TRUTH_PRUNE_ALGO,
-    RANDOM_PRUNE_ALGO,
-    EDGE_ATTR_PATCH_PRUNE_ALGO,
-    ACDC_PRUNE_ALGO,
-    DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO,
-    EDGE_PRUNING_PRUNE_ALGO,
-]
-
-# Eval ablations — sweep all three so the same discovered circuit is scored
-# under each.  This is the free eval-axis sweep (no retraining).
+# Eval ablations swept for free (no retraining) on every discovered circuit.
 EVAL_ABLATION_TYPES: List[AblationType] = [
     AblationType.RESAMPLE,
     AblationType.ZERO,
     AblationType.TOKENWISE_MEAN_CORRUPT,
 ]
 
-# Per-task metric selection (spec §3 + hard compatibility).
-# Hard incompatibility: CORRECT_ANSWER_PERCENT and CORRECT_ANSWER_GREATER_THAN_INCORRECT
-# both assert batch.answers is a Tensor (a single correct answer), which fails on
-# Greater-Than (list-valued answers: "any year > XX"). LOGIT_DIFF_PERCENT is
-# unstable/uninformative on Docstring (spec "avoid"). KL metrics and the answer-diff/val
-# metrics handle both tensor- and list-valued answers, so they run on every task.
-_COMMON_METRICS = [
-    CLEAN_KL_DIV_METRIC,         # faithfulness — all tasks
-    ANSWER_PAIR_KL_DIV_METRIC,   # DiscoGP paper comparison
-]
+# Patch direction -> (measure, what-is-ablated) (Miller 2024 Table 3, clean input):
+#   TREE_PATCH = ablate complement (keep circuit)   -> faithfulness  (Row 3)
+#   EDGE_PATCH = ablate circuit    (keep complement) -> completeness (Row 1)
+_PATCH_SEMANTICS = {
+    PatchType.TREE_PATCH: "faithfulness",
+    PatchType.EDGE_PATCH: "completeness",
+}
+
+# Per-task metric selection (spec §3 + hard compatibility). CORRECT_ANSWER_* assert a
+# single tensor answer -> excluded for Greater-Than (list answers). LOGIT_DIFF_PERCENT
+# is unstable on Docstring -> excluded there (KL is the Docstring primary).
+_COMMON_METRICS = [CLEAN_KL_DIV_METRIC, ANSWER_PAIR_KL_DIV_METRIC]
 TASK_METRICS: dict = {
     IOI_COMPONENT_CIRCUIT_TASK.key: _COMMON_METRICS + [
-        LOGIT_DIFF_PERCENT_METRIC,      # primary (IOI)
+        LOGIT_DIFF_PERCENT_METRIC,
         PROB_DIFF_METRIC,
         CORRECT_ANSWER_PERCENT_METRIC,
-        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # correct > wrong (IO vs S)
+        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
     ],
     GREATERTHAN_COMPONENT_CIRCUIT_TASK.key: _COMMON_METRICS + [
-        LOGIT_DIFF_PERCENT_METRIC,      # primary (GT)
-        PROB_DIFF_METRIC,               # secondary (GT)
-        # CORRECT_ANSWER_PERCENT / _GREATER_THAN_INCORRECT excluded — incompatible (list answers)
+        LOGIT_DIFF_PERCENT_METRIC,
+        PROB_DIFF_METRIC,
     ],
     DOCSTRING_COMPONENT_CIRCUIT_TASK.key: _COMMON_METRICS + [
-        CORRECT_ANSWER_PERCENT_METRIC,  # secondary (Docstring)
-        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,  # correct arg > other args
-        # LOGIT_DIFF_PERCENT excluded — unstable on Docstring (spec "avoid")
+        CORRECT_ANSWER_PERCENT_METRIC,
+        CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC,
     ],
 }
 
-PRUNE_CACHE_DIR = ".prune_scores_cache"
-RESULTS_DIR = "results/faithfulness_comparison"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Discovery
+# Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
-task_prune_scores: TaskPruneScores = defaultdict(dict)
-_loaded_file: str | None = None
-_algo_hyperparams: dict = {}
-
-if compute_prune_scores:
-    _algo_hyperparams = {a.key: algo_hyperparams(a) for a in PRUNE_ALGOS}
-    task_prune_scores = run_prune_algos(TASKS, PRUNE_ALGOS)
-
-if load_prune_scores:
-    assert load_prune_scores_file is not None, "Set load_prune_scores_file"
-    _loaded_file = load_prune_scores_file
-    loaded = load_cache(PRUNE_CACHE_DIR, load_prune_scores_file)
-    task_prune_scores = {k: v | task_prune_scores[k] for k, v in loaded.items()}
-
-if save_prune_scores:
-    save_cache(task_prune_scores, PRUNE_CACHE_DIR, "faithfulness-prune-scores")
-
-# Cast all scores to float32 for consistent downstream arithmetic.
-for task_key, algo_scores in task_prune_scores.items():
-    for algo_key, prune_scores in algo_scores.items():
-        for mod, scores in prune_scores.items():
-            task_prune_scores[task_key][algo_key][mod] = scores.float()
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Experiment folder + first manifest write
-# ─────────────────────────────────────────────────────────────────────────────
-
-experiment_id = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-experiment_folder = repo_path_to_abs_path(RESULTS_DIR) / experiment_id
-experiment_folder.mkdir(parents=True, exist_ok=True)
-
-_manifest: dict = {
-    "experiment_id": experiment_id,
-    "started_at": datetime.now().isoformat(timespec="seconds"),
-    "git": git_state(),
-    "flags": {
-        "compute_prune_scores": compute_prune_scores,
-        "save_prune_scores": save_prune_scores,
-        "load_prune_scores": load_prune_scores,
-    },
-    "loaded_prune_scores_file": _loaded_file,
-    "tasks": [{"key": k, "name": TASK_DICT[k].name} for k in task_prune_scores],
-    "algos": sorted({a for ps in task_prune_scores.values() for a in ps}),
-    "algo_hyperparams": _algo_hyperparams,
-    "eval_ablation_types": EVAL_ABLATION_TYPES,
-    "metrics_per_task": {k: [m.key for m in ms] for k, ms in TASK_METRICS.items()},
+# Short, filesystem-clean ablation slugs, consistent with the discovery-ablation names
+# used by faithfulness_cells.py (zero/resample/mean). AblationType.__str__ is title-cased
+# with spaces ("Tokenwise Mean Corrupt"), so normalise explicitly.
+_ABL_SHORT = {
+    AblationType.ZERO: "zero",
+    AblationType.RESAMPLE: "resample",
+    AblationType.TOKENWISE_MEAN_CORRUPT: "mean",
 }
-write_manifest(experiment_folder / "manifest.json", _manifest)
+# measurement_figs stores the ablation as str(AblationType) in its meta dict.
+_ABL_SHORT_FROM_STR = {str(a): s for a, s in _ABL_SHORT.items()}
+
+
+def _task_slug(task_key: str) -> str:
+    return TASK_DICT[task_key].name.lower().replace(" ", "_")
+
+
+def _norm_slug(s: str) -> str:
+    return s.split(".")[-1].lower().replace(" ", "_")
+
+
+def _ablation_slug(ablation: AblationType) -> str:
+    return _ABL_SHORT.get(ablation, _norm_slug(str(ablation)))
+
+
+def _value_at_budget(series, budget) -> Optional[float]:
+    """Faithfulness value at the grid point nearest `budget` (e.g. true_edge_count)."""
+    if not series:
+        return None
+    if budget is None:
+        return series[len(series) // 2][1]  # mid grid point if no reference budget
+    return min(series, key=lambda xy: abs(xy[0] - budget))[1]
+
+
+def _experiment_folder(name: Optional[str], seed: int) -> Path:
+    base = repo_path_to_abs_path(RESULTS_DIR)
+    if name:
+        folder = base / name
+    else:
+        folder = base / f"faithfulness_seed{seed}_{datetime.now():%Y-%m-%d}"
+        if folder.exists():  # same-day re-run: disambiguate, don't clobber
+            folder = base / f"{folder.name}_{datetime.now():%H%M}"
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+def _group_cells_by_discovery_ablation(loaded, seed: int):
+    """Assemble {discovery-ablation D: {task_key: {base_algo_key: PruneScores}}}.
+
+    Swept cells land in their own ablation's group; ablation-independent anchors
+    (EAP/GT/Random) are added to *every* group as reference rows. Each loaded cell
+    holds exactly one (task, algo) entry; we re-key it to the BASE algo key (the
+    variant key "Edge Pruning [zero]" is not in PRUNE_ALGO_DICT, the base
+    "Edge Pruning" is) so downstream lookups and legends are clean — the discovery
+    ablation lives in the output path, not the algo name.
+    """
+    groups = {d: defaultdict(dict) for d in DISCOVERY_ABLATIONS}
+    consumed: list = []
+    for manifest, tps in loaded:
+        cell = (manifest or {}).get("cell", {})
+        task_short, algo_short, abl = cell.get("task"), cell.get("algo"), cell.get("ablation")
+        if cell.get("seed") != seed or cell.get("null_test"):
+            continue
+        if task_short not in _TASK_TEMPLATES or algo_short not in _ALGO_MAP:
+            continue
+        task_key = _TASK_TEMPLATES[task_short].key
+        base_algo_key = _ALGO_MAP[algo_short].key
+        # The cell holds a single (task -> single algo -> PruneScores).
+        scores = next(iter(next(iter(tps.values())).values()))
+        target_ds = DISCOVERY_ABLATIONS if algo_short in ANCHOR_ALGOS else [abl]
+        for d in target_ds:
+            if d in groups:
+                groups[d][task_key][base_algo_key] = scores
+        consumed.append({
+            "task": task_short, "algo": algo_short, "ablation": abl,
+            "cache_file": (manifest or {}).get("cache_file"),
+            "git": (manifest or {}).get("git", {}).get("commit"),
+            "saved_at": (manifest or {}).get("saved_at"),
+        })
+    return groups, consumed
+
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Circuit graph visualisations
+# Main
 # ─────────────────────────────────────────────────────────────────────────────
 
-circuit_graph_paths: list = []
-for task_key, algo_prune_scores in task_prune_scores.items():
-    task = TASK_DICT[task_key]
-    task_slug = task.name.lower().replace(" ", "_")
-    for algo_key, ps in algo_prune_scores.items():
-        algo = PRUNE_ALGO_DICT[algo_key]
-        # A viz failure must never abort the run after discovery has completed.
+def main():
+    parser = argparse.ArgumentParser(description="Faithfulness spine analysis pass (sub-RQ3).")
+    parser.add_argument("--cache-dir", default=FAITHFULNESS_CACHE_DIR, help="Discovery cell cache folder")
+    parser.add_argument("--seed", type=int, default=42, help="Seed of the cells to analyse")
+    parser.add_argument("--name", default=None, help="Experiment folder name (default: faithfulness_seed<seed>_<date>)")
+    parser.add_argument("--no-circuit-graphs", action="store_true", help="Skip circuit-graph HTML")
+    args = parser.parse_args()
+
+    loaded = latest_per_cell(load_many_caches(args.cache_dir, "cell_"))
+    groups, consumed = _group_cells_by_discovery_ablation(loaded, args.seed)
+    print(f"Loaded {len(consumed)} cells from {args.cache_dir} (seed {args.seed}).")
+
+    experiment_folder = _experiment_folder(args.name, args.seed)
+    print(f"Writing results to: {experiment_folder}")
+
+    manifest: dict = {
+        "experiment": experiment_folder.name,
+        "started_at": datetime.now().isoformat(timespec="seconds"),
+        "git": git_state(),
+        "discovery_cache_dir": args.cache_dir,
+        "seed": args.seed,
+        "discovery_ablations": DISCOVERY_ABLATIONS,
+        "eval_ablation_types": EVAL_ABLATION_TYPES,
+        "patch_types": list(_PATCH_SEMANTICS.values()),
+        "metrics_per_task": {k: [m.key for m in ms] for k, ms in TASK_METRICS.items()},
+        "consumed_cells": consumed,
+    }
+    write_manifest(experiment_folder / "manifest.json", manifest)
+
+    summary_rows: list = []  # one row per (discovery, task, algo, measure, eval-ablation, metric)
+    # Overlay curves for the interactive HTML: one figure per (task, measure, metric),
+    # each holding every (algo x discovery-ablation x eval-ablation) series.
+    overlay: dict = defaultdict(list)  # (task_key, measure, metric_key) -> [CurveEntry]
+
+    for d in DISCOVERY_ABLATIONS:
+        tps_d = groups[d]
+        if not tps_d:
+            print(f"[discovery={d}] no cells, skipping.")
+            continue
+        d_dir = experiment_folder / f"discovery-{d}"
+        d_dir.mkdir(parents=True, exist_ok=True)  # ROC writes here directly
+
+        # Move loaded scores onto each task's model device + float32.
+        for task_key, algo_ps in tps_d.items():
+            dev = next(TASK_DICT[task_key].model.parameters()).device
+            for ak in list(algo_ps):
+                algo_ps[ak] = {m: s.float().to(dev) for m, s in algo_ps[ak].items()}
+
+        # ── Circuit graphs (per discovery-ablation × task × algo) ──
+        if not args.no_circuit_graphs:
+            for task_key, algo_ps in tps_d.items():
+                task = TASK_DICT[task_key]
+                for algo_key, ps in algo_ps.items():
+                    try:
+                        save_circuit_sankey_slider(
+                            prune_scores=ps, model=task.model,
+                            algo_name=PRUNE_ALGO_DICT[algo_key].name, task_name=task.name,
+                            output_dir=d_dir / _task_slug(task_key) / "circuit_graphs",
+                            max_edges=10000, true_edge_count=task.true_edge_count,
+                            seq_labels=task.test_loader.seq_labels,
+                        )
+                    except Exception as e:
+                        print(f"WARNING: circuit graph failed {d}/{task.name}/{algo_key}: {e}")
+
+        # ── ROC vs ground-truth circuits ──
         try:
-            html_path = save_circuit_sankey_slider(
-                prune_scores=ps,
-                model=task.model,
-                algo_name=algo.name,
-                task_name=task.name,
-                output_dir=experiment_folder / task_slug / "circuit_graphs",
-                max_edges=10000,
-                true_edge_count=task.true_edge_count,
-                seq_labels=task.test_loader.seq_labels,
-            )
-            circuit_graph_paths.append(f"{task_slug}/circuit_graphs/{html_path.name}")
+            roc_fig = roc_plot(measure_roc(tps_d))
+            roc_fig.write_image(str(d_dir / "roc.pdf"))
         except Exception as e:
-            print(f"WARNING: circuit graph failed for {task.name} / {algo.name}: {e}")
+            print(f"WARNING: ROC failed for discovery={d}: {e}")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Evaluation — free sweep over eval ablations × patch types
-# ─────────────────────────────────────────────────────────────────────────────
+        # ── Eval matrix: per patch direction × task × eval-ablation × metric ──
+        for patch_type, measure in _PATCH_SEMANTICS.items():
+            for task_key, algo_ps in tps_d.items():
+                task = TASK_DICT[task_key]
+                metrics = TASK_METRICS.get(task_key, _COMMON_METRICS)
+                try:
+                    measurements = measure_prune_metrics(
+                        ablation_types=EVAL_ABLATION_TYPES, metrics=metrics,
+                        task_prune_scores={task_key: algo_ps}, patch_type=patch_type,
+                    )
+                except Exception as e:
+                    print(f"WARNING: measure failed {d}/{measure}/{task.name}: {e}")
+                    continue
 
-# Each entry is (fig, relative_path). Figures are organised as
-# <task>/<faithfulness|completeness>/<eval-ablation>/<metric>.pdf for easy navigation;
-# ROC (spans all tasks) stays at the experiment root.
-figs: list = []
+                for fig, meta in measurement_figs(measurements, auc_plots=False):
+                    metric_slug = meta["metric_key"].lower().replace(" ", "_")
+                    abl_slug = _ABL_SHORT_FROM_STR.get(
+                        meta["ablation_type"], _norm_slug(meta["ablation_type"])
+                    )
+                    rel = d_dir / _task_slug(task_key) / measure / abl_slug / f"{metric_slug}.pdf"
+                    rel.parent.mkdir(parents=True, exist_ok=True)
+                    try:
+                        fig.write_image(str(rel))
+                    except Exception as e:
+                        print(f"WARNING: write figure failed {rel}: {e}")
 
-# ROC vs ground-truth circuits (patch-type independent).
-roc_measurements = measure_roc(task_prune_scores)
-figs.append((roc_plot(roc_measurements), Path("roc.pdf")))
+                # Summary-table rows: faithfulness at the ground-truth edge count.
+                budget = task.true_edge_count
+                for ev in EVAL_ABLATION_TYPES:
+                    for m in metrics:
+                        for algo_key in algo_ps:
+                            try:
+                                series = extract_metric(measurements, ev, m.key, task_key, algo_key)
+                            except KeyError:
+                                continue
+                            # Anchors have no discovery sweep → label "anchor" (stored once).
+                            disc_label = "anchor" if algo_key in _ANCHOR_ALGO_KEYS else d
+                            overlay[(task_key, measure, m.key)].append(
+                                (algo_key, disc_label, _ablation_slug(ev), series)
+                            )
+                            summary_rows.append({
+                                "discovery_ablation": d,
+                                "task": task.name,
+                                "algo": PRUNE_ALGO_DICT[algo_key].short_name,
+                                "measure": measure,
+                                "eval_ablation": _ablation_slug(ev),
+                                "metric": m.key,
+                                "budget_edges": budget,
+                                "value": _value_at_budget(series, budget),
+                            })
 
-# Metric curves: call once per patch type so faithfulness and completeness figures
-# are produced separately (measure_prune_metrics takes a single patch_type arg).
-#
-# Patch direction → what is ablated → what it measures (Miller 2024, Table 3, clean
-# input / reverse_clean_corrupt=False):
-#   TREE_PATCH = ablate the complement (keep circuit)  → faithfulness  (Row 3)
-#   EDGE_PATCH = ablate the circuit    (keep complement) → completeness (Row 1)
-# The ablation value (zero/resample/mean) is what the ablated edges are set to.
-_PATCH_SEMANTICS = {
-    PatchType.TREE_PATCH: ("faithfulness", "ablate-complement"),
-    PatchType.EDGE_PATCH: ("completeness", "ablate-circuit"),
-}
-# Run per task so each task uses only its compatible metrics (TASK_METRICS).
-# auc_plots=False: the AUC summary asserts a 0-edge baseline point, which binary-score
-# algos (Ground Truth: 2 score-groups -> edge_counts_util omits 0) don't produce.
-for patch_type in (PatchType.TREE_PATCH, PatchType.EDGE_PATCH):
-    measure, _ablated = _PATCH_SEMANTICS[patch_type]  # _ablated documented in comment above
-    for task_key, algo_ps in task_prune_scores.items():
-        task_slug = TASK_DICT[task_key].name.lower().replace(" ", "_")
-        metrics = TASK_METRICS.get(task_key, _COMMON_METRICS)
+    # ── Interactive overlay HTMLs (cross-cell comparison) ──
+    _write_interactive(experiment_folder, overlay)
+
+    # ── Summary tables ──
+    _write_summary(experiment_folder, summary_rows)
+
+    manifest.update({
+        "completed_at": datetime.now().isoformat(timespec="seconds"),
+        "summary_rows": len(summary_rows),
+    })
+    write_manifest(experiment_folder / "manifest.json", manifest)
+    print(f"\nDone. {len(summary_rows)} summary rows. Results in: {experiment_folder}")
+
+
+def _write_interactive(folder: Path, overlay: dict) -> None:
+    """One interactive overlay HTML per (task, measure, metric) under interactive/.
+
+    Also dumps the raw curve data to interactive/overlay.pkl so the plots can be
+    re-styled later (replot_interactive.py) without re-measuring the metrics.
+    """
+    if not overlay:
+        print("WARNING: no overlay curves produced.")
+        return
+    interactive_dir = folder / "interactive"
+    interactive_dir.mkdir(parents=True, exist_ok=True)
+    with open(interactive_dir / "overlay.pkl", "wb") as f:
+        pickle.dump(dict(overlay), f)
+    eval_labels = [_ablation_slug(a) for a in EVAL_ABLATION_TYPES]
+    default_eval = _ablation_slug(AblationType.RESAMPLE)
+    algo_display = {k: v.short_name for k, v in PRUNE_ALGO_DICT.items()}
+    n = 0
+    for (task_key, measure, metric_key), entries in overlay.items():
+        metric_slug = metric_key.lower().replace(" ", "_")
+        out = folder / "interactive" / _task_slug(task_key) / measure / f"{metric_slug}.html"
         try:
-            measurements = measure_prune_metrics(
-                ablation_types=EVAL_ABLATION_TYPES,
-                metrics=metrics,
-                task_prune_scores={task_key: algo_ps},
-                patch_type=patch_type,
+            written = save_interactive_curves(
+                entries,
+                title=f"{TASK_DICT[task_key].name} · {measure} · {metric_key}",
+                x_title="edges",
+                y_title=metric_key,
+                eval_labels=eval_labels,
+                default_eval=default_eval,
+                out_path=out,
+                algo_display=algo_display,
             )
-            for fig, meta in measurement_figs(measurements, auc_plots=False):
-                metric_slug = meta["metric_key"].lower().replace(" ", "_")
-                ablation_slug = str(meta["ablation_type"]).split(".")[-1].lower()
-                suffix = "_auc" if meta["is_auc"] else ""
-                # <task>/<measure>/<ablation>/<metric>.pdf  e.g.
-                # docstring/completeness/zero/correct_answer_percent.pdf
-                rel = Path(task_slug) / measure / ablation_slug / f"{metric_slug}{suffix}.pdf"
-                figs.append((fig, rel))
+            if written is not None:
+                n += 1
         except Exception as e:
-            print(f"WARNING: metric figures failed for {task_slug} / {measure}: {e}")
+            print(f"WARNING: interactive plot failed {out}: {e}")
+    print(f"Wrote {n} interactive overlay HTMLs under {folder / 'interactive'}")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Save figures + final manifest
-# ─────────────────────────────────────────────────────────────────────────────
 
-figure_names = []
-for fig, rel in figs:
-    try:
-        path = experiment_folder / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        fig.write_image(str(path))
-        figure_names.append(str(rel))
-    except Exception as e:
-        print(f"WARNING: failed to write figure {rel}: {e}")
+def _write_summary(folder: Path, rows: list) -> None:
+    if not rows:
+        print("WARNING: no summary rows produced.")
+        return
+    cols = ["discovery_ablation", "task", "algo", "measure", "eval_ablation",
+            "metric", "budget_edges", "value"]
+    with open(folder / "summary.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols)
+        w.writeheader()
+        w.writerows(rows)
 
-_manifest.update({
-    "completed_at": datetime.now().isoformat(timespec="seconds"),
-    "patch_types": [PatchType.TREE_PATCH, PatchType.EDGE_PATCH],
-    "figures_saved": figure_names,
-    "circuit_graphs": circuit_graph_paths,
-})
-write_manifest(experiment_folder / "manifest.json", _manifest)
+    # Headline pivot (markdown): faithfulness KL at matched eval==discovery ablation,
+    # rows=algo, cols=discovery-ablation, per task — the discovery-relativity table.
+    lines = ["# Faithfulness spine summary", "",
+             f"Full tidy table: `summary.csv` ({len(rows)} rows).", "",
+             "## Headline: Clean-KL faithfulness at the ground-truth edge count",
+             "*(TREE-patch, eval-ablation matched to discovery-ablation)*", ""]
+    headline = [r for r in rows
+                if r["metric"] == CLEAN_KL_DIV_METRIC.key and r["measure"] == "faithfulness"
+                and r["eval_ablation"] == r["discovery_ablation"]]
+    tasks = sorted({r["task"] for r in headline})
+    for task in tasks:
+        lines += [f"### {task}", ""]
+        algos = sorted({r["algo"] for r in headline if r["task"] == task})
+        lines.append("| algo | " + " | ".join(DISCOVERY_ABLATIONS) + " |")
+        lines.append("|" + "---|" * (len(DISCOVERY_ABLATIONS) + 1))
+        for algo in algos:
+            cells = []
+            for d in DISCOVERY_ABLATIONS:
+                v = next((r["value"] for r in headline
+                          if r["task"] == task and r["algo"] == algo
+                          and r["discovery_ablation"] == d), None)
+                cells.append(f"{v:.4f}" if isinstance(v, float) else "-")
+            lines.append(f"| {algo} | " + " | ".join(cells) + " |")
+        lines.append("")
+    (folder / "summary.md").write_text("\n".join(lines))
 
-print(f"\nDone. Results in: {experiment_folder}")
+
+if __name__ == "__main__":
+    main()

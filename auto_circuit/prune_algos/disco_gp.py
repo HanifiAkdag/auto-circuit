@@ -28,7 +28,10 @@ from torch.optim import AdamW
 
 from auto_circuit.data import BatchKey, PromptDataLoader
 from auto_circuit.types import AblationType, Edge, PruneScores
-from auto_circuit.utils.ablation_activations import batch_src_ablations
+from auto_circuit.utils.ablation_activations import (
+    BATCH_SPECIFIC_ABLATIONS,
+    batch_src_ablations,
+)
 from auto_circuit.utils.custom_tqdm import tqdm
 from auto_circuit.utils.graph_utils import patch_mode
 from auto_circuit.utils.gumbel_sigmoid_utils import gumbel_sigmoid, schedule_epoch_lambda
@@ -292,8 +295,11 @@ def disco_gp_prune_scores(
     # =========================================================
     # Phase 2: Edge mask optimisation
     # =========================================================
+    # batch_src_ablations requires clean_corrupt set iff the ablation is batch-specific
+    # (per-batch corrupt activations); non-batch ablations (zero, dataset-mean) take None.
+    clean_corrupt = "corrupt" if ablation_type in BATCH_SPECIFIC_ABLATIONS else None
     src_outs: Dict[BatchKey, t.Tensor] = batch_src_ablations(
-        model, dataloader, ablation_type=ablation_type
+        model, dataloader, ablation_type=ablation_type, clean_corrupt=clean_corrupt
     )
 
     dest_wrapper_dict: Dict[str, PatchWrapperImpl] = {

@@ -228,10 +228,12 @@ def net_viz(
         sources = [remap[s] for s in sources]
         targets = [remap[d] for d in targets]
 
-        if highlight_complete_paths:
+        new_idx_to_layer = {remap[old]: idx_to_node[old].layer for old in used}
+        # Skip path-highlighting when the panel has no nodes (e.g. a near-empty slider
+        # step) — min()/max() over an empty mapping would raise.
+        if highlight_complete_paths and new_idx_to_layer:
             # Edges on a path from Embed (min layer) to Resid End (max layer) are
             # highlighted; all others are dimmed to gray.
-            new_idx_to_layer = {remap[old]: idx_to_node[old].layer for old in used}
             min_lyr = min(new_idx_to_layer.values())
             max_lyr = max(new_idx_to_layer.values())
             embed_set = {i for i, l in new_idx_to_layer.items() if l == min_lyr}

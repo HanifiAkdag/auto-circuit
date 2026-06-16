@@ -7,6 +7,7 @@ import torch as t
 from auto_circuit.metrics.analysis_utils import (
     extract_metric,
     jaccard,
+    latest_per_cell,
     load_many_caches,
     overlap_matrix,
     top_k_edge_set,
@@ -104,3 +105,25 @@ def test_load_many_caches_and_extract_metric(tmp_path):
         measurements, AblationType.RESAMPLE, "Clean KL Div", "taskA", "algoX"
     )
     assert series == [(0, 0.0), (10, 0.5)]
+
+
+def test_latest_per_cell():
+    """Dedup keeps the newest file per cell identity; distinct cells are all kept."""
+    def cell(task, algo, abl, saved, tag):
+        manifest = {
+            "cell": {"task": task, "algo": algo, "ablation": abl, "seed": 42, "null_test": False},
+            "saved_at": saved,
+        }
+        return (manifest, {"tps": tag})
+
+    loaded = [
+        cell("ioi", "ep", "zero", "2026-06-08T10:00:00", "old"),
+        cell("ioi", "ep", "zero", "2026-06-08T12:00:00", "new"),  # newer -> wins
+        cell("ioi", "ep", "resample", "2026-06-08T10:00:00", "other-abl"),
+        cell("gt", "acdc", "zero", "2026-06-08T10:00:00", "other-cell"),
+    ]
+    kept = latest_per_cell(loaded)
+    assert len(kept) == 3  # the two ioi/ep/zero collapse to one
+    tags = {tps["tps"] for _, tps in kept}
+    assert "new" in tags and "old" not in tags
+    assert {"new", "other-abl", "other-cell"} == tags
