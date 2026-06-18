@@ -2,6 +2,17 @@
 
 ## Related Work
 
+### Feature-level circuit discovery: attribution graphs and cross-layer transcoders — 2026-06-18
+
+- **Context:** Reading Ameisen, Lindsey et al. (2025, Anthropic), "Circuit Tracing: Revealing Computational Graphs in Language Models" (Transformer Circuits Thread), to position this thesis's component-level comparison against the feature-level paradigm.
+- **Observation:**
+  - The method re-decomposes MLPs into sparse **features** via **cross-layer transcoders** (read at one layer, write to all later MLP outputs), then builds a **local replacement model** that freezes attention patterns and norm denominators and adds **error nodes**, making computation exactly reproduce the model on a single prompt while being approximately linear.
+  - On that linearized system, causal influence is read off directly as a per-prompt **attribution graph** (nodes: embeddings, features, error nodes, logits). The graph is a *hypothesis* validated by intervention (steer "Texas"→"California" flips Dallas→Austin to Sacramento).
+  - **Faithfulness is built in, not measured after:** error-node magnitude is an explicit, honest signal of unexplained computation ("dark matter"); mechanistic-faithfulness checks show good directional agreement (~0.8 cosine) but significant magnitude divergence across layers.
+  - Hard limits: frozen attention makes graphs **per-prompt local** and uninformative when attention formation is the crux (induction, multiple-choice); inhibitory circuits are under-represented; global cross-prompt circuits need TWERA to beat interference.
+- **Significance:** Names the **granularity boundary** of this thesis — EP/DiscoGP/ACDC/EAP discover circuits over *polysemantic native components* (heads, MLPs, edges), whereas attribution graphs change the units to *escape* superposition. The error-node idea is the same faithfulness concern as Pillar 1 attacked from the opposite side (built-in vs measured-after, both descending from Miller 2024). Per-prompt locality reinforces the Pillar-2 stability and Pillar-3 null-test framing. Best cited as the contrasting paradigm in Related Work and as a Limitations/Future-Work pointer (component-level discovery inherits superposition; feature-level tracing is the orthogonal response).
+- **Code pointer:** `docs/related_work/circuit_tracing_attribution_graphs.md`
+
 ### Non-identifiability of circuit discovery and hydra effects — 2026-05-28
 
 - **Context:** Reading Méloux et al. (2025), "The Dead Salmons of AI Interpretability" (arXiv 2512.18792), while framing the multi-algorithm comparison chapter.
