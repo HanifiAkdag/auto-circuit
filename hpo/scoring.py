@@ -32,8 +32,12 @@ from auto_circuit.types import AblationType, Edge, Measurements, PatchType, Prun
 from auto_circuit.utils.patchable_model import PatchableModel
 
 # Consistent set of edge-count sweep points used for AUC integration.
-# Must start at 0 (required by measurements_auc) and span a logarithmic range.
-DEFAULT_EVAL_EDGE_COUNTS: List[int] = [0, 5, 10, 20, 50, 100, 200, 500, 1000]
+# Must start at 0 (required by measurements_auc) and span a logarithmic range up to
+# the full model. _run_sweep caps these to the model's edge count and always appends
+# the full-model point, so the curve/AUC reaches all edges regardless of task size.
+DEFAULT_EVAL_EDGE_COUNTS: List[int] = [
+    0, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000,
+]
 
 
 def _run_sweep(
@@ -47,9 +51,9 @@ def _run_sweep(
     """Run the circuit sweep and return raw (edge_count, metric_value) measurements."""
     try:
         n_edges = model.n_edges
-        counts = [c for c in edge_counts if c <= n_edges]
-        if not counts or counts[0] != 0:
-            counts = [0] + [c for c in counts if c > 0]
+        # Always include 0 (baseline, required by measurements_auc) and n_edges
+        # (full model) so the sweep spans the entire circuit-size range.
+        counts = sorted({0, n_edges} | {c for c in edge_counts if 0 < c < n_edges})
 
         circuit_outs = run_circuits(
             model=model,

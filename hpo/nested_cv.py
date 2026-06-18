@@ -71,7 +71,7 @@ from auto_circuit.tasks import (
     Task,
 )
 from auto_circuit.types import AblationType, PruneScores, TaskPruneScores
-from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
+from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path
 
 from hpo.cv_utils import holdout_split, kfold_prompt_loaders, register_fold_kv_caches
 from hpo.scoring import DEFAULT_EVAL_EDGE_COUNTS, METRIC_REGISTRY, score_all
@@ -353,8 +353,10 @@ def main() -> None:
 
     # Save the baseline copy (stripped of target algo) and config — worker 0 only,
     # to avoid concurrent writes from parallel SLURM workers to the same path.
+    # Scoped to the run dir (not the shared cache) so a later run can't load a
+    # stale baseline from a different experiment.
     if args.worker_id == 0:
-        save_cache(dict(task_prune_scores), cache_folder, "baseline_prune_scores")
+        t.save(dict(task_prune_scores), out_root / "baseline_prune_scores.pkl")
         config = vars(args)
         config["max_resource"] = max_resource
         (out_root / "config.json").write_text(json.dumps(config, indent=2))
@@ -446,6 +448,10 @@ def main() -> None:
             # Cap fidelity if requested
             if fidelity_param is not None and args.max_epochs_cap is not None:
                 hparams[fidelity_param] = args.max_epochs_cap
+
+            # finalize.py refits from this, not study.best_params (which drops
+            # non-suggested kwargs like use_weight_masks / loss_mode / tao_exps).
+            trial.set_user_attr("full_hparams", dict(hparams))
 
             inner_scores_list: List[Optional[float]] = []
 
