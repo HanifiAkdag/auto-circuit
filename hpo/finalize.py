@@ -41,7 +41,7 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
 )
 from auto_circuit.prune_algos.prune_algos import GROUND_TRUTH_PRUNE_ALGO, PRUNE_ALGO_DICT
 from auto_circuit.types import AblationType, PatchType, PruneScores, TaskPruneScores
-from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
+from auto_circuit.utils.misc import repo_path_to_abs_path, save_cache
 
 from hpo.cv_utils import kfold_prompt_loaders, register_fold_kv_caches
 from hpo.nested_cv import (
@@ -72,10 +72,21 @@ def _cache_dir() -> Path:
     return repo_path_to_abs_path(CACHE_FOLDER)
 
 
-def _find_fold_cache(fold_idx: int) -> Optional[Path]:
-    """Return most-recent fold-cache pkl path, or None."""
-    matches = sorted(_cache_dir().glob(f"fold{fold_idx}_prune_scores-*.pkl"))
-    return matches[-1] if matches else None
+def _fold_cache_path(fold_dir: Path) -> Path:
+    """Per-run fold cache path (deterministic, scoped to this run's fold dir)."""
+    return fold_dir / "prune_scores.pkl"
+
+
+def _find_fold_cache(fold_dir: Path, fold_idx: int) -> Optional[Path]:
+    """Per-run fold cache, else legacy shared cache (newest by mtime, not name).
+
+    The DD-MM-YYYY_HH-MM-SS suffix does not sort lexically by date.
+    """
+    per_run = _fold_cache_path(fold_dir)
+    if per_run.exists():
+        return per_run
+    matches = list(_cache_dir().glob(f"fold{fold_idx}_prune_scores-*.pkl"))
+    return max(matches, key=lambda p: p.stat().st_mtime) if matches else None
 
 
 def main() -> None:
@@ -114,14 +125,19 @@ def main() -> None:
 
     fidelity_param = ss.fidelity_param
 
-    # Load baseline (saved by worker 0 during HPO). save_cache appends a
-    # timestamp suffix, so glob for the newest match.
+    # Load baseline (saved by worker 0 during HPO). Prefer the per-run copy in the
+    # run dir; fall back to the legacy shared cache (newest by mtime — the
+    # DD-MM-YYYY suffix does not sort lexically by date) for old runs.
     task_prune_scores: TaskPruneScores = defaultdict(dict)
-    baseline_matches = sorted(_cache_dir().glob("baseline_prune_scores-*.pkl"))
-    if baseline_matches:
-        loaded = load_cache(CACHE_FOLDER, baseline_matches[-1].name)
+    per_run_baseline = out_root / "baseline_prune_scores.pkl"
+    baseline_path: Optional[Path] = per_run_baseline if per_run_baseline.exists() else None
+    if baseline_path is None:
+        legacy = list(_cache_dir().glob("baseline_prune_scores-*.pkl"))
+        baseline_path = max(legacy, key=lambda p: p.stat().st_mtime) if legacy else None
+    if baseline_path is not None:
+        loaded = t.load(baseline_path)
         task_prune_scores = defaultdict(dict, loaded)
-        print(f"[finalize] Loaded baseline from {baseline_matches[-1].name}")
+        print(f"[finalize] Loaded baseline from {baseline_path}")
         print(f"[finalize] Baseline algos: {list(task_prune_scores.get(task.key, {}).keys())}")
     else:
         print(f"[finalize] No baseline cache found; figures will compare only fold refits.")
@@ -159,7 +175,12 @@ def main() -> None:
         storage = JournalStorage(JournalFileBackend(str(log_path)))
         study = optuna.load_study(study_name=study_name, storage=storage)
 
-        best_hparams = study.best_params
+        # Refit from the full hparam dict stored during the trial (structural flags
+        # + derived params that study.best_params drops). Fall back to best_params
+        # for older runs that predate the user_attr.
+        best_trial = study.best_trial
+        refit_full_hparams = best_trial.user_attrs.get("full_hparams", best_trial.params)
+        best_hparams = study.best_params  # suggested-only, kept for logging
         best_hparams_per_fold.append(best_hparams)
 
         # Single-writer (finalize is a single process), safe to write directly.
@@ -171,12 +192,12 @@ def main() -> None:
 
         # Cache-hit: prior finalize already produced refit + eval for this fold
         scores_path = fold_dir / "outer_test_scores.json"
-        cache_pkl = _find_fold_cache(fold_idx)
+        cache_pkl = _find_fold_cache(fold_dir, fold_idx)
         if not cli_args.force_refit and scores_path.exists() and cache_pkl is not None:
-            print(f"[finalize] Fold {fold_idx}: cache hit ({cache_pkl.name}), skipping refit "
+            print(f"[finalize] Fold {fold_idx}: cache hit ({cache_pkl}), skipping refit "
                   f"(use --force-refit to override).")
             outer_scores[f"fold{fold_idx}"] = json.loads(scores_path.read_text())
-            cached = load_cache(CACHE_FOLDER, cache_pkl.name)
+            cached = t.load(cache_pkl)
             if task.key in cached and fold_key in cached[task.key]:
                 fold_prune_scores[fold_key] = cached[task.key][fold_key]
             continue
@@ -184,17 +205,14 @@ def main() -> None:
         # Refit
         print(f"[finalize] Refitting on full outer_train ({fold_idx})...")
         t.manual_seed(seed + fold_idx)
-        refit_hparams = dict(best_hparams)
+        refit_hparams = dict(refit_full_hparams)
         if fidelity_param is not None and max_epochs_cap is not None:
             refit_hparams[fidelity_param] = max_epochs_cap
         refit_ps = ss.base_func(model, outer_train, true_edges, **refit_hparams)
 
         fold_prune_scores[fold_key] = refit_ps
-        save_cache(
-            {task.key: {fold_key: refit_ps}},
-            CACHE_FOLDER,
-            f"fold{fold_idx}_prune_scores",
-        )
+        # Per-run cache (deterministic path, scoped to this run's fold dir).
+        t.save({task.key: {fold_key: refit_ps}}, _fold_cache_path(fold_dir))
 
         # Eval outer_test (one-shot unbiased estimate)
         print(f"[finalize] Evaluating on outer_test ({fold_idx})...")
@@ -279,12 +297,18 @@ def main() -> None:
                 if k != gt_key and k in known
             }
         }
+        # Span the full model: cap sweep points to this task's edge count and always
+        # include the full-model point so the figures aren't truncated at 1000 edges.
+        n_edges = task.model.n_edges
+        fig_edge_counts = sorted(
+            {0, n_edges} | {c for c in eval_edge_counts if 0 < c < n_edges}
+        )
         prune_measurements = measure_prune_metrics(
             ablation_types=ablation_types,
             metrics=_metrics,
             task_prune_scores=non_gt,
             patch_type=PatchType.TREE_PATCH,
-            test_edge_counts=eval_edge_counts or None,
+            test_edge_counts=fig_edge_counts,
         )
         if gt_key in combined.get(task.key, {}) and task.true_edge_count is not None:
             gt_only = {task.key: {gt_key: combined[task.key][gt_key]}}
