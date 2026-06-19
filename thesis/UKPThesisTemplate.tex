@@ -66,8 +66,10 @@
 %%%%%%%%%%%%%%%%%%%
 % Bibliography
 %%%%%%%%%%%%%%%%%%%
-\usepackage[style=alphabetic]{biblatex}
-\addbibresource{UKPThesisTemplate.bib}% File name of BibTeX database
+% \usepackage[style=alphabetic]{biblatex}
+% \addbibresource{UKPThesisTemplate.bib}% File name of BibTeX database
+
+\usepackage{natbib}
 
 %%%%%%%%%%%%%%%%%%%
 % Package suggestions for tables
@@ -103,7 +105,7 @@
 
 \submissiondate{\today}
 \examdate{\today}
-\addTitleBox{\includegraphics[width=0.9\linewidth]{UKPThesisTemplate 2026v2/Images/UKP_logo.pdf}}
+\addTitleBox{\includegraphics[width=0.9\linewidth]{Thesis/Images/UKP_logo.pdf}}
 %\tuprints{printid=XXXX,year=2022,license=cc-by-4.0}% License information for TUprints
 
 \begin{document}
@@ -123,20 +125,44 @@
 
 \chapter{Introduction}\label{ch:introduction}
 
-\section{Motivation}
-% Why mechanistic interpretability and circuit discovery matter.
+\section{Motivation}\label{sec:motivation}
 
-\section{Problem Statement}
-% The gap this thesis addresses.
+Transformer language models have become remarkably capable, yet how they arrive at their outputs remains largely opaque. \emph{Mechanistic interpretability} addresses this opacity by attempting to reverse-engineer the internal algorithms a model has learned, expressing them in terms a human can inspect~\citep{elhage2021mathematical}. A central abstraction in this effort is the \emph{circuit}: the sparse subgraph of model components (attention heads and multi-layer perceptrons, or MLPs) and the connections between them that are jointly responsible for a specific, well-defined behavior~\citep{wang2023interpretability}. \emph{Circuit discovery} is the task of identifying that subgraph automatically, replacing the painstaking manual analysis of early work with reproducible algorithms. This thesis studies circuit discovery on GPT-2 Small~\citep{gpt2}, using three established benchmark tasks: Indirect Object Identification (IOI)~\citep{wang2023interpretability}, Greater-Than~\citep{hanna2023doesgpt2computegreaterthan}, and Docstring completion~\citep{stefanhex_janiak_2023}.
 
-\section{Research Questions}
-% State the sub-RQs (faithfulness, stability, null test).
+The state of the art in circuit discovery spans three families of methods. \emph{Search-based} methods, exemplified by Automatic Circuit Discovery (ACDC)~\citep{acdc}, iteratively test and prune connections to isolate those that matter for the task. \emph{Attribution-based} methods, such as Edge Attribution Patching (EAP)~\citep{syed-etal-2024-attribution}, estimate the importance of every connection in a single pass, trading some accuracy for a large gain in speed. Most recently, \emph{gradient-based} methods, such as Edge Pruning~\citep{edgePruning} and DiscoGP~\citep{yu-etal-2025-sheaf}, frame discovery as an optimization problem, learning a differentiable mask over the model's connections. These optimization methods are faster than exhaustive search and recover sparser, more faithful circuits, which makes them the current frontier of the field.
 
-\section{Contributions}
-% Bullet the concrete contributions of this thesis.
+Circuit discovery is increasingly relied upon to support claims about model safety, debugging, and trustworthiness, so the \emph{reliability} of the circuits it produces matters a great deal. Two findings complicate this picture. First, a discovered circuit is not a unique ground truth: the result depends heavily on methodological choices such as the ablation used to test it, so faithfulness scores reflect the experimenter's setup as much as the model~\citep{miller2024transformer}. Second, a single task generally admits \emph{many} distinct circuits that are each equally faithful, a non-identifiability that is intrinsic to the problem rather than a defect of any one algorithm~\citep{meloux2025deadsalmons}. Together these mean that we cannot uncritically trust any single method's output and, more pressingly, that we cannot even \emph{compare} methods fairly today. Each algorithm is typically published with its own evaluation framework, its own ablation strategy, and its own codebase, so apparent differences between methods are confounded by differences in how they were measured. Establishing a fair basis for comparison is the gap this thesis sets out to close.
 
-\section{Thesis Outline}
-% One paragraph mapping the remaining chapters.
+\section{Problem Statement}\label{sec:problem}
+
+The motivation above gives rise to two coupled gaps. The first is a \emph{tooling} gap. The gradient-based methods, Edge Pruning and DiscoGP, are distributed as standalone implementations, each carrying its own evaluation procedure. AutoCircuit~\citep{miller2024transformer}, the standard framework for edge-level circuit evaluation, does not support them. Without a shared pipeline, there is no way to subject all four algorithms to the same ablations and metrics, and therefore no controlled comparison is possible.
+
+The second is a \emph{knowledge} gap. Existing comparisons of circuit-discovery algorithms tend to conflate the algorithm with the methodology used to evaluate it, and they are usually based on a single run. This leaves two questions unanswered for the gradient-based methods in particular: how \emph{stable} are their circuits across repeated runs, and do they recover genuine task structure at all, as opposed to plausible-looking artifacts, a question made concrete by comparing against a \emph{random-weight null model}. Closing the tooling gap is the precondition for answering these questions, since both require evaluating every method under identical conditions.
+
+\section{Research Questions}\label{sec:rqs}
+
+This thesis is organized around two research questions:
+
+\begin{description}
+  \item[RQ1 (Integration).] Can Edge Pruning and DiscoGP be integrated into a single, shared evaluation framework (AutoCircuit) so that they are assessed under exactly the same ablations and metrics as ACDC and EAP?
+  \item[RQ2 (Comparison).] Under identical ablations and metrics, how do the gradient-based methods (Edge Pruning, DiscoGP) compare to ACDC and EAP in terms of \emph{(a)} faithfulness, \emph{(b)} stability across repeated runs, and \emph{(c)} their behavior on a random-weight null model?
+\end{description}
+
+\noindent RQ1 is the enabling question; RQ2 is the central one, and its three parts structure the experimental work of the thesis.
+
+\section{Contributions}\label{sec:contributions}
+
+This thesis makes the following contributions:
+
+\begin{itemize}
+  \item A unified, open-source integration of Edge Pruning and DiscoGP into the AutoCircuit framework, the first setting in which these gradient-based methods are evaluated under the same ablations and metrics as the established ACDC and EAP algorithms.
+  \item A controlled, methodology-aware comparison of all four algorithms across three benchmark tasks, holding ablation and metric choices fixed so that the observed differences reflect the algorithms themselves rather than their evaluation setups.
+  \item An empirical characterization of the methods along three axes (faithfulness, run-to-run stability, and behavior against a random-weight null model), addressing not only which method is most faithful, but how reliable and non-spurious each method's circuits are.
+\end{itemize}
+
+\section{Thesis Outline}\label{sec:outline}
+
+The remainder of this thesis is organized as follows. Chapter~\ref{ch:background} introduces the necessary background on transformers, the circuit abstraction, and the AutoCircuit framework. Chapter~\ref{ch:related-work} surveys related work on circuit-discovery algorithms and on the reliability of circuit faithfulness. Chapter~\ref{ch:methodology} describes the integration of Edge Pruning and DiscoGP into AutoCircuit and the design of the comparison experiments. Chapter~\ref{ch:experiments} details the benchmark tasks, metrics, and experimental setup, and Chapter~\ref{ch:results} reports the results across the three axes of RQ2. Chapter~\ref{ch:discussion} interprets these findings and discusses their limitations, and Chapter~\ref{ch:conclusion} concludes and outlines directions for future work.
 
 \chapter{Background}\label{ch:background}
 % Transformers, GPT-2 Small, activation patching, ablation types,
@@ -171,6 +197,7 @@
 %\listoffigures
 %\listoftables
 
-\printbibliography
-
+% \printbibliography
+\bibliographystyle{acl_natbib}
+\bibliography{Thesis/UKPThesisTemplate}
 \end{document}

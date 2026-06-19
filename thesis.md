@@ -1,5 +1,25 @@
 # Thesis Notes
 
+## Introduction
+
+### Introduction chapter drafted; framing decisions — 2026-06-19
+
+- **Context:** Writing the LaTeX Introduction (`thesis/UKPThesisTemplate.tex`).
+- **Observation / decisions:**
+  - **Spine:** the *comparison* of circuit-discovery algorithms is the payload; *integration* of EP/DiscoGP into AutoCircuit is the enabling contribution. Intro funnels: opaque LLMs → circuits → discovery methods (search/attribution/gradient) → results are hard to compare (methodology-relativity + non-identifiability) → this thesis unifies + compares.
+  - **Murano dropped** (supervisor decision) → clean **two-RQ** structure: RQ1 integration, RQ2 comparison with three parts (faithfulness, stability, random-weight null).
+  - **DiscoGP described only in its paper-faithful form** (answer-margin CE); the `argmax_ce` relaxation is omitted from the write-up.
+  - Intro is **motivation/contribution-focused per the grading rubric** (9a topic, 9b motivation, 9c SOTA methods named-not-dissected, 10 RQs, 11 contributions). Algorithm internals → Background/Methodology; per-paper findings → Related Work. Citation budget kept minimal (ACDC, EAP, EP, DiscoGP, Miller 2024, Méloux 2025).
+- **Significance:** Locks the thesis's top-level narrative and RQ structure; downstream chapters must match (each RQ ↔ a contribution ↔ a chapter).
+- **Code pointer:** `thesis/UKPThesisTemplate.tex` (Introduction); blueprint at `~/.claude/plans/wiggly-napping-sky.md`.
+
+### Dead-salmon null-test gap corrected after reading Méloux 2025 in full — 2026-06-19
+
+- **Context:** Verifying the Pillar-3 (null test) framing against the actual Dead Salmon paper (Méloux et al. 2025, arXiv 2512.18792).
+- **Observation:** It is a position paper. It *prescribes* a randomized-weights null test (Appendix A eq. 4 Monte-Carlo p-value; Table 1 assigns the circuit-discovery row the error `KL(P_full‖P_circuit)`) but *empirically* runs it on **probing only** (sentiment / POS / world-models). For circuit discovery it cites toy-model artifacts (`melouxeverything`) and a **prior circuit-level hypothesis test, Shi et al. 2024** ("Hypothesis Testing the Circuit Hypothesis").
+- **Significance:** "First null test on circuit discovery" would be an overclaim. The defensible gap is *instantiating Méloux's prescribed test for the gradient-based optimizers EP/DiscoGP (vs ACDC/EAP) inside the unified AutoCircuit harness on real GPT-2 tasks* — i.e. completing the circuit-discovery row of their Table 1. Cite Shi 2024 to differentiate. The thesis's KL faithfulness spine equals the discrepancy measure Méloux assigns to circuit discovery, so Pillars 1 and 3 sit inside their statistical-causal framework. **TODO:** locate the exact Shi 2024 reference and add to the bib before writing Methodology/Related Work.
+- **Code pointer:** `docs/related_work/dead_salmon_interpretability.md` (summary may need this nuance added).
+
 ## Related Work
 
 ### Feature-level circuit discovery: attribution graphs and cross-layer transcoders — 2026-06-18
