@@ -1,0 +1,257 @@
+%% This is file `DEMO-TUDaThesis.tex' version 4.05 (2025-11-13),
+%% it is part of
+%% TUDa-CI -- Corporate Design for TU Darmstadt
+%% ----------------------------------------------------------------------------
+%%
+%% Copyright (C) 2018--2025 by Marei Peischl <marei@peitex.de>
+%%
+%% ============================================================================
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%% http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008/05/04 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The current maintainer of this work is
+%%   Marei Peischl <tuda-ci@peitex.de>
+%%
+%% The development repository can be found at
+%% https://github.com/tudace/tuda_latex_templates
+%% Please use the issue tracker for feedback!
+%%
+%% If you need a compiled version of this document, have a look at
+%% http://mirror.ctan.org/macros/latex/contrib/tuda-ci/doc
+%% or at the documentation directory of this package (if installed)
+%% <path to your LaTeX distribution>/doc/latex/tuda-ci
+%% ============================================================================
+%%
+% !TeX program = lualatex
+%%
+
+% Enable PDF/A via pdfmanagement
+% Temporary workaround for an incompatibility wth the current status of the tagging project, see https://github.com/tudace/tuda_latex_templates/issues/521
+\DocumentMetadata{
+	pdfstandard=a-2b,
+	pdfversion=1.7,% 2.0 is possible as well, but PDF/A-2b requires < 2.0
+	lang=en,
+}
+%change the thesis={type=bachelor} to type=master for Master Thesis 
+\documentclass[
+	english,% Main language as global option
+	accentcolor=9c,% Choose accent color: For a list of available colors see the full tudapub documentation
+	ruledheaders=section,% Section levels above this one will follow the ruled layout
+	class=report,% Choose the base document class. Will choose the matching KOMA-Script class
+	thesis={type=master},% Thesis. For PhD thesis have a look at DEMO-TUDaPhd example file
+	fontsize=11pt,% Basic font size. CI default setting of 9pt is too small for theses
+	parskip=half-,% Use a parskip instead of indent, see KOMA-Script documentation
+	custommargins=true,% Calculate margins using typearea
+	marginpar=false,% Disable marginpar
+%	BCOR=5mm,% Binding correction
+%	accept-missing-logos=true,% No error in case logo files are not available
+%	logofile=example-image,% In case logo should be replaced
+]{tudapub}
+
+
+%%%%%%%%%%%%%%%%%%%
+% Language setup
+%%%%%%%%%%%%%%%%%%%
+\usepackage[english, main=ngerman]{babel}
+\usepackage{microtype}
+\usepackage[autostyle]{csquotes}% \enquote, to simplify use of quotation marks
+
+%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%
+\usepackage[style=alphabetic]{biblatex}
+\addbibresource{UKPThesisTemplate.bib}% File name of BibTeX database
+
+%%%%%%%%%%%%%%%%%%%
+% Package suggestions for tables
+%%%%%%%%%%%%%%%%%%%
+\usepackage{array}% Fundamental tools for tables. Is automatically loaded by the following packages
+\usepackage{tabularx}% Tables with flexible columns to achieve fixed width
+%\usepackage{longtable}% Tables across multiple pages
+%\usepackage{xltabular}% Tables with fixed width spanning multiple pages
+%\usepackage{booktabs}% Improved layout for horizontal rules in tables
+
+%%%%%%%%%%%%%%%%%%%
+% Package suggestions math
+%%%%%%%%%%%%%%%%%%%
+\usepackage{mathtools}% Extended version of amsmath
+\usepackage{amssymb}% Additional symbols
+\usepackage{siunitx}% Numbers and Units
+
+\hypersetup{% Metadata adjustments, in case these are not set, the data provided for \maketitle will be used
+	pdfauthor=Marei Peischl (peiTeX),
+	pdfcreationdate=2024-05-03,
+	pdfkeywords={TU Darmstadt; Corporate Design; LaTeX}
+}
+
+\title{Title of my work}
+\subtitle{and a subtitle}
+\author[vorname nachname]{Hanifi Ibrahim Akdağ}%optionales Argument ist die Signatur,
+\birthplace{Turkey}%Geburtsort, bei Dissertationen zwingend notwendig
+\reviewer{Prof. Dr. Iryna Gurevych \and Reviewer 2 \and …}
+
+% The following elements will be placed on the title page
+\department{inf}% If defined the shorthand will be replaced by the full name otherwhise it's used directly.
+\institute{Ubiquitous Knowledge Processing Lab}
+\group{}
+
+\submissiondate{\today}
+\examdate{\today}
+\addTitleBox{\includegraphics[width=0.9\linewidth]{UKPThesisTemplate 2026v2/Images/UKP_logo.pdf}}
+%\tuprints{printid=XXXX,year=2022,license=cc-by-4.0}% License information for TUprints
+
+\begin{document}
+
+\maketitle
+\affidavit
+
+\begin{abstract}
+	Die Zusammenfassung der Arbeit sollte nicht mehr als 20 Zeilen lang sein. Also: immer schön kurz fassen und es nicht übertreiben, sonst wird der Text zu lang und damit nicht mehr handhabbar. Es muss sowohl eine Deutsche als auch eine Englische Fassung vorhanden sein, die den gleichen Inhalt haben sollte.
+\end{abstract}
+
+\begin{abstract}[english]
+	The summary of the work should be no longer than 20 lines, so please be concise. Additionally, both a German and an English version must appear and should have the same content.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Die schriftliche Ausarbeitung}
+
+Diese Anleitung soll als Hilfestellung zum Verfassen Ihrer Arbeit dienen. Sie enthält Empfehlungen, Richtlinien und Tipps für die Vorbereitung, Gliederung und Gestaltung. Die Einhaltung der Regeln kann die Qualität der Ausarbeitung verbessern und damit die Wahrscheinlichkeit einer guten Beurteilung erhöhen.
+
+\section{Inhalt und Aufbau der Arbeit}
+Die \textit{klassische} Form einer Ausarbeitung hat \underline{etwa} folgende Abschnitte (hängt stark von der Aufgabenstellung ab):
+\begin{enumerate}
+	\item Inhaltsverzeichnis
+	\item Einleitung (Definition des Problems, Einbettung in das Forschungsfeld)
+	\item Beschreibung der Problemstellung (Welches Problem soll erarbeitet werden?)
+	\item Verwendete Ansätze, Methoden und/oder Modelle (Sprachen, Entwurfsmethoden, Datenmodelle, Analysemethoden, Formalismen)
+	\item Kritische Würdigung (Vergleich mit verwandten Arbeiten, Diskussion offener Punkte und insbesondere auch Ihre persönliche Bewertung)
+	\item Zusammenfassung
+	\item Literaturverzeichnis
+\end{enumerate}
+%
+Die hier angeführte Gliederung ist nicht unbedingt äquivalent zur Kapitelstruktur Ihrer Arbeit. So kann es beispielsweise sinnvoll sein, die Implementierung in mehrere Kapitel zu unterteilen oder die technischen Daten und die Beurteilung zu einem Kapitel zusammenzufassen. In Einzelfällen kann auch eine andere Reihenfolge angebracht sein, beispielsweise wenn eine Klassenbibliothek entwickelt wurde, deren Benutzung Kenntnis ihrer Implementierung voraussetzt. Achten Sie auf jeden Fall darauf, dass grundlegende Punkte zuerst behandelt werden, sodass Sie in späteren Kapiteln darauf aufbauen können.\\
+Ob Anhänge sinnvoll sind, hängt vom Thema Ihrer Arbeit ab. Kurze Programmstücke können direkt in die entsprechenden Kapitel eingesetzt werden. Lange Beispielprogramme, die den Lesefluss stören würden und für das Verständnis eines Kapitels aber unbedingt erforderlich sind, sollten in einen Anhang verbannt werden. Bei Bildschirmmasken, Klassendiagrammen oder ähnlichen liegt die Grenze bei etwa zwei Abbildungen pro Seite.\\
+
+Bei der Behandlung der Themen sind vor allem folgende Punkte zu beachten:
+\begin{itemize}
+	\item Beschränkung auf das Wesentliche (keine Details, sondern das große Bild)
+	\item Kritische Auseinandersetzung mit dem Thema
+	\item Repräsentative Auswahl einschlägiger und weiterführender Literatur
+\end{itemize}
+
+Literaturverweise sollen sich nicht auf die Basisliteratur beschränken. Es wird erwartet, dass weitere Literaturquellen zum Thema ausfindig gemacht und in der Arbeit zitiert werden. Zur besseren Verarbeitung der Ausarbeitung empfehlen wir, die einzelnen Kapitel oder Abschnitte jeweils in eine eigene Datei zu setzen und diese per \begin{verbatim}\input{dateiname}\end{verbatim} einzubinden. \newline
+
+\section{Vorbereitung}
+Es ist empfehlenswert, die Teile der Arbeit in derselben Reihenfolge zu schreiben, in der sie später gelesen werden. Auf diese Weise steigt die Wahrscheinlichkeit, dass die Arbeit flüssig gelesen werden kann, dass sie keine Brüche enthält und keine unbekannten (z.B. erst später definierten) Begriffe verwendet werden. Allerdings setzt diese Arbeitsweise voraus, dass zuvor ein Plan der schriftlichen Arbeit ausgearbeitet wird. \\
+Stellen Sie als erstes das Inhaltsverzeichnis auf. Beschränken Sie sich auf ein- und zweistufige Überschriften, und ergänzen Sie jeden Abschnitt um die geschätzte Seitenanzahl sowie Stichworte zum Inhalt.\\
+Die Schätzung des Umfangs gibt einen Anhaltspunkt für die Schwerpunkte der Arbeit. Wenn die Seitenanzahl des Hauptteils unter der von nebensächlichen Abschnitten (z.B. der Einleitung) liegt, sollten Sie die Gliederung neu überdenken. Wenn einzelne Kapitel zu umfangreich werden, sollten Sie eine Aufteilung in kleinere Kapitel in Betracht ziehen.\\
+Die Stichworte sollten so gewählt werden, dass Sie sich beim Schreiben noch daran erinnern, was Sie sich dabei gedacht haben. Empfehlenswert sind auch rhetorische Fragen, die Sie im betreffenden Abschnitt beantworten wollen. Überprüfen Sie anhand der Stichworte, ob die einzelnen Kapitel und Abschnitte aufeinander aufbauen, so dass möglichst selten Vorwärtsverweise auf folgende Kapitel notwendig werden.\\
+Es ist empfehlenswert, schon während der Implementierungsarbeit Notizen zu sammeln, in denen der Projektverlauf, aufgetretene Probleme und ihre Lösungen festgehalten werden. Es ist auch nützlich, über Irrwege Buch zu führen. Jeder falsche und später verworfene Lösungsansatz vermittelt Einsichten, die dem Leser der Abschlussarbeit von Nutzen sein können.
+
+\section{Die wissenschaftliche Praxis}
+Sollten Sie aus anderen Quellen Bestandteile oder Zitate in Ihre Arbeit übernehmen, die dabei nötigen Quellenangaben nicht oder grob unvollständig machen, verstoßen Sie damit gegen die gute wissenschaftliche Praxis. Die übernommenen Bestandteile sind damit Plagiate und gelten als \textbf{Betrug}.
+Arbeiten, die dies tun, werden mit 5,0 bewertet. Der Betrugsversuch wird an das Prüfungs-Sekretariat gemeldet, wo sie zu einem Vermerk in den Akten führen und unter Umständen zu weiteren Schritten.
+Wie sie Zitate korrekt kennzeichnen, können Sie in Kapitel 4.3 nachlesen. Auf keinen Fall ist es statthaft:
+\begin{itemize}
+	\item Wörtlich abzuschreiben oder via ``Cut \& Paste'' Passagen zu kopieren, ohne solche Abschnitte eindeutig als Originalzitate zu kennzeichnen. Auch wenn derlei Zitate zwar sinnvoll sein können, taugen übrigens nicht zum Aufblähen einer Arbeit zum Zwecke des Erreichens eines vorgegebenen oder vermuteten ``Soll-Umfangs''.
+	\item Zitate abzuändern damit sie nicht mehr als Originalzitate gekennzeichnet werden müssen oder nicht mehr so leicht mittels Suchmaschinen aufzufinden sind. Beachten Sie, dass es inzwischen spezielle elektronische Hilfsmittel zum Aufspüren von derartigen Plagiaten gibt – der nachgewiesene Betrugsversuch wiegt in solchen Fällen umso schwerer.
+	\item Ideen und Konzepte zu übernehmen, ohne Urheber zweifelsfrei zu benennen.
+\end{itemize}
+
+\subsection{Stil}
+Die inhaltlich beste Arbeit ist schwierig zu lesen, wenn man von plumpem oder zu verschnörkeltem Stil abgelenkt wird. Ein guter Schreibstil kann leider nicht im Schnellverfahren erlernt werden, sondern wird mühsam durch Erfahrung und Übung erworben. In der Schule wird zwar das Schreiben von Aufsätzen geübt, das technische Schreiben bleibt aber auf der Strecke. Die folgenden Hinweise sollen daher einige Anhaltspunkte für die Ausarbeitung bieten.\\
+Benutzen Sie eine einfache, sachliche und klare Sprache. Vermeiden Sie geschwollene Ausdrucksweisen, „wohlklingende“ Fremdwörter, zu lange und geschachtelte Sätze, die man zweimal lesen muss, um ihren syntaktischen Aufbau zu durchschauen, sowie lange Aufzählungen wie in diesem Satz.\\
+Winzige Abschnitte mit nur wenigen Zeilen rechtfertigen keine eigene Überschrift. Überdenken Sie in solchen Fällen die Gliederung neu. Vermeiden Sie zu tiefe Schachtelung der Kapitel. Dreistufige Überschriften (1.2.3) reichen in der Regel.
+Auch innerhalb eines Abschnitts können und sollten Sie durch Absätze, Einrückungen und nicht nummerierte Überschriften für Struktur sorgen. Auf jeden Fall sollten lange Absätze in mehrere kleinere zerlegt werden.\\
+Wortwiederholungen sind in literarischen Werken verpönt, in technischen Beschreibungen aber oft für das Verständnis wesentlich. Wenn in einer Arbeit die Wendungen „Eingabefenster“, „aktives Fenster“, „vorderstes Fenster“ und „aktuelles Fenster“ nebeneinander vorkommen, so vermutet der Leser einen Sinn dahinter und versucht vergeblich, die Unterschiede zu ergründen. Benutzen sie daher konsequent denselben Begriff für dieselbe Bedeutung. Noch besser: erklären Sie den Begriff bei oder vor seinem ersten Auftreten.\\
+
+Folgende Bücher bieten Hilfen und Antworten auf viele Fragen rund um das ``wissenschaftliche'' Arbeiten und Schreiben. Die Fachschaft Informatik subventioniert den Studierenden der Informatik Lehrbücher (mehr Informationen unter: \url{http://host04.fachschaft.informatik.tu-darmstadt.de/buecher/}):
+\begin{itemize}
+	\item \textit{Die Technik wissenschaftlichen Arbeitens: Eine praktische Anleitung} 
+	\begin{itemize}
+		\item Verfasser: Norbert Franck, Joachim Stary.
+		\item ISBN: 9783825207243.
+		\item Preis: 17,90 EUR. Studentischer Anteil: 6,23 EUR.
+		\item Buch ist in Fachbereichsbibliothek und ULB verfügbar
+	\end{itemize}
+	\item \textit{Wissenschaftliches Arbeiten: Technik - Methodik - Form} (Broschiert, Vahlen, 2008) (Neu!) 
+	\begin{itemize}
+		\item Verfasser: Manuel René Theisen.
+		\item ISBN: 9783800635962.
+		\item Preis: 13,00 EUR. Studentischer Anteil: 4,53 EUR.
+	\end{itemize}
+	\item \textit{Technisches Schreiben: (Nicht nur) für Informatiker} 
+	\begin{itemize}
+		\item Verfasser: Peter Rechenberg.
+		\item ISBN: 9783446406957.
+		\item Preis: 19,90 EUR. Studentischer Anteil: 6,93 EUR.
+	\end{itemize}
+	\item \textit{Getting Things Done. The Art of Stress-Free Productivity} (Taschenbuch) (Neu!) 
+	\begin{itemize}
+		\item Verfasser: David Allen.
+		\item ISBN: 9780142000281.
+		\item Preis: 13,10 EUR. Studentischer Anteil: 4,56 EUR.
+		\item Buch ist in englischer Sprache, studentischer Anteil kann aufgrund von Währungsschwankungen höher ausfallen. Der Subventionsanteil beträgt 8,54 EUR.
+	\end{itemize}
+\end{itemize}
+
+
+\subsection{Zahlen, Ziffern und Maßangaben}
+Im Fließtext werden natürliche Zahlen zwischen 0 und 9 üblicherweise durch Worte dargestellt, alle anderen Zahlen durch Ziffern (z.B. fünf Schritte, 42 Schritte). Sätze oder Überschriften sollten nicht mit einer Ziffer beginnen. Versuchen Sie, den Satz umzuformulieren, falls dies nicht möglich ist, schreiben Sie die Zahl aus.\\
+Wenn Sie in einem Satz Zahlen kleiner als 10 mit Zahlen größer als 10 vergleichen, verwenden Sie durchgängig Ziffern (z.B. „in 4 von 20 Fällen“). Die Zahlen „Null“ und „Eins“ sind in Worten dargestellt verständlicher. Sie können deshalb auch in solchen Fällen ausgeschrieben werden (z.B. „eine von 50 Testpersonen“).\\
+Bei Angabe des Datums sollte der Tag immer in Ziffern angegeben werden. Zwischen den Datumsbestandteilen wird ein Punkt gesetzt, führende Nullen sind nicht üblich. Schreiben Sie wenn möglich die Monatsangabe aus. Bei Zeitangaben werden Stunden und Minuten durch einen Punkt (11.30) oder eine Hochstellung voneinander abgehoben (1130).\\
+Ganze Zahlen aus mehr als 3 Ziffern werden von der Endziffer aus in dreistellige Gruppen zerlegt. Gliedern Sie die Gruppen durch Zwischenräume. Eine Gliederung durch Punkte, Kommata oder Hochkommata sollte vermieden werden, weil es dadurch zu Verwechslungen zwischen deutsch- und englischsprachigen Texten kommen kann. In LATEX verwenden Sie für den Zwischenraum ein Spatium (\,), in Word ein geschütztes Leerzeichen (Strg+Leerzeichen).\\
+Dezimalstellen werden im Deutschen laut Duden von den ganzen Zahlen durch Komma getrennt. Wenn Sie Ihre Arbeit auf Englisch schreiben, verwenden Sie stattdessen einen Punkt. Bei Zahlen kleiner als Eins wird auch die führende Null angegeben.\\
+Zwischen einem Zahlenwert und einer vorhergehenden oder nachfolgenden Einheit oder Abkürzung darf kein Zeilenumbruch erfolgen (z.B. 11 km, € 5000). Verwenden Sie ein geschütztes Leerzeichen, um dies zu erzwingen.
+
+\subsection{Überprüfen auf Fehler}
+Sobald Sie Ihre Arbeit fertig gestellt haben, überprüfen Sie Ihr eigenes Werk auf Fehler: Führen Sie eine Rechtschreibprüfung durch.
+Lesen Sie Ihre Arbeit selbst noch einmal durch und merzen Sie die „letzten Fehler“ aus. Wenn möglich, bitten Sie einen Kollegen, die Arbeit durchzulesen und dabei auf inhaltliche Mängel (die Sie selbst aus „Betriebsblindheit“ übersehen) zu achten. \\
+Wenn Sie der Meinung sind, alles für eine gute Arbeit getan zu haben, geben Sie die „vorläufige Endfassung“ bei Ihrem Betreuer ab. Er wird die Arbeit noch einmal Korrektur lesen und Verbesserungsvorschläge anbringen. In welchem Ausmaß Sie bei der letzten Überarbeitung auf diese Vorschläge eingehen, bleibt Ihnen überlassen.\\
+Beachten Sie, dass auch Ihr Betreuer für die Durchsicht der Arbeit einige Zeit benötigt.
+
+\section{Arbeiten mit Literatur}
+Wissenschaftliche Literatur ist die wichtigste Informationsquelle für ihre Arbeit. Hier eine kurze Charakterisierung der Literatur:
+\begin{itemize}
+	\item \textbf{Bücher} befassen sich meist mit einem größeren Problembereich, der systematisch und vollständig behandelt wird. Der Nachteil von Büchern ist, dass sie meist nicht die allerneuesten Erkenntnisse behandeln. Dafür enthalten Bücher meist eine ganzheitliche Präsentation des Stoffgebietes. Der Inhalt wird von Experten vor dem Erscheinen geprüft.
+	\item \textbf{Artikel in Fachzeitschriften und Artikelsammlungen} sind wissenschaftlich höchst wertvoll, und präsentieren oft neue Resultate für ein Fachpublikum. Die Artikel werden von Experten vor dem Erscheinen geprüft, und oft dem Autor zur Überarbeitung zurückgegeben. Dieser Review-Vorgang kann sich über mehrere Monate ziehen und sorgt meist für sehr hohe Qualität (allerdings zu Lasten der Aktualität).
+	\item \textbf{Artikel in Konferenzbänden} haben ähnliche Eigenschaften wie Artikel aus Zeitschriften, jedoch ist die Qualitätskontrolle nicht ganz so perfekt. Der Grund dafür ist, dass der Artikel zu einem bestimmten Datum fertig sein muss, um rechtzeitig zur Konferenz zu erscheinen. Die Qualität zwischen einzelnen Konferenzen variiert stark.
+	\item \textbf{Technical Reports} enthalten meist neueste Inhalte, manchmal Vorabversionen für oben genannte Artikel. Technical Reports durchlaufen keinerlei Qualitätskontrolle, und sind durchschnittlich von weit geringerer Qualität als Artikel und Bücher.
+\end{itemize}
+Übrigens: Nur Artikel, die eine Qualitätskontrolle bestanden haben, nennt man „Publikationen“. „Papers“ ist ein Überbegriff, der alle oben aufgeführten Publikationsarten umfasst.\\
+
+Die einzelnen Schritte bei der Suche nach Literatur (nach \cite{Buchberger1992}):
+\begin{enumerate}
+	\item Fragen Sie Leute, die auf dem entsprechenden Gebiet arbeiten. Ebenso finden Sie in den Bibliotheken des Fachbereichs fachspezifische Bücher.
+	\item Betrachten Sie die Literaturliste in den vorhandenen relevanten Publikationen.
+	\item Betrachten Sie das Inhaltsverzeichnis und den Index vorhandener relevanter Bücher, um zusätzliche Schlüsselworte für die weitere Suche zu finden.
+	\item Suchen Sie im Schlüsselwortkatalog von Bibliotheken.
+	\item Suchen Sie in relevanten Literatur-CD-ROMs und im Internet.
+	\item Durchsuchen Sie „Review Journals“, wie etwa Computer Abstracts, ACM Computing Reviews, ACM Guide to Computing Literature.
+	\item Schreiben Sie an Autoren vorhandener relevanter Papers für weiterführende Literatur.
+\end{enumerate}
+Die Literatursuche ist ein iterativer Prozess!
+
+
+\section{Bibliographie}
+Vgl. \textit{UKPThesisTemplate.bib} . Manchmal ist es notwendig, BibTex manuell zu starten (F8 in TeXstudio).
+
+\section{Figuren oder Bilderverzeichnis}
+Optional. Bitte mit der jeweiligen Betreuungsperson absprechen.
+
+% Optional
+%\listoffigures
+%\listoftables
+
+\printbibliography
+
+\end{document}
