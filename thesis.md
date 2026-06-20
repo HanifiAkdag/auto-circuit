@@ -13,6 +13,15 @@
 - **Significance:** Locks the thesis's top-level narrative and RQ structure; downstream chapters must match (each RQ ↔ a contribution ↔ a chapter).
 - **Code pointer:** `thesis/UKPThesisTemplate.tex` (Introduction); blueprint at `~/.claude/plans/wiggly-napping-sky.md`.
 
+### RQ structure finalized + AutoCircuit already has gradient methods (novelty scoping) — 2026-06-19
+
+- **Context:** Revising the exposé research questions for the thesis intro after dropping Murano and DiscoGP weight-pruning; user flagged that AutoCircuit may already contain gradient-based pruning.
+- **Observation:**
+  - Verified in `auto_circuit/prune_algos/prune_algos.py` + `subnetwork_probing.py`: AutoCircuit **already ships gradient/optimization-based mask methods** — Subnetwork Edge Probing (SEP), Subnetwork/Circuit Tree Probing (STP/TP), Circuit Probing. `subnetwork_probing_prune_scores` optimizes edge masks via Adam + hard-concrete L0 to maximize faithfulness. SP is the literal basis for Edge Pruning.
+  - **RQ restructured to one primary RQ + three sub-RQs** (Integration / Faithfulness / Reliability); the old Murano sub-RQ removed; primary RQ reworded from "unified within a standardized interpretability framework" (Murano allusion) to "integrated into a common evaluation framework," and comparison-forward to match the agreed spine.
+- **Significance:** The contribution is **not** "bringing gradient-based discovery to AutoCircuit" (false — SP/TP exist) but integrating the two *specific recent published* algorithms EP (Bhaskar 2024) and DiscoGP (Yu 2025) so they can be compared on equal footing against ACDC/EAP/SP. Any "first gradient method in a standard framework" claim must be avoided. EP-as-descendant-of-SP and SP as an additional baseline are good Related-Work/Background points.
+- **Code pointer:** `auto_circuit/prune_algos/subnetwork_probing.py`; intro §3 in `thesis/UKPThesisTemplate.tex`.
+
 ### Dead-salmon null-test gap corrected after reading Méloux 2025 in full — 2026-06-19
 
 - **Context:** Verifying the Pillar-3 (null test) framing against the actual Dead Salmon paper (Méloux et al. 2025, arXiv 2512.18792).
