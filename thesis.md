@@ -29,7 +29,31 @@
 - **Significance:** "First null test on circuit discovery" would be an overclaim. The defensible gap is *instantiating Méloux's prescribed test for the gradient-based optimizers EP/DiscoGP (vs ACDC/EAP) inside the unified AutoCircuit harness on real GPT-2 tasks* — i.e. completing the circuit-discovery row of their Table 1. Cite Shi 2024 to differentiate. The thesis's KL faithfulness spine equals the discrepancy measure Méloux assigns to circuit discovery, so Pillars 1 and 3 sit inside their statistical-causal framework. **TODO:** locate the exact Shi 2024 reference and add to the bib before writing Methodology/Related Work.
 - **Code pointer:** `docs/related_work/dead_salmon_interpretability.md` (summary may need this nuance added).
 
+### Intro revised on supervisor feedback; three Méloux papers → three reliability axes — 2026-06-21
+
+- **Context:** Reworking `thesis/chapters/introduction.tex` after supervisor feedback.
+- **Observation:**
+  - Circuit defined *loosely*, precise definition deferred to Background ("what counts as a circuit" is contested).
+  - Discovery is not inherently automated: early work was manual patching; \citet{acdc} gave the *first* automated algorithm. Framed historically.
+  - Models generalized: IOI/GT = `gpt2-small`, Docstring = `attn-only-4l` (`tasks.py:324,334`). Not "GPT-2 Small only."
+  - Three Méloux papers now each anchor one axis: `meloux2025everything` = non-identifiability (Motivation), `meloux2025variance` = stability, `meloux2025deadsalmons` = "genuine learned structure vs spurious artifact" via random-weight null (both Sub-RQ 3). Previously only deadsalmons cited, for the wrong concept. NB: "non-spuriousness" was a coined draft label, replaced in prose with plain wording — the paper's own terms are "spurious" (adj.), "false positives", "dead salmon artifacts"; do not reuse the coined noun.
+  - Problem-statement para 2 rewritten into a clean two-axis reliability gap (stability + non-spuriousness).
+  - **Variance paper names the stability gap explicitly** (verified §6.3 Limitations, arXiv 2510.00845): *"our circuit discovery analysis focuses on the EAP family and its variants"*; non-EAP methods it lists (NAP/HAP/RelP) all rely on CMA; *"Characterizing their stability is an important direction for future work."* EP/DiscoGP are gradient-based optimization (neither EAP nor CMA) → their stability is unmeasured → direct citable support for Sub-RQ 3. Caveat: do **not** claim they are more stable a priori (paper argues step-(c) selection instability may still apply); it is untested, not known.
+- **Significance:** Fixes flagged factual/framing errors; gives a Méloux-paper → reliability-axis → Pillar mapping the later chapters must mirror.
+- **Code pointer:** `thesis/chapters/introduction.tex` §Motivation, §Problem Statement, Sub-RQ 3.
+
 ## Related Work
+
+### ACDC: automating circuit discovery as graph pruning — 2026-06-21
+
+- **Context:** Reading Conmy et al. (2023, NeurIPS Spotlight), "Towards Automated Circuit Discovery for Mechanistic Interpretability", as the origin paper for the `ACDC_PRUNE_ALGO` baseline and the graph-pruning framing the thesis builds on.
+- **Observation:**
+  - Systematizes the manual interp workflow into three steps (choose metric+dataset → activation-patch to find relevant units → identify the circuit subgraph) and **automates only step 3**. The thesis inherits this scoping: it compares *step-3* algorithms, not the whole pipeline.
+  - ACDC = recursive greedy edge pruning in reverse topological order; prune an edge iff ablating it changes the metric by less than threshold τ. The metric is KL divergence to the full model (ancestor of `CLEAN_KL_DIV_METRIC`); ablation is corrupted-input/resample patching (ancestor of EP's default).
+  - Compared against **Subnetwork Probing** (continuous L0-masked edges → basis for AutoCircuit SP and Edge Pruning) and **HISP** (gradient attribution → ancestor of EAP). No single method dominates across tasks/metrics; ACDC is sensitive to metric choice and τ.
+  - Same benchmark tasks as this thesis (IOI, Greater-Than on GPT-2 Small; Docstring on attn-only-4l) plus tracr ground-truth programs; evaluated by ROC of recovered edges against hand-labeled circuits.
+- **Significance:** Establishes the shared substrate of the whole comparison and explains a key design asymmetry (CLAUDE.md note 3): ACDC's *per-τ binary* output is why it is the only algorithm that synthesizes a ranking across ~20 runs, whereas EP/DiscoGP/EAP return one trained mask. Its documented metric/threshold sensitivity is the empirical seed of the Miller (2024) ablation-triple framing used in sub-RQ3. Cite in Introduction (motivating automation), Background/Related Work (graph-pruning origin + baseline), and Discussion (ACDC as a moving baseline, not ground truth).
+- **Code pointer:** `docs/related_work/acdc_automatic_circuit_discovery.md`
 
 ### Feature-level circuit discovery: attribution graphs and cross-layer transcoders — 2026-06-18
 
@@ -53,6 +77,17 @@
   - Faithfulness metrics (KL divergence, logit diff) measure how well a circuit reproduces the full model's output — not whether it identifies the correct mechanism. A faithful circuit is not necessarily causally correct.
 - **Significance:** Provides theoretical grounding for why EP and DiscoGP return different circuits on IOI/GT/Docstring — the divergence is expected and does not indicate one algorithm is broken. Frames the multi-algorithm comparison as exploring the solution space of valid circuit explanations rather than a race to a unique ground truth. Directly relevant to the Discussion chapter when interpreting disagreements between algorithms.
 - **Code pointer:** `docs/related_work/dead_salmon_interpretability.md`
+
+### Non-identifiability of MI explanations proven empirically on toy models — 2026-06-21
+
+- **Context:** Reading Méloux et al. (2025, ICLR), "Everything, Everywhere, All at Once: Is Mechanistic Interpretability Identifiable?" (OpenReview 5IWJBStfU7), the empirical companion to the Dead Salmon paper, while building the theoretical framing for the multi-algorithm comparison chapter.
+- **Observation:**
+  - The paper tests two MI strategies on Boolean functions and small MLPs (exhaustive enumeration possible): (i) "where-then-what" (find circuit first, then interpret — exactly what EP/DiscoGP/ACDC/EAP do) and (ii) "what-then-where" (fix an algorithm, find subspace). Both are non-identifiable.
+  - Four dimensions of non-identifiability: (1) multiple circuits replicate the same behavior at the same faithfulness level; (2) multiple interpretations exist for a single circuit; (3) several algorithms exhibit causal alignment with the same network; (4) a single algorithm aligns with different activation subspaces.
+  - Faithfulness thresholds do not resolve non-identifiability — they shrink the set of valid circuits but do not collapse it to one.
+  - Two stances: *pragmatic* (drop uniqueness; require predictive + manipulability standards only — what AutoCircuit's ROC/KL pipeline does) or *strict* (require complementary validation across multiple paradigms).
+- **Significance:** Formal empirical grounding for why EP, DiscoGP, ACDC, and EAP return structurally different circuits on IOI/GT/Docstring. The thesis comparison explores a non-singleton solution space, not convergence on ground truth. Dead Salmon cites this (`meloux2025everything`) when prescribing circuit-discovery null tests. Together they frame Pillars 1–3: faithfulness (pragmatic standard), stability (variance in the non-unique solution set), null test (ruling out random-weight artifacts).
+- **Code pointer:** `docs/related_work/everything_everywhere_all_at_once_identifiability.md`
 
 ### Circuit non-uniqueness is constructible: Functional Anisotropy rejected (OASR) — 2026-06-15
 
