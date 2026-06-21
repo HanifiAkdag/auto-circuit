@@ -1,0 +1,354 @@
+%% This is file `DEMO-TUDaThesis.tex' version 4.01 (2025-02-11),
+%% it is part of
+%% TUDa-CI -- Corporate Design for TU Darmstadt
+%% ----------------------------------------------------------------------------
+%%
+%% Copyright (C) 2018--2025 by Marei Peischl <marei@peitex.de>
+%%
+%% ============================================================================
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%% http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008/05/04 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The current maintainer of this work is
+%%   Marei Peischl <tuda-ci@peitex.de>
+%%
+%% The development repository can be found at
+%% https://github.com/tudace/tuda_latex_templates
+%% Please use the issue tracker for feedback!
+%%
+%% If you need a compiled version of this document, have a look at
+%% http://mirror.ctan.org/macros/latex/contrib/tuda-ci/doc
+%% or at the documentation directory of this package (if installed)
+%% <path to your LaTeX distribution>/doc/latex/tuda-ci
+%% ============================================================================
+%%
+% !TeX program = lualatex
+%%
+
+\DocumentMetadata{
+	pdfstandard=a-2b,
+	pdfversion=1.7,% 2.0 is possible as well, but some validators don't support that yet
+}
+
+%%%%%%%%%%%%%%%%%%%
+% TUDa template setup - You don't have to modify too much here
+%%%%%%%%%%%%%%%%%%%
+% Please ignore the syntax error highlighting, it's caused by the line `thesis={type=bachelor}`, as a designed part of the latex template, if you change or comment on it, it will break the compilation
+\documentclass[
+    IMRAD=false,
+	english,
+	ruledheaders=section, % section levels above this one will follow the ruled layout
+	class=report, % Choose the base document class. Will choose the matching KOMA-Script class
+	thesis={type=bachelor}, % Thesis, for PhD thesis have a look at DEMO-TUDaPhd example file
+	accentcolor=9c, % Choose accent color: For a list of available colors see the full tudapub documentation
+	custommargins=false,% Calculate margins using typearea
+	marginpar=false,% toggle marginpar
+%	BCOR=5mm,% Binding correction
+	parskip=half,% use a parskip instead of indent, see KOMA-Script documentation
+	fontsize=11pt,% basic font size, CI default setting of 9pt is too small for theses
+%	logofile=example-image, % In case logo files are not available
+]{tudapub}
+
+% New page spacing control 
+\RedeclareSectionCommand[
+  beforeskip=0pt,    % vertical space before the chapter title
+  afterskip=5pt  % Controls spacing before the actual chapter content starts
+]{chapter}
+
+\RedeclareSectionCommand[
+  beforeskip=-1ex, % Controls the vertical space before the heading. (Keep it negative to prevent the next line from indenting).
+  afterskip=-1em   % Controls the horizontal space between the heading and the text. (Negative makes it a run-in heading).
+]{paragraph}
+
+
+%%%%%%%%%%%%%%%%%%%
+% Language setup
+%%%%%%%%%%%%%%%%%%%
+\usepackage[german, main=english]{babel}
+\usepackage[autostyle]{csquotes}% \enquote, to simplify use of quotation marks
+\usepackage{microtype}
+
+
+%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%
+% 1. USE BIBLATEX PACKAGE
+% \usepackage[
+%     % style=numeric,
+%     style=authoryear-icomp,
+%     sorting=none,
+%     backend=biber,
+%     maxnames=2,
+%     natbib=true,
+%     ibidtracker=false
+% ]{biblatex}
+% \addbibresource{ExposeBibliography.bib}   % File name of BibTeX database
+\usepackage{natbib}
+
+% % 2. USE NATBIB PACKAGE (You might need other )
+% \usepackage{natbib}
+% \bibliographystyle{acl_natbib}
+% \bibliographystyle{ksfh_nat}   
+% \bibliographystyle{unsrtnat}   
+% \bibliographystyle{dinat}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%
+% Package suggestions for tables
+%%%%%%%%%%%%%%%%%%%
+\usepackage{array}%  Fundamental tools for tables. Is automatically loaded by the following packages
+% tables with flexible columns to achieve fixed width
+\usepackage{longtable}% tables across multiple pages
+\usepackage{xltabular}% tables with fixed width spanning multiple pages, Improved layout for horizontal rules in tables
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{arydshln}
+
+
+%%%%%%%%%%%%%%%%%%%
+% Package suggestions math - activate if you need to insert equations
+%%%%%%%%%%%%%%%%%%%
+\usepackage{mathtools}% Extended version of amsmath
+\usepackage{amssymb}% Additional symbols
+%\usepackage{siunitx}% Numbers and  Units
+
+
+%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%
+% Anonymisation set up for (peer) review
+% 1. Anonymisation for the EiWA course needs to be true for submission!
+% 2. Anonymisation could be left OFF for other uses of this template that don't involve single- or double-blind (peer) review.
+%%%%%%%%%%%%%%%%%%%
+\newif\ifanonymize
+% \anonymizetrue % Change to \anonymizefalse to show private information
+\anonymizefalse % Change to \anonymizetrue to show private information
+
+
+%%%%%%%%%%%%%%%%%%%
+% You need to update this data even if the anonymization switch is on submission!
+%%%%%%%%%%%%%%%%%%%
+\title{Unifying Gradient-Based Circuit Discovery: Extending AutoCircuit for Multi-Granular Mechanistic Interpretability}  % for proper formatting of the title, please use `capitalizemytitle.com` and be consistent with the style
+% \subtitle{(not mandatory) a subtitle to provide context, clarify study scope or highlight methodology so that readers understand the boundaries of the study/what it will and won't cover}
+\author{Hanifi Ibrahim Akdag}
+% \birthplace{}% Usually only required for PhD theses
+\supervisor{Prof. Dr. Iryna Gurevych}           %Gutachter
+\responsiblestaff{Alireza Bayat Makou, Jingcheng Niu}     % your hands-on supervisors/PhDs/Postdocs, let it be "Yiwei Wang" if no additional staff is responsible
+\matriculationno{2675035}                       %Matrikelnummer
+% \reviewer{ } %not used
+
+
+% The following elements will be placed on the title page.
+% \department is a required date. See full tudapub documentation for details.
+\department{inf}% If defined the shorthand will be replaced by the full name otherwise it's used directly
+\institute{Ubiquitous Knowledge Processing Lab}
+\group{}
+
+\submissiondate{\today}
+\examdate{\today}
+
+%\tuprints{urn=XXXXX,printid=XXXX,year=2022,license=cc-by-4.0}% License information for TUprints
+
+\maketitle
+
+\chapter{Motivation}\label{motivation}
+
+While modern Transformer-based Large Language Models \citep[LLMs;][]{gpt2, llama} rely on their massive scale to handle complex, real-world applications, recent work demonstrates that for certain isolated, well-defined tasks, only a small fraction (1-7\%) of the model's components is actively utilized \citep{yu-etal-2025-sheaf,wang2023interpretability,acdc}. Because these task-specific mechanisms are sparsely distributed within the dense ``black box'' of the neural network, isolating them is difficult. Although recent circuit discovery methods have successfully identified these components for simple behaviors, efficiently scaling these techniques and demonstrating their universality across diverse tasks and larger model sizes remains a significant challenge \citep{edgePruning, syed-etal-2024-attribution}.
+
+The field of Mechanistic Interpretability (MI) seeks to reverse-engineer the complex computations of LLMs into human-understandable algorithms by investigating their fundamental objects of study \citep{rai2025practicalreview}. A central pillar of this effort involves extracting ``circuits'' \citep{wang2023interpretability}. A circuit can be defined as a sparse, human-understandable subgraph of the model's computational graph that is responsible for a specific behavior. In this representation, nodes correspond to discrete functional components, such as attention heads or MLP layers, while edges represent the causal pathways of information flow between them. Initially, circuit discovery relied on manual, labor-intensive activation patching. Recently, automated methods have accelerated this process, such as the Automatic Circuit Discovery (ACDC) algorithm \citep{acdc}, which assesses an edge's importance iteratively using activation patching \citep{goldowskydill2023localizingmodelbehaviorpath}. To overcome ACDC's computational bottlenecks, a highly efficient gradient-based Edge Pruning method was introduced \citep{edgePruning}. Most recently, DiscoGP advanced the state-of-the-art by introducing ``sheaves''. DiscoGP is a framework that jointly prunes both computational graph edges and weight parameters, enabling circuit discovery at a finer, neuron-level granularity \citep{yu-etal-2025-sheaf}.
+
+Recognizing that existing evaluations of circuit faithfulness are highly inconsistent and lack robustness across different metrics and ablation setups, \citet{miller2024transformer} introduced the AutoCircuit library to establish a standardized evaluation pipeline. Currently, however, it only operates at edge-level granularity and does not support state-of-the-art gradient-based methods like Edge Pruning or the neuron-level joint pruning of DiscoGP. This architectural limitation represents a critical bottleneck for the MI field. Because these advanced methods cannot currently be evaluated within the same standardized pipeline, it remains difficult to conduct fair comparisons between fundamentally different discovery paradigms. If this gap is left unresolved, the MI community will lack the objective benchmarks necessary to definitively determine whether finer, neuron-level granularity genuinely yields more faithful and robust circuits than edge-level approaches. Furthermore, the UKP Lab’s interpretability framework, Murano, currently lacks a built-in module for circuit discovery. A primary focus of this project is to integrate a standardized pipeline like AutoCircuit into Murano, providing researchers with a seamless, ready-to-use discovery tool. While this integration establishes the core capability, expanding the underlying framework to support the latest gradient-based methods will ensure Murano provides a comprehensive tool.
+
+To bridge this gap, this thesis will integrate Edge Pruning and DiscoGP into the AutoCircuit library and incorporate this unified pipeline into the Murano framework. This work will enable rigorous comparisons between contemporary algorithms while equipping the Murano framework with essential automated circuit discovery capabilities. Driven by this objective, the research question of this thesis asks: \textbf{How can leading gradient-based circuit discovery methods be unified and evaluated within a standardized interpretability framework?}
+
+To systematically address this primary question, the investigation is structured around three sub-questions:
+
+\begin{itemize}
+    \item \textbf{Sub-RQ 1:} How can Edge Pruning and  DiscoGP be integrated into the existing edge-centric architecture of the AutoCircuit library?
+    \item \textbf{Sub-RQ 2:} How can the expanded AutoCircuit workflow be adapted and integrated into the Murano framework to serve as an end-to-end circuit discovery module?
+    \item \textbf{Sub-RQ 3:} How do these integrated gradient-based methods compare against traditional algorithms across standard benchmark tasks (IOI \citep{wang2023interpretability}, Greater-Than \citep{hanna2023doesgpt2computegreaterthan}, and Docstring \citep{stefanhex_janiak_2023}) when evaluated under identical ablations and metrics?
+\end{itemize}
+
+\chapter{Approach}\label{approach}
+\newcommand{\miniheader}[1]{\vspace{0.5em}\noindent\textbf{\Large\textsf{#1}}\par\vspace{0.5em}} % for subsections
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SOTA / Related Work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section*{State-of-the-Art (SOTA) / Related Work}    % it takes too much space, prefer custom miniheader
+\miniheader{State-of-the-Art (SOTA) / Related Work}
+
+To systematically explain the internal reasoning of LLMs, foundational work by \citet{elhage2021mathematical} conceptualized transformers as functional components communicating via a residual stream. Building on this, \citet{wang2023interpretability} and \citet{acdc} formalized the extraction of ``circuits'' by modeling the forward pass as a computational directed acyclic graph (DAG).
+
+The foundational ACDC algorithm systematized circuit discovery into an automated workflow \citep{acdc}. While ACDC successfully isolated circuits for various behaviors, its greedy nature evaluates edges one by one. This approach fails to capture complex combinatorial dependencies between connections and scales poorly with larger models.
+
+To address these scaling limitations, the state-of-the-art has shifted toward gradient-based optimization. Edge Pruning (EP) introduced differentiable masks over graph edges, allowing sub-networks to be optimized globally and simultaneously \citep{edgePruning}. In parallel, research into weight pruning, driven by the ``Lottery Ticket Hypothesis'', demonstrated that sparse subnetworks within model weights can match full-model performance \citep{frankle2019lottery}. \citet{savarese2021winninglotterycontinuous} further advanced this by using continuous sparsification to extract these subnetworks without exhaustive retraining.
+
+DiscoGP advanced the paradigm by observing that edge and weight pruning are not mutually exclusive \citep{yu-etal-2025-sheaf}. By performing joint computation graph and weight parameter pruning, DiscoGP identifies ``sheaves,'' self-contained modular units discovered at the individual neuron level. These sheaves often preserve near-perfect performance on isolated, well-defined linguistic and factual recall benchmarks while utilizing only 1–7\% of the original parameters \citep{yu-etal-2025-sheaf}.
+
+To standardize evaluation across these divergent methods, \citet{miller2024transformer} introduced the AutoCircuit library. AutoCircuit unifies discovery by modeling transformers as factorized graphs where circuits are represented as edge sets. However, AutoCircuit remains strictly edge-centric and lacks the architectural extensions required for the weight-level masking used in DiscoGP or the global differentiable masks used in Edge Pruning. This thesis addresses these limitations by technically extending AutoCircuit to support multi-granular masking and integrating the unified framework into the Murano framework.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theoretical Framework / Foundational Concepts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \section*{Theoretical Framework / Foundational Concepts}
+\miniheader{Theoretical Framework / Foundational Concepts}
+
+We focus on three theoretical concepts that define how circuits are represented, isolated, and evaluated:
+
+\paragraph{Structural Formalization and Granularity} This research views the Transformer architecture through the lens of Residual Stream theory \citep{elhage2021mathematical}, where the model is conceptualized as a channel with discrete components performing additive updates. AutoCircuit \citep{miller2024transformer} operationalizes this by decomposing the forward pass into a factorized DAG where each component (attention head, MLP) is wrapped by a \texttt{PatchWrapper} module. When activated, a \texttt{PatchWrapper} intercepts the forward pass and interpolates inputs between clean and ablated activations using a learnable \texttt{patch\_mask} parameter. All discovery algorithms share a common \texttt{PruneAlgo} interface, returning \texttt{PruneScores}, a dictionary mapping each destination node to per-edge importance scores, that are thresholded at evaluation time to activate or deactivate edges. This edge-centric design currently does not support weight-level masking within nodes.
+
+\paragraph{Causal Attribution and Intervention Theory} To measure the importance of nodes or edges within the DAG, this study relies on the theory of activation patching. Formally, given a model $M$, a circuit $C$ is evaluated by calculating the intervention performance $F(x) = M(x \mid do(a = \tilde{a}))$ for all components $a \notin C$ \citep{miller2024transformer}. This approach quantifies the causal role of a component by replacing its ``clean'' activation with an ablated target value $\tilde{a}$. Depending on the specific technique, $\tilde{a}$ can take several forms: the activation $a(\tilde{x})$ from a ``corrupted'' control input $\tilde{x}$—typically a counterfactual prompt designed to break the behavior of interest while maintaining a similar logical structure---(resample ablation) \citep{meng2022locating}, a dataset-wide average (mean ablation) \citep{wang2023interpretability}, or a zero vector (zero ablation) \citep{olsson2022context}. Discovered sub-networks are rigorously validated against core criteria. While specific terminologies and definitions for these metrics vary across the literature \citep{wang2023interpretability, yu-etal-2025-sheaf, acdc}, they are generally formalized for a circuit $C \subseteq E$ (the set of all edges) and a test set $D$ as follows:
+
+\begin{itemize}
+    \item \textit{Faithfulness:} The degree to which the circuit preserves the original model's output distribution $p_{\text{base}}$, measured via KL divergence: 
+    \[ \mathbb{E}_{x \in D}\left[\text{KL}(p_{\text{base}}(\cdot \mid x) \parallel p_C(\cdot \mid x, \tilde{x}))\right] \]
+    \item \textit{Completeness (or Sufficiency):} The ability of the isolated circuit to independently perform the target task, measured by its accuracy: 
+    \[ \text{Acc}(C, D) = \frac{1}{|D|} \sum_{(x,y) \in D} \mathbf{1}[\arg\max p_C(\cdot \mid x, \tilde{x}) = y] \]
+    \item \textit{Sparsity (or Minimality):} The fraction of retained components, defined as $|C| / |E|$, ensuring irrelevant nodes and edges are excluded.
+\end{itemize}
+
+\paragraph{Gradient-Based Masking and Global Optimization} To move beyond combinatorial search, Edge Pruning \citep{edgePruning} assigns continuous parameters to every edge, which interpolates between clean and corrupted activations during the forward pass. Parameterized via a Hard-Concrete distribution, these masks are optimized globally via gradient descent against a faithfulness loss and an $L_0$ sparsity penalty. DiscoGP \citep{yu-etal-2025-sheaf} extends this with a dual-mask system: \textit{weight masks} are per-parameter logits sampled via Gumbel-Sigmoid into binary masks applied by element-wise multiplication with frozen original weights (\texttt{param = mask * original\_weight}), while \textit{edge masks} gate residual-stream contributions with separate masks for Query, Key, and Value paths per attention head. DiscoGP trains in two phases: first optimizing weight masks, then edge masks. Each minimizes a weighted combination of faithfulness, completeness, and sparsity losses.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% (Methodology Guidance follows in a separate section)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \textbf{Methodology} - How will you answer the RQ(s)?
+\miniheader{Methods}
+
+\paragraph{Overall Approach and Design} The primary scientific objective of this project is to conduct a rigorous, direct comparison of structurally divergent circuit discovery algorithms by unifying them under a shared foundation. To achieve this, this project follows a three-phase structure. First, the AutoCircuit library \citep{miller2024transformer} will be extended to support Edge Pruning \citep{edgePruning} and DiscoGP \citep{yu-etal-2025-sheaf} (Sub-RQ 1). Second, this extended framework will be integrated into the Murano framework as an end-to-end circuit discovery module (Sub-RQ 2). Finally, a comparative empirical study will validate the integrated methods against iterative baselines like ACDC \citep{acdc} (Sub-RQ 3).
+
+\paragraph{Implementation Details} We build on the original \texttt{AutoCircuit} codebase and implement our method using \texttt{NNsight} \citep{nnsight} and \texttt{TransformerLens} \citep{nanda2022transformerlens}. The foundation for the EP implementation is largely in place: AutoCircuit's existing Subnetwork Probing module already optimizes \texttt{patch\_mask} parameters via gradient descent, so EP will be realized by extending it with the Gumbel-Sigmoid sampling option and a combined faithfulness--sparsity--completeness loss. DiscoGP integration requires a deeper extension: a new \texttt{WeightMaskLayer} module will wrap each eligible weight tensor inside the model, storing frozen originals alongside trainable mask logits. A two-phase \texttt{PruneAlgo} will first optimize weight mask logits, then freeze them and optimize edge mask logits. The Q/K/V edge-mask granularity of DiscoGP will be addressed by extending AutoCircuit's graph factorization to optionally split each attention destination node into three sub-nodes. For Murano integration, an adapter will map Murano's model registry and data format to AutoCircuit's \texttt{Task} objects.
+
+\paragraph{Data and Evaluation} Three established benchmarks (IOI \citep{wang2023interpretability}, Greater-Than \citep{hanna2023doesgpt2computegreaterthan}, and Docstring \citep{stefanhex_janiak_2023}) are chosen for evaluation. All experiments target GPT-2 Small \citep{gpt2} for compatibility with existing literature. Following \citet{miller2024transformer} and \citet{yu-etal-2025-sheaf}, methods will be compared on \textit{Functional Faithfulness}, \textit{Sparsity}, and \textit{Completeness} under identical ablation types and data splits.
+
+\paragraph{Feasibility and Anticipated Challenges} The central technical risk is the architectural mismatch between AutoCircuit's edge-only \texttt{PatchWrapper} and DiscoGP's dual masking. This will be mitigated by a modular API extension that decouples weight masking from edge patching. All data are open-source benchmarks with no PII; no ethical concerns arise. A pragmatic limitation is that experiments are restricted to GPT-2 Small; generalization to larger models remains beyond the scope.
+
+
+\chapter{Schedule}\label{schedule}
+
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\definecolor{tudared}{RGB}{185, 15, 34}
+
+\begin{xltabular}{\textwidth}{|c|M{5cm}|p{10cm}|}
+    
+    %%% MONAT 1
+    \hline
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 1: Library Exploration \& Architectural Deep-Dive}}} \\ 
+    \hline
+    Week 1 & \textbf{Planning \& Setup} & Finalize research objectives and configure Slurm environment. \\
+    \hdashline
+    Week 2 & \textbf{AutoCircuit Codebase Study} & Deep-dive into the AutoCircuit internal graph factorization and patching logic. \\
+    \hdashline
+    Week 3 & \textbf{SOTA Reproduction} & Implement baseline ACDC experiments within AutoCircuit to verify library behavior. \\
+    \hdashline
+    Week 4 & \textbf{Methodology Refinement} & Map DiscoGP and Edge Pruning requirements to the existing AutoCircuit API. \\
+    \hline
+
+    %%% MONAT 2
+    \hline
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 2: Core Development \& Edge Pruning Integration}}} \\ 
+    \hline
+    Week 1-2 & \textbf{Gradient Masking Layer} & Develop the differentiable masking interface to allow global gradient-based optimization. \\
+    \hdashline
+    Week 3-4 & \textbf{Edge Pruning Implementation} & Integrate standard Edge Pruning (EP) logic as a discovery module within the library. \\
+    \hline
+
+    %%% MONAT 3
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 3: Complex Integration: DiscoGP \& Sheaves}}} \\ 
+    \hline
+    Week 1-2 & \textbf{Weight-Level Masking} & Extend AutoCircuit’s edge-centric design to support weight masking. \\
+    \hdashline
+    Week 3-4 & \textbf{Dual-Mask Optimization} & Implement joint pruning for DiscoGP to enable neuron-level sheaf discovery. \\
+    \hline
+
+    %%% MONAT 4
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 4: Platform Integration \& Evaluation}}} \\ 
+    \hline
+    Week 1-2 & \textbf{Murano Framework Adapter} & Develop the adapter to map Murano configurations to the unified discovery pipeline. \\
+    \hdashline
+    Week 3-4 & \textbf{Benchmark Execution} & Run full discovery (EP, DiscoGP, ACDC) on IOI, Greater-Than, and Docstring tasks. \\
+    \hline
+
+    %%% MONAT 5
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 5: Data Analysis \& Accelerated Writing}}} \\ 
+    \hline
+    Week 1-2 & \textbf{Comparative Analysis} & Evaluate Functional Faithfulness vs. Sparsity across different granularities. \\
+    \hdashline
+    Week 3 & \textbf{Methodology Drafting} & Document technical extensions and integration logic while the implementation is fresh. \\
+    \hdashline
+    Week 4 & \textbf{Results Drafting} & Formalize experimental outcomes, tables, and visualization of discovered circuits. \\
+    \hline
+
+    %%% MONAT 6
+    \rowcolor{tudared} \multicolumn{3}{|c|}{\textcolor{white}{\textbf{Month 6: Finalization \& Submission}}} \\ 
+    \hline
+    Week 1 & \textbf{Chapter Consolidation} & Draft Introduction, Related Work, and Discussion into a unified manuscript. \\
+    \hdashline
+    Week 2 & \textbf{Rapid Self-Revision} & Final polish of technical arguments, formatting, and proofreading. \\
+    \hdashline
+    Week 3 & \textbf{Advisor Review \& Edits} & Incorporate feedback from supervisors (Alireza, Jingcheng) on the final draft. \\
+    \hdashline
+    Week 4 & \textbf{Buffer \& Final Submission} & Final verification of code documentation and submission of the thesis. \\
+    \hline
+
+\end{xltabular}
+
+\newpage
+% Insert an unnumbered chapter *with* a TOC entry:
+\addchap{Research Integrity Considerations and Declarations}\label{ch:ethics}
+
+
+\miniheader{Integrity Considerations}\label{section:integrity_app}
+
+\begin{itemize}
+    \item \textbf{Ethics Application:} This computational research uses open-source benchmarks (e.g., IOI, Docstring) and involves no human or animal subjects. No ethics application is required.
+    \item \textbf{Data Protection:} The project processes no personally identifiable information (PII). No data protection application is necessary.
+    \item \textbf{Dual-Use Considerations:} This work focuses on improving AI transparency and safety via interpretability tools. No significant dual-use risks are anticipated.
+\end{itemize}
+
+\miniheader{Declaration of Generative AI in Scientific Writing}\label{section:genai}
+
+In accordance with academic policies (e.g., ACL 2023 Policy on AI Writing Assistance), I declare the following regarding generative AI use in this exposé:
+
+\begin{itemize}
+    \item \textbf{Scope of AI Assistance:} Generative AI models were used strictly for paraphrasing and language polishing. The scientific concepts, methodology, and core arguments are entirely my own.
+    \item \textbf{Quality Control Measures:} All AI-refined text was manually reviewed, edited, and cross-checked against original notes and cited literature to ensure strict accuracy and coherence.
+    \item \textbf{Transparency and Acknowledgment:} AI assistance was limited to stylistic improvements throughout the draft; no substantive content was autonomously generated by AI.
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%
+% Bibliography tools
+%%%%%%%%%%%%%%%%%%%
+% a website for exporting the most recent BibTex for relevant literature: https://dblp.org/
+\bibliographystyle{acl_natbib}
+\bibliography{expose/ExposeBibliography}   % 1. USE BIBLATEX PACKAGE
+% \bibliography{ExposeBibliography}   % 2. USE NATBIB PACKAGE
+
+\end{document}
+
+%% End of file `DEMO-TUDaThesis.tex'.
