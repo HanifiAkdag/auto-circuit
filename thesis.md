@@ -44,6 +44,17 @@
 
 ## Related Work
 
+### Zoom In: the foundational definition of features and circuits — 2026-06-23
+
+- **Context:** Reading Olah, Cammarata et al. (2020, Distill), "Zoom In: An Introduction to Circuits", as the conceptual origin point for the Introduction's "what is a circuit / why mechanistic interpretability" framing.
+- **Observation:**
+  - Supplies the vocabulary the whole thesis stands on: a **feature** is the fundamental unit, a *direction in activation space* (often a single neuron, e.g. a curve detector); a **circuit** is "a computational subgraph of a neural network", a set of features plus the weighted edges between them. This is the direct ancestor of circuit-discovery-as-graph-pruning that ACDC/EP/DiscoGP/EAP operationalize.
+  - States three speculative, testable claims: **Features** (rigorously studiable directions), **Circuits** (weights wire features into studiable algorithms), **Universality** (analogous features/circuits recur across models and tasks).
+  - Circuits are valued because they make **falsifiable predictions**: "if you understand a circuit, you should be able to predict what will change if you edit the weights." This is the philosophical seed of faithfulness-by-intervention.
+  - Flags **polysemantic neurons / superposition** as the core obstacle: networks may store more features than neurons, so native components are not cleanly interpretable. This is exactly the granularity ceiling that motivates the feature-level contrast (attribution graphs, transcoders).
+- **Significance:** This is the "altitude-zero" motivation for the Introduction (why circuit discovery exists at all) and the source of the feature/circuit definitions used before any algorithm is introduced. Its universality claim is the optimistic prior that the thesis's non-identifiability sources (Méloux 2025) and methodology-relativity sources (Miller 2024) push back on, so it anchors the Introduction and pairs naturally with them in Related Work. Superposition framing forward-links to the component-vs-feature granularity boundary already noted for the attribution-graphs paper.
+- **Code pointer:** `docs/related_work/zoom_in_circuits.md`
+
 ### ACDC: automating circuit discovery as graph pruning — 2026-06-21
 
 - **Context:** Reading Conmy et al. (2023, NeurIPS Spotlight), "Towards Automated Circuit Discovery for Mechanistic Interpretability", as the origin paper for the `ACDC_PRUNE_ALGO` baseline and the graph-pruning framing the thesis builds on.
