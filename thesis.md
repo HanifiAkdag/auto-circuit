@@ -204,6 +204,24 @@
 
 ## Results
 
+### Future direction: frame the faithfulness-per-edge curves as the methodology-relativity result — 2026-06-25
+
+- **Context:** Brainstorm on what the main result graphs (metric vs. number of edges, one curve per algorithm, `measure_prune_metrics` grid) could *argue*, not just show. Pure-reframing idea, no new code planned for now.
+- **Premise check (important):** Metric-vs-edge-count plots are NOT a literature gap. ACDC and Edge Pruning both publish them, and AutoCircuit's `PruneScores → run_circuits` top-k thresholding exists precisely to produce them. Do not claim the plot type or the tooling as a contribution — both are prior art. A reviewer will list counterexamples.
+- **What can actually be ours:** A *matched, head-to-head* sweep of EP / DiscoGP / ACDC / EAP on **one** faithfulness-per-edge axis under the **same** `(discovery-ablation, eval-ablation, patch-direction)` triple (Miller 2024). The original papers each plotted only their own algorithm, on their own axis, under their own ablation, so the matched comparison and its interpretation are the novel part, not the curve itself.
+- **Three-part argument the curves can carry:**
+  - **Headline (methodology-relativity):** which algorithm looks best *at a fixed edge budget* reorders/reshapes as the ablation triple changes. This is the sub-RQ3 / Miller story told through *curve shape* rather than a single faithfulness scalar.
+  - **Support / cause (flatness):** curves plateau quickly → most edges redundant → circuit *size* is under-determined. Flatness is the mechanism that makes the ordering fragile (near-flat curves let small ablation shifts flip the ranking). Ties to hydra effect, backup heads, Distributive Dense Circuit Hypothesis, non-identifiability ([[related_work_miller2024]] and the Méloux/Chen entries).
+  - **Support / verdict (Pareto):** a ranking can still be read off the curves, but the point is that it is *conditional*, not absolute.
+- **Honesty hedge (chose pure-reframing):** the reordering is shown by curve *inspection*, not a rank-flip statistic. State this explicitly and name "quantify curve-shape sensitivity (rank-flip / knee measures across the 3×3 grid)" as future work — this defuses the obvious reviewer objection and leaves a clean hook. The cached `PruneScores` already support that quantification if revisited later.
+- **Cross-chapter touchpoints (where it could be mentioned):**
+  - **Introduction:** add *nothing structural* — line 9 (Miller methodology-relativity) and the line-39 contribution already carry the headline. A fourth gap would dilute. Optional: soften Sub-RQ 2 wording so "compare in faithfulness" hints the result is reported *as a size-dependent curve* and may be condition-sensitive, avoiding a perceived bait-and-switch when Results returns a conditional verdict.
+  - **Background (Ch. 2):** the genuine place to add ~1 paragraph — define faithfulness as a *curve over edge budget*, with circuit size a swept free parameter (the natural output of top-k thresholding), so Results doesn't have to teach the axis and make the argument at once.
+  - **Methodology/Experiments:** 1–2 sentences naming the choice to report faithfulness as a curve over budgets rather than a scalar.
+  - **Results:** the curves + flatness/reordering *observations* only (no interpretation beyond the axes).
+  - **Discussion:** interpret flatness + reordering via redundancy + non-identifiability + Miller.
+- **Significance:** Reframes "the literature is lazy about these plots" (indefensible) into "the *shape* of matched curves is a measurable signature of redundancy and methodology-relativity" (defensible, reinforces sub-RQ3). No new experiments required to state it; quantification deferred.
+
 ### DiscoGP edge-only variants: KL collapse despite strong logit-difference (IOI, zero ablation) — 2026-05-15
 
 - **Context:** IOI component circuit, GPT-2 Small, zero ablation for training and evaluation. Algorithms: `DiscoGP-E` (edge-only, `argmax_ce`, no completeness), `DiscoGP-EP` (edge-only, `answer_margin_ce`, completeness on), `DiscoGP` (joint weight+edge), EAP, Random, Ground Truth.
