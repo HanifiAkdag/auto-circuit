@@ -7,7 +7,7 @@
 - **Context:** Writing the LaTeX Introduction (`thesis/UKPThesisTemplate.tex`).
 - **Observation / decisions:**
   - **Spine:** the *comparison* of circuit-discovery algorithms is the payload; *integration* of EP/DiscoGP into AutoCircuit is the enabling contribution. Intro funnels: opaque LLMs → circuits → discovery methods (search/attribution/gradient) → results are hard to compare (methodology-relativity + non-identifiability) → this thesis unifies + compares.
-  - **Murano dropped** (supervisor decision) → clean **two-RQ** structure: RQ1 integration, RQ2 comparison with three parts (faithfulness, stability, random-weight null).
+  - **Murano dropped** (supervisor decision). *(Superseded by the next entry: the final structure is one primary RQ + three sub-RQs — Integration / Faithfulness / Reliability — not a "two-RQ" split.)*
   - **DiscoGP described only in its paper-faithful form** (answer-margin CE); the `argmax_ce` relaxation is omitted from the write-up.
   - Intro is **motivation/contribution-focused per the grading rubric** (9a topic, 9b motivation, 9c SOTA methods named-not-dissected, 10 RQs, 11 contributions). Algorithm internals → Background/Methodology; per-paper findings → Related Work. Citation budget kept minimal (ACDC, EAP, EP, DiscoGP, Miller 2024, Méloux 2025).
 - **Significance:** Locks the thesis's top-level narrative and RQ structure; downstream chapters must match (each RQ ↔ a contribution ↔ a chapter).
@@ -37,12 +37,24 @@
   - Discovery is not inherently automated: early work was manual patching; \citet{acdc} gave the *first* automated algorithm. Framed historically.
   - Models generalized: IOI/GT = `gpt2-small`, Docstring = `attn-only-4l` (`tasks.py:324,334`). Not "GPT-2 Small only."
   - Three Méloux papers now each anchor one axis: `meloux2025everything` = non-identifiability (Motivation), `meloux2025variance` = stability, `meloux2025deadsalmons` = "genuine learned structure vs spurious artifact" via random-weight null (both Sub-RQ 3). Previously only deadsalmons cited, for the wrong concept. NB: "non-spuriousness" was a coined draft label, replaced in prose with plain wording — the paper's own terms are "spurious" (adj.), "false positives", "dead salmon artifacts"; do not reuse the coined noun.
-  - Problem-statement para 2 rewritten into a clean two-axis reliability gap (stability + non-spuriousness).
+  - Problem-statement para 2 rewritten into a clean two-axis reliability gap (stability + genuine-vs-spurious structure; the coined noun "non-spuriousness" was dropped, see note above).
   - **Variance paper names the stability gap explicitly** (verified §6.3 Limitations, arXiv 2510.00845): *"our circuit discovery analysis focuses on the EAP family and its variants"*; non-EAP methods it lists (NAP/HAP/RelP) all rely on CMA; *"Characterizing their stability is an important direction for future work."* EP/DiscoGP are gradient-based optimization (neither EAP nor CMA) → their stability is unmeasured → direct citable support for Sub-RQ 3. Caveat: do **not** claim they are more stable a priori (paper argues step-(c) selection instability may still apply); it is untested, not known.
 - **Significance:** Fixes flagged factual/framing errors; gives a Méloux-paper → reliability-axis → Pillar mapping the later chapters must mirror.
 - **Code pointer:** `thesis/chapters/introduction.tex` §Motivation, §Problem Statement, Sub-RQ 3.
 
 ## Related Work
+
+### Open Problems in MI: the field's own map of what circuit discovery hasn't solved — 2026-07-07
+
+- **Context:** Reading Sharkey, Chughtai et al. (2025, arXiv 2501.16496), "Open Problems in Mechanistic Interpretability", a 30-author forward-facing review, to situate the thesis within the field's stated open agenda (Introduction framing + Discussion/Limitations grounding).
+- **Observation:**
+  - Frames MI as two approaches (reverse-engineering "roles of components" vs concept-based "components for roles"), each split into decomposition → description → validation. The thesis lives entirely inside reverse-engineering, at the *description/validation* steps of the circuit-discovery instantiation.
+  - Section 2.3 lays out circuit discovery as a 5-step pipeline (task def → DAG decomposition → patching/attribution to find the subgraph → iterative describe-validate loop → final validation) and evaluates circuits on the Wang et al. (2023) triad: **faithfulness / minimality / completeness**. These are exactly the axes behind `CLEAN_KL_DIV_METRIC` and the completeness metrics.
+  - Cites Miller et al. (2024) twice, once for large within-task per-datapoint variance (circuit is average-case, not per-example), and once for faithfulness being *dependent on the causal-intervention implementation* and misleading on complex circuits. This is the field-consensus statement of the thesis's sub-RQ3 premise.
+  - Names the exact pathologies the thesis observes empirically: **backup/negative behavior** evades performance-maximizing metrics (grounds the negative-head sign anomaly); scalable discovery (attribution patching / EAP / AtP\*) is only a **first-order approximation** of true ablation effect ("unclear whether... adequate"); and **streetlight interpretability**, IOI/GT/Docstring were chosen because they are easy, not representative.
+  - Socio-technical section (§4.2) warns MI is rarely competitive with non-interpretability baselines and is often "graded on its own curve", a caution that supports the thesis's *relative* (algorithm-vs-algorithm) rather than absolute-utility framing.
+- **Significance:** This is the strongest single citation for the Discussion: the field's own consensus review states that faithfulness is methodology-relative and that current metrics/approximations are unreliable, which is precisely what the thesis's ablation-triple faithfulness curves demonstrate concretely. In the Introduction it establishes that circuit discovery is an acknowledged-unsolved pipeline, not a settled tool. Pairs with Miller 2024 (`faithfulness_metrics_not_robust.md`) and ACDC (`acdc_automatic_circuit_discovery.md`).
+- **Code pointer:** `docs/related_work/open_problems_mech_interp.md`
 
 ### Zoom In: the foundational definition of features and circuits — 2026-06-23
 
