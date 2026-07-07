@@ -2,6 +2,13 @@
 
 ## Introduction
 
+### Supervisor rejected Intro draft ("4/10"); scientific-register overhaul needed — 2026-07-07
+
+- **Context:** Supervisor reviewed the drafted Introduction (`thesis/chapters/introduction.tex`) and rated it "4/10 at best." All five complaints target scientific register/precision, not content.
+- **Observation:** Concrete flags: (1) informal/vague phrasing ("a small part of the network", "trading some accuracy", "none can be taken at face value"); (2) first sentence overloaded and too casual; (3) the circuit is wrongly framed as "the central object of this thesis" (the real object is the controlled *comparison of discovery methods*; the circuit is their artifact); (4) vague generic gap sentences ("apparent differences... confounded", "fair basis... the gap this thesis closes"); (5) "Two reliability questions therefore remain open, and neither..." uses cataphora ("Two" before the list) and repeats the prior sentence's structure.
+- **Significance:** These map cleanly onto Swales' CARS model (intro structure) and standard scientific-register rules (precision, active claims, no idioms, one idea/sentence). Captured durably so they apply to all remaining chapters, not just a one-off intro fix.
+- **Code pointer / Run:** Guidance distilled to `docs/writing/scientific_writing_guide.md` (CARS + register + smells table + rubric); operationalized as the `writing-thesis-prose` skill (auto-invokes on thesis prose). Intro rewrite is a deferred separate pass.
+
 ### Introduction chapter drafted; framing decisions — 2026-06-19
 
 - **Context:** Writing the LaTeX Introduction (`thesis/UKPThesisTemplate.tex`).
