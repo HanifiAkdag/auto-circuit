@@ -2,6 +2,13 @@
 
 ## Introduction
 
+### Method taxonomy corrected: EAP is gradient-based; EP/DiscoGP renamed "optimization-based" — 2026-07-09
+
+- **Context:** Supervisor feedback on the Introduction's state-of-the-art paragraph.
+- **Observation:** The old three-family taxonomy (search-based / attribution-based / gradient-based) was factually wrong on two counts. (1) **EAP is itself gradient-based**: attribution patching uses gradients to approximate the ablation effect in one backward pass, so "attribution" and "gradient" are not disjoint families. (2) **ACDC is greedy, not "search-based"**: it prunes edges one at a time against a threshold.
+- **Significance:** Forces a terminology change across the thesis. The families are now distinguished by *how edge importance is estimated*: **greedy pruning** (ACDC), **gradient-based attribution** (EAP), **gradient-based mask optimization** (EP, DiscoGP). Because EP/DiscoGP can no longer be called "the gradient-based methods" without ambiguity, they are called **optimization-based** throughout, including in the central RQ, Problem Statement, and Contributions. `CLAUDE.md`, this file's older entries, and the memory files still say "gradient-based" for EP/DiscoGP and are not yet aligned.
+- **Code pointer / Run:** `thesis/chapters/introduction.tex` (Motivation ¶3, Problem Statement, RQs, Contributions).
+
 ### Supervisor rejected Intro draft ("4/10"); scientific-register overhaul needed — 2026-07-07
 
 - **Context:** Supervisor reviewed the drafted Introduction (`thesis/chapters/introduction.tex`) and rated it "4/10 at best." All five complaints target scientific register/precision, not content.
