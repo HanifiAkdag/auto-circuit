@@ -2,6 +2,26 @@
 
 ## Introduction
 
+### Canonical gap / contributions / RQs — 2026-07-09
+
+- **Gap** (three parts, one per sub-RQ; tooling is the enabler, not the payload):
+  1. **Ranking robustness:** EP and DiscoGP were each shown superior only under their own protocol (EP: resample + full-vocab KL; DiscoGP: zero ablation + label accuracy) and the proposing method wins in each paper. No study varies the discovery/eval ablation as an experimental variable.
+  2. **Stability:** per-run circuit variance quantified only for attribution methods; open for mask-optimization methods (Méloux).
+  3. **Spuriousness:** no random-weight null test exists for EP/DiscoGP.
+- **Contributions** (mirror the gap):
+  1. EP + DiscoGP integrated into AutoCircuit; discovery/eval ablation becomes independently settable for these methods.
+  2. Crossed discovery×eval ablation comparison of all four algorithms (IOI/GT/Docstring): do published orderings persist outside their origin protocols?
+  3. Reliability characterization: run-to-run stability + random-weight null.
+- **RQs:** central RQ = comparison under a common framework with identical ablations/metrics. Sub-RQ1 integration; Sub-RQ2 faithfulness + ranking persistence under ablation change; Sub-RQ3 reliability (stability, null).
+- **Never claim** EP-vs-DiscoGP was "never compared" (see next entry).
+
+### DiscoGP camera-ready DOES compare against EP — 2026-07-09
+
+- **Context:** User challenged the "EP-vs-DiscoGP never compared" gap claim; verified against the EMNLP camera-ready (arXiv 2407.03779).
+- **Observation:** Table 2 runs EP (original implementation, Appendix C), ACDC, and EAP as baselines on BLiMP/IOI/PARAREL, all scored under zero ablation with label-space accuracy/KL and favorable sparsity budgets for ACDC/EAP. EP nearly matches DiscoGP on its home criterion (IOI: 100%/KL 0.032 vs 100%/0.020); ACDC/EAP collapse (~52/58%).
+- **Significance:** Grounds the "single-protocol, proposer wins" gap framing (canonical entry above); Introduction rewritten accordingly same day.
+- **Code pointer / Run:** `docs/related_work/disco_gp_sheaf_discovery.md` §Comparisons (corrected); `thesis/chapters/introduction.tex`; CLAUDE.md index line; memories `project_context` + `edge_pruning_method_and_vs_discogp`.
+
 ### Method taxonomy corrected: EAP is gradient-based; EP/DiscoGP renamed "optimization-based" — 2026-07-09
 
 - **Context:** Supervisor feedback on the Introduction's state-of-the-art paragraph.
