@@ -15,6 +15,14 @@
 - **RQs:** central RQ = comparison under a common framework with identical ablations/metrics. Sub-RQ1 integration; Sub-RQ2 faithfulness + ranking persistence under ablation change; Sub-RQ3 reliability (stability, null).
 - **Never claim** EP-vs-DiscoGP was "never compared" (see next entry).
 
+### EP Appendix D examines seed stability — soften the Pillar-2 gap claim — 2026-07-13
+
+- **Context:** Midterm presentation prep; re-verified both papers' evaluation protocols in the primary sources (arXiv 2406.16778 HTML, 2407.03779 HTML, `disco_gp/evaluation.py`) after the user asked for citation checks.
+- **Observation:** EP's Appendix D runs **12 seeds** at one representative sparsity per task (IOI 97.5%, GT 99.0%, GP 97.0%): resulting sparsity and KL are "remarkably consistent", but **pairwise edge IoU is only 0.5–0.7** ("high, but far from 1") over the 66 pairs; the authors attribute this to redundant components and defer the definitional question to future work.
+  - Protocols re-confirmed: EP evaluates all methods (EP/ACDC/EAP) under **interchange ablation + full-vocab KL** (zero ablation only in the Tracr check); DiscoGP evaluates all methods (incl. EP) under **zero ablation + sheaf accuracy + label-space KL** (2-class softmax over (good,bad) logits; answer-index softmax for PARAREL) — verified in `compute_faith_loss_binary_label` / `_multi_label`.
+- **Significance:** The Pillar-2 gap must be stated as "stability never *compared across methods or protocols*", never as "never examined for mask-optimization methods" (EP examined its own; DiscoGP averages 5 runs' performance without reporting circuit overlap). `introduction.tex:17` ("quantified mainly for attribution-based methods such as EAP") survives on the word "mainly" but should cite/acknowledge EP Appendix D when Related Work is written. Bonus: EP's IoU 0.5–0.7 is a published anchor to sanity-check Pillar 2's Jaccard numbers against.
+- **Code pointer / Run:** `docs/related_work/edge_pruning.md` §Evaluation protocol (new); `presentation/outline.md` slide 12 say-notes.
+
 ### DiscoGP camera-ready DOES compare against EP — 2026-07-09
 
 - **Context:** User challenged the "EP-vs-DiscoGP never compared" gap claim; verified against the EMNLP camera-ready (arXiv 2407.03779).
@@ -77,6 +85,16 @@
 - **Code pointer:** `thesis/chapters/introduction.tex` §Motivation, §Problem Statement, Sub-RQ 3.
 
 ## Related Work
+
+### Rome paper publishes per-method instability numbers — Pillar 2 gap re-scoped, not weakened — 2026-07-13
+
+- **Context:** User asked whether "All Circuits Lead to Rome" (Chen et al., ICML 2026, arXiv 2605.12671; already in related work) weakens the stability pillar; re-read the paper's stability-specific results (Tables 4–5, Figure 3).
+- **Observation:**
+  - The paper publishes perturbation-instability figures for three of the four thesis methods: **ACDC** pairwise IoU **1.09% (interchange) / 6.76% (zero)** under randomized head-traversal ordering at fixed threshold; **EAP** IoU decreasing with top-k under random name selections; **EP** minimum pairwise IoU **0.340 (full-vocab KL) vs 0.064 (task CE)** under loss-form change.
+  - Each method is probed with a *different, deliberately chosen* perturbation to prove circuit multiplicity — an existence proof, not a controlled reliability measurement. No matched seed-resampling across all four methods under a fixed protocol, matched sparsity, and common tasks.
+  - ACDC's instability differs by ablation (1.09% vs 6.76%): instability itself is protocol-dependent, a published preview of the Pillar-1×Pillar-2 interaction.
+- **Significance:** Pillar 2 is *re-scoped*, not weakened: its claim must be "no controlled cross-method comparison of natural seed-to-seed stability under matched protocols" (never "stability was never quantified", which is now false twice over: EP Appendix D + this paper). Interpretation also shifts: low Jaccard is the *expected* outcome under the Distributive Dense Circuit Hypothesis, so Pillar 2 measures the *degree and method/protocol-dependence* of instability, not the existence of a defect. The paper's numbers (ACDC 1.09/6.76%, EP 0.340, 20-run mutual IoU 0.15–0.30%) become published anchors to cross-check Pillar-2 Jaccard values against.
+- **Code pointer:** `docs/related_work/all_circuits_lead_to_rome.md` (findings + implications rows updated same day).
 
 ### Open Problems in MI: the field's own map of what circuit discovery hasn't solved — 2026-07-07
 
@@ -247,6 +265,17 @@
   - **Canonical position-aware circuit:** the IOI circuit (Wang et al. 2022, `2211.00593`) is only separable by position — its head classes (Duplicate-Token, S-Inhibition, Name-Mover) are defined by *which positions* they read/write (S1/S2/IO/END). At component granularity this positional logic is averaged away.
   - **Token-level discovery methods exist:** Information Flow Routes (Ferrando & Voita 2024, `2403.00824`) build graphs whose nodes are per-position token representations via single-pass attribution (no template, no corrupt pairs); Sparse Feature Circuits (Marks et al. 2024, `2403.19647`) go one rung finer to feature×position; positional Edge Attribution Patching (Ensign & Garriga-Alonso 2024, `2407.14008`) is the position-resolved EAP analogue of AutoCircuit's `token_circuit` switch.
 - **Significance:** Justifies why token granularity is meaningful (it resolves a real degree of freedom that component circuits average over) while bounding why it stays out of the main comparison: it breaks granularity uniformity across the GT/Docstring/IOI spine and multiplies the node space. Leaves a clean, well-cited hook if a token-granularity sub-study is added later (positional EAP / Information Flow Routes as the natural baselines; Heimersheim & Nanda `2404.15255` and RelP `2508.21258` for the attribution-faithfulness caveats).
+
+### EAP's resample ablation is definitional, not a configurable choice — 2026-07-15
+
+- **Context:** Reading Syed et al. (2023), "Attribution Patching Outperforms Automated Circuit Discovery" (NeurIPS ATTRIB), to answer whether AutoCircuit's hardcoded resample ablation in EAP is a design choice and whether EAP could be run at other discovery ablations for the sub-RQ3 spine.
+- **Observation:**
+  - EAP's score is defined (Eq. 2) as the first-order Taylor expansion of corrupted-prompt activation patching (Eq. 1), `grad · (e_corr − e_clean)`: the resample baseline is part of the method's definition, inherited from Nanda's attribution patching and ACDC's protocol, and the paper never discusses alternative baselines.
+  - The Taylor machinery itself is baseline-agnostic: substituting zero for `e_corr` gives a first-order estimate of zero-ablating each edge. AutoCircuit's fast equivalent `mask_gradient_prune_scores` already exposes `ablation_type` (default `RESAMPLE`), so an EAP-zero/EAP-mean variant is a one-line registration; only the slow reference implementation (`edge_attribution_patching.py`, the registered `EDGE_ATTR_PATCH_PRUNE_ALGO`) hardcodes clean/corrupt caches.
+  - Prior art for non-resample attribution baselines: Marks et al. (2024, Sparse Feature Circuits) use a zero baseline when counterfactual pairs don't exist; Hanna et al. (2024, EAP-IG) name mean/zero as alternatives others use but don't sweep them. No paper systematically sweeps EAP's discovery ablation.
+  - Caveats for an EAP-zero variant: the paper itself shows the linearization is loose even at resample (R² = 0.27 vs activation patching, ~2× overestimation, concave curves for embedding edges), and a zero baseline is a larger, more off-distribution perturbation, so the approximation should degrade further. KL is unusable as EAP's discovery metric (zero gradient at the clean point), so any variant stays on logit-diff discovery vs KL evaluation.
+- **Significance:** Justifies the spine's treatment of EAP as a single-protocol (resample) anchor as paper-faithful, while identifying a cheap, well-defined extension (EAP swept over discovery ablations via `mask_gradient_prune_scores`) that would add a fourth algorithm family to the discovery-ablation sweep; also gives the citable reason why EAP cannot share the KL discovery objective.
+- **Code pointer:** `docs/related_work/edge_attribution_patching_syed2023.md`; `auto_circuit/prune_algos/mask_gradient.py:27`
 
 ## Results
 
@@ -470,6 +499,17 @@
 
 ## Experiments
 
+### EAP under zero/mean discovery ablation: smoke test passes, rankings diverge — 2026-07-16
+
+- **Context:** Follow-up to the 2026-07-15 finding that EAP's resample ablation is definitional but the Taylor machinery is baseline-agnostic. Smoke-tested EAP via `mask_gradient_prune_scores(grad_function="logit", answer_function="avg_diff", mask_val=0.0)` with `ablation_type` ∈ {RESAMPLE, ZERO, TOKENWISE_MEAN_CORRUPT} on Docstring (component, attn-only-4l) and IOI (component, gpt2-small).
+- **Observation:**
+  - All three ablations run to completion with finite, fully non-degenerate scores on both tasks; the resample run reproduces the registered `EDGE_ATTR_PATCH_PRUNE_ALGO` exactly (corr = 1.000000, max abs diff ≤ 1.4e-6), confirming the `mask_gradient` route is a faithful EAP.
+  - Discovery ablation changes EAP's ranking substantially: top-100 |score| overlap vs resample is 0.25 (Docstring) / 0.30 (IOI) for zero and 0.85 / 0.58 for mean; score-vector correlations 0.32 / 0.52 (zero) and 0.83 / 0.71 (mean). Zero diverges most, consistent with it being the largest off-distribution perturbation for the linearization.
+  - API gotcha: `batch_src_ablations` asserts `clean_corrupt` is set only for batch-specific ablations, so ZERO and TOKENWISE_MEAN_CORRUPT require `clean_corrupt=None` (the `mask_gradient_prune_scores` default `"corrupt"` must be overridden).
+  - Resource note: the IOI mask-gradient backward OOMs on a 24 GB GPU; needs `--constraint="gpu_mem:80gb"` (or smaller batches).
+- **Significance:** EAP-zero/EAP-mean are viable one-line discovery variants, so EAP need not stay a single-protocol anchor in the spine; the large ranking divergence under zero suggests adding them would strengthen the discovery-ablation axis with a fourth (attribution-based) algorithm family. `make_ablation_variant`'s "not meaningful for EAP" note only holds for the registered slow implementation.
+- **Code pointer / Run:** smoke script (temp): `/mnt/beegfs/work/akdag/thesis/tmp_eap_ablation_smoke.py`; `auto_circuit/prune_algos/mask_gradient.py:27`
+
 ### Pillar 1 faithfulness spine implemented, run, and merged (#4) — 2026-06-16
 
 - **Context:** Closing GitHub issue #4 (Pillar 1 of the sub-RQ3 design). Built the full discovery × eval matrix as a two-step pipeline, ran it end-to-end, reviewed, and merged via PR #8 into `main` (`pillar1-faithfulness` branch).
@@ -609,6 +649,7 @@
 
 ## Notes
 
+- **2026-07-15** — Thesis retitled (supervisor tone feedback: do not attack the compared papers): "Common Ground for Circuit Discovery — Integrating Edge Pruning and DiscoGP into AutoCircuit for a Protocol-Controlled Comparison" (`UKPThesisTemplate.tex:95-96`; old title claimed "Gradient-Based", inconsistent with the optimization-based taxonomy, and did not name the protocol axis). Slide 5 of the midterm deck reworded to the same neutral framing ("one protocol per paper", "best/lower" cells, defusal-first speaker notes) in `presentation/outline.md` + both agent prompts. Verify with supervisor whether the registered title can still be changed.
 - **2026-05-31** — Added `auto_circuit/visualize_circuit_slider.py` (`save_circuit_sankey_slider`): one interactive HTML Sankey per (task, algorithm) with an edge-count slider whose steps reuse `edge_counts_util` — the exact logarithmic grid `measure_prune_metrics` uses — so the graph slider lines up tick-for-tick with the prune-metric curves. Wired into `experiments/circuit_discovery.py` (replaces the old Sports-Players-only `draw_seq_graph` block).
 - **2026-05-31** — Gotcha when reusing `net_viz` (`visualize.py`): its `score_threshold` filter is `abs(edge_score) < threshold → skip`, so passing `score_threshold=0.0` does **not** drop zero-valued edges. Zeroing sub-threshold scores in the `PruneScores` dict therefore does NOT shrink the rendered Sankey — every "circuit" still draws all ~32k edges. Correct top-k rendering requires passing the actual threshold (`prune_scores_threshold(ps, k)`, floored to a small positive eps) into `net_viz` directly. This bug inflated a 10k-edge HTML to ~90 MB; the fix brings the full log-grid file to ~3 MB.
 - **2026-05-31** — The lost `circuit_graph_viz.py` (only `.pyc` survived, never committed) was rebuilt fresh rather than recovered; new module lives next to `visualize.py` as `visualize_circuit_slider.py`.
