@@ -416,9 +416,11 @@ def algo_prune_scores(
 
 | Key | Weight masks | Edge masks | hard | loss_mode | completeness |
 |---|---|---|---|---|---|
-| `DISCO_GP_PRUNE_ALGO` | ✓ | ✓ | True (default) | `argmax_ce` | Phase 2 ON |
+| `DISCO_GP_PRUNE_ALGO` (`"DiscoGP (joint)"`) | ✓ | ✓ | True (default) | `argmax_ce` | Phase 2 ON |
 | `DISCO_GP_EDGE_ONLY_PRUNE_ALGO` (`"DiscoGP-E"`) | ✗ | ✓ | True (explicit) | `argmax_ce` | OFF (`e_lambda_complete_init=0`) |
-| `DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO` (`"DiscoGP-EP"`) | ✗ | ✓ | True (explicit) | `answer_margin_ce` | ON (`e_lambda_complete_init=1`) |
+| `DISCO_GP_EDGE_ONLY_PAPER_PRUNE_ALGO` (`"DiscoGP"`) | ✗ | ✓ | True (explicit) | `answer_margin_ce` | ON (`e_lambda_complete_init=1`) |
+
+The paper-faithful edge-only variant carries the plain display name `"DiscoGP"` (it is the form the thesis reports); the joint weight+edge variant is labelled `"DiscoGP (joint)"`. Algo *keys* and the `run_cell.py` CLI slugs (`discogp-ep`, `discogp`) are unchanged, so cached `PruneScores` still resolve.
 
 The previous `DISCO_GP_EDGE_ONLY_HARD_PRUNE_ALGO` (which had a bug where `hard` was not passed) has been removed and replaced by the two new edge-only variants above — both explicitly pass `hard=True`.
 

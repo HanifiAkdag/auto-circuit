@@ -5,7 +5,7 @@ discovery methods. Imported by the analysis pass (`faithfulness_comparison.py`) 
 printed one cell per line by the SLURM array launcher (`faithfulness_discovery.sh`),
 so the launcher and the analysis can never disagree on what the matrix is.
 
-Full discovery x eval matrix (single seed): EP / DiscoGP-EP / ACDC / EAP are each
+Full discovery x eval matrix (single seed): EP / DiscoGP / ACDC / EAP are each
 run under every discovery ablation {zero, resample, mean} (EAP via the mask-gradient
 implementation, whose first-order estimate targets whichever ablation baseline is
 chosen; resample reproduces Syed et al. 2023 exactly). Ground Truth and Random are

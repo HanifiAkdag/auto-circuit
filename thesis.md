@@ -15,6 +15,13 @@
 - **RQs:** central RQ = comparison under a common framework with identical ablations/metrics. Sub-RQ1 integration; Sub-RQ2 faithfulness + ranking persistence under ablation change; Sub-RQ3 reliability (stability, null).
 - **Never claim** EP-vs-DiscoGP was "never compared" (see next entry).
 
+### Sub-RQ1 is phrased so the audience answers "just implement them" — 2026-07-21
+
+- **Context:** Midterm presentation review; supervisor read the research-questions slide, which carries the `introduction.tex` wording of Sub-RQ 1 verbatim.
+- **Observation:** "How can Edge Pruning and DiscoGP be integrated into the edge-centric architecture of the AutoCircuit library...?" reads as a task, not a research question. The listener's instinctive answer is "just implement them", so the difficulty is never conveyed. The supervisor's phrasing: *"the answer to how is just implement them, because that's what the audience thinks; you never explain what is the difficulty of doing it."*
+- **Significance:** The non-trivial content of Sub-RQ 1 is two things the current wording hides: (1) **port faithfulness** — each method must provably reproduce the original's behaviour inside a shared non-invasive wrapper, where DiscoGP's original does not wrap a model at all but rebuilds the transformer blocks to thread its own `prev_head_idx` residual axis, and its mask convention is inverted (1 = keep vs AutoCircuit's 1 = ablate, a silent correctness bug if missed); (2) **decoupling the ablation** — every original hardwires its own ablation, so lifting it into a free parameter is what makes the crossed discovery×evaluation matrix possible at all. Both were verified by line-by-line audits against the original repositories at fixed commits. Applies to `introduction.tex` §Research Questions, not only the slide: the written Sub-RQ 1 should foreground faithfulness and ablation-decoupling rather than "how can they be integrated".
+- **Code pointer / Run:** `presentation/outline.md` slides 10–11; `docs/related_work/edge_pruning.md` and `disco_gp_sheaf_discovery.md` §Faithfulness of the AutoCircuit Port.
+
 ### EP Appendix D examines seed stability — soften the Pillar-2 gap claim — 2026-07-13
 
 - **Context:** Midterm presentation prep; re-verified both papers' evaluation protocols in the primary sources (arXiv 2406.16778 HTML, 2407.03779 HTML, `disco_gp/evaluation.py`) after the user asked for citation checks.

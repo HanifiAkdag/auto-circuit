@@ -3,12 +3,12 @@
 Complements the static per-cell PDFs. Each HTML overlays *all* discovery cells for
 one (task, measure, metric) so any subset can be compared interactively:
 
-  - one line per (algo x discovery-ablation), e.g. "DiscoGP-EP | disc=zero";
+  - one line per (algo x discovery-ablation), e.g. "DiscoGP | disc=zero";
   - a dropdown selects the eval-ablation (resample / zero / mean);
   - color encodes the algorithm, line dash encodes the discovery-ablation;
   - the Plotly legend toggles individual lines (click = show/hide,
     double-click = isolate), so you can pick exactly the curves to compare
-    (e.g. DiscoGP-EP disc=zero vs disc=resample alongside EP disc=mean).
+    (e.g. DiscoGP disc=zero vs disc=resample alongside EP disc=mean).
 
 Anchor algorithms (GT / Random) have no discovery sweep, so they appear once
 per eval-ablation as solid reference lines.
