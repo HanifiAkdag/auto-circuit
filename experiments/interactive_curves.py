@@ -16,33 +16,26 @@ per eval-ablation as solid reference lines.
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import plotly.colors as pc
 import plotly.graph_objects as go
+
+from auto_circuit.utils.plot_theme import (
+    DISC_DASH as _DISC_DASH,
+)
+from auto_circuit.utils.plot_theme import (
+    DISC_SYMBOL as _DISC_SYMBOL,
+)
+from auto_circuit.utils.plot_theme import (
+    INK_MUTED,
+    algo_colors,
+    apply_theme,
+)
 
 # One overlaid line: its algo, discovery label, eval label and (edges, value) series.
 CurveEntry = Tuple[str, str, str, List[Tuple[float, float]]]
 
-# Per discovery-ablation styling. Dash + marker symbol are varied together so
-# same-colour lines (one algo, different discovery) stay distinguishable even when
-# printed greyscale or zoomed out.
-_DISC_DASH: Dict[str, str] = {
-    "zero": "dash",
-    "resample": "solid",
-    "mean": "dot",
-    "anchor": "solid",
-}
-_DISC_SYMBOL: Dict[str, str] = {
-    "zero": "square",
-    "resample": "circle",
-    "mean": "diamond",
-    "anchor": "x",
-}
+# Dash + marker symbol vary together with the discovery ablation, so same-colour
+# lines (one algo, different discovery) stay distinguishable in greyscale.
 _DISC_ORDER = ["zero", "resample", "mean", "anchor"]
-
-
-def _algo_color_map(algo_keys: List[str]) -> Dict[str, str]:
-    palette = pc.qualitative.D3 + pc.qualitative.Set2 + pc.qualitative.Dark24
-    return {a: palette[i % len(palette)] for i, a in enumerate(sorted(algo_keys))}
 
 
 def _line_name(algo_display: str, disc: str) -> str:
@@ -74,7 +67,10 @@ def save_interactive_curves(
         return None
 
     algo_keys = sorted({k[0] for k in by_key})
-    color = _algo_color_map(algo_keys)
+    # Colour follows the algorithm's display name, so a hue means the same thing
+    # here as in the static figures.
+    by_display = algo_colors(algo_display.get(a, a) for a in algo_keys)
+    color = {a: by_display[algo_display.get(a, a)] for a in algo_keys}
     default_eval = default_eval if default_eval in eval_labels else eval_labels[0]
 
     # Stable trace order: algo, then discovery, then eval.
@@ -99,7 +95,11 @@ def save_interactive_curves(
                 name=name,
                 legendgroup=algo_display.get(algo_key, algo_key),
                 line=dict(color=color[algo_key], dash=_DISC_DASH.get(disc, "solid"), width=2),
-                marker=dict(size=6, symbol=_DISC_SYMBOL.get(disc, "circle")),
+                marker=dict(
+                    size=6,
+                    symbol=_DISC_SYMBOL.get(disc, "circle"),
+                    line=dict(width=1.2, color="#ffffff"),
+                ),
                 visible=(ev == default_eval),
                 hovertemplate=(
                     f"<b>{name}</b><br>eval={ev}<br>"
@@ -124,8 +124,14 @@ def save_interactive_curves(
         )
     active = next((i for i, b in enumerate(buttons) if b["label"] == f"eval = {default_eval}"), 0)
 
+    apply_theme(fig, width=1080, height=640, margin_left=100)
     fig.update_layout(
-        title=dict(text=f"{title} — eval-ablation: {default_eval}"),
+        title=dict(
+            text=f"{title} — eval-ablation: {default_eval}",
+            font=dict(size=15, color="#0b0b0b"),
+            x=0.0,
+            xanchor="left",
+        ),
         # dtick=1 on a log axis = one label per power of ten (10, 100, 1000, …)
         # instead of Plotly's default 1,2,5 per-decade labels; minor ticks stay
         # as unlabeled gridlines for orientation.
@@ -136,17 +142,33 @@ def save_interactive_curves(
             minor=dict(showgrid=True),
         ),
         yaxis=dict(title=y_title),
-        legend=dict(title="click to toggle · double-click to isolate", groupclick="toggleitem"),
-        template="plotly_white",
+        hovermode="closest",
+        legend=dict(
+            title=dict(
+                text="click to toggle · double-click to isolate",
+                font=dict(size=11, color=INK_MUTED),
+            ),
+            groupclick="toggleitem",
+            orientation="v",
+            yanchor="top",
+            y=1.0,
+            xanchor="left",
+            x=1.01,
+        ),
+        margin=dict(r=260, t=90),
         updatemenus=[
             dict(
                 buttons=buttons,
                 active=active,
                 direction="down",
                 showactive=True,
+                bgcolor="#ffffff",
+                bordercolor="#c3c2b7",
+                borderwidth=1,
+                font=dict(size=12),
                 x=1.0,
                 xanchor="right",
-                y=1.12,
+                y=1.14,
                 yanchor="top",
             )
         ],

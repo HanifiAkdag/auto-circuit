@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import plotly.graph_objects as go
 import torch as t
@@ -101,7 +101,10 @@ FigMeta = Dict[str, Any]
 
 
 def measurement_figs(
-    measurements: AblationMeasurements, auc_plots: bool = False
+    measurements: AblationMeasurements,
+    auc_plots: bool = False,
+    discovery_ablation: Optional[str] = None,
+    omit_algo: Optional[Callable[[str, str, AblationType], bool]] = None,
 ) -> Tuple[Tuple[go.Figure, FigMeta], ...]:
     """
     Plot the measurements from
@@ -113,6 +116,12 @@ def measurement_figs(
     Args:
         measurements: The measurements to plot.
         auc_plots: Whether to include the average AUC plots.
+        discovery_ablation: Ablation the circuits were *discovered* under, named in
+            the subtitle beside the eval ablation. Only the caller knows it.
+        omit_algo: Predicate `(task_key, algo_key, ablation_type) -> bool`. When it
+            returns True the algorithm is left out of that figure. Lets the caller
+            drop a result whose protocol makes it meaningless, without changing
+            what was measured.
 
     Returns:
         A tuple of (figure, metadata) pairs. Each metadata dict contains:
@@ -130,6 +139,7 @@ def measurement_figs(
                 continue
             metric = PRUNE_METRIC_DICT[metric_key]
             data, y_max = [], 0.0
+            omitted: Dict[str, Set[str]] = defaultdict(set)
             for task_key, algo_measurements in task_measurements.items():
                 task = TASK_DICT[task_key]
                 # Assert all tasks have the same token_circuit value
@@ -137,6 +147,11 @@ def measurement_figs(
 
                 for algo_key, points in algo_measurements.items():
                     algo = PRUNE_ALGO_DICT[algo_key]
+                    if omit_algo is not None and omit_algo(
+                        task_key, algo_key, ablation_type
+                    ):
+                        omitted[task_key].add(algo_key)
+                        continue
                     if len(points) > 1:
                         for x, y in points:
                             data.append(
@@ -170,6 +185,8 @@ def measurement_figs(
                     y_axes_match=metric.y_axes_match,
                     y_max=y_max,
                     y_min=metric.y_min,
+                    discovery_ablation=discovery_ablation,
+                    omit_algos=dict(omitted),
                 ),
                 meta,
             ))

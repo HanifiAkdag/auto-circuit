@@ -27,7 +27,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -112,6 +112,16 @@ TASK_METRICS: dict = {
     ],
 }
 
+# Eval ablation each official circuit was originally established under: IOI = mean
+# over the ABC distribution (Wang et al. 2022), Greater-Than = resample (Hanna et al.
+# 2023), Docstring = resample (Heimersheim & Janiak 2023). GT is plotted only at its
+# own ablation; elsewhere the number reports protocol mismatch, not circuit quality.
+GT_NATIVE_EVAL_ABLATION: Dict[str, str] = {
+    IOI_COMPONENT_CIRCUIT_TASK.key: "mean",
+    GREATERTHAN_COMPONENT_CIRCUIT_TASK.key: "resample",
+    DOCSTRING_COMPONENT_CIRCUIT_TASK.key: "resample",
+}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -139,6 +149,21 @@ def _norm_slug(s: str) -> str:
 
 def _ablation_slug(ablation: AblationType) -> str:
     return _ABL_SHORT.get(ablation, _norm_slug(str(ablation)))
+
+
+_GT_ALGO_KEY = _ALGO_MAP["gt"].key
+
+
+def _omit_gt(task_key: str, algo_key: str, ablation: AblationType) -> bool:
+    """True where GT should be hidden: any eval ablation but its own.
+
+    See GT_NATIVE_EVAL_ABLATION. Tasks with no recorded native ablation keep GT
+    everywhere rather than silently losing it.
+    """
+    if algo_key != _GT_ALGO_KEY:
+        return False
+    native = GT_NATIVE_EVAL_ABLATION.get(task_key)
+    return native is not None and _ablation_slug(ablation) != native
 
 
 def _value_at_budget(series, budget) -> Optional[float]:
@@ -287,7 +312,10 @@ def main():
                     print(f"WARNING: measure failed {d}/{measure}/{task.name}: {e}")
                     continue
 
-                for fig, meta in measurement_figs(measurements, auc_plots=False):
+                for fig, meta in measurement_figs(
+                    measurements, auc_plots=False, discovery_ablation=d,
+                    omit_algo=_omit_gt,
+                ):
                     metric_slug = meta["metric_key"].lower().replace(" ", "_")
                     abl_slug = _ABL_SHORT_FROM_STR.get(
                         meta["ablation_type"], _norm_slug(meta["ablation_type"])
@@ -310,9 +338,12 @@ def main():
                                 continue
                             # Anchors have no discovery sweep → label "anchor" (stored once).
                             disc_label = "anchor" if algo_key in _ANCHOR_ALGO_KEYS else d
-                            overlay[(task_key, measure, m.key)].append(
-                                (algo_key, disc_label, _ablation_slug(ev), series)
-                            )
+                            # Figures follow the GT-native-ablation rule; summary.csv
+                            # keeps every row so the dropped values stay inspectable.
+                            if not _omit_gt(task_key, algo_key, ev):
+                                overlay[(task_key, measure, m.key)].append(
+                                    (algo_key, disc_label, _ablation_slug(ev), series)
+                                )
                             summary_rows.append({
                                 "discovery_ablation": d,
                                 "task": task.name,
