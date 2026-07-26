@@ -54,7 +54,7 @@ No monolithic orchestrator. Each experiment cell is run **one at a time** with i
 ### Code realities that shape the foundation (verified 2026-06-02)
 
 - **Discovery ablation is hard-coded, not a parameter.** `edge_pruning.py:165` (`RESAMPLE`), `disco_gp.py:294` (`ZERO`); `PruneAlgo.func` is `(model, dataloader, official_edges) → PruneScores` with no ablation arg. Fix: add `ablation_type: AblationType` param to both algo functions; expose at call site via `functools.partial` to produce ablation-tagged `PruneAlgo` variants with unique `key`/`name` (e.g. `"Edge Pruning [zero]"`), keeping the native variants as defaults.
-- **EAP/ACDC decision (resolved 2026-06-05):** **EAP stays corrupt-only** — extending it would require threading `src_ablations(...)` through `edge_attribution_patching.py:89–108`, adding noise for unclear gain. **ACDC gets `ablation_type` threaded** similarly to EP/DiscoGP. The spine's discovery axis is effectively *EP/DiscoGP/ACDC × {zero, resample, mean}* **+ EAP × {corrupt}**, with GT/Random ablation-independent (≈30 discovery cells).
+- **EAP/ACDC decision (resolved 2026-06-05):** **EAP stays corrupt-only** — extending it would require threading `src_ablations(...)` through `edge_attribution_patching.py:89–108`, adding noise for unclear gain. **[SUPERSEDED 2026-07-16 — see §12: the premise was wrong; no threading was needed because the test-verified equivalent `mask_gradient_prune_scores` already exposes `ablation_type`.]** **ACDC gets `ablation_type` threaded** similarly to EP/DiscoGP. The spine's discovery axis is effectively *EP/DiscoGP/ACDC × {zero, resample, mean}* **+ EAP × {corrupt}**, with GT/Random ablation-independent (≈30 discovery cells).
 - **`Task` has no seed field**, and `DATASET_CACHE` (`tasks.py:192`) is keyed as `(dataset_name, batch_size, batch_count, token_circuit, device)` — excludes seed, so a new seed silently returns the cached loader. Fix: add seed to `DATASET_CACHE` key + `load_datasets_from_json(random_seed=seed)` call; also `torch.manual_seed(seed)` before EP/DiscoGP discovery (masks are randomly init'd). The seed axis is genuinely new plumbing.
 - **Null-test model hook:** `Task._model_def` accepts `nn.Module` (`tasks.py:149`) but that branch **skips** the cfg flags set at lines 173-177 (`use_attn_result`, `use_attn_in`, `use_split_qkv_input`, `use_hook_mlp_in`) and skips `eval()`. Set these manually on the randomly-initialized model before passing it.
 - **Cache identity:** encode `(discovery_ablation, seed)` into the cache filename (or algo key) so cells don't overwrite each other. The current timestamp-based naming in `save_cache` already prevents collisions in practice; the structured approach lets the analysis pass look up cells by identity rather than by timestamp.
@@ -72,7 +72,7 @@ Post-hoc module used exclusively by the analysis pass. Functions needed (verifie
 
 ## 4. Pillar 1 — Faithfulness spine (full discovery × eval matrix)
 
-- **Discovery axis:** train each method under each ablation ∈ {zero, resample, mean}. Cell count is **not** a clean 4×3×3: EP/DiscoGP/ACDC sweep all three ablations (9 cells/task), **EAP is corrupt-only** (1 cell/task, decision locked in §3), GT/Random are ablation-independent (1 each). So ≈ (3 methods × 3 ablations + EAP × 1) × 3 tasks ≈ **30 discovery cells** + anchors.
+- **Discovery axis:** train each method under each ablation ∈ {zero, resample, mean}. Cell count is **not** a clean 4×3×3: EP/DiscoGP/ACDC sweep all three ablations (9 cells/task), **EAP is corrupt-only** (1 cell/task, decision locked in §3), GT/Random are ablation-independent (1 each). So ≈ (3 methods × 3 ablations + EAP × 1) × 3 tasks ≈ **30 discovery cells** + anchors. **[SUPERSEDED 2026-07-16 — see §12: EAP is swept too; realized matrix = 4 methods × 3 ablations × 3 tasks + GT/Random anchors = 42 cells.]**
 - **Evaluation axis (cached, free):** score every circuit across {zero, resample, mean} × {tree-patch, edge-patch}.
 - **Metrics:** task-primary/secondary above + completeness + sparsity, plus ROC-vs-ground-truth across the sweep.
 - **Headline results:**
@@ -144,4 +144,30 @@ Each "run" below is a **standalone job** (run-per-setting operating model); the 
 - Confirm `functools.partial` (no signature change to `PruneAlgo.func`) vs a thin `PruneAlgoAblation` wrapper class for ablation-aware variants. Partial is simpler; a wrapper lets you carry metadata (ablation name, native vs swept) without monkey-patching.
 
 **Resolved (2026-06-05):**
-- EAP extension: **closed** — EAP stays corrupt-only; ACDC gets ablation_type threaded (see §3 code realities).
+- EAP extension: ~~closed — EAP stays corrupt-only~~ **reopened and reversed 2026-07-16 (§12)** — EAP is swept over {zero, resample, mean} via `eap_prune_scores`; ACDC gets ablation_type threaded (see §3 code realities).
+
+## 12. Amendment (2026-07-16): EAP joins the discovery sweep
+
+The §3 decision "EAP stays corrupt-only" rested on a false premise. Rereading Syed et
+al. (2023) and the AutoCircuit code showed:
+
+- Resample ablation is part of EAP's *definition* in the paper (the score linearizes
+  corrupted-prompt patching), but the Taylor machinery is baseline-agnostic: any
+  ablation baseline yields the corresponding first-order estimate (precedent: Marks
+  et al. 2024 use a zero baseline when counterfactual pairs don't exist).
+- No `src_ablations` threading was ever required: `mask_gradient_prune_scores`
+  (test-verified exactly equal to the reference EAP at resample) has exposed
+  `ablation_type` all along. Only the slow reference implementation
+  (`edge_attribution_patching.py`) hardcodes the corrupt cache.
+- Smoke test (2026-07-16, Docstring + IOI): zero/mean EAP run correctly; resample
+  reproduces the registered EAP exactly (corr 1.000000); zero reorders the top-100
+  ranking heavily (overlap 0.25/0.30), mean moderately (0.85/0.58).
+
+**Changes:** `EDGE_ATTR_PATCH_PRUNE_ALGO.func` → `eap_prune_scores` (mask-gradient
+wrapper deriving `clean_corrupt` from the ablation type); EAP moved from
+`ANCHOR_ALGOS` to `SWEPT_ALGOS` in `faithfulness_cells.py`; spine = **42 cells**
+(4 swept × 3 ablations × 3 tasks + GT/Random anchors ×3 tasks). Old EAP resample
+caches remain valid (scores identical) and are reused via `--skip-if-exists`.
+EAP was never "ablation-independent": it was ablation-*bound* (to resample) by the
+registered implementation — the opposite property. GT/Random are the only genuine
+ablation-independent anchors.

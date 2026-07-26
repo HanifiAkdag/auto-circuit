@@ -8,9 +8,6 @@ from auto_circuit.prune_algos.activation_magnitude import (
     activation_magnitude_prune_scores,
 )
 from auto_circuit.prune_algos.circuit_probing import circuit_probing_prune_scores
-from auto_circuit.prune_algos.edge_attribution_patching import (
-    edge_attribution_patching_prune_scores,
-)
 from auto_circuit.prune_algos.edge_pruning import edge_pruning_prune_scores
 from auto_circuit.prune_algos.disco_gp import disco_gp_prune_scores
 from auto_circuit.prune_algos.ground_truth import ground_truth_prune_scores
@@ -27,6 +24,7 @@ from auto_circuit.types import (
     PruneScores,
     TaskPruneScores,
 )
+from auto_circuit.utils.ablation_activations import BATCH_SPECIFIC_ABLATIONS
 from auto_circuit.utils.custom_tqdm import tqdm
 from auto_circuit.utils.patchable_model import PatchableModel
 
@@ -65,8 +63,8 @@ def make_ablation_variant(base_algo: PruneAlgo, ablation_type: AblationType) -> 
     a partial (e.g. EDGE_PRUNING_PRUNE_ALGO, ACDC_PRUNE_ALGO). Preserves the base algo's
     hyperparameters; only adds/overrides ablation_type.
 
-    Not meaningful for EAP (which is inherently corrupt-only) or GT/Random
-    (ablation-independent); call-site should skip those algos.
+    Works for any algo whose func accepts ablation_type (EP, DiscoGP, ACDC, EAP).
+    Not meaningful for GT/Random (ablation-independent); call-site should skip those.
     """
     slug = str(ablation_type).split(".")[-1].lower()
     return PruneAlgo(
@@ -118,11 +116,39 @@ ACT_MAG_PRUNE_ALGO = PruneAlgo(
     func=activation_magnitude_prune_scores,
 )
 RANDOM_PRUNE_ALGO = PruneAlgo(key="Random", name="Random", func=random_prune_scores)
+
+
+def eap_prune_scores(
+    model: PatchableModel,
+    dataloader: PromptDataLoader,
+    official_edges: Optional[Set[Edge]],
+    ablation_type: AblationType = AblationType.RESAMPLE,
+) -> PruneScores:
+    """EAP via the fast mask-gradient implementation, generalized over ablation.
+
+    At `ablation_type=RESAMPLE` this is exactly `edge_attribution_patching_prune_scores`
+    (Syed et al. 2023, verified in `test_edge_attribution_patching.py`), which the paper
+    defines as the linearization of corrupted-prompt patching. Other ablation types give
+    the same first-order estimate toward that ablation's baseline (cf. Marks et al. 2024).
+    `clean_corrupt` only applies to batch-specific ablations, so it is derived here.
+    """
+    return mask_gradient_prune_scores(
+        model=model,
+        dataloader=dataloader,
+        official_edges=official_edges,
+        grad_function="logit",
+        answer_function="avg_diff",
+        mask_val=0.0,
+        ablation_type=ablation_type,
+        clean_corrupt="corrupt" if ablation_type in BATCH_SPECIFIC_ABLATIONS else None,
+    )
+
+
 EDGE_ATTR_PATCH_PRUNE_ALGO = PruneAlgo(
     key="Edge Attribution Patching",
     name="Edge Attribution Patching",
     _short_name="EAP",
-    func=edge_attribution_patching_prune_scores,
+    func=eap_prune_scores,
 )
 ACDC_PRUNE_ALGO = PruneAlgo(
     key="ACDC",

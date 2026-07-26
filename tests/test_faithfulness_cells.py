@@ -15,14 +15,14 @@ from faithfulness_cells import (  # noqa: E402
 
 
 def test_cell_count_and_composition():
-    # 3 tasks x (3 swept x 3 ablations + 3 anchors) = 36
+    # 3 tasks x (4 swept x 3 ablations + 2 anchors) = 42
     assert len(CELLS) == len(TASKS) * (len(SWEPT_ALGOS) * len(DISCOVERY_ABLATIONS) + len(ANCHOR_ALGOS))
-    assert len(CELLS) == 36
+    assert len(CELLS) == 42
 
     swept = [c for c in CELLS if c["algo"] in SWEPT_ALGOS]
     anchors = [c for c in CELLS if c["algo"] in ANCHOR_ALGOS]
-    assert len(swept) == 27
-    assert len(anchors) == 9
+    assert len(swept) == 36
+    assert len(anchors) == 6
 
     # Swept algos cover every discovery ablation on every task.
     for task in TASKS:

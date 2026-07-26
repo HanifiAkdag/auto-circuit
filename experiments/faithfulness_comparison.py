@@ -166,7 +166,7 @@ def _group_cells_by_discovery_ablation(loaded, seed: int):
     """Assemble {discovery-ablation D: {task_key: {base_algo_key: PruneScores}}}.
 
     Swept cells land in their own ablation's group; ablation-independent anchors
-    (EAP/GT/Random) are added to *every* group as reference rows. Each loaded cell
+    (GT/Random) are added to *every* group as reference rows. Each loaded cell
     holds exactly one (task, algo) entry; we re-key it to the BASE algo key (the
     variant key "Edge Pruning [zero]" is not in PRUNE_ALGO_DICT, the base
     "Edge Pruning" is) so downstream lookups and legends are clean — the discovery

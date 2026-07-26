@@ -50,9 +50,9 @@ from auto_circuit.types import AblationType
 from auto_circuit.utils.misc import repo_path_to_abs_path
 from experiment_utils import algo_hyperparams, git_state
 
-# Algos that accept an ablation_type parameter (EP, DiscoGP variants, ACDC).
-# EAP is corrupt-only by construction; GT and Random are ablation-independent.
-_ABLATION_AWARE_ALGOS = {"ep", "discogp", "discogp-e", "discogp-ep", "acdc"}
+# Algos that accept an ablation_type parameter (EP, DiscoGP variants, ACDC, EAP).
+# GT and Random are ablation-independent.
+_ABLATION_AWARE_ALGOS = {"ep", "discogp", "discogp-e", "discogp-ep", "acdc", "eap"}
 
 _ALGO_MAP: dict[str, PruneAlgo] = {
     "ep": EDGE_PRUNING_PRUNE_ALGO,
@@ -175,7 +175,7 @@ def main():
     if args.algo in _ABLATION_AWARE_ALGOS:
         algo = make_ablation_variant(base_algo, ablation_type)
     else:
-        algo = base_algo  # EAP / GT / Random: ablation is inherent or irrelevant
+        algo = base_algo  # GT / Random: ablation is irrelevant
 
     task = _build_task(args.task, args.seed, args.null_test)
 

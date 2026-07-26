@@ -10,7 +10,7 @@ one (task, measure, metric) so any subset can be compared interactively:
     double-click = isolate), so you can pick exactly the curves to compare
     (e.g. DiscoGP-EP disc=zero vs disc=resample alongside EP disc=mean).
 
-Anchor algorithms (EAP / GT / Random) have no discovery sweep, so they appear once
+Anchor algorithms (GT / Random) have no discovery sweep, so they appear once
 per eval-ablation as solid reference lines.
 """
 from pathlib import Path
