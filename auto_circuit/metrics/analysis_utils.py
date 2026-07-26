@@ -21,16 +21,28 @@ from auto_circuit.utils.misc import load_cache
 from auto_circuit.utils.tensor_ops import prune_scores_threshold
 
 
-def top_k_edge_set(prune_scores: PruneScores, k: int, edges: Set[Edge]) -> Set[Edge]:
+def top_k_edge_set(
+    prune_scores: PruneScores, k: int, edges: Set[Edge], exclude_zero: bool = False
+) -> Set[Edge]:
     """Return the set of top-k edges by absolute prune score.
 
     Uses the same ranking as run_circuits / prune.py (abs threshold via
     prune_scores_threshold from tensor_ops).
+
+    With ``exclude_zero``, edges with an exactly-zero score are never included even
+    when the k-th largest |score| is 0 (binary GT scores or ACDC's mostly-zero
+    scores at k above their nonzero count would otherwise admit every edge); the
+    circuit then simply stops growing at the number of nonzero-score edges.
     """
     if k == 0:
         return set()
-    threshold = prune_scores_threshold(prune_scores, k)
-    return {e for e in edges if abs(e.prune_score(prune_scores).item()) >= threshold.item()}
+    threshold = prune_scores_threshold(prune_scores, k).item()
+    return {
+        e
+        for e in edges
+        if (s := abs(e.prune_score(prune_scores).item())) >= threshold
+        and (s > 0 or not exclude_zero)
+    }
 
 
 def jaccard(a: Set[Edge], b: Set[Edge]) -> float:

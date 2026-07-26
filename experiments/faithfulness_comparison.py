@@ -63,8 +63,12 @@ from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
 from experiment_utils import git_state, write_manifest
 from interactive_curves import save_interactive_curves
 
-from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS
+from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS
 from run_cell import _ALGO_MAP, _TASK_TEMPLATES
+from similarity_heatmaps import (
+    DEFAULT_SIMILARITY_EDGE_COUNTS,
+    write_all_similarity_heatmaps,
+)
 
 # Base algo keys of the ablation-independent anchors (no discovery sweep).
 _ANCHOR_ALGO_KEYS = {_ALGO_MAP[a].key for a in ANCHOR_ALGOS}
@@ -233,6 +237,11 @@ def main():
     parser.add_argument("--seed", type=int, default=42, help="Seed of the cells to analyse")
     parser.add_argument("--name", default=None, help="Experiment folder name (default: faithfulness_seed<seed>_<date>)")
     parser.add_argument("--no-circuit-graphs", action="store_true", help="Skip circuit-graph HTML")
+    parser.add_argument(
+        "--similarity-edge-counts", type=int, nargs="+",
+        default=DEFAULT_SIMILARITY_EDGE_COUNTS,
+        help="Edge budgets for the cross-cell Jaccard similarity heatmaps",
+    )
     args = parser.parse_args()
 
     loaded = latest_per_cell(load_many_caches(args.cache_dir, "cell_"))
@@ -252,6 +261,7 @@ def main():
         "eval_ablation_types": EVAL_ABLATION_TYPES,
         "patch_types": list(_PATCH_SEMANTICS.values()),
         "metrics_per_task": {k: [m.key for m in ms] for k, ms in TASK_METRICS.items()},
+        "similarity_edge_counts": args.similarity_edge_counts,
         "consumed_cells": consumed,
     }
     write_manifest(experiment_folder / "manifest.json", manifest)
@@ -354,6 +364,16 @@ def main():
                                 "budget_edges": budget,
                                 "value": _value_at_budget(series, budget),
                             })
+
+    # ── Cross-cell circuit-similarity heatmaps (algo x discovery-ablation axes) ──
+    write_all_similarity_heatmaps(
+        groups=groups,
+        discovery_ablations=DISCOVERY_ABLATIONS,
+        algo_order=[_ALGO_MAP[a].key for a in SWEPT_ALGOS],
+        anchor_algo_keys=[_ALGO_MAP[a].key for a in ANCHOR_ALGOS],
+        edge_counts=args.similarity_edge_counts,
+        experiment_folder=experiment_folder,
+    )
 
     # ── Interactive overlay HTMLs (cross-cell comparison) ──
     _write_interactive(experiment_folder, overlay)

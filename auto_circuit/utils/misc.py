@@ -53,7 +53,9 @@ def load_cache(folder_name: str, filename: str) -> Dict[Any, Any]:
         The loaded dictionary.
     """
     folder = repo_path_to_abs_path(folder_name)
-    return t.load(folder / filename)
+    # Caches saved on GPU nodes must stay loadable on CPU-only analysis nodes.
+    map_location = None if t.cuda.is_available() else t.device("cpu")
+    return t.load(folder / filename, map_location=map_location)
 
 
 @contextmanager
