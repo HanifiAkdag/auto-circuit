@@ -86,6 +86,14 @@ def main():
     t.save(merged, cache_path)
     print(f"Saved merged cache to {cache_path}")
 
+    # Partials all ran the same task, so carry their data budget onto the merged cell;
+    # without it the merged cells would be the only ones with no budget recorded.
+    partial_manifest = partials[0].with_name(partials[0].name.replace(".pkl", "_manifest.json"))
+    budget = None
+    if partial_manifest.exists():
+        with open(partial_manifest) as f:
+            budget = json.load(f).get("data_budget")
+
     manifest = {
         "cell": {
             "task": args.task, "algo": "acdc",
@@ -95,6 +103,7 @@ def main():
         "cache_file": cache_path.name,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
         "git": git_state(),
+        "data_budget": budget,
         "merged_from": [f.name for f in partials],
         "note": "tao-split ACDC partials merged by element-wise min (identical to single-process 20-tau sweep).",
     }

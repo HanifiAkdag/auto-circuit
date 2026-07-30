@@ -114,6 +114,21 @@ def _build_null_model(model_def: str, device: t.device) -> t.nn.Module:
     return model
 
 
+def _data_budget(task: Task) -> dict[str, Any]:
+    """Record the data budget: nothing else in the cache identifies it, so cells from
+    different tasks.py settings are otherwise indistinguishable. Both fields may be a
+    scalar (same for train and test) or a (train, test) tuple, as Task.init_task reads
+    them."""
+    pair = lambda v: v if isinstance(v, tuple) else (v, v)  # noqa: E731
+    bs, bc = pair(task.batch_size), pair(task.batch_count)
+    return {
+        "batch_size": task.batch_size,
+        "batch_count": task.batch_count,
+        "train_examples": bs[0] * bc[0],
+        "test_examples": bs[1] * bc[1],
+    }
+
+
 def _build_task(task_short: str, seed: int, null_test: bool) -> Task:
     """Construct a Task from the template, overriding seed (and model for null test)."""
     tmpl = _TASK_TEMPLATES[task_short]
@@ -224,6 +239,7 @@ def main():
         "cache_file": cache_path.name,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
         "git": git_state(),
+        "data_budget": _data_budget(task),
         "algo_hyperparams": algo_hyperparams(algo),
     }
     manifest_path = folder / f"{full_stem}_manifest.json"
