@@ -17,8 +17,11 @@ def git_state() -> dict[str, Any]:
         return subprocess.check_output(cmd, cwd=_REPO_ROOT, text=True).strip()
 
     commit = run(["git", "rev-parse", "HEAD"])
-    status_lines = run(["git", "status", "--porcelain"]).splitlines()
-    dirty_files = [l[3:] for l in status_lines if l.strip()]
+    # Porcelain lines are "XY <path>"; don't strip, the leading space is significant.
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain"], cwd=_REPO_ROOT, text=True
+    )
+    dirty_files = [l[3:] for l in status.splitlines() if l.strip()]
     return {"commit": commit, "dirty": bool(dirty_files), "dirty_files": dirty_files}
 
 
