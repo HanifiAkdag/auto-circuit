@@ -45,7 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from auto_circuit.metrics.analysis_utils import load_many_caches
 from auto_circuit.utils.misc import repo_path_to_abs_path
 
-FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness"
+FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness_v2"
 RESULTS_DIR = "results/edge_prob_diagnostic"
 EPS = 1e-6
 

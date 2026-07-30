@@ -14,7 +14,7 @@ Called by faithfulness_comparison.py after the eval matrix; also runnable standa
 (CPU-only — models are loaded just for the edge graph) to regenerate heatmaps from
 cached cells without re-measuring anything:
 
-  srun python experiments/similarity_heatmaps.py --cache-dir .prune_scores_cache/faithfulness
+  srun python experiments/similarity_heatmaps.py --cache-dir .prune_scores_cache/faithfulness_v2
 """
 import argparse
 import csv
@@ -415,7 +415,7 @@ def main() -> None:
     from run_cell import _ALGO_MAP
 
     parser = argparse.ArgumentParser(description="Circuit-similarity heatmaps from cached cells.")
-    parser.add_argument("--cache-dir", default=".prune_scores_cache/faithfulness")
+    parser.add_argument("--cache-dir", default=".prune_scores_cache/faithfulness_v2")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--out", default=None, help="Output folder (default: results/faithfulness_comparison/similarity_<date>)")
     parser.add_argument("--edge-counts", type=int, nargs="+", default=DEFAULT_SIMILARITY_EDGE_COUNTS)

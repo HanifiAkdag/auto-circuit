@@ -2,7 +2,7 @@
 
 Discovery is run separately as a SLURM array of per-cell jobs
 (`faithfulness_discovery.sh` -> `run_cell.py`), producing one cached `PruneScores` per
-(method, task, discovery-ablation) in `.prune_scores_cache/faithfulness/`. This script
+(method, task, discovery-ablation) in `.prune_scores_cache/faithfulness_v2/`. This script
 LOADS those cells (no retraining), groups them by discovery-ablation, and produces the
 full discovery x eval matrix:
 
@@ -77,7 +77,9 @@ _ANCHOR_ALGO_KEYS = {_ALGO_MAP[a].key for a in ANCHOR_ALGOS}
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 
-FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness"
+# One cache dir per protocol: cells do not record the data budget, so a dir that
+# mixes runs from different tasks.py settings silently mixes budgets in one figure.
+FAITHFULNESS_CACHE_DIR = ".prune_scores_cache/faithfulness_v2"
 RESULTS_DIR = "results/faithfulness_comparison"
 
 # Eval ablations swept for free (no retraining) on every discovered circuit.
