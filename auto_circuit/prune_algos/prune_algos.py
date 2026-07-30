@@ -155,9 +155,8 @@ ACDC_PRUNE_ALGO = PruneAlgo(
     name="ACDC",
     func=partial(
         acdc_prune_scores,
-        tao_exps=list(range(-6, -2)),
-        # tao_exps=[-5],
-        tao_bases=[1],
+        tao_exps=list(range(-5, -1)),
+        tao_bases=[1, 3, 5, 7, 9],
     ),
 )
 MSE_ACDC_PRUNE_ALGO = PruneAlgo(

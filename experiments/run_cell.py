@@ -19,6 +19,7 @@ import random
 import sys
 from copy import deepcopy
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -148,12 +149,20 @@ def main():
     parser.add_argument("--null-test", action="store_true", help="Use randomly-initialized model weights (dead-salmon null)")
     parser.add_argument("--skip-if-exists", action="store_true", help="Skip if this cell is already cached (requeue-safe)")
     parser.add_argument("--force", action="store_true", help="Recompute even if a cache exists")
+    # ACDC-only: split the tao sweep across parallel jobs. Each partial computes a
+    # disjoint subset of tao; the tao passes are independent and merge by element-wise
+    # min (see merge_acdc_partials.py), which is identical to one process running all
+    # tao. --partial-tag makes the cache name unique so partials do not collide.
+    parser.add_argument("--tao-bases", default=None, help="ACDC only: comma-separated tao bases override (e.g. '1,3')")
+    parser.add_argument("--tao-exps", default=None, help="ACDC only: comma-separated tao exps override (e.g. '-5,-4,-3,-2')")
+    parser.add_argument("--partial-tag", default=None, help="Suffix appended to the cache stem (for tao-split partials)")
     args = parser.parse_args()
 
     # ── Cache identity (computed up front so we can skip/resume) ──
     null_tag = "_null" if args.null_test else ""
+    partial_tag = f"__{args.partial_tag}" if args.partial_tag else ""
     algo_slug = args.algo.replace("-", "_")
-    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}"
+    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}{partial_tag}"
     folder = repo_path_to_abs_path(args.output_dir)
     folder.mkdir(parents=True, exist_ok=True)
 
@@ -171,6 +180,20 @@ def main():
 
     ablation_type = _ABLATION_MAP[args.ablation]
     base_algo = _ALGO_MAP[args.algo]
+
+    # ACDC tao-sweep override (partial jobs). partial() lets outer kwargs win, so this
+    # overrides the tao_bases/tao_exps already bound in ACDC_PRUNE_ALGO.func.
+    if args.tao_bases is not None or args.tao_exps is not None:
+        assert args.algo == "acdc", "--tao-bases/--tao-exps are ACDC-only"
+        tao_kwargs: dict[str, Any] = {}
+        if args.tao_bases is not None:
+            tao_kwargs["tao_bases"] = [int(b) for b in args.tao_bases.split(",")]
+        if args.tao_exps is not None:
+            tao_kwargs["tao_exps"] = [int(e) for e in args.tao_exps.split(",")]
+        base_algo = PruneAlgo(
+            key=base_algo.key, name=base_algo.name,
+            func=partial(base_algo.func, **tao_kwargs), _short_name=base_algo.short_name,
+        )
 
     if args.algo in _ABLATION_AWARE_ALGOS:
         algo = make_ablation_variant(base_algo, ablation_type)

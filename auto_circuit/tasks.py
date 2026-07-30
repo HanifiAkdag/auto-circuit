@@ -260,6 +260,12 @@ class Task:
         self.__init_complete__ = True
 
 
+# Shared data budget for the faithfulness spine (IOI / Greater-Than / Docstring), held
+# identical so algorithms see equal data: ACDC reads only the first batch (N = batch_size),
+# DiscoGP's step count is train_batches * epochs. 704 train + 256 test fits the 1000-prompt pools.
+SPINE_BATCH_SIZE: int = 64
+SPINE_BATCH_COUNT: Tuple[int, int] = (11, 4)
+
 SPORTS_PLAYERS_TOKEN_CIRCUIT_TASK: Task = Task(
     key="Sports Players Token Circuit",
     name="Sports Players",
@@ -301,8 +307,8 @@ IOI_COMPONENT_CIRCUIT_TASK: Task = Task(
     name="Indirect Object Identification",
     _model_def="gpt2-small",
     _dataset_name="ioi/ioi_prompts",
-    batch_size=128,
-    batch_count=(6, 1),
+    batch_size=SPINE_BATCH_SIZE,
+    batch_count=SPINE_BATCH_COUNT,
     _true_edge_func=ioi_true_edges,
     token_circuit=False,
 )
@@ -323,8 +329,8 @@ DOCSTRING_TOKEN_CIRCUIT_TASK: Task = Task(
     name="Docstring",
     _model_def="attn-only-4l",
     _dataset_name="docstring_prompts",
-    batch_size=128,
-    batch_count=2,
+    batch_size=SPINE_BATCH_SIZE,
+    batch_count=SPINE_BATCH_COUNT,
     _true_edge_func=docstring_node_based_official_edges,
     token_circuit=True,
 )
@@ -333,8 +339,8 @@ DOCSTRING_COMPONENT_CIRCUIT_TASK: Task = Task(
     name="Docstring",
     _model_def="attn-only-4l",
     _dataset_name="docstring_prompts",
-    batch_size=128,
-    batch_count=2,
+    batch_size=SPINE_BATCH_SIZE,
+    batch_count=SPINE_BATCH_COUNT,
     _true_edge_func=docstring_true_edges,
     token_circuit=False,
 )
@@ -343,8 +349,8 @@ GREATERTHAN_COMPONENT_CIRCUIT_TASK: Task = Task(
     name="Greaterthan",
     _model_def="gpt2-small",
     _dataset_name="greaterthan_gpt2-small_prompts",
-    batch_size=64,
-    batch_count=2,
+    batch_size=SPINE_BATCH_SIZE,
+    batch_count=SPINE_BATCH_COUNT,
     _true_edge_func=greaterthan_true_edges,
     token_circuit=False,
 )
