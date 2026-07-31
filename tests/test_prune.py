@@ -75,6 +75,57 @@ def test_pruning(
     assert t.allclose(circ_outs[3][key].cpu(), t.tensor([[-9.0, -13.0]]), atol=1e-3)
 
 
+@pytest.mark.parametrize("seq_len", [None, 3])
+def test_edge_patch_reverse_is_knockout(
+    micro_model: MicroModel,
+    micro_dataloader: PromptDataLoader,
+    seq_len: Optional[int],
+):
+    """EDGE_PATCH + reverse_clean_corrupt is the knockout direction: run the clean
+    prompt and ablate the circuit. Without the flag it is the denoising direction
+    (corrupt prompt, restore the circuit), which test_pruning pins.
+    """
+    model: PatchableModel = patchable_model(
+        model=micro_model,
+        factorized=True,
+        slice_output="last_seq",
+        seq_len=seq_len,
+        separate_qkv=True,
+        device=DEVICE,
+    )
+    test_loader = micro_dataloader
+    test_batch = next(iter(test_loader))
+    with t.inference_mode():
+        clean_out = model(test_batch.clean)
+
+    edge_dict = dict([((edge.seq_idx, edge.name), edge) for edge in model.edges])
+    seq_idx = None if seq_len is None else seq_len - 1
+    prune_scores: PruneScores = model.new_prune_scores()
+    prune_edges: Dict[Edge, float] = {
+        edge_dict[(seq_idx, "B0.1->Resid End")]: 3.0,
+        edge_dict[(seq_idx, "B0.0->B1.1")]: 2.0,
+        edge_dict[(seq_idx, "Resid Start->B0.0")]: 1.0,
+    }
+    for edge, score in prune_edges.items():
+        prune_scores[edge.dest.module_name][edge.patch_idx] = score
+
+    circ_outs = run_circuits(
+        model=model,
+        dataloader=test_loader,
+        test_edge_counts=[0, 1, 2, 3],
+        prune_scores=prune_scores,
+        patch_type=PatchType.EDGE_PATCH,
+        reverse_clean_corrupt=True,
+    )
+    key = test_batch.key
+
+    # Knocking out nothing must leave the clean model exactly untouched.
+    assert t.allclose(circ_outs[0][key], clean_out[:, -1], atol=1e-3)
+    assert t.allclose(circ_outs[1][key].cpu(), t.tensor([[19.0, 41.0]]), atol=1e-3)
+    assert t.allclose(circ_outs[2][key].cpu(), t.tensor([[13.0, 25.0]]), atol=1e-3)
+    assert t.allclose(circ_outs[3][key].cpu(), t.tensor([[9.0, 13.0]]), atol=1e-3)
+
+
 # model = micro_model()
 # dataloader = micro_dataloader()
 # test_pruning(model, dataloader, seq_len=None, show_graphs=True)
