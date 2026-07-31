@@ -171,3 +171,22 @@ caches remain valid (scores identical) and are reused via `--skip-if-exists`.
 EAP was never "ablation-independent": it was ablation-*bound* (to resample) by the
 registered implementation — the opposite property. GT/Random are the only genuine
 ablation-independent anchors.
+
+## 13. Erratum (2026-07-31): completeness ran the denoising direction
+
+§4 specifies the evaluation axis as `{zero, resample, mean} x {tree-patch, edge-patch}`
+but does not fix which prompt each patch direction runs on. `run_circuits` pairs
+`EDGE_PATCH` with the corrupt prompt by default (a denoising/sufficiency test), and
+`faithfulness_comparison.py` did not pass `reverse_clean_corrupt`, so every completeness
+number produced up to and including the `faithfulness_seed42_2026-07-27` results tree is
+a denoising measurement, not the knockout stated in the code comment.
+
+Diagnostic: completeness KL started at `KL(clean||corrupt)` (3.625 on IOI) at zero edges
+and fell to 0 at the full edge count. A knockout must start at exactly 0 and rise.
+
+Fixed by passing `reverse_clean_corrupt=(patch_type == PatchType.EDGE_PATCH)`.
+Faithfulness, ROC, circuit graphs, and the similarity heatmaps are unaffected: they never
+used `EDGE_PATCH`. Discovery is unaffected: it does not call `run_circuits`. The fix also
+makes the zero and mean eval-ablation columns of the completeness panels interpretable,
+since the ablation now chooses how the circuit is destroyed rather than what is written
+into it.
