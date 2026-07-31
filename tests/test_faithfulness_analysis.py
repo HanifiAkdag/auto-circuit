@@ -55,3 +55,16 @@ def test_grouping_swept_rekeys_and_anchors_in_every_group():
 
     # seed/null filtering: only the 4 valid cells are consumed.
     assert len(consumed) == 4
+
+
+def test_completeness_runs_the_knockout_direction():
+    """Both measures must run on the CLEAN prompt. run_circuits pairs EDGE_PATCH with
+    the corrupt prompt unless reverse_clean_corrupt is set, so completeness needs the
+    flag and faithfulness must not have it.
+    """
+    from auto_circuit.types import PatchType  # noqa: E402
+
+    from faithfulness_comparison import _reverse_clean_corrupt  # noqa: E402
+
+    assert _reverse_clean_corrupt(PatchType.EDGE_PATCH) is True
+    assert _reverse_clean_corrupt(PatchType.TREE_PATCH) is False

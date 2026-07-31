@@ -97,6 +97,12 @@ _PATCH_SEMANTICS = {
     PatchType.EDGE_PATCH: "completeness",
 }
 
+
+def _reverse_clean_corrupt(patch_type: PatchType) -> bool:
+    """Both measures above run on the clean prompt, but run_circuits defaults EDGE_PATCH
+    to the corrupt prompt (denoising). Reverse it so completeness is a knockout."""
+    return patch_type == PatchType.EDGE_PATCH
+
 # Per-task metric selection (spec §3 + hard compatibility). CORRECT_ANSWER_* assert a
 # single tensor answer -> excluded for Greater-Than (list answers). LOGIT_DIFF_PERCENT
 # is unstable on Docstring -> excluded there (KL is the Docstring primary).
@@ -261,7 +267,13 @@ def main():
         "seed": args.seed,
         "discovery_ablations": DISCOVERY_ABLATIONS,
         "eval_ablation_types": EVAL_ABLATION_TYPES,
-        "patch_types": list(_PATCH_SEMANTICS.values()),
+        "patch_types": {
+            measure: {
+                "patch_type": str(pt),
+                "reverse_clean_corrupt": _reverse_clean_corrupt(pt),
+            }
+            for pt, measure in _PATCH_SEMANTICS.items()
+        },
         "metrics_per_task": {k: [m.key for m in ms] for k, ms in TASK_METRICS.items()},
         "similarity_edge_counts": args.similarity_edge_counts,
         "consumed_cells": consumed,
@@ -319,6 +331,7 @@ def main():
                     measurements = measure_prune_metrics(
                         ablation_types=EVAL_ABLATION_TYPES, metrics=metrics,
                         task_prune_scores={task_key: algo_ps}, patch_type=patch_type,
+                        reverse_clean_corrupt=_reverse_clean_corrupt(patch_type),
                     )
                 except Exception as e:
                     print(f"WARNING: measure failed {d}/{measure}/{task.name}: {e}")
