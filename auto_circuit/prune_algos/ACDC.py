@@ -82,8 +82,18 @@ def acdc_prune_scores(
     model = model
     test_model = deepcopy(model) if test_mode else None
     out_slice = model.out_slice
+    # Descending layer, with a total-order tiebreak: model.edges is a set, so sorting
+    # on layer alone leaves the many within-layer ties in a per-process order, which
+    # changes the greedy visit order (and hence the circuit) between identical runs.
     edges: OrderedSet[Edge] = OrderedSet(
-        sorted(model.edges, key=lambda x: x.dest.layer, reverse=True)
+        sorted(
+            model.edges,
+            key=lambda e: (
+                -e.dest.layer,
+                e.name,
+                -1 if e.seq_idx is None else e.seq_idx,
+            ),
+        )
     )
 
     prune_scores = model.new_prune_scores(init_val=t.inf)

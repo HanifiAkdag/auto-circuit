@@ -249,8 +249,11 @@ def edge_pruning_prune_scores(
     # ============================================================
     # Step 5: Build module-name → dest-wrapper lookup
     # ============================================================
+    # Canonical order: the effective-mask loop below builds the autograd graph in this
+    # order, so a per-process order makes the backward accumulate gradients in a
+    # different order, and the float differences compound over training.
     dest_wrapper_dict: Dict[str, PatchWrapperImpl] = {
-        wrapper.module_name: wrapper for wrapper in model.dest_wrappers
+        wrapper.module_name: wrapper for wrapper in model.ordered_dest_wrappers
     }
 
     # ============================================================
