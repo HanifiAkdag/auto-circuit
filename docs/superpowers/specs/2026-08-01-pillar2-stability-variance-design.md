@@ -73,14 +73,22 @@ ACDC on IOI is ~13 GPU-h per cell unsplit, and `yolo` is preemptible with no che
 so a preempted long job restarts from zero. The spine's τ-split is reused for the two
 expensive ACDC tasks.
 
-| stage | script | jobs | per-job |
-|---|---|---|---|
-| A. main array | `stability_discovery.sh` | 165 | median ~3 min |
-| B. ACDC partials | `stability_acdc_partials.sh` | 150 | ~51 min (IOI), ~16 min (GT) |
-| C. merge | `stability_acdc_merge.sh` | 1 (30 merges) | ~1.6 min each |
+| stage | script | units of work | SLURM jobs | per unit |
+|---|---|---|---|---|
+| A. main array | `stability_discovery.sh` | 165 cells | 10 workers | median ~3 min |
+| B. ACDC partials | `stability_acdc_partials.sh` | 150 partials | 10 workers | ~51 min (IOI), ~16 min (GT) |
+| C. merge | `stability_acdc_merge.sh` | 30 merges | 1 | ~1.6 min |
 
 Stage A is the 195 cells minus ACDC × {ioi, gt} × 3 ablations × 5 seeds (= 30), which move
 to stage B. ACDC-docstring is fast and stays in stage A.
+
+**Worker model.** The `yolo` QOS caps a user at **50 submitted and 20 running** jobs, and
+array elements count individually, so a 165-element array is rejected outright. Stages A
+and B are therefore small arrays of *workers*: worker `w` of `N` processes units
+`w, w+N, w+2N, …` sequentially. 10 + 10 workers saturates both the 20-job running cap and
+the 16-GPU `a180` pool. Each unit is still an independent `run_cell.py --skip-if-exists`
+call, so a preempted or failed worker loses at most the unit in flight and a resubmit
+resumes.
 
 Stage B splits the 20-τ sweep by base (5 bases × 4 exponents each). The partials merge by
 element-wise min, which is exactly equivalent to one process running all 20 τ: each τ pass
