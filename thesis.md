@@ -518,6 +518,55 @@
 
 ## Experiments
 
+### Run-to-run nondeterminism is set-iteration order, not GPU floating point — 2026-08-01
+
+- **Context:** Scoping Pillar 2 (stability). Before varying the seed, checked whether re-running the *identical* command reproduces a cell. Probe: `docstring`, seed 42, each cell run twice per node on two nodes (`nelson`, `carl`), caches compared bitwise and by top-k Jaccard.
+- **Observation — same node, same seed, back-to-back runs are not reproducible for three of four algorithms:**
+
+  | algo | bitwise equal | J@50 | J@200 | J@500 |
+  |---|---|---|---|---|
+  | EAP | **yes** | 1.000 | 1.000 | 1.000 |
+  | EP | no | 0.75 / 0.64 | 0.42 / 0.48 | 0.41 / 0.43 |
+  | DiscoGP (paper) | no | 0.33 / 0.16 | 0.40 / 0.33 | 0.46 / 0.36 |
+  | ACDC | no | 0.37 / 0.08 | 0.59 / 0.58 | 0.79 / 0.81 |
+
+  (two values = the nelson and carl replicate pairs.)
+- **It is not GPU floating point.** EAP is *bitwise* identical across same-node repeats, so the forward/backward kernels are deterministic on a fixed device. Cross-node, EAP differs by only `max|Δ| = 3.6e-5` and its top-k ranking is **unchanged** (J = 1.000 at every k), so genuine FP differences are far too small to explain J ≈ 0.4.
+- **Cause: container iteration order is not canonical, and it varies per process.**
+    - `model.edges` is a plain `set` (`graph_utils.py:176`); `model.wrappers` / `model.dest_wrappers` are `Set[PatchWrapperImpl]`, i.e. sets of `nn.Module`, whose hash is identity-based and therefore cannot be pinned by `PYTHONHASHSEED`.
+    - Verified across 3 processes on one node with one seed: `edges`, `srcs` and `dest_wrappers` iteration digests all differ, and ACDC's sorted edge list starts with 6 completely different edges each time.
+    - **EP / DiscoGP:** the seeded RNG stream is consumed in `dest_wrappers` order, so the *same named mask* receives a *different* slice of the stream each run. Verified directly: `blocks.0.hook_k_input`'s first three uniforms differ between processes despite `t.manual_seed(42)`. Mask init and per-step Hard-Concrete/Gumbel noise therefore both change.
+    - **ACDC:** `sorted(model.edges, key=lambda x: x.dest.layer, reverse=True)` (`ACDC.py:85`) sorts on a coarse key with a stable sort, so the many ties within a layer retain set order. The greedy removal order changes, and greedy decisions cascade.
+    - **EAP is immune** because it writes each edge's score into its own slot, so order is irrelevant. `src_ablations` is likewise immune: it explicitly re-sorts by `src_idx` and asserts the result (`ablation_activations.py:129-130`).
+- **`PYTHONHASHSEED=0` does not fix it** (tested end-to-end): EP J@200 = 0.49, DiscoGP 0.53, ACDC 0.56. Confirmed the variable was in effect (string hashes stable across processes). The `nn.Module` identity hashes remain unpinned, so the fix has to be code-level (sort by a total-order key such as `module_name` / `edge.name`), not an environment variable.
+- **Significance:**
+    - Pillar 2 as currently specified would not measure what it claims: re-running one command already gives J@200 ≈ 0.4–0.6, so a seed sweep conflates seed variance with uncontrolled ordering variance. Either pin the order and then vary the seed, or explicitly define and report the same-seed re-run as the noise floor that seed-variance is measured against.
+    - Every cached spine cell is one draw from this distribution. The faithfulness curves remain valid (each cell is a real circuit, discovered under the stated protocol), but **no cell is reproducible from its manifest**, which is a reproducibility caveat the write-up must state.
+    - It also sharpens the per-algorithm stability story: EAP is exactly reproducible, EP/DiscoGP inherit optimization noise, and ACDC's instability is an ordering effect rather than the arithmetic effect previously recorded (erratum applied to the 2026-07-27 entry).
+- **Code pointer / Run:** SLURM jobs 416192 (nelson), 416193 (carl), 416270 (`PYTHONHASHSEED=0`); probe scripts were scratch under `.prune_scores_cache/_dettest/` (gitignored, since deleted). To reproduce: run the same cell twice into two `--output-dir`s and compare the cached `PruneScores` bitwise and by top-k Jaccard; to inspect ordering, digest `[w.module_name for w in model.dest_wrappers]` in several processes. Order-sensitive sites at the time: `graph_utils.py:176`, `ACDC.py:85`, `edge_pruning.py:182-195`, `disco_gp.py:313`.
+- **Follow-up:** fixed the same day, see the next entry.
+
+### Making discovery reproducible: canonical iteration order — 2026-08-01
+
+- **Context:** Fix for the nondeterminism in the previous entry, so Pillar 2 can measure seed variance rather than ordering variance.
+- **Change (3 sites, all "iterate a canonical order instead of a set"):**
+    - `PatchableModel.ordered_dest_wrappers` (new property): `dest_wrappers` sorted by `module_name`. One place to state the invariant; `patch_masks` is now built from it, so its dict order is canonical and every `patch_masks.items()` consumer (EP init, Random, SP, the completeness metrics) inherits the fix.
+    - `edge_pruning.py` and `disco_gp.py`: build `dest_wrapper_dict` from `model.ordered_dest_wrappers`.
+    - `ACDC.py`: sort edges on `(-dest.layer, e.name, seq_idx)` instead of `dest.layer` alone, so the within-layer ties that dominate the greedy sweep have a total order.
+- **Result — same node, same seed, back-to-back runs are now bitwise identical for all four algorithms** (docstring; verified on both nelson and carl, jobs 416289/416290):
+
+  | algo | before (J@200) | after |
+  |---|---|---|
+  | ACDC | 0.59 / 0.58 | **bitwise identical** |
+  | DiscoGP (paper) | 0.40 / 0.33 | **bitwise identical** |
+  | EP | 0.42 / 0.48 | **bitwise identical** |
+  | EAP | already identical | bitwise identical |
+- **EP needed a second fix, and the diagnosis is the interesting part.** After the `patch_masks` fix, EP alone was still irreproducible. It was *not* a kernel: `use_deterministic_algorithms(True)` + `CUBLAS_WORKSPACE_CONFIG=:4096:8` raised no error and did not help, and running EP **twice inside one process** was bitwise identical. Every input (batch contents, weights, initial `edge_log_alphas`/`node_log_alphas`, `in_srcs`) was byte-identical across processes. The culprit was EP's own `dest_wrapper_dict`, still built from the raw set: the effective-mask loop builds the **autograd graph** in that order, so the backward accumulated gradients in a different order. The resulting float difference is invisible for ~138 steps and then compounds: the two runs' loss traces agree exactly to step 138 and diverge at step 139.
+- **Cross-node is still not bitwise reproducible**, and cannot be: different GPU architectures give genuinely different rounding. EAP is unaffected in ranking (max|Δ| 3.6e-5, J = 1.000), but for the optimization-based methods the difference compounds (EP J@200 ≈ 0.65, DiscoGP ≈ 0.91). **Stability runs must therefore pin the node**, or report cross-node variance as a separate, named axis.
+- **Consequence for existing results:** the cached spine cells were discovered under the old arbitrary ordering, so recomputing any cell now gives a different circuit. The curves remain valid (each cell is a real circuit under the stated protocol) but the cache and any re-run are no longer comparable edge-for-edge. Re-running the spine under the fix is what makes it reproducible going forward.
+- **Regression test:** `tests/utils/test_canonical_iteration_order.py` (3 tests) pins `ordered_dest_wrappers` sortedness, `patch_masks` key order, and that ACDC's sort key is a total order with descending layers.
+- **Code pointer / Run:** `auto_circuit/utils/patchable_model.py` (`ordered_dest_wrappers`), `auto_circuit/prune_algos/{edge_pruning,disco_gp,ACDC}.py`, `tests/utils/test_canonical_iteration_order.py`; jobs 416281/416282 (partial fix), 416289/416290 (full fix), 416296 (post-refactor re-check). The EP diagnosis used three throwaway probes (run EP twice in one process; digest every EP input across processes; run under `use_deterministic_algorithms(True)`), all scratch and since deleted.
+
 ### What "completeness" means in the source literature, and how to measure it here — 2026-07-31
 
 - **Context:** Designing the completeness experiment, following the finding that the completeness column ran the opposite patch direction to the one it documents (fixed 2026-07-31; see Notes, 2026-07-27 rev. 2026-07-31). Read Miller et al. (2024) §3.1.5 + Table 3, Wang et al. (2022) §4, the DiscoGP camera-ready (EMNLP 2025) §4-5, Bhaskar et al. (2024) and Conmy et al. (2023).
@@ -752,7 +801,7 @@
 - **Context:** To add points to the coarse ACDC faithfulness curve and reach sparser circuits (prev. entry), widened the τ sweep and built tooling to parallelize the (now slower) discovery. All numbers below predate the concurrent batch-size change to the spine (see [[dataloader-consumption-per-algo]]), so specific edge counts will move; the mechanisms hold.
 - **Config change (`prune_algos.py` `ACDC_PRUNE_ALGO`):** `tao_bases=[1]`, `tao_exps=range(-6,-2)` (4 τ, max `1e-3`) → `tao_bases=[1,3,5,7,9]`, `tao_exps=range(-5,-1)` (20 τ, max `9e-2`). This is AutoCircuit's own default sweep. Gives ~20 curve points instead of ~5 and, via the larger max τ, pushes the left endpoint below the old ~600-edge core.
 - **Cost:** ~5× the old ACDC discovery time (one greedy sweep over all ~32k edges per τ). Measured under the *pre-batch-change* config: docstring (attn-only-4l) ~9 min/cell; GT ~2 h/cell; **IOI ~13 h/cell** (~14 edges/s → ~39 min/τ × 20) — the long pole. (These will change with the new batch size.)
-- **ACDC is not bit-reproducible.** Two identical single-process runs (docstring/resample, same seed, same node) differ by **max 0.027 in score and 546/1281 edges**. Cause: the greedy test `faith - prev_faith < tao` (`ACDC.py:170`) is a hard threshold, so GPU floating-point nondeterminism near the boundary flips keep/remove decisions, which cascade through the greedy sweep. This is intrinsic ACDC seed-instability, not a harness bug — relevant to Pillar 2 (stability) and a caveat on any single-seed ACDC number.
+- **ACDC is not bit-reproducible.** Two identical single-process runs (docstring/resample, same seed, same node) differ by **max 0.027 in score and 546/1281 edges**. ~~Cause: the greedy test `faith - prev_faith < tao` (`ACDC.py:170`) is a hard threshold, so GPU floating-point nondeterminism near the boundary flips keep/remove decisions, which cascade through the greedy sweep.~~ **Erratum (2026-08-01): the GPU-FP attribution is wrong.** The dominant cause is non-canonical set-iteration order changing ACDC's greedy visit order between processes; see [[#run-to-run-nondeterminism-is-set-iteration-order-not-gpu-floating-point--2026-08-01]]. The conclusion (ACDC is not bit-reproducible, a caveat on any single-seed ACDC number) stands.
 - **τ passes are independent → parallelizable.** Each τ starts fresh (`set_all_masks(0)`, `prev_faith=0`) and writes `min(tao, curr)` into a `+inf`-initialised tensor; edges never removed stay `+inf`. So splitting the τ sweep across jobs and taking the **element-wise min** across partials reproduces the single-process result exactly (min is commutative/associative, `+inf` is its identity). Empirically the split differs from a single 20-τ process by the **same 0.027 / ~half the edges** as two identical single runs — i.e. within ACDC's own nondeterminism, so the split is as faithful as ACDC is to itself.
 - **Tooling added:** `run_cell.py` gains `--tao-bases`/`--tao-exps`/`--partial-tag` (ACDC-only; override the bound τ via `partial()` and write uniquely-named partials to a subdir the analysis glob ignores). `experiments/merge_acdc_partials.py` min-merges a cell's partials into one canonical cache + manifest. Launchers (gitignored): `acdc_ioi_partials.sh` (5 τ-bases × 3 ablations = 15 partial jobs, splitting IOI's ~39 GPU-h over ~9 GPUs → ~5 h wall) + `acdc_ioi_merge.sh` (chained via `--dependency=afterok`). Cell-level parallelism was already maxed (9 concurrent cells); the win is spreading the IOI long-pole across more GPUs.
 - **Significance:** Restores ACDC to a comparable point density and reachable sparsity on the faithfulness spine; documents ACDC's intrinsic run-to-run instability (a Pillar-2 signal, not noise to hide); and provides a validated, exact-up-to-nondeterminism parallelization for the expensive ACDC discovery.
