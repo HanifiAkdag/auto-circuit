@@ -567,6 +567,37 @@
 - **Regression test:** `tests/utils/test_canonical_iteration_order.py` (3 tests) pins `ordered_dest_wrappers` sortedness, `patch_masks` key order, and that ACDC's sort key is a total order with descending layers.
 - **Code pointer / Run:** `auto_circuit/utils/patchable_model.py` (`ordered_dest_wrappers`), `auto_circuit/prune_algos/{edge_pruning,disco_gp,ACDC}.py`, `tests/utils/test_canonical_iteration_order.py`; jobs 416281/416282 (partial fix), 416289/416290 (full fix), 416296 (post-refactor re-check). The EP diagnosis used three throwaway probes (run EP twice in one process; digest every EP input across processes; run under `use_deterministic_algorithms(True)`), all scratch and since deleted.
 
+### Pillar-2 stability run complete: 195 cells, and two audit findings — 2026-08-02
+
+- **Context:** Post-run audit of the seed-variance discovery run (`.prune_scores_cache/stability/`, 195 cells = 4 swept algos × 3 tasks × 3 ablations × 5 seeds + Random × 3 tasks × 5 seeds).
+- **Run health:** all SLURM elements `COMPLETED 0:0` (jobs 416307/416309 array, 416310 partials, 416329 merge); 195 pkl + 195 manifests, 150 partials, zero orphans, zero stray `.tmp`, zero load failures. All 30 ACDC merges consumed exactly 5 partials and yielded 21 score levels (20 τ + `inf`). No NaN, no `-inf`, no `+inf` outside ACDC, no degenerate (constant-score) cell. Data budget 704/256 on every manifest.
+- **Finding 1 — one site of the canonical-order fix was missed, and it is the one that silently corrupts *analysis*.** `mask_gradient.py:112` still iterated the raw `model.dest_wrappers` set when assembling its output dict, so EAP (which the spine runs via `mask_gradient_prune_scores`) emitted **15 different key orders across 15 cells**, while EP/DiscoGP/ACDC/Random all emitted the one sorted order.
+    - **Values are unaffected.** The gradients already sit on each wrapper's `patch_mask.grad` before that loop runs, so only dict insertion order varies. This is consistent with EAP having been bitwise-reproducible throughout.
+    - **The hazard is downstream.** Any analysis that flattens `PruneScores` into a single index space (concatenating tensors to compare two runs) silently compares mismatched edges. This produced a spurious "EAP is at the chance floor" reading (J@200 = 0.004 on IOI/GT, identical to Random) that contradicted the correct value.
+    - `analysis_utils.top_k_edge_set` is **immune**, because it resolves scores through `Edge.prune_score(prune_scores)`, i.e. by module name. Pillar-1 results and the heatmaps are therefore unaffected, and the 195 cached cells need no re-run.
+    - Fixed by iterating `ordered_dest_wrappers`; added `test_prune_scores_keys_are_sorted`, which asserts `new_prune_scores()` key order matches `patch_masks`.
+- **Finding 2 — ACDC is the only method with real score ties, and the choice of how to cut them moves the stability number by ≤ 0.06.** ACDC assigns only 21 distinct values over 32 491 edges (score = the τ at which the edge was pruned; `+inf` = never pruned), so a rank-k cut lands inside a block of equal scores. Every other method has near-continuous float scores: the block on the k=200 boundary is **exactly 1 edge** for DiscoGP / EAP / Random, and 1–2 for EP (1–12 at k=1000 where its masks saturate). ACDC's is 8–165 edges, of which 2–91 must be picked.
+    - **Selection is a threshold, not a top-k.** `run_circuits` reads the k-th largest `|score|` and sets `patch_mask = (|score| >= threshold)` per tensor (`prune.py:94`, noted at `:87`), so a straddling tie block is admitted whole. ACDC therefore overshoots the requested budget (request 200 → get 200–353; request 1000 → get 1001–1521) while every other method lands exactly on the request.
+    - **Three defensible pairing rules for the stability comparison.** (a) *Threshold at fixed k*, as above. (b) *`topk` at fixed k*: exact sizes, tie broken by a rule carrying no information. (c) *Matched τ*: ACDC's score **is** τ and the τ sweep is a fixed list, so 20 of 20 levels are shared across seeds (17–18 on docstring, where some τ removed nothing); `{edges with score >= τ}` is then a circuit defined by a shared hyperparameter rather than by an arbitrary size.
+    - **Measured, mean pairwise cross-seed Jaccard near 200 edges:**
+
+      | task / ablation | (a) threshold | (b) topk | (c) matched τ |
+      |---|---|---|---|
+      | docstring / mean | 0.699 | 0.670 | 0.699 |
+      | docstring / resample | 0.708 | 0.648 | 0.647 |
+      | docstring / zero | 0.616 | 0.610 | 0.609 |
+      | gt / mean | 0.746 | 0.747 | 0.746 |
+      | gt / resample | 0.691 | 0.742 | 0.757 |
+      | gt / zero | 0.503 | 0.493 | 0.487 |
+      | ioi / mean | 0.602 | 0.635 | 0.602 |
+      | ioi / resample | 0.653 | 0.656 | 0.653 |
+      | ioi / zero | 0.451 | 0.447 | 0.425 |
+
+    - **The tie question is second-order.** All three rules agree to ≤ 0.06, well inside the spread across ablations (0.43–0.76), so ACDC's stability signal does not depend on how ties are cut. Two secondary effects, both small: a deterministic (index-order) tie-break manufactures ≈ +0.026 median agreement (+0.108 worst, ioi/mean) relative to a randomized tie-break; and unequal sizes under rule (a) cap *individual pairs* at `|A|/|B|` (0.58 for the 204-vs-353 pair), though the mean over pairs barely moves because most pairs are similarly sized.
+    - **Consequence for the Pillar-2 analysis:** use **matched τ** for ACDC. The gain is defensibility rather than accuracy: it compares circuits produced by the same hyperparameter, which is what "re-run the method" means, and its realized sizes come out tight anyway (`[202, 203, 203, 206, 209]` for gt/mean, `[200, 201, 206, 207, 207]` for ioi/resample). Other methods keep the shared k-grid. For cross-method panels, read off ACDC's realized sizes and evaluate the others at exactly those sizes, which they can hit since their boundary blocks are single edges.
+    - **Pillar 1 needs no change, for the same reason.** `run_circuits` stores each result under `patch_edge_count`, the number of edges actually kept (`prune.py:102`), not the requested k. Since the kept set is always a complete tie block, ACDC's faithfulness points already *are* τ-circuits plotted at their true sizes. This is also the mechanism behind the known coarse ACDC curve: several requested budgets fall inside one tie block, produce the identical circuit, and collapse onto the same `patch_edge_count` key. The curve is honest, not degraded; a stability comparison differs only because it must fix a shared coordinate for *two* circuits before comparing them.
+- **Code pointer / Run:** `auto_circuit/prune_algos/mask_gradient.py:112`, `tests/utils/test_canonical_iteration_order.py`; audit scripts kept at `.prune_scores_cache/stability/{audit_cells,validate_cells,seedcheck,overshoot,topk_option,natural_grid,tau_grid}.py`.
+
 ### What "completeness" means in the source literature, and how to measure it here — 2026-07-31
 
 - **Context:** Designing the completeness experiment, following the finding that the completeness column ran the opposite patch direction to the one it documents (fixed 2026-07-31; see Notes, 2026-07-27 rev. 2026-07-31). Read Miller et al. (2024) §3.1.5 + Table 3, Wang et al. (2022) §4, the DiscoGP camera-ready (EMNLP 2025) §4-5, Bhaskar et al. (2024) and Conmy et al. (2023).

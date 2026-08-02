@@ -34,6 +34,20 @@ def test_patch_masks_keys_are_sorted(mini_tl_transformer: tl.HookedTransformer):
     assert list(model.patch_masks) == sorted(model.patch_masks)
 
 
+def test_prune_scores_keys_are_sorted(mini_tl_transformer: tl.HookedTransformer):
+    """Every algo must emit PruneScores in one canonical key order.
+
+    Values are keyed by module name, so a per-process order is harmless to the scores
+    themselves, but it silently breaks any analysis that flattens the dict into a
+    single index space (e.g. concatenating tensors to compare two runs).
+    """
+    model = patchable_model(mini_tl_transformer, factorized=True, separate_qkv=True)
+    expected = sorted(model.patch_masks)
+
+    assert list(model.new_prune_scores()) == expected
+    assert [w.module_name for w in model.ordered_dest_wrappers] == expected
+
+
 def test_acdc_edge_order_is_a_total_order(mini_tl_transformer: tl.HookedTransformer):
     """Layer alone leaves within-layer ties in set order; the key must break them."""
     model = patchable_model(mini_tl_transformer, factorized=True, separate_qkv=True)
