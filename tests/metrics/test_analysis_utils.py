@@ -5,11 +5,22 @@ import numpy as np
 import torch as t
 
 from auto_circuit.metrics.analysis_utils import (
+    Budget,
+    budget_mask,
+    budget_threshold,
+    edge_index,
+    edge_score_vector,
     extract_metric,
     jaccard,
     latest_per_cell,
     load_many_caches,
+    mutual_iou,
     overlap_matrix,
+    pairwise_jaccard,
+    pairwise_stats,
+    realised_edge_count,
+    select_edges,
+    selection_frequency,
     top_k_edge_set,
 )
 from auto_circuit.model_utils.micro_model_utils import MicroModel
@@ -64,12 +75,83 @@ def test_overlap_matrix():
     for i, e in enumerate(es[3:6]):      # top-3 of B (disjoint from A)
         ps_b[e.dest.module_name][e.patch_idx] = float(10 - i)
 
-    m = overlap_matrix([ps_a, ps_a, ps_b], k=3, edges=edges)
+    m = overlap_matrix([ps_a, ps_a, ps_b], budget=3, edges=edges)
     assert m.shape == (3, 3)
     assert np.allclose(np.diag(m), 1.0)   # self-overlap
     assert m[0, 1] == 1.0                  # identical runs
     assert m[0, 2] == 0.0                  # disjoint runs
     assert np.allclose(m, m.T)             # symmetric
+
+
+def _scored(model: PatchableModel, values: dict) -> dict:
+    ps = model.new_prune_scores()
+    es = sorted(model.edges, key=lambda e: e.name)
+    for i, v in values.items():
+        ps[es[i].dest.module_name][es[i].patch_idx] = float(v)
+    return ps
+
+
+def test_edge_score_vector_is_key_order_invariant():
+    """The vectorised path must key on edge identity, never on dict iteration order.
+
+    Cached cells on disk were written under many different PruneScores key orders, so a
+    comparison that indexed by dict order would silently compare unrelated edges.
+    """
+    model = _micro_patchable()
+    ps = _scored(model, {0: 10.0, 1: 9.0, 2: 8.0})
+    shuffled = dict(reversed(list(ps.items())))
+    assert list(shuffled) != list(ps)
+
+    index = edge_index(model.edges, ps)
+    assert np.array_equal(
+        edge_score_vector(index, ps), edge_score_vector(index, shuffled)
+    )
+    # Same multiset of scores as the flat tensors: the order is a permutation, not a subset.
+    flat = t.cat([v.flatten().abs() for v in ps.values()]).cpu().numpy()
+    assert len(index) == model.n_edges
+    assert np.array_equal(
+        np.sort(edge_score_vector(index, ps)), np.sort(flat.astype(np.float64))
+    )
+
+
+def test_budget_mask_matches_edge_set_path_across_a_tie_block():
+    model = _micro_patchable()
+    es = sorted(model.edges, key=lambda e: e.name)
+    ps = _scored(model, {0: 10.0, 1: 5.0, 2: 5.0, 3: 5.0, 4: 1.0})
+    index = edge_index(model.edges, ps)
+    scores = edge_score_vector(index, ps)
+
+    for k in (1, 2, 3, 4, 5):
+        budget = Budget("top_k", k)
+        from_edges = select_edges(ps, budget, model.edges)
+        from_vector = {index.edges[i] for i in np.flatnonzero(budget_mask(scores, budget))}
+        assert from_edges == from_vector
+    # Requesting 2 admits the whole 3-edge tie block, exactly as run_circuits does.
+    assert len(select_edges(ps, Budget("top_k", 2), model.edges)) == 4
+    assert realised_edge_count(ps, Budget("threshold", 5.0), model.edges) == 4
+    assert select_edges(ps, Budget("threshold", 5.0), model.edges) == set(es[:4])
+
+
+def test_pairwise_stats_uses_only_distinct_pairs():
+    mat = np.array([[1.0, 0.2, 0.4], [0.2, 1.0, 0.6], [0.4, 0.6, 1.0]])
+    stats = pairwise_stats(mat)
+    assert stats["n_pairs"] == 3                       # not 9, and not 6
+    assert np.isclose(stats["mean"], 0.4)              # diagonal excluded
+    assert stats["min"] == 0.2 and stats["max"] == 0.6
+
+
+def test_mutual_iou_and_selection_frequency():
+    identical = np.array([[True, True, False]] * 3)
+    assert mutual_iou(identical) == (1.0, 2, 2)
+    assert list(selection_frequency(identical)) == [0, 0, 0, 2]
+
+    disjoint = np.array(
+        [[True, False, False], [False, True, False], [False, False, True]]
+    )
+    assert mutual_iou(disjoint) == (0.0, 0, 3)
+    assert list(selection_frequency(disjoint)) == [0, 3, 0, 0]
+    assert np.allclose(np.diag(pairwise_jaccard(disjoint)), 1.0)
+    assert pairwise_jaccard(disjoint)[0, 1] == 0.0
 
 
 def test_load_many_caches_and_extract_metric(tmp_path):
