@@ -302,8 +302,10 @@ def disco_gp_prune_scores(
         model, dataloader, ablation_type=ablation_type, clean_corrupt=clean_corrupt
     )
 
+    # Canonical order: edge_logits are initialised in this order, so a per-process
+    # order would hand each mask a different slice of the seeded RNG stream.
     dest_wrapper_dict: Dict[str, PatchWrapperImpl] = {
-        w.module_name: w for w in model.dest_wrappers
+        w.module_name: w for w in model.ordered_dest_wrappers
     }
 
     edge_logits: Dict[str, nn.Parameter] = {}

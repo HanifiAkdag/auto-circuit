@@ -112,7 +112,7 @@ class PatchableModel(t.nn.Module):
         self.src_wrappers = src_wrappers
         self.dest_wrappers = dest_wrappers
         self.patch_masks = {}
-        for dest_wrapper in self.dest_wrappers:
+        for dest_wrapper in self.ordered_dest_wrappers:
             self.patch_masks[dest_wrapper.module_name] = dest_wrapper.patch_mask
         self.out_slice = out_slice
         self.is_factorized = is_factorized
@@ -167,6 +167,18 @@ class PatchableModel(t.nn.Module):
             batch_size = args[0].shape[0]
             kv = self.kv_caches[batch_size]
             return self.wrapped_model.input_to_embed(*args, past_kv_cache=kv, **kwargs)
+
+    @property
+    def ordered_dest_wrappers(self) -> List[PatchWrapperImpl]:
+        """
+        `dest_wrappers` in a canonical order.
+
+        `dest_wrappers` is a set of `nn.Module`s, so it is identity-hashed and its
+        iteration order differs between processes. Any algorithm that draws random
+        masks, or builds an autograd graph, in that order would otherwise produce a
+        different result on every run from the same seed. Iterate this instead.
+        """
+        return sorted(self.dest_wrappers, key=lambda w: w.module_name)
 
     def new_prune_scores(self, init_val: float = 0.0) -> PruneScores:
         """

@@ -15,6 +15,7 @@ See docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md §3
 """
 import argparse
 import json
+import os
 import random
 import sys
 from copy import deepcopy
@@ -184,7 +185,13 @@ def main():
     # Requeue/restart-safe: a cancelled-then-requeued array task whose cell already
     # finished exits immediately instead of recomputing.
     if args.skip_if_exists and not args.force:
-        existing = sorted(folder.glob(f"{base_filename}-*.pkl"))
+        # A .pkl is only "cached" if its manifest landed too. A job killed between the
+        # two writes leaves an orphan .pkl; treating that as done would silently drop
+        # the cell from the analysis, which keys off manifests.
+        existing = [
+            p for p in sorted(folder.glob(f"{base_filename}-*.pkl"))
+            if (folder / f"{p.stem}_manifest.json").exists()
+        ]
         if existing:
             print(f"Cell already cached ({existing[-1].name}); skipping. Use --force to recompute.")
             return
@@ -224,7 +231,11 @@ def main():
     dt_string = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     full_stem = f"{base_filename}-{dt_string}"
     cache_path = folder / f"{full_stem}.pkl"
-    t.save(task_prune_scores, cache_path)
+    # Write-then-rename: on a preemptible partition a direct write can be truncated by
+    # SIGKILL, and a torn .pkl at the final name would be mistaken for a finished cell.
+    tmp_cache = cache_path.with_name(cache_path.name + ".tmp")
+    t.save(task_prune_scores, tmp_cache)
+    os.replace(tmp_cache, cache_path)
     print(f"Saved cache to {cache_path}")
 
     manifest = {
@@ -243,8 +254,10 @@ def main():
         "algo_hyperparams": algo_hyperparams(algo),
     }
     manifest_path = folder / f"{full_stem}_manifest.json"
-    with open(manifest_path, "w") as f:
+    tmp_manifest = manifest_path.with_name(manifest_path.name + ".tmp")
+    with open(tmp_manifest, "w") as f:
         json.dump(manifest, f, indent=2, default=_serialize)
+    os.replace(tmp_manifest, manifest_path)
     print(f"Saved manifest to {manifest_path}")
 
 

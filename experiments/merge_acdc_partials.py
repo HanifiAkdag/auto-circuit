@@ -14,6 +14,7 @@ Usage:
 """
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -83,7 +84,11 @@ def main():
     dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     stem_out = f"cell_{args.task}_acdc_{args.ablation}_seed{args.seed}-{dt}"
     cache_path = out / f"{stem_out}.pkl"
-    t.save(merged, cache_path)
+    # Write-then-rename, as in run_cell.py: a direct write truncated by preemption would
+    # leave a torn .pkl under the final name.
+    tmp_cache = cache_path.with_name(cache_path.name + ".tmp")
+    t.save(merged, tmp_cache)
+    os.replace(tmp_cache, cache_path)
     print(f"Saved merged cache to {cache_path}")
 
     # Partials all ran the same task, so carry their data budget onto the merged cell;
@@ -107,8 +112,11 @@ def main():
         "merged_from": [f.name for f in partials],
         "note": "tao-split ACDC partials merged by element-wise min (identical to single-process 20-tau sweep).",
     }
-    with open(out / f"{stem_out}_manifest.json", "w") as f:
+    manifest_path = out / f"{stem_out}_manifest.json"
+    tmp_manifest = manifest_path.with_name(manifest_path.name + ".tmp")
+    with open(tmp_manifest, "w") as f:
         json.dump(manifest, f, indent=2, default=_serialize)
+    os.replace(tmp_manifest, manifest_path)
     print(f"Saved manifest to {out / (stem_out + '_manifest.json')}")
 
 

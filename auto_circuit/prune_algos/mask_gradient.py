@@ -109,7 +109,7 @@ def mask_gradient_prune_scores(
                     loss.backward()
 
     prune_scores: PruneScores = {}
-    for dest_wrapper in model.dest_wrappers:
+    for dest_wrapper in model.ordered_dest_wrappers:
         grad = dest_wrapper.patch_mask.grad
         assert grad is not None
         prune_scores[dest_wrapper.module_name] = grad.detach().clone()
