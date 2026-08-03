@@ -342,14 +342,26 @@ def fig_jaccard_compact(rows: List[dict]) -> go.Figure:
 
 def fig_selection_frequency(summary: List[dict]) -> go.Figure:
     tasks, algos = _tasks(summary), _algos(summary)
+    # Name each panel with the circuit size it is cut at: the task's ground-truth count.
+    sizes = {
+        t: next((r["true_edge_count"] for r in summary if r["task"] == t), None)
+        for t in tasks
+    }
     fig = make_subplots(
         rows=1,
         cols=len(tasks),
         shared_yaxes=True,
-        subplot_titles=[TASK_DISPLAY.get(t, t) for t in tasks],
+        subplot_titles=[
+            f"{TASK_DISPLAY.get(t, t)} · {sizes[t]:,.0f}-edge circuits"
+            if sizes[t] else TASK_DISPLAY.get(t, t)
+            for t in tasks
+        ],
         # Wide enough that the union size printed past each bar clears the next panel.
         horizontal_spacing=0.075,
     )
+    # Restyle the panel titles now, before the union-size labels are added: the helper
+    # sweeps every annotation, and those labels must stay small and muted.
+    _facet_titles(fig)
     labels: List[str] = []
     for algo in algos:
         for ablation in (["anchor"] if algo == "Random" else ABLATION_ORDER):
@@ -390,29 +402,38 @@ def fig_selection_frequency(summary: List[dict]) -> go.Figure:
                 row=1,
                 col=task_i,
             )
+        # The union size is what every bar is normalised by, so it is printed per row
+        # and named by a column header rather than left as a bare number.
+        suffix = f"{task_i if task_i > 1 else ''}"
+        fig.add_annotation(
+            x=1.005, xref=f"x{suffix} domain", xanchor="left",
+            y=1.02, yref=f"y{suffix} domain", yanchor="bottom",
+            text="edges in<br>union", showarrow=False, align="left",
+            font=dict(size=9.5, color=INK_MUTED, family=FONT_FAMILY),
+        )
         for label in labels:
             row = by_label.get(label)
             if row:
                 fig.add_annotation(
-                    x=1.005, y=label, xref=f"x{task_i if task_i > 1 else ''} domain",
-                    yref=f"y{task_i if task_i > 1 else ''}", xanchor="left",
-                    text=f"{row['n_union']}", showarrow=False,
-                    font=dict(size=10, color=INK_MUTED, family=FONT_FAMILY),
+                    x=1.005, y=label, xref=f"x{suffix} domain",
+                    yref=f"y{suffix}", xanchor="left",
+                    text=f"{row['n_union']:,.0f}", showarrow=False,
+                    font=dict(size=10.5, color=INK_MUTED, family=FONT_FAMILY),
                 )
 
-    apply_theme(fig, width=1180, height=640, margin_left=150)
+    apply_theme(fig, width=1180, height=680, margin_left=150)
     header(
         fig,
         "What the union of five seed circuits is made of",
-        "Share of the union selected by exactly n of the five seeds, at the published "
-        "circuit size. Grey number: size of the union.",
-        top=165,
+        "Share of the union selected by exactly n of the five seeds. Union: every edge any "
+        "seed selected. ACDC is matched by threshold, so its size is approximate.",
+        top=200,
         right=60,
+        legend_y=1.13,
     )
     fig.update_layout(barmode="stack", bargap=0.35)
     fig.update_xaxes(range=[0, 1], tickformat=".0%", title=dict(text="Share of union"))
     fig.update_yaxes(autorange="reversed", categoryorder="array", categoryarray=labels)
-    _facet_titles(fig)
     return fig
 
 
