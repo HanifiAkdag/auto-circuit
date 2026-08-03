@@ -33,7 +33,6 @@ from plotly.subplots import make_subplots
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.utils.plot_theme import (
-    AXIS,
     DISC_DASH,
     DISC_SYMBOL,
     FONT_FAMILY,
@@ -44,11 +43,9 @@ from auto_circuit.utils.plot_theme import (
     algo_colors,
     algo_symbols,
     apply_theme,
+    header,
     is_anchor,
 )
-
-# Méloux et al. (2025), quoted as their reference bar and not as a criterion of ours.
-STABLE_BAR = 0.80
 
 ALGO_ORDER = ["EP", "DiscoGP", "ACDC", "EAP", "Random"]
 ABLATION_ORDER = ["zero", "resample", "mean"]
@@ -120,23 +117,6 @@ def _band(fig, xs, lo, hi, color: str, row: int, col: int) -> None:
 def _facet_titles(fig, size: int = 14) -> None:
     """Subplot titles are annotations; only the column headers exist, so restyle them all."""
     fig.for_each_annotation(lambda a: a.update(font=dict(size=size, color=INK_PRIMARY)))
-
-
-def _header(fig, title: str, subtitle: str, *, top: int = 170, right: int = 120) -> None:
-    """Title above, legend below it. apply_theme parks the legend at y=1.07, which a
-    two-line title would otherwise sit on top of."""
-    fig.update_layout(
-        margin=dict(t=top, r=right),
-        title=dict(
-            text=f"{title}<br><sup>{subtitle}</sup>",
-            font=dict(size=15, color=INK_PRIMARY),
-            x=0.0,
-            xanchor="left",
-            y=0.965,
-            yanchor="top",
-        ),
-        legend=dict(y=1.03),
-    )
 
 
 def _grid(tasks: List[str], ablations: List[str]):
@@ -216,17 +196,15 @@ def fig_jaccard_vs_budget(rows: List[dict]) -> go.Figure:
                     row=r_i,
                     col=task_i,
                 )
-            fig.add_hline(
-                y=STABLE_BAR, line=dict(color=INK_MUTED, width=1, dash="dot"),
-                row=r_i, col=task_i,
-            )
 
     apply_theme(fig, width=1080, height=960, margin_left=96)
-    _header(
+    header(
         fig,
         "Circuit agreement across five discovery seeds",
-        "line: mean pairwise Jaccard · band: min–max over the seed pairs · dotted: the "
-        "0.8 bar of Méloux et al. (2025)",
+        "Jaccard overlap of the top-k edge sets, averaged over the ten seed pairs. "
+        "Band spans those pairs.",
+        top=170,
+        right=120,
     )
     fig.update_yaxes(range=[0, 1], tickformat=".0%", dtick=0.25)
     fig.update_xaxes(type="log", dtick=1, exponentformat="power", minor_ticks="outside")
@@ -278,11 +256,12 @@ def fig_mutual_iou_vs_budget(rows: List[dict]) -> go.Figure:
                 )
 
     apply_theme(fig, width=1080, height=960, margin_left=96)
-    _header(
+    header(
         fig,
         "Edges recovered by all five seeds at once",
-        "|∩ of five| / |∪ of five| · always below the mean pairwise Jaccard, and the gap "
-        "is agreement that is pair-specific",
+        "Size of the intersection of the five top-k edge sets, over the size of their union.",
+        top=170,
+        right=120,
     )
     fig.update_yaxes(range=[0, 1], tickformat=".0%", dtick=0.25)
     fig.update_xaxes(type="log", dtick=1, exponentformat="power", minor_ticks="outside")
@@ -337,15 +316,13 @@ def fig_jaccard_compact(rows: List[dict]) -> go.Figure:
                     row=1,
                     col=task_i,
                 )
-        fig.add_hline(
-            y=STABLE_BAR, line=dict(color=INK_MUTED, width=1, dash="dot"), row=1, col=task_i
-        )
     apply_theme(fig, width=1300, height=560, margin_left=100)
-    _header(
+    header(
         fig,
         "Circuit agreement across seeds, every discovery protocol",
-        "mean pairwise Jaccard · colour = algorithm, dash = discovery ablation",
-        top=110,
+        "Mean pairwise Jaccard of the top-k edge sets. Colour: algorithm. Dash: discovery "
+        "ablation.",
+        top=130,
         right=250,
     )
     fig.update_layout(
@@ -370,7 +347,8 @@ def fig_selection_frequency(summary: List[dict]) -> go.Figure:
         cols=len(tasks),
         shared_yaxes=True,
         subplot_titles=[TASK_DISPLAY.get(t, t) for t in tasks],
-        horizontal_spacing=0.035,
+        # Wide enough that the union size printed past each bar clears the next panel.
+        horizontal_spacing=0.075,
     )
     labels: List[str] = []
     for algo in algos:
@@ -423,12 +401,12 @@ def fig_selection_frequency(summary: List[dict]) -> go.Figure:
                 )
 
     apply_theme(fig, width=1180, height=640, margin_left=150)
-    _header(
+    header(
         fig,
         "What the union of five seed circuits is made of",
-        "share of |∪| found by exactly n seeds, at the published circuit size · dark = "
-        "the reproducible core · grey number = |∪|",
-        top=150,
+        "Share of the union selected by exactly n of the five seeds, at the published "
+        "circuit size. Grey number: size of the union.",
+        top=165,
         right=60,
     )
     fig.update_layout(barmode="stack", bargap=0.35)
@@ -518,9 +496,6 @@ def fig_stability_vs_function(summary: List[dict]) -> Optional[go.Figure]:
                 row=1,
                 col=task_i,
             )
-        fig.add_vline(
-            x=STABLE_BAR, line=dict(color=AXIS, width=1, dash="dash"), row=1, col=task_i
-        )
 
     # Colour carries the algorithm, so the symbol key needs its own neutral legend block.
     for ablation in ABLATION_ORDER:
@@ -543,22 +518,18 @@ def fig_stability_vs_function(summary: List[dict]) -> Optional[go.Figure]:
         )
 
     apply_theme(fig, width=1180, height=580, margin_left=110)
-    _header(
+    header(
         fig,
         "Structural instability against functional instability",
-        "at the published circuit size · x: mean pairwise Jaccard with its min–max range "
-        "· y: standard deviation of the task metric across the five seeds, in the "
-        "metric's own units · symbol = discovery ablation",
-        top=150,
+        "One marker per algorithm and discovery ablation, at the published circuit size. "
+        "Horizontal bar: min-max Jaccard. Symbol: discovery ablation.",
+        top=165,
         right=40,
     )
     fig.update_xaxes(range=[0, 1], tickformat=".0%", title=dict(text="Pairwise Jaccard"))
     fig.update_yaxes(rangemode="tozero")
     fig.update_yaxes(
-        title=dict(
-            text="Spread of the task metric<br><sup>sd across seeds · lower = behaviour "
-            "reproduces</sup>"
-        ),
+        title=dict(text="Task metric, sd across seeds"),
         col=1,
     )
     _facet_titles(fig)
@@ -627,11 +598,12 @@ def fig_faithfulness_spread(
                 col=col,
             )
     apply_theme(fig, width=1280, height=580, margin_left=110)
-    _header(
+    header(
         fig,
         f"{TASK_DISPLAY.get(task, task)} · {metric} across five seeds",
-        "line: mean over seeds · band: min–max · evaluated under the discovery ablation",
-        top=140,
+        "Line: mean over the five seeds. Band: min-max. Each panel is evaluated under its "
+        "own discovery ablation.",
+        top=155,
         right=40,
     )
     fig.update_xaxes(

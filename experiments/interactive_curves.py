@@ -28,6 +28,8 @@ from auto_circuit.utils.plot_theme import (
     INK_MUTED,
     algo_colors,
     apply_theme,
+    header,
+    title_markup,
 )
 
 # One overlaid line: its algo, discovery label, eval label and (edges, value) series.
@@ -109,6 +111,9 @@ def save_interactive_curves(
         )
         trace_eval.append(ev)
 
+    def _sub(ev: str) -> str:
+        return f"Eval ablation: {ev}. Colour: algorithm. Dash: discovery ablation."
+
     # Dropdown: pick the eval-ablation (shows only that eval's lines).
     buttons = []
     for ev in eval_labels:
@@ -119,19 +124,14 @@ def save_interactive_curves(
             dict(
                 label=f"eval = {ev}",
                 method="update",
-                args=[{"visible": vis}, {"title.text": f"{title} — eval-ablation: {ev}"}],
+                args=[{"visible": vis}, {"title.text": title_markup(title, _sub(ev))}],
             )
         )
     active = next((i for i, b in enumerate(buttons) if b["label"] == f"eval = {default_eval}"), 0)
 
     apply_theme(fig, width=1080, height=640, margin_left=100)
+    header(fig, title, _sub(default_eval), top=140)
     fig.update_layout(
-        title=dict(
-            text=f"{title} — eval-ablation: {default_eval}",
-            font=dict(size=15, color="#0b0b0b"),
-            x=0.0,
-            xanchor="left",
-        ),
         # dtick=1 on a log axis = one label per power of ten (10, 100, 1000, …)
         # instead of Plotly's default 1,2,5 per-decade labels; minor ticks stay
         # as unlabeled gridlines for orientation.
