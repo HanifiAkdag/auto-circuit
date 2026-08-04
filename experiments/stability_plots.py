@@ -572,11 +572,6 @@ def _panel_points(
     return points
 
 
-def _chance_at(struct: Dict[tuple, List[dict]], task: str, target: float) -> Optional[float]:
-    row = _pick_budget(struct.get((task, "Random", "anchor"), []), target)
-    return row["jaccard_mean"] if row else None
-
-
 def _published_sizes(summary: List[dict], tasks: List[str]) -> Dict[str, float]:
     return {
         t: next((r["true_edge_count"] for r in summary if r["task"] == t), 0) for t in tasks
@@ -737,13 +732,6 @@ def fig_stability_vs_function(
                     xanchor="right", yanchor="top", showarrow=False,
                     font=dict(size=11.5, color=INK_SECONDARY, family=FONT_FAMILY),
                 )
-            chance = _chance_at(struct, task, published[task])
-            if chance is not None:
-                fig.add_vline(
-                    x=chance,
-                    line=dict(color=INK_MUTED, width=1, dash="dot"),
-                    row=row_i, col=col_i,
-                )
             fig.update_yaxes(rangemode="tozero", row=row_i, col=col_i)
 
     _ablation_key(fig)
@@ -753,7 +741,7 @@ def fig_stability_vs_function(
         "Structural instability against functional instability",
         "One marker per algorithm and discovery ablation, at the published circuit size.<br>"
         "Rows are metrics, columns are tasks; each panel carries its Spearman ρ. "
-        "Bar: min-max Jaccard. Dotted line: the Random anchor.",
+        "Bar: min-max Jaccard over the ten seed pairs.",
         top=215,
         right=40,
         legend_y=1.035,
@@ -789,8 +777,8 @@ def fig_stability_vs_function_slider(
     """The same plane, swept over circuit size.
 
     A single budget is one slice of a moving picture: pairwise Jaccard rises with k for
-    every method, including the Random anchor, so any ordering read off one panel has to
-    survive the sweep to mean anything.
+    every method, so any ordering read off one panel has to survive the sweep to mean
+    anything.
     """
     if not structural or not functional:
         return None
@@ -814,17 +802,12 @@ def fig_stability_vs_function_slider(
             for algo in algos:
                 for ablation in ABLATION_ORDER:
                     slots.append((row_i, col_i, task, metric, f"{algo}|{ablation}"))
-            slots.append((row_i, col_i, task, metric, None))
 
     frames: Dict[int, List[dict]] = {}
     ceilings: Dict[Tuple[int, int], float] = {}
     for step, (_, targets) in enumerate(budgets):
         payload = []
         for row_i, col_i, task, metric, who in slots:
-            if who is None:
-                chance = _chance_at(struct, task, targets[task])
-                payload.append(dict(x=[chance, chance] if chance else [], y=[0, 0]))
-                continue
             algo, ablation = who.split("|")
             found = [
                 p for p in _panel_points(
@@ -848,17 +831,6 @@ def fig_stability_vs_function_slider(
     initial = frames[0]
     for slot, data in zip(slots, initial):
         row_i, col_i, task, metric, who = slot
-        if who is None:
-            top = ceilings.get((row_i, col_i), 1.0) * 1.08
-            fig.add_trace(
-                go.Scatter(
-                    x=data["x"], y=[0, top], mode="lines",
-                    line=dict(color=INK_MUTED, width=1, dash="dot"),
-                    hoverinfo="skip", showlegend=False,
-                ),
-                row=row_i, col=col_i,
-            )
-            continue
         algo, ablation = who.split("|")
         fig.add_trace(
             go.Scatter(
@@ -896,11 +868,7 @@ def fig_stability_vs_function_slider(
                 args=[
                     {
                         "x": [d["x"] for d in payload],
-                        "y": [
-                            [0, ceilings.get((s[0], s[1]), 1.0) * 1.08]
-                            if s[4] is None else d["y"]
-                            for s, d in zip(slots, payload)
-                        ],
+                        "y": [d["y"] for d in payload],
                         "error_x.array": [d.get("hi", []) for d in payload],
                         "error_x.arrayminus": [d.get("lo", []) for d in payload],
                         "customdata": [
@@ -918,8 +886,8 @@ def fig_stability_vs_function_slider(
         fig,
         "Structural instability against functional instability, by circuit size",
         "One marker per algorithm and discovery ablation. Drag the slider to change the "
-        "edge budget.<br>Rows are metrics, columns are tasks. Bar: min-max Jaccard. "
-        "Dotted line: the Random anchor, which also moves with the budget.",
+        "edge budget.<br>Rows are metrics, columns are tasks. "
+        "Bar: min-max Jaccard over the ten seed pairs.",
         top=225,
         right=40,
         legend_y=1.03,
