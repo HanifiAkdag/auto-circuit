@@ -619,29 +619,23 @@ def _stability_grid(tasks: List[str]):
     return fig
 
 
-def _metric_row_labels(fig, n_cols: int, inset_px: int = 20) -> None:
-    """Name each metric down the left edge, clear of the axis titles.
+def _metric_axes(fig, x_title: str = "Pairwise Jaccard", x_y: float = -0.055) -> None:
+    """Name the metric on its row's y-axis, and the shared x once under the whole grid.
 
-    Annotation paper coordinates span the area *inside* the margins, so reaching the canvas
-    edge means going negative. Convert from pixels so the label stays put at any width.
+    Every panel shares one x quantity and one kind of y, so per-panel titles would repeat
+    the same two strings nine times. The metric belongs on the axis it scales rather than
+    in a separate strip down the edge.
     """
-    width = fig.layout.width or 1180
-    left = fig.layout.margin.l or 80
-    plot_width = width - left - (fig.layout.margin.r or 40)
-    for i, metric in enumerate(ROW_METRICS):
-        _, (y0, y1) = _panel_box(fig, i + 1, 1, n_cols)
-        fig.add_annotation(
-            text=f"<b>{METRIC_GLOSS.get(metric, metric)}</b>",
-            xref="paper",
-            yref="paper",
-            x=(inset_px - left) / plot_width,
-            y=(y0 + y1) / 2,
-            xanchor="center",
-            yanchor="middle",
-            showarrow=False,
-            textangle=-90,
-            font=dict(size=12.5, color=INK_PRIMARY, family=FONT_FAMILY),
+    for i, metric in enumerate(ROW_METRICS, start=1):
+        fig.update_yaxes(
+            title=dict(text=f"sd of {METRIC_GLOSS.get(metric, metric)}"), row=i, col=1
         )
+    fig.add_annotation(
+        text=x_title,
+        xref="paper", yref="paper", x=0.5, y=x_y,
+        xanchor="center", yanchor="top", showarrow=False,
+        font=dict(size=13, color=INK_SECONDARY, family=FONT_FAMILY),
+    )
 
 
 def _ablation_key(fig) -> None:
@@ -753,7 +747,7 @@ def fig_stability_vs_function(
             fig.update_yaxes(rangemode="tozero", row=row_i, col=col_i)
 
     _ablation_key(fig)
-    apply_theme(fig, width=1180, height=1120, margin_left=165)
+    apply_theme(fig, width=1180, height=1120, margin_left=115)
     header(
         fig,
         "Structural instability against functional instability",
@@ -764,10 +758,9 @@ def fig_stability_vs_function(
         right=40,
         legend_y=1.035,
     )
-    _metric_row_labels(fig, len(tasks))
     fig.update_xaxes(range=[0, 1], tickformat=".0%")
-    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
-    fig.update_yaxes(title=dict(text="sd across seeds"), col=1)
+    _metric_axes(fig)
+    fig.update_layout(margin=dict(b=95))
     return fig
 
 
@@ -920,7 +913,7 @@ def fig_stability_vs_function_slider(
         )
 
     _ablation_key(fig)
-    apply_theme(fig, width=1180, height=1180, margin_left=165)
+    apply_theme(fig, width=1180, height=1180, margin_left=115)
     header(
         fig,
         "Structural instability against functional instability, by circuit size",
@@ -931,10 +924,8 @@ def fig_stability_vs_function_slider(
         right=40,
         legend_y=1.03,
     )
-    _metric_row_labels(fig, len(tasks))
     fig.update_xaxes(range=[0, 1], tickformat=".0%")
-    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
-    fig.update_yaxes(title=dict(text="sd across seeds"), col=1)
+    _metric_axes(fig, x_y=-0.045)
     # Ranges are held across steps; autoscaling per step would make the sweep unreadable.
     for (row_i, col_i), top in ceilings.items():
         fig.update_yaxes(range=[0, top * 1.08], row=row_i, col=col_i)
@@ -945,7 +936,7 @@ def fig_stability_vs_function_slider(
                 steps=steps,
                 x=0.08,
                 len=0.84,
-                y=-0.055,
+                y=-0.105,
                 pad=dict(t=8, b=8),
                 currentvalue=dict(
                     prefix="circuit size: ",
@@ -958,7 +949,7 @@ def fig_stability_vs_function_slider(
                 bordercolor=SURFACE,
             )
         ],
-        margin=dict(b=120),
+        margin=dict(b=150),
     )
     return fig
 
