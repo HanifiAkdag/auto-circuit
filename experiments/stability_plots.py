@@ -25,6 +25,7 @@ import argparse
 import csv
 import math
 import sys
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -533,7 +534,7 @@ def _pick_budget(rows: List[dict], target: float) -> Optional[dict]:
     """
     if not rows:
         return None
-    if rows[0]["selector"] == "top_k":
+    if all(r["selector"] == "top_k" for r in rows):
         return next((r for r in rows if r["budget_value"] == target), None)
     best = min(rows, key=lambda r: abs(r["realised_mean"] - target))
     ratio = best["realised_mean"] / target if target else 0.0
@@ -761,14 +762,19 @@ def _slider_budgets(
     """Edge counts the functional pass measured, minus each task's own published size.
 
     The published sizes differ per task, so as global steps they would empty out the other
-    two columns. They get one shared step of their own instead.
+    two columns. They get one shared step of their own instead. The unpruned model is
+    dropped for the same reason, and it carries no information here: every method is the
+    same circuit there.
     """
     # functional.csv carries only `budget_label`; for a top-k row that label is the count.
-    counts = {
-        r["budget_label"] for r in functional
-        if r["selector"] == "top_k" and r["task"] in tasks
-    }
-    return sorted(counts - set(published.values()))
+    per_task: Dict[str, set] = defaultdict(set)
+    for r in functional:
+        count = _num(r["budget_label"]) if r["selector"] == "top_k" else None
+        if count is not None and r["task"] in tasks:
+            per_task[r["task"]].add(count)
+    full = {max(v) for v in per_task.values() if v}
+    counts = set().union(*per_task.values()) if per_task else set()
+    return sorted(counts - full - set(published.values()))
 
 
 def fig_stability_vs_function_slider(

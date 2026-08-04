@@ -97,7 +97,7 @@ STABILITY_METRIC: Dict[str, str] = {
     _TASK_TEMPLATES["docstring"].key: CORRECT_ANSWER_PERCENT_METRIC.key,
 }
 
-FUNCTIONAL_BUDGETS = [50, 100, 200, 500, 1000, 2000, 5000, 10000]
+FUNCTIONAL_BUDGETS = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
 
 _ABL_SHORT_INV = {v: k for k, v in _ABL_SHORT.items()}
 
@@ -200,11 +200,17 @@ def _load_cell(cache_dir: str, spec: Tuple[str, str, str], seeds: List[int]) -> 
 
 
 def _budgets(cell: Cell, edges: set, true_edge_count: Optional[int]) -> List[Budget]:
-    """The budget grid for a cell: matched top-k, or matched tau where scores are tied."""
+    """The budget grid for a cell: matched top-k, or matched tau where scores are tied.
+
+    The grid always ends at the unpruned model. ACDC's coarsest tau admits only ~21k of
+    the 32k edges, so without that terminal point its curve stops short of every other
+    method's and the sweep never reaches the size where all of them coincide.
+    """
+    full = Budget("top_k", len(edges))
     if cell.algo == "acdc":
-        return [Budget("threshold", tau) for tau in _acdc_tau_grid()]
+        return [Budget("threshold", tau) for tau in _acdc_tau_grid()] + [full]
     grid = matched_budgets(edges, true_edge_count)
-    return [Budget("top_k", k) for k in grid if 10 <= k < len(edges)]
+    return [Budget("top_k", k) for k in grid if 10 <= k < len(edges)] + [full]
 
 
 def _structural_rows(cell: Cell, index: EdgeIndex, budgets: List[Budget]) -> List[dict]:
@@ -275,6 +281,7 @@ def _functional_rows(
     # (eval, metric, budget_label) -> {seed: value}; realised counts are per seed.
     collected: Dict[Tuple[str, str, str], Dict[int, float]] = defaultdict(dict)
     realised_by_budget: Dict[str, List[int]] = defaultdict(list)
+    kind_by_budget = {b.label: b.kind for b in budgets}
 
     for seed, ps in zip(cell.seeds, device_scores):
         # Resolved on the vector, not per Edge: the loop over 32k Edge objects costs
@@ -283,7 +290,7 @@ def _functional_rows(
         realised = {b.label: int(budget_mask(scores, b).sum()) for b in budgets}
         for label, count in realised.items():
             realised_by_budget[label].append(count)
-        counts = sorted({c for c in realised.values() if 0 < c < n_edges})
+        counts = sorted({c for c in realised.values() if 0 < c <= n_edges})
         if not counts:
             print(f"WARNING: {cell} seed {seed}: no usable budgets, skipping")
             continue
@@ -318,7 +325,7 @@ def _functional_rows(
                 algo=cell.short_name,
                 discovery_ablation="anchor" if cell.is_anchor else cell.ablation,
                 eval_ablation=eval_slug,
-                selector=budgets[0].kind,
+                selector=kind_by_budget[label],
                 budget_label=label,
                 realised_mean=float(np.mean(realised_by_budget[label])),
                 metric=metric_key,
@@ -559,6 +566,7 @@ def main() -> None:
         if cell.algo != "acdc":
             wanted = sorted(set(args.functional_budgets + ([task.true_edge_count] if task.true_edge_count else [])))
             fbudgets = [Budget("top_k", k) for k in wanted if 0 < k < len(edges)]
+            fbudgets.append(Budget("top_k", len(edges)))
         functional += _functional_rows(cell, index, fbudgets, on_device)
 
     _write_csv(folder / "structural.csv", structural, STRUCTURAL_FIELDS)
