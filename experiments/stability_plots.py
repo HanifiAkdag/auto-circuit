@@ -604,25 +604,44 @@ def _at_panel(fig, row, col, n_cols, fx: float, fy: float) -> Tuple[float, float
 
 
 def _stability_grid(tasks: List[str]):
-    """3 metric rows x task columns, with each panel titled by task and metric."""
-    titles = []
-    for metric in ROW_METRICS:
-        for task in tasks:
-            titles.append(
-                f"<b>{TASK_DISPLAY.get(task, task)}</b><br>"
-                f'<span style="font-size:11px;color:{INK_MUTED}">'
-                f"{METRIC_GLOSS.get(metric, metric)}</span>"
-            )
+    """Metric rows x task columns: task names head the columns, metrics label the rows."""
+    titles = [TASK_DISPLAY.get(t, t) for t in tasks]
+    titles += [""] * (len(tasks) * (len(ROW_METRICS) - 1))
     fig = make_subplots(
         rows=len(ROW_METRICS),
         cols=len(tasks),
         subplot_titles=titles,
         horizontal_spacing=0.06,
-        vertical_spacing=0.11,
+        vertical_spacing=0.09,
     )
     # Restyle the panel titles before any other annotation exists: the helper sweeps them all.
     _facet_titles(fig)
     return fig
+
+
+def _metric_row_labels(fig, n_cols: int, inset_px: int = 20) -> None:
+    """Name each metric down the left edge, clear of the axis titles.
+
+    Annotation paper coordinates span the area *inside* the margins, so reaching the canvas
+    edge means going negative. Convert from pixels so the label stays put at any width.
+    """
+    width = fig.layout.width or 1180
+    left = fig.layout.margin.l or 80
+    plot_width = width - left - (fig.layout.margin.r or 40)
+    for i, metric in enumerate(ROW_METRICS):
+        _, (y0, y1) = _panel_box(fig, i + 1, 1, n_cols)
+        fig.add_annotation(
+            text=f"<b>{METRIC_GLOSS.get(metric, metric)}</b>",
+            xref="paper",
+            yref="paper",
+            x=(inset_px - left) / plot_width,
+            y=(y0 + y1) / 2,
+            xanchor="center",
+            yanchor="middle",
+            showarrow=False,
+            textangle=-90,
+            font=dict(size=12.5, color=INK_PRIMARY, family=FONT_FAMILY),
+        )
 
 
 def _ablation_key(fig) -> None:
@@ -734,21 +753,21 @@ def fig_stability_vs_function(
             fig.update_yaxes(rangemode="tozero", row=row_i, col=col_i)
 
     _ablation_key(fig)
-    apply_theme(fig, width=1180, height=1120, margin_left=110)
+    apply_theme(fig, width=1180, height=1120, margin_left=165)
     header(
         fig,
         "Structural instability against functional instability",
         "One marker per algorithm and discovery ablation, at the published circuit size.<br>"
-        "Each row is one metric, each panel its Spearman ρ. Bar: min-max Jaccard. "
-        "Dotted line: the Random anchor.",
+        "Rows are metrics, columns are tasks; each panel carries its Spearman ρ. "
+        "Bar: min-max Jaccard. Dotted line: the Random anchor.",
         top=215,
         right=40,
         legend_y=1.035,
     )
-    # No row labels: every panel already names its metric under the task name.
+    _metric_row_labels(fig, len(tasks))
     fig.update_xaxes(range=[0, 1], tickformat=".0%")
     fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
-    fig.update_yaxes(title=dict(text="sd across the five seeds"), col=1)
+    fig.update_yaxes(title=dict(text="sd across seeds"), col=1)
     return fig
 
 
@@ -901,21 +920,21 @@ def fig_stability_vs_function_slider(
         )
 
     _ablation_key(fig)
-    apply_theme(fig, width=1180, height=1180, margin_left=110)
+    apply_theme(fig, width=1180, height=1180, margin_left=165)
     header(
         fig,
         "Structural instability against functional instability, by circuit size",
         "One marker per algorithm and discovery ablation. Drag the slider to change the "
-        "edge budget.<br>Each row is one metric. Bar: min-max Jaccard. Dotted line: the "
-        "Random anchor, which also moves with the budget.",
+        "edge budget.<br>Rows are metrics, columns are tasks. Bar: min-max Jaccard. "
+        "Dotted line: the Random anchor, which also moves with the budget.",
         top=225,
         right=40,
         legend_y=1.03,
     )
-    # No row labels: every panel already names its metric under the task name.
+    _metric_row_labels(fig, len(tasks))
     fig.update_xaxes(range=[0, 1], tickformat=".0%")
     fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
-    fig.update_yaxes(title=dict(text="sd across the five seeds"), col=1)
+    fig.update_yaxes(title=dict(text="sd across seeds"), col=1)
     # Ranges are held across steps; autoscaling per step would make the sweep unreadable.
     for (row_i, col_i), top in ceilings.items():
         fig.update_yaxes(range=[0, top * 1.08], row=row_i, col=col_i)
