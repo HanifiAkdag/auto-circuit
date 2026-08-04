@@ -23,9 +23,10 @@ four of them), so a standard error has no sampling interpretation.
 """
 import argparse
 import csv
+import math
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -53,6 +54,19 @@ TASK_ORDER = ["Indirect Object Identification", "Greaterthan", "Docstring"]
 TASK_DISPLAY = {"Indirect Object Identification": "IOI", "Greaterthan": "Greater-Than"}
 
 _BAND_ALPHA = 0.13
+
+# The two-class decision: does the correct answer outscore the incorrect one. Chen et al.
+# report exactly this as "Acc.", so it is the axis their non-uniqueness claim is made on.
+DECISION_METRIC = "Correct Answer Greater Than Incorrect Percent"
+
+METRIC_GLOSS: Dict[str, str] = {
+    "Logit Diff Percent": "logit diff, % of full model",
+    "Correct Answer Percent": "correct answer top-1, %",
+    DECISION_METRIC: "correct beats incorrect, %",
+    "Clean KL Div": "KL from the full model",
+    "Answer Pair KL Div": "answer-pair KL",
+    "Prob Diff": "probability difference",
+}
 
 
 def _rgba(hex_color: str, alpha: float) -> str:
@@ -133,12 +147,12 @@ def _grid(tasks: List[str], ablations: List[str]):
     return fig
 
 
-def _row_labels(fig, ablations: List[str], n_cols: int) -> None:
+def _row_labels(fig, ablations: List[str], n_cols: int, suffix: str = " discovery") -> None:
     """Name each row of the grid on its right edge, so the y-axis stays for the metric."""
     n_rows = len(ablations)
     for i, ablation in enumerate(ablations):
         fig.add_annotation(
-            text=f"<b>{ablation}</b> discovery",
+            text=f"<b>{ablation}</b>{suffix}",
             xref="paper",
             yref=f"y{(i * n_cols) + 1} domain" if i else "y domain",
             x=1.005,
@@ -440,49 +454,154 @@ def fig_selection_frequency(summary: List[dict]) -> go.Figure:
 # ── Fig 2: does structural disagreement show up in behaviour? ───────────────────────
 
 
-def fig_stability_vs_function(summary: List[dict]) -> Optional[go.Figure]:
-    """y is the spread in the metric's own units, not its coefficient of variation.
-
-    Both task metrics are percentages of the full model, so a standard deviation in
-    percentage points is directly readable and comparable within a task. A CV is not: it
-    divides by a mean that several cells drive to zero (ACDC/IOI/mean means 4.15%), which
-    manufactures enormous instability out of a circuit that is merely bad.
-    """
-    usable = [r for r in summary if isinstance(r.get("primary_sd"), float)
-              and r["primary_sd"] == r["primary_sd"]]
-    if not usable:
+def _num(value) -> Optional[float]:
+    """Numbers survive `_read` as int or float; anything else is a missing measurement."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    tasks, algos = _tasks(usable), _algos(usable)
-    colors = algo_colors(algos)
+    return None if value != value else float(value)
+
+
+def _ranks(values: List[float]) -> List[float]:
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    out = [0.0] * len(values)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and values[order[j + 1]] == values[order[i]]:
+            j += 1
+        shared = (i + j) / 2 + 1
+        for t in range(i, j + 1):
+            out[order[t]] = shared
+        i = j + 1
+    return out
+
+
+def _spearman(xs: List[float], ys: List[float]) -> Optional[float]:
+    if len(xs) < 3:
+        return None
+    rx, ry = _ranks(xs), _ranks(ys)
+    n = len(xs)
+    mx, my = sum(rx) / n, sum(ry) / n
+    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    dx = sum((a - mx) ** 2 for a in rx) ** 0.5
+    dy = sum((b - my) ** 2 for b in ry) ** 0.5
+    return num / (dx * dy) if dx and dy else None
+
+
+def _diagonal_sd(functional: List[dict]) -> Dict[tuple, float]:
+    """Across-seed sd keyed by cell and metric, each cell read at its own eval ablation."""
+    out: Dict[tuple, float] = {}
+    for r in functional:
+        if r["eval_ablation"] != r["discovery_ablation"]:
+            continue
+        sd = _num(r.get("metric_sd"))
+        if sd is None:
+            continue
+        key = (r["task"], r["algo"], r["discovery_ablation"], r["budget_label"], r["metric"])
+        out[key] = sd
+    return out
+
+
+def _log_ticks(floor: float, hi: float, mark_zero: bool) -> Tuple[List[float], List[str]]:
+    """Decade ticks, plus a floor tick standing in for zero only where a zero is plotted."""
+    vals: List[float] = [floor] if mark_zero else []
+    texts: List[str] = ["0"] if mark_zero else []
+    exp = math.floor(math.log10(floor)) + 1
+    while 10.0**exp <= hi * 1.5 and len(vals) < 8:
+        value = 10.0**exp
+        if not mark_zero or value > floor * 1.9:
+            vals.append(value)
+            texts.append(f"{value:g}")
+        exp += 1
+    return vals, texts
+
+
+def fig_stability_vs_function(
+    summary: List[dict], functional: List[dict]
+) -> Optional[go.Figure]:
+    """Two rows, because whether instability is visible depends on the metric.
+
+    y is the spread in the metric's own units, not its coefficient of variation: a CV
+    divides by a mean that several cells drive to zero (ACDC/IOI/mean means 4.15%), which
+    manufactures enormous instability out of a circuit that is merely bad. An sd of exactly
+    zero is meaningful here, so the log axis floors it rather than dropping the point.
+    """
+    cells = [
+        r for r in summary
+        if r["algo"] != "Random" and _num(r.get("primary_sd")) is not None
+    ]
+    if not cells:
+        return None
+    tasks = _tasks(cells)
+    colors = algo_colors(_algos(summary))
+    sd_by = _diagonal_sd(functional)
+    have_decision = {k[0] for k in sd_by if k[4] == DECISION_METRIC}
+
+    # Row 1 is the metric the analysis pass nominated per task; row 2 is the decision the
+    # circuit makes, which is what the reference papers score.
+    primary = {r["task"]: r["primary_metric"] for r in cells}
+    row_metrics: List[Dict[str, Optional[str]]] = [
+        {t: primary.get(t) for t in tasks},
+        {t: (DECISION_METRIC if t in have_decision else None) for t in tasks},
+    ]
+    row_names = ["primary", "decision"]
+
+    titles = []
+    for metrics in row_metrics:
+        for task in tasks:
+            metric = metrics[task]
+            gloss = METRIC_GLOSS.get(metric, metric) if metric else "not defined for this task"
+            titles.append(
+                f"<b>{TASK_DISPLAY.get(task, task)}</b><br>"
+                f'<span style="font-size:11px;color:{INK_MUTED}">{gloss}</span>'
+            )
     fig = make_subplots(
-        rows=1,
+        rows=2,
         cols=len(tasks),
-        subplot_titles=[TASK_DISPLAY.get(t, t) for t in tasks],
-        horizontal_spacing=0.055,
+        subplot_titles=titles,
+        horizontal_spacing=0.06,
+        vertical_spacing=0.15,
     )
-    for task_i, task in enumerate(tasks, start=1):
-        trows = [r for r in usable if r["task"] == task]
-        # Random is the x-floor, drawn as a guide rather than as a competing marker: its
-        # metric is at chance for every seed, so its CV is 0 and has no place on a log axis.
-        floor = next((r["jaccard_mean"] for r in trows if r["algo"] == "Random"), None)
-        for algo in [a for a in algos if a != "Random"]:
-            for ablation in ABLATION_ORDER:
-                row = next(
-                    (r for r in trows
-                     if r["algo"] == algo and r["discovery_ablation"] == ablation),
-                    None,
-                )
-                if row is None:
-                    continue
+    # Restyle the panel titles before any other annotation exists: the helper sweeps them all.
+    _facet_titles(fig)
+
+    legend_seen: set = set()
+    for row_i, metrics in enumerate(row_metrics, start=1):
+        for col_i, task in enumerate(tasks, start=1):
+            metric = metrics[task]
+            trows = [r for r in cells if r["task"] == task]
+            points = []
+            for algo in _algos(trows):
+                for ablation in ABLATION_ORDER:
+                    cell = next(
+                        (r for r in trows if r["algo"] == algo
+                         and r["discovery_ablation"] == ablation),
+                        None,
+                    )
+                    if cell is None or metric is None:
+                        continue
+                    key = (task, algo, ablation, cell["budget_label"], metric)
+                    if key in sd_by:
+                        points.append((algo, ablation, cell, sd_by[key]))
+
+            if not points:
+                fig.update_xaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
+                fig.update_yaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
+                continue
+
+            positive = [sd for *_, sd in points if sd > 0]
+            floor = min(positive) / 3.0 if positive else 1.0
+            highest = max(sd for *_, sd in points)
+            for algo, ablation, cell, sd in points:
                 fig.add_trace(
                     go.Scatter(
-                        x=[row["jaccard_mean"]],
-                        y=[row["primary_sd"]],
+                        x=[cell["jaccard_mean"]],
+                        y=[sd if sd > 0 else floor],
                         error_x=dict(
                             type="data",
                             symmetric=False,
-                            array=[row["jaccard_max"] - row["jaccard_mean"]],
-                            arrayminus=[row["jaccard_mean"] - row["jaccard_min"]],
+                            array=[cell["jaccard_max"] - cell["jaccard_mean"]],
+                            arrayminus=[cell["jaccard_mean"] - cell["jaccard_min"]],
                             color=_rgba(colors[algo], 0.4),
                             thickness=1,
                             width=0,
@@ -490,32 +609,56 @@ def fig_stability_vs_function(summary: List[dict]) -> Optional[go.Figure]:
                         mode="markers",
                         name=algo,
                         legendgroup=algo,
-                        showlegend=(task_i == 1 and ablation == ABLATION_ORDER[0]),
+                        showlegend=algo not in legend_seen,
                         marker=dict(
                             color=colors[algo],
                             size=11,
                             symbol=DISC_SYMBOL[ablation],
                             line=dict(width=1.6, color="#ffffff"),
                         ),
+                        customdata=[[sd]],
                         hovertemplate=f"{algo} · {ablation}<br>mean J=%{{x:.3f}}<br>"
-                        "spread (sd)=%{y:.3g}<extra></extra>",
+                        "sd=%{customdata[0]:.3g}<extra></extra>",
                     ),
-                    row=1,
-                    col=task_i,
+                    row=row_i,
+                    col=col_i,
                 )
-        if floor is not None:
-            fig.add_vline(
-                x=floor,
-                line=dict(color=INK_MUTED, width=1, dash="dot"),
-                annotation=dict(
-                    text="Random",
-                    font=dict(size=10, color=INK_MUTED),
-                    textangle=90,
-                    yanchor="bottom",
-                    y=0,
-                ),
-                row=1,
-                col=task_i,
+                legend_seen.add(algo)
+
+            rho = _spearman(
+                [cell["jaccard_mean"] for _, _, cell, _ in points],
+                [sd for *_, sd in points],
+            )
+            if rho is not None:
+                fig.add_annotation(
+                    text=f"ρ = {rho:+.2f}",
+                    xref="x domain", yref="y domain",
+                    x=0.97, y=0.98, xanchor="right", yanchor="top", showarrow=False,
+                    font=dict(size=11.5, color=INK_SECONDARY, family=FONT_FAMILY),
+                    row=row_i,
+                    col=col_i,
+                )
+
+            chance = next(
+                (r["jaccard_mean"] for r in summary
+                 if r["task"] == task and r["algo"] == "Random"),
+                None,
+            )
+            if chance is not None:
+                fig.add_vline(
+                    x=chance,
+                    line=dict(color=INK_MUTED, width=1, dash="dot"),
+                    row=row_i,
+                    col=col_i,
+                )
+            ticks, labels = _log_ticks(floor, highest, any(sd == 0 for *_, sd in points))
+            fig.update_yaxes(
+                type="log",
+                tickvals=ticks,
+                ticktext=labels,
+                range=[math.log10(floor / 1.7), math.log10(max(highest, floor) * 1.7)],
+                row=row_i,
+                col=col_i,
             )
 
     # Colour carries the algorithm, so the symbol key needs its own neutral legend block.
@@ -538,23 +681,24 @@ def fig_stability_vs_function(summary: List[dict]) -> Optional[go.Figure]:
             col=1,
         )
 
-    apply_theme(fig, width=1180, height=580, margin_left=110)
+    apply_theme(fig, width=1180, height=880, margin_left=110)
     header(
         fig,
         "Structural instability against functional instability",
-        "One marker per algorithm and discovery ablation, at the published circuit size. "
-        "Horizontal bar: min-max Jaccard. Symbol: discovery ablation.",
-        top=165,
-        right=40,
+        "One marker per algorithm and discovery ablation, at the published circuit size.<br>"
+        "Each panel names its own y-metric and its Spearman ρ. Bar: min-max Jaccard. "
+        "Dotted line: the Random anchor.",
+        top=200,
+        right=60,
+        legend_y=1.06,
     )
-    fig.update_xaxes(range=[0, 1], tickformat=".0%", title=dict(text="Pairwise Jaccard"))
-    fig.update_yaxes(rangemode="tozero")
-    fig.update_yaxes(
-        title=dict(text="Task metric, sd across seeds"),
-        col=1,
-    )
-    _facet_titles(fig)
+    _row_labels(fig, row_names, len(tasks), suffix=" metric")
+    fig.update_xaxes(range=[0, 1], tickformat=".0%")
+    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=2)
+    fig.update_yaxes(title=dict(text="sd across the five seeds"), col=1)
     return fig
+
+
 
 
 # ── Fig 5: the functional curves behind Fig 2 ───────────────────────────────────────
@@ -663,7 +807,10 @@ def write_all_figures(folder: Path) -> None:
     _save(fig_mutual_iou_vs_budget(structural), figures / "mutual_iou_vs_budget.pdf")
     _save(fig_jaccard_compact(structural), figures / "compact" / "jaccard_vs_budget.pdf")
     _save(fig_selection_frequency(summary), figures / "selection_frequency.pdf")
-    _save(fig_stability_vs_function(summary), figures / "stability_vs_function.pdf")
+    _save(
+        fig_stability_vs_function(summary, functional),
+        figures / "stability_vs_function.pdf",
+    )
 
     seen = {(r["task"], r["metric"]) for r in functional}
     for task, metric in sorted(seen):
