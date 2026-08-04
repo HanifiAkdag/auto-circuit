@@ -34,13 +34,16 @@ from plotly.subplots import make_subplots
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.utils.plot_theme import (
+    AXIS,
     DISC_DASH,
     DISC_SYMBOL,
     FONT_FAMILY,
+    GRID,
     INK_MUTED,
     INK_PRIMARY,
     INK_SECONDARY,
     SEQUENTIAL_BLUE,
+    SURFACE,
     algo_colors,
     algo_symbols,
     apply_theme,
@@ -502,166 +505,128 @@ def _diagonal_sd(functional: List[dict]) -> Dict[tuple, float]:
     return out
 
 
-def _log_ticks(floor: float, hi: float, mark_zero: bool) -> Tuple[List[float], List[str]]:
-    """Decade ticks, plus a floor tick standing in for zero only where a zero is plotted."""
-    vals: List[float] = [floor] if mark_zero else []
-    texts: List[str] = ["0"] if mark_zero else []
-    exp = math.floor(math.log10(floor)) + 1
-    while 10.0**exp <= hi * 1.5 and len(vals) < 8:
-        value = 10.0**exp
-        if not mark_zero or value > floor * 1.9:
-            vals.append(value)
-            texts.append(f"{value:g}")
-        exp += 1
-    return vals, texts
 
 
-def fig_stability_vs_function(
-    summary: List[dict], functional: List[dict]
-) -> Optional[go.Figure]:
-    """Two rows, because whether instability is visible depends on the metric.
+# One metric per row, the same three for every task, so a row can be read across tasks.
+ROW_METRICS = ["Logit Diff Percent", "Clean KL Div", DECISION_METRIC]
 
-    y is the spread in the metric's own units, not its coefficient of variation: a CV
-    divides by a mean that several cells drive to zero (ACDC/IOI/mean means 4.15%), which
-    manufactures enormous instability out of a circuit that is merely bad. An sd of exactly
-    zero is meaningful here, so the log axis floors it rather than dropping the point.
+
+def _struct_rows(structural: List[dict]) -> Dict[tuple, List[dict]]:
+    out: Dict[tuple, List[dict]] = {}
+    for r in structural:
+        out.setdefault((r["task"], r["algo"], r["discovery_ablation"]), []).append(r)
+    for rows in out.values():
+        rows.sort(key=lambda r: r["realised_mean"])
+    return out
+
+
+_MATCH_TOLERANCE = 4.0
+
+
+def _pick_budget(rows: List[dict], target: float) -> Optional[dict]:
+    """Top-k methods must hit the budget exactly; ACDC is matched on realised size.
+
+    ACDC scores are the tau an edge was pruned at, so its grid is ~20 tau values whose
+    realised sizes fall where they fall. Asking for its nearest realised size is the same
+    rule `select_at_budget` applies during the analysis pass. Nearest is refused past a
+    factor of four, where the match would be to a circuit of a different order of size.
     """
-    cells = [
-        r for r in summary
-        if r["algo"] != "Random" and _num(r.get("primary_sd")) is not None
-    ]
-    if not cells:
+    if not rows:
         return None
-    tasks = _tasks(cells)
-    colors = algo_colors(_algos(summary))
-    sd_by = _diagonal_sd(functional)
-    have_decision = {k[0] for k in sd_by if k[4] == DECISION_METRIC}
+    if rows[0]["selector"] == "top_k":
+        return next((r for r in rows if r["budget_value"] == target), None)
+    best = min(rows, key=lambda r: abs(r["realised_mean"] - target))
+    ratio = best["realised_mean"] / target if target else 0.0
+    return best if 1 / _MATCH_TOLERANCE <= ratio <= _MATCH_TOLERANCE else None
 
-    # Row 1 is the metric the analysis pass nominated per task; row 2 is the decision the
-    # circuit makes, which is what the reference papers score.
-    primary = {r["task"]: r["primary_metric"] for r in cells}
-    row_metrics: List[Dict[str, Optional[str]]] = [
-        {t: primary.get(t) for t in tasks},
-        {t: (DECISION_METRIC if t in have_decision else None) for t in tasks},
-    ]
-    row_names = ["primary", "decision"]
 
+def _panel_points(
+    struct: Dict[tuple, List[dict]],
+    sd_by: Dict[tuple, float],
+    task: str,
+    metric: str,
+    target: float,
+    algos: List[str],
+) -> List[dict]:
+    points = []
+    for algo in algos:
+        for ablation in ABLATION_ORDER:
+            rows = struct.get((task, algo, ablation))
+            row = _pick_budget(rows, target) if rows else None
+            if row is None:
+                continue
+            sd = sd_by.get((task, algo, ablation, row["budget_label"], metric))
+            if sd is None:
+                continue
+            points.append(
+                dict(
+                    algo=algo,
+                    ablation=ablation,
+                    jaccard=row["jaccard_mean"],
+                    lo=row["jaccard_mean"] - row["jaccard_min"],
+                    hi=row["jaccard_max"] - row["jaccard_mean"],
+                    sd=sd,
+                    size=row["realised_mean"],
+                )
+            )
+    return points
+
+
+def _chance_at(struct: Dict[tuple, List[dict]], task: str, target: float) -> Optional[float]:
+    row = _pick_budget(struct.get((task, "Random", "anchor"), []), target)
+    return row["jaccard_mean"] if row else None
+
+
+def _published_sizes(summary: List[dict], tasks: List[str]) -> Dict[str, float]:
+    return {
+        t: next((r["true_edge_count"] for r in summary if r["task"] == t), 0) for t in tasks
+    }
+
+
+def _panel_box(fig, row: int, col: int, n_cols: int) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+    """Paper-space extent of one subplot.
+
+    `add_annotation(row=, col=)` resolves against the subplot's own axes only for panels
+    that carry traces, so an empty panel silently takes the first axis instead. Reading the
+    domains is unambiguous either way.
+    """
+    n = (row - 1) * n_cols + col
+    suffix = "" if n == 1 else str(n)
+    return (
+        tuple(fig.layout[f"xaxis{suffix}"].domain),
+        tuple(fig.layout[f"yaxis{suffix}"].domain),
+    )
+
+
+def _at_panel(fig, row, col, n_cols, fx: float, fy: float) -> Tuple[float, float]:
+    (x0, x1), (y0, y1) = _panel_box(fig, row, col, n_cols)
+    return x0 + fx * (x1 - x0), y0 + fy * (y1 - y0)
+
+
+def _stability_grid(tasks: List[str]):
+    """3 metric rows x task columns, with each panel titled by task and metric."""
     titles = []
-    for metrics in row_metrics:
+    for metric in ROW_METRICS:
         for task in tasks:
-            metric = metrics[task]
-            gloss = METRIC_GLOSS.get(metric, metric) if metric else "not defined for this task"
             titles.append(
                 f"<b>{TASK_DISPLAY.get(task, task)}</b><br>"
-                f'<span style="font-size:11px;color:{INK_MUTED}">{gloss}</span>'
+                f'<span style="font-size:11px;color:{INK_MUTED}">'
+                f"{METRIC_GLOSS.get(metric, metric)}</span>"
             )
     fig = make_subplots(
-        rows=2,
+        rows=len(ROW_METRICS),
         cols=len(tasks),
         subplot_titles=titles,
         horizontal_spacing=0.06,
-        vertical_spacing=0.15,
+        vertical_spacing=0.11,
     )
     # Restyle the panel titles before any other annotation exists: the helper sweeps them all.
     _facet_titles(fig)
+    return fig
 
-    legend_seen: set = set()
-    for row_i, metrics in enumerate(row_metrics, start=1):
-        for col_i, task in enumerate(tasks, start=1):
-            metric = metrics[task]
-            trows = [r for r in cells if r["task"] == task]
-            points = []
-            for algo in _algos(trows):
-                for ablation in ABLATION_ORDER:
-                    cell = next(
-                        (r for r in trows if r["algo"] == algo
-                         and r["discovery_ablation"] == ablation),
-                        None,
-                    )
-                    if cell is None or metric is None:
-                        continue
-                    key = (task, algo, ablation, cell["budget_label"], metric)
-                    if key in sd_by:
-                        points.append((algo, ablation, cell, sd_by[key]))
 
-            if not points:
-                fig.update_xaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
-                fig.update_yaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
-                continue
-
-            positive = [sd for *_, sd in points if sd > 0]
-            floor = min(positive) / 3.0 if positive else 1.0
-            highest = max(sd for *_, sd in points)
-            for algo, ablation, cell, sd in points:
-                fig.add_trace(
-                    go.Scatter(
-                        x=[cell["jaccard_mean"]],
-                        y=[sd if sd > 0 else floor],
-                        error_x=dict(
-                            type="data",
-                            symmetric=False,
-                            array=[cell["jaccard_max"] - cell["jaccard_mean"]],
-                            arrayminus=[cell["jaccard_mean"] - cell["jaccard_min"]],
-                            color=_rgba(colors[algo], 0.4),
-                            thickness=1,
-                            width=0,
-                        ),
-                        mode="markers",
-                        name=algo,
-                        legendgroup=algo,
-                        showlegend=algo not in legend_seen,
-                        marker=dict(
-                            color=colors[algo],
-                            size=11,
-                            symbol=DISC_SYMBOL[ablation],
-                            line=dict(width=1.6, color="#ffffff"),
-                        ),
-                        customdata=[[sd]],
-                        hovertemplate=f"{algo} · {ablation}<br>mean J=%{{x:.3f}}<br>"
-                        "sd=%{customdata[0]:.3g}<extra></extra>",
-                    ),
-                    row=row_i,
-                    col=col_i,
-                )
-                legend_seen.add(algo)
-
-            rho = _spearman(
-                [cell["jaccard_mean"] for _, _, cell, _ in points],
-                [sd for *_, sd in points],
-            )
-            if rho is not None:
-                fig.add_annotation(
-                    text=f"ρ = {rho:+.2f}",
-                    xref="x domain", yref="y domain",
-                    x=0.97, y=0.98, xanchor="right", yanchor="top", showarrow=False,
-                    font=dict(size=11.5, color=INK_SECONDARY, family=FONT_FAMILY),
-                    row=row_i,
-                    col=col_i,
-                )
-
-            chance = next(
-                (r["jaccard_mean"] for r in summary
-                 if r["task"] == task and r["algo"] == "Random"),
-                None,
-            )
-            if chance is not None:
-                fig.add_vline(
-                    x=chance,
-                    line=dict(color=INK_MUTED, width=1, dash="dot"),
-                    row=row_i,
-                    col=col_i,
-                )
-            ticks, labels = _log_ticks(floor, highest, any(sd == 0 for *_, sd in points))
-            fig.update_yaxes(
-                type="log",
-                tickvals=ticks,
-                ticktext=labels,
-                range=[math.log10(floor / 1.7), math.log10(max(highest, floor) * 1.7)],
-                row=row_i,
-                col=col_i,
-            )
-
-    # Colour carries the algorithm, so the symbol key needs its own neutral legend block.
+def _ablation_key(fig) -> None:
+    """Colour carries the algorithm, so the symbol key needs its own neutral legend block."""
     for ablation in ABLATION_ORDER:
         fig.add_trace(
             go.Scatter(
@@ -681,22 +646,303 @@ def fig_stability_vs_function(
             col=1,
         )
 
-    apply_theme(fig, width=1180, height=880, margin_left=110)
+
+def fig_stability_vs_function(
+    summary: List[dict], structural: List[dict], functional: List[dict]
+) -> Optional[go.Figure]:
+    """Structural against functional instability at the published circuit size.
+
+    y is the spread in the metric's own units, not its coefficient of variation: a CV
+    divides by a mean that several cells drive to zero (ACDC/IOI/mean means 4.15%), which
+    manufactures enormous instability out of a circuit that is merely bad. The axis is
+    linear because an sd of exactly zero is a real and interesting value here.
+    """
+    if not structural or not functional:
+        return None
+    tasks = _tasks(structural)
+    algos = [a for a in _algos(structural) if a != "Random"]
+    colors = algo_colors(_algos(structural))
+    struct, sd_by = _struct_rows(structural), _diagonal_sd(functional)
+    published = _published_sizes(summary, tasks)
+
+    fig = _stability_grid(tasks)
+    legend_seen: set = set()
+    for row_i, metric in enumerate(ROW_METRICS, start=1):
+        for col_i, task in enumerate(tasks, start=1):
+            points = _panel_points(struct, sd_by, task, metric, published[task], algos)
+            if not points:
+                ax, ay = _at_panel(fig, row_i, col_i, len(tasks), 0.5, 0.5)
+                fig.add_annotation(
+                    text="not measured<br>for this task",
+                    xref="paper", yref="paper", x=ax, y=ay,
+                    showarrow=False, align="center",
+                    font=dict(size=11.5, color=INK_MUTED, family=FONT_FAMILY),
+                )
+                fig.update_xaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
+                fig.update_yaxes(showgrid=False, showticklabels=False, row=row_i, col=col_i)
+                continue
+
+            for p in points:
+                fig.add_trace(
+                    go.Scatter(
+                        x=[p["jaccard"]],
+                        y=[p["sd"]],
+                        error_x=dict(
+                            type="data",
+                            symmetric=False,
+                            array=[p["hi"]],
+                            arrayminus=[p["lo"]],
+                            color=_rgba(colors[p["algo"]], 0.4),
+                            thickness=1,
+                            width=0,
+                        ),
+                        mode="markers",
+                        name=p["algo"],
+                        legendgroup=p["algo"],
+                        showlegend=p["algo"] not in legend_seen,
+                        marker=dict(
+                            color=colors[p["algo"]],
+                            size=11,
+                            symbol=DISC_SYMBOL[p["ablation"]],
+                            line=dict(width=1.6, color="#ffffff"),
+                        ),
+                        customdata=[[p["size"]]],
+                        hovertemplate=f"{p['algo']} · {p['ablation']}<br>mean J=%{{x:.3f}}"
+                        "<br>sd=%{y:.3g}<br>%{customdata[0]:,.0f} edges<extra></extra>",
+                    ),
+                    row=row_i,
+                    col=col_i,
+                )
+                legend_seen.add(p["algo"])
+
+            rho = _spearman([p["jaccard"] for p in points], [p["sd"] for p in points])
+            if rho is not None:
+                ax, ay = _at_panel(fig, row_i, col_i, len(tasks), 0.97, 0.99)
+                fig.add_annotation(
+                    text=f"ρ = {rho:+.2f}",
+                    xref="paper", yref="paper", x=ax, y=ay,
+                    xanchor="right", yanchor="top", showarrow=False,
+                    font=dict(size=11.5, color=INK_SECONDARY, family=FONT_FAMILY),
+                )
+            chance = _chance_at(struct, task, published[task])
+            if chance is not None:
+                fig.add_vline(
+                    x=chance,
+                    line=dict(color=INK_MUTED, width=1, dash="dot"),
+                    row=row_i, col=col_i,
+                )
+            fig.update_yaxes(rangemode="tozero", row=row_i, col=col_i)
+
+    _ablation_key(fig)
+    apply_theme(fig, width=1180, height=1120, margin_left=110)
     header(
         fig,
         "Structural instability against functional instability",
         "One marker per algorithm and discovery ablation, at the published circuit size.<br>"
-        "Each panel names its own y-metric and its Spearman ρ. Bar: min-max Jaccard. "
+        "Each row is one metric, each panel its Spearman ρ. Bar: min-max Jaccard. "
         "Dotted line: the Random anchor.",
-        top=200,
-        right=60,
-        legend_y=1.06,
+        top=215,
+        right=40,
+        legend_y=1.035,
     )
-    _row_labels(fig, row_names, len(tasks), suffix=" metric")
+    # No row labels: every panel already names its metric under the task name.
     fig.update_xaxes(range=[0, 1], tickformat=".0%")
-    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=2)
+    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
     fig.update_yaxes(title=dict(text="sd across the five seeds"), col=1)
     return fig
+
+
+# ── Fig 2b: the same plane, with the circuit size on a slider ───────────────────────
+
+
+def _slider_budgets(
+    functional: List[dict], tasks: List[str], published: Dict[str, float]
+) -> List[float]:
+    """Edge counts the functional pass measured, minus each task's own published size.
+
+    The published sizes differ per task, so as global steps they would empty out the other
+    two columns. They get one shared step of their own instead.
+    """
+    # functional.csv carries only `budget_label`; for a top-k row that label is the count.
+    counts = {
+        r["budget_label"] for r in functional
+        if r["selector"] == "top_k" and r["task"] in tasks
+    }
+    return sorted(counts - set(published.values()))
+
+
+def fig_stability_vs_function_slider(
+    summary: List[dict], structural: List[dict], functional: List[dict]
+) -> Optional[go.Figure]:
+    """The same plane, swept over circuit size.
+
+    A single budget is one slice of a moving picture: pairwise Jaccard rises with k for
+    every method, including the Random anchor, so any ordering read off one panel has to
+    survive the sweep to mean anything.
+    """
+    if not structural or not functional:
+        return None
+    tasks = _tasks(structural)
+    algos = [a for a in _algos(structural) if a != "Random"]
+    colors = algo_colors(_algos(structural))
+    struct, sd_by = _struct_rows(structural), _diagonal_sd(functional)
+    published = _published_sizes(summary, tasks)
+
+    budgets: List[Tuple[str, Dict[str, float]]] = [
+        ("published", {t: published[t] for t in tasks})
+    ]
+    for count in _slider_budgets(functional, tasks, published):
+        budgets.append((f"{count:,.0f}", {t: count for t in tasks}))
+
+    # One trace per (row, col, algo, ablation) plus one Random guide per panel, all built
+    # once and then restyled by the slider, so a step is a data swap and not a redraw.
+    slots: List[Tuple[int, int, str, str, Optional[str]]] = []
+    for row_i, metric in enumerate(ROW_METRICS, start=1):
+        for col_i, task in enumerate(tasks, start=1):
+            for algo in algos:
+                for ablation in ABLATION_ORDER:
+                    slots.append((row_i, col_i, task, metric, f"{algo}|{ablation}"))
+            slots.append((row_i, col_i, task, metric, None))
+
+    frames: Dict[int, List[dict]] = {}
+    ceilings: Dict[Tuple[int, int], float] = {}
+    for step, (_, targets) in enumerate(budgets):
+        payload = []
+        for row_i, col_i, task, metric, who in slots:
+            if who is None:
+                chance = _chance_at(struct, task, targets[task])
+                payload.append(dict(x=[chance, chance] if chance else [], y=[0, 0]))
+                continue
+            algo, ablation = who.split("|")
+            found = [
+                p for p in _panel_points(
+                    struct, sd_by, task, metric, targets[task], [algo]
+                ) if p["ablation"] == ablation
+            ]
+            if not found:
+                payload.append(dict(x=[], y=[], lo=[], hi=[], size=[]))
+                continue
+            p = found[0]
+            payload.append(
+                dict(x=[p["jaccard"]], y=[p["sd"]], lo=[p["lo"]], hi=[p["hi"]],
+                     size=[p["size"]])
+            )
+            key = (row_i, col_i)
+            ceilings[key] = max(ceilings.get(key, 0.0), p["sd"])
+        frames[step] = payload
+
+    fig = _stability_grid(tasks)
+    legend_seen: set = set()
+    initial = frames[0]
+    for slot, data in zip(slots, initial):
+        row_i, col_i, task, metric, who = slot
+        if who is None:
+            top = ceilings.get((row_i, col_i), 1.0) * 1.08
+            fig.add_trace(
+                go.Scatter(
+                    x=data["x"], y=[0, top], mode="lines",
+                    line=dict(color=INK_MUTED, width=1, dash="dot"),
+                    hoverinfo="skip", showlegend=False,
+                ),
+                row=row_i, col=col_i,
+            )
+            continue
+        algo, ablation = who.split("|")
+        fig.add_trace(
+            go.Scatter(
+                x=data["x"],
+                y=data["y"],
+                error_x=dict(
+                    type="data", symmetric=False,
+                    array=data.get("hi", []), arrayminus=data.get("lo", []),
+                    color=_rgba(colors[algo], 0.4), thickness=1, width=0,
+                ),
+                mode="markers",
+                name=algo,
+                legendgroup=algo,
+                showlegend=algo not in legend_seen,
+                marker=dict(
+                    color=colors[algo], size=11, symbol=DISC_SYMBOL[ablation],
+                    line=dict(width=1.6, color="#ffffff"),
+                ),
+                customdata=[[s] for s in data.get("size", [])],
+                hovertemplate=f"{algo} · {ablation}<br>mean J=%{{x:.3f}}<br>sd=%{{y:.3g}}"
+                "<br>%{customdata[0]:,.0f} edges<extra></extra>",
+            ),
+            row=row_i, col=col_i,
+        )
+        legend_seen.add(algo)
+
+    n_data = len(slots)
+    steps = []
+    for step, (label, _) in enumerate(budgets):
+        payload = frames[step]
+        steps.append(
+            dict(
+                method="restyle",
+                label=label,
+                args=[
+                    {
+                        "x": [d["x"] for d in payload],
+                        "y": [
+                            [0, ceilings.get((s[0], s[1]), 1.0) * 1.08]
+                            if s[4] is None else d["y"]
+                            for s, d in zip(slots, payload)
+                        ],
+                        "error_x.array": [d.get("hi", []) for d in payload],
+                        "error_x.arrayminus": [d.get("lo", []) for d in payload],
+                        "customdata": [
+                            [[v] for v in d.get("size", [])] for d in payload
+                        ],
+                    },
+                    list(range(n_data)),
+                ],
+            )
+        )
+
+    _ablation_key(fig)
+    apply_theme(fig, width=1180, height=1180, margin_left=110)
+    header(
+        fig,
+        "Structural instability against functional instability, by circuit size",
+        "One marker per algorithm and discovery ablation. Drag the slider to change the "
+        "edge budget.<br>Each row is one metric. Bar: min-max Jaccard. Dotted line: the "
+        "Random anchor, which also moves with the budget.",
+        top=225,
+        right=40,
+        legend_y=1.03,
+    )
+    # No row labels: every panel already names its metric under the task name.
+    fig.update_xaxes(range=[0, 1], tickformat=".0%")
+    fig.update_xaxes(title=dict(text="Pairwise Jaccard"), row=len(ROW_METRICS))
+    fig.update_yaxes(title=dict(text="sd across the five seeds"), col=1)
+    # Ranges are held across steps; autoscaling per step would make the sweep unreadable.
+    for (row_i, col_i), top in ceilings.items():
+        fig.update_yaxes(range=[0, top * 1.08], row=row_i, col=col_i)
+    fig.update_layout(
+        sliders=[
+            dict(
+                active=0,
+                steps=steps,
+                x=0.08,
+                len=0.84,
+                y=-0.055,
+                pad=dict(t=8, b=8),
+                currentvalue=dict(
+                    prefix="circuit size: ",
+                    font=dict(size=13, color=INK_PRIMARY, family=FONT_FAMILY),
+                ),
+                font=dict(size=11, color=INK_MUTED, family=FONT_FAMILY),
+                tickcolor=AXIS,
+                bgcolor=GRID,
+                activebgcolor=INK_SECONDARY,
+                bordercolor=SURFACE,
+            )
+        ],
+        margin=dict(b=120),
+    )
+    return fig
+
 
 
 
@@ -808,9 +1054,14 @@ def write_all_figures(folder: Path) -> None:
     _save(fig_jaccard_compact(structural), figures / "compact" / "jaccard_vs_budget.pdf")
     _save(fig_selection_frequency(summary), figures / "selection_frequency.pdf")
     _save(
-        fig_stability_vs_function(summary, functional),
+        fig_stability_vs_function(summary, structural, functional),
         figures / "stability_vs_function.pdf",
     )
+    slider = fig_stability_vs_function_slider(summary, structural, functional)
+    if slider is not None:
+        path = figures / "stability_vs_function_by_size.html"
+        slider.write_html(str(path), include_plotlyjs="cdn", full_html=True)
+        print(f"  {path.relative_to(path.parents[1])}")
 
     seen = {(r["task"], r["metric"]) for r in functional}
     for task, metric in sorted(seen):
