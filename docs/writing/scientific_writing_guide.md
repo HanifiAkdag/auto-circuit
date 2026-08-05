@@ -88,7 +88,35 @@ Frame the correct **central object**: this thesis is about the controlled *compa
 circuit-discovery methods*, not the circuit itself (the circuit is the artifact the methods
 produce). Trace each RQ → a contribution → a chapter.
 
-### Background / Related Work — synthesize, do not summarize
+### Background — the machinery the reader must already have
+Background and Related Work answer different questions. **Background: what must the reader
+know to follow my methodology?** **Related Work: what have others done about my problem?**
+Both are almost entirely external material and therefore almost entirely cited, but the
+jobs do not overlap. The discovery algorithms (EP, DiscoGP, ACDC, EAP) are attempts at this
+thesis's problem and belong in Related Work, not in Background.
+
+- **Every item must be justified by downstream use.** State explicitly how each background
+  concept is used later ("this is why the edge abstraction is well defined"). Per-subsection
+  test: name the later chapter that breaks without it. If none, cut the subsection.
+  Background is part of the tree of problems and solutions, not a laundry list.
+- **Assume a competent CS/ML reader.** Do not explain backpropagation or softmax. Do explain
+  the factorized residual-stream view, because the edge abstraction depends on it and a
+  general ML reader does not carry it.
+- **Organize by concept, never by paper or by chronology.** The layout is itself a
+  contribution: it is the field seen from this thesis's vantage point.
+- **Fix the notation and vocabulary here** (edge, circuit, ablation type, patch direction,
+  faithfulness), define each once, and use it unchanged thereafter. This is the one place
+  where `\emph` on a first definition is warranted.
+- **Register:** present tense for established facts, past tense for what a specific work did.
+  No hedging on textbook material. Borrowed figures are encouraged, cited in the caption.
+- **Length:** roughly 10–15% of the body. Erring short is safer than erring long; this
+  chapter is infrastructure, not the argument.
+
+Planned order for this thesis: (1) transformers as a computational graph, (2) the circuit
+abstraction and its quality properties, (3) activation patching and ablation types,
+(4) AutoCircuit as the edge-patchable architecture standardization, (5) models and tasks.
+
+### Related Work — synthesize, do not summarize
 - A summary reports what each paper says one by one; a **synthesis** states *your* point and
   uses multiple papers as evidence for it. Organize by **theme / debate / method**, not one
   paragraph per paper.
@@ -201,3 +229,14 @@ made elsewhere (no promise unfulfilled, no result unpromised).
   [Paperpile thesis structure](https://paperpile.com/g/thesis-structure/).
 - Register / taboo words — [Scribbr](https://www.scribbr.com/academic-writing/taboo-words/),
   [Sune Lehmann, *How to write a master's thesis*](https://sunelehmann.com/how-to-write-a-masters-thesis/).
+- Background vs Related Work — [Claypool (WPI) one-pager](https://web.cs.wpi.edu/~claypool/one-pagers/background-rw.pdf)
+  (the clearest CS-specific statement of the split),
+  [Elphinstone (UNSW) thesis guide](https://cgi.cse.unsw.edu.au/~kevine/thesisguide.html)
+  ("not a list of papers", "not a brain dump").
+- CS technical writing — [Michael Ernst (UW)](https://homes.cs.washington.edu/~mernst/advice/write-technical-paper.html)
+  (tree of problems and solutions; mini-introductions per section),
+  [Ian Watson (Auckland), *How to Write a Master's Thesis in CS*](https://www.cs.auckland.ac.nz/~ian/msc/write)
+  (build the chapter from an annotated bibliography).
+- German CS-faculty norms — [TU Chemnitz CE guidelines (2025)](https://www.tu-chemnitz.de/informatik/ce/files/guidelines_2025.pdf)
+  (Background only for specialized topics; assume common CS knowledge).
+- Example chapter to imitate — [Colorado State, Background and Related Work](https://www.cs.colostate.edu/~christos/thesis/chp3.pdf).
