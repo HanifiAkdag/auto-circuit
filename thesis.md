@@ -569,7 +569,7 @@
 
 ### Pillar-2 analysis: seed stability measured, and it tracks functional instability — 2026-08-03
 
-- **Context:** The analysis pass over the 195 cached stability cells (`experiments/stability_analysis.py`, figures in `experiments/stability_plots.py`, spec `docs/superpowers/specs/2026-08-02-pillar2-stability-analysis-design.md`). Structural pass (edge-set agreement between seeds) plus functional pass (each seed's circuit re-scored, faithfulness only, all three eval ablations). Run 416493, 25 min on one A100.
+- **Context:** The analysis pass over the 195 cached stability cells (`experiments/stability_analysis.py`, figures in `experiments/stability_plots.py`, spec `docs/superpowers/specs/2026-08-02-pillar2-stability-analysis-design.md`). Structural pass (edge-set agreement between seeds) plus functional pass (each seed's circuit re-scored). Run 416493, 25 min on one A100. **Correction (2026-08-05):** this entry originally described the functional pass as covering "all three eval ablations". It did not. Swept cells were scored only on the diagonal (eval ablation = discovery ablation); only the Random anchor, being ablation-independent at discovery, got all three. The full cross was added later the same week, see the entry below.
 - **Observation — a clear and consistent stability ordering, far above the chance floor.** Mean pairwise Jaccard at the published circuit size, worst→best across the three ablations:
     - **EAP 0.89–0.95** on every task and ablation. It is the only method that clears Méloux et al.'s 0.8 bar, and it does so nearly everywhere.
     - **ACDC 0.51–0.82**, **EP 0.31–0.90**, **DiscoGP 0.18–0.37**.

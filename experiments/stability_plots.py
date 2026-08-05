@@ -493,9 +493,16 @@ def _spearman(xs: List[float], ys: List[float]) -> Optional[float]:
 
 
 def _diagonal_sd(functional: List[dict]) -> Dict[tuple, float]:
-    """Across-seed sd keyed by cell and metric, each cell read at its own eval ablation."""
+    """Across-seed sd keyed by cell and metric, each cell read at its own eval ablation.
+
+    Faithfulness only. The stability-vs-function plane is an argument about how much of a
+    circuit's behaviour survives reseeding, and mixing in the complement's behaviour would
+    put two different questions on one axis.
+    """
     out: Dict[tuple, float] = {}
     for r in functional:
+        if r.get("measure", "faithfulness") != "faithfulness":
+            continue
         if r["eval_ablation"] != r["discovery_ablation"]:
             continue
         sd = _num(r.get("metric_sd"))
@@ -740,7 +747,8 @@ def fig_stability_vs_function(
     header(
         fig,
         "Structural instability against functional instability",
-        "One marker per algorithm and discovery ablation, at the published circuit size.<br>"
+        "One marker per algorithm and discovery ablation, at the published circuit size, "
+        "faithfulness under the matched protocol.<br>"
         "Rows are metrics, columns are tasks; each panel carries its Spearman ρ. "
         "Bar: min-max Jaccard over the ten seed pairs.",
         top=215,
@@ -769,6 +777,8 @@ def _slider_budgets(
     # functional.csv carries only `budget_label`; for a top-k row that label is the count.
     per_task: Dict[str, set] = defaultdict(set)
     for r in functional:
+        if r.get("measure", "faithfulness") != "faithfulness":
+            continue
         count = _num(r["budget_label"]) if r["selector"] == "top_k" else None
         if count is not None and r["task"] in tasks:
             per_task[r["task"]].add(count)
@@ -891,8 +901,9 @@ def fig_stability_vs_function_slider(
     header(
         fig,
         "Structural instability against functional instability, by circuit size",
-        "One marker per algorithm and discovery ablation. Drag the slider to change the "
-        "edge budget.<br>Rows are metrics, columns are tasks. "
+        "One marker per algorithm and discovery ablation, faithfulness under the matched "
+        "protocol. Drag the slider to change the edge budget.<br>"
+        "Rows are metrics, columns are tasks. "
         "Bar: min-max Jaccard over the ten seed pairs.",
         top=225,
         right=40,
@@ -934,95 +945,150 @@ def fig_stability_vs_function_slider(
 # ── Fig 5: the functional curves behind Fig 2 ───────────────────────────────────────
 
 
-def fig_faithfulness_spread(
-    functional: List[dict], task: str, metric: str
+_MEASURE_GLOSS = {
+    "faithfulness": "circuit kept, complement ablated",
+    "completeness": "circuit ablated, complement kept",
+}
+
+
+def fig_measure_grid(
+    functional: List[dict], task: str, metric: str, measure: str
 ) -> Optional[go.Figure]:
-    rows = [r for r in functional if r["task"] == task and r["metric"] == metric]
+    """One task and metric over the whole protocol square.
+
+    Rows are the ablation the circuit was discovered under, columns the ablation it is
+    scored under, so the diagonal is the matched protocol and everything off it is a
+    protocol mismatch. Folding both into one figure is what keeps nine combinations from
+    becoming nine files.
+    """
+    rows = [
+        r for r in functional
+        if r["task"] == task and r["metric"] == metric
+        and r.get("measure", "faithfulness") == measure
+    ]
     if not rows:
         return None
     algos = _algos(rows)
     colors, symbols = algo_colors(algos), algo_symbols(algos)
+    n_cols = len(ABLATION_ORDER)
     fig = make_subplots(
-        rows=1,
-        cols=len(ABLATION_ORDER),
+        rows=len(ABLATION_ORDER),
+        cols=n_cols,
+        shared_xaxes=True,
         shared_yaxes=True,
-        subplot_titles=[f"{a} discovery" for a in ABLATION_ORDER],
-        horizontal_spacing=0.04,
+        subplot_titles=[f"{a} eval" for a in ABLATION_ORDER]
+        + [""] * (n_cols * (len(ABLATION_ORDER) - 1)),
+        horizontal_spacing=0.045,
+        vertical_spacing=0.075,
     )
-    for col, ablation in enumerate(ABLATION_ORDER, start=1):
-        for algo in algos:
-            want = "anchor" if algo == "Random" else ablation
-            eval_want = ablation
-            series = sorted(
-                (
-                    r for r in rows
-                    if r["algo"] == algo and r["discovery_ablation"] == want
-                    and r["eval_ablation"] == eval_want
-                ),
-                key=lambda r: r["realised_mean"],
-            )
-            if not series:
-                continue
-            xs = [s["realised_mean"] for s in series]
-            anchor = is_anchor(algo)
-            if not anchor:
-                _band(
-                    fig, xs, [s["metric_min"] for s in series],
-                    [s["metric_max"] for s in series], colors[algo], 1, col,
+    for r_i, discovery in enumerate(ABLATION_ORDER, start=1):
+        for c_i, evaluation in enumerate(ABLATION_ORDER, start=1):
+            for algo in algos:
+                want = "anchor" if algo == "Random" else discovery
+                series = sorted(
+                    (
+                        r for r in rows
+                        if r["algo"] == algo and r["discovery_ablation"] == want
+                        and r["eval_ablation"] == evaluation
+                    ),
+                    key=lambda r: r["realised_mean"],
                 )
-            fig.add_trace(
-                go.Scatter(
-                    x=xs,
-                    y=[s["metric_mean"] for s in series],
-                    name=algo,
-                    legendgroup=algo,
-                    showlegend=(col == 1),
-                    mode="lines+markers",
-                    line=dict(
-                        color=colors[algo],
-                        width=1.5 if anchor else 2,
-                        dash="dash" if anchor else "solid",
+                if not series:
+                    continue
+                xs = [s["realised_mean"] for s in series]
+                anchor = is_anchor(algo)
+                if not anchor:
+                    _band(
+                        fig, xs, [s["metric_min"] for s in series],
+                        [s["metric_max"] for s in series], colors[algo], r_i, c_i,
+                    )
+                fig.add_trace(
+                    go.Scatter(
+                        x=xs,
+                        y=[s["metric_mean"] for s in series],
+                        name=algo,
+                        legendgroup=algo,
+                        showlegend=(r_i == 1 and c_i == 1),
+                        mode="lines+markers",
+                        line=dict(
+                            color=colors[algo],
+                            width=1.5 if anchor else 2,
+                            dash="dash" if anchor else "solid",
+                        ),
+                        marker=dict(
+                            size=5 if anchor else 7,
+                            symbol=symbols[algo],
+                            line=dict(width=1.4, color="#ffffff"),
+                        ),
                     ),
-                    marker=dict(
-                        size=5 if anchor else 7,
-                        symbol=symbols[algo],
-                        line=dict(width=1.4, color="#ffffff"),
-                    ),
-                ),
-                row=1,
-                col=col,
-            )
-    apply_theme(fig, width=1280, height=580, margin_left=110)
+                    row=r_i,
+                    col=c_i,
+                )
+    apply_theme(fig, width=1180, height=980, margin_left=110)
     header(
         fig,
-        f"{TASK_DISPLAY.get(task, task)} · {metric} across five seeds",
-        "Line: mean over the five seeds. Band: min-max. Each panel is evaluated under its "
-        "own discovery ablation.",
-        top=155,
+        f"{TASK_DISPLAY.get(task, task)} · {metric} · {measure}",
+        f"Line: mean over the five seeds. Band: min-max. {_MEASURE_GLOSS[measure]}. "
+        "Boxed panels are the matched protocol,<br>where the circuit is scored under the "
+        "ablation it was discovered with.",
+        top=185,
         right=40,
     )
     fig.update_xaxes(
-        type="log", dtick=1, exponentformat="power", title=dict(text="Edges in circuit")
+        type="log", dtick=1, exponentformat="power", title=dict(text="Edges in circuit"),
+        row=len(ABLATION_ORDER),
     )
     fig.update_yaxes(title=dict(text=metric), col=1)
+    _row_labels(fig, ABLATION_ORDER, n_cols)
     _facet_titles(fig)
+    _ring_diagonal(fig, n_cols)
     return fig
+
+
+def _ring_diagonal(fig, n_cols: int) -> None:
+    """Outline the panels where the eval ablation matches the discovery ablation."""
+    for i in range(n_cols):
+        n = (i * n_cols) + i + 1
+        suffix = "" if n == 1 else str(n)
+        fig.add_shape(
+            type="rect",
+            xref=f"x{suffix} domain",
+            yref=f"y{suffix} domain",
+            x0=0, x1=1, y0=0, y1=1,
+            line=dict(color=AXIS, width=1.4),
+            fillcolor="rgba(0,0,0,0)",
+            layer="below",
+        )
 
 
 # ── driver ──────────────────────────────────────────────────────────────────────────
 
 
-def _save(fig: Optional[go.Figure], path: Path) -> None:
+def _save(
+    fig: Optional[go.Figure],
+    path: Path,
+    formats: Tuple[str, ...] = ("pdf", "png", "html"),
+) -> None:
+    """PDF for the thesis, PNG to look at, HTML for hover.
+
+    The grid figures opt out of HTML: nine panels of banded curves make a ~200 KB page
+    that nobody opens twenty-eight of.
+    """
     if fig is None:
         print(f"SKIP {path.name}: no data")
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        fig.write_image(str(path))
-        fig.write_image(str(path.with_suffix(".png")), scale=2)
+        if "pdf" in formats:
+            fig.write_image(str(path))
+        if "png" in formats:
+            fig.write_image(str(path.with_suffix(".png")), scale=2)
     except Exception as e:
         print(f"WARNING: static export failed for {path.name} ({e}); writing HTML")
-    fig.write_html(str(path.with_suffix(".html")), include_plotlyjs="cdn", full_html=True)
+    if "html" in formats:
+        fig.write_html(
+            str(path.with_suffix(".html")), include_plotlyjs="cdn", full_html=True
+        )
     print(f"  {path.relative_to(path.parents[1])}")
 
 
@@ -1047,13 +1113,18 @@ def write_all_figures(folder: Path) -> None:
         slider.write_html(str(path), include_plotlyjs="cdn", full_html=True)
         print(f"  {path.relative_to(path.parents[1])}")
 
-    seen = {(r["task"], r["metric"]) for r in functional}
-    for task, metric in sorted(seen):
+    # The task lives in the filename, not a folder: two folders of fourteen beat six of
+    # four or five, and the measure is the only dimension that earns a directory.
+    seen = {
+        (r.get("measure", "faithfulness"), r["task"], r["metric"]) for r in functional
+    }
+    for measure, task, metric in sorted(seen):
         slug = metric.lower().replace(" ", "_")
         task_slug = task.lower().replace(" ", "_")
         _save(
-            fig_faithfulness_spread(functional, task, metric),
-            figures / "faithfulness" / task_slug / f"{slug}.pdf",
+            fig_measure_grid(functional, task, metric, measure),
+            figures / measure / f"{task_slug}__{slug}.pdf",
+            formats=("pdf", "png"),
         )
 
 
