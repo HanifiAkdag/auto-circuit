@@ -18,4 +18,6 @@ logs/
 CLAUDE.md
 *.pkl
 hpo/results/
+docs/related_work/.scratch/
+.scratch/
 docs/related_work/
