@@ -93,6 +93,45 @@
 
 ## Related Work
 
+### The field's practical review states the ablation ordering Pillar 1 tests, and never cites Miller — 2026-08-08
+
+- **Context:** Reading Rai, Zhou, Feng, Saparov & Yao, "A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models" (arXiv 2407.02646, **v4** — substantially revised, cites work through 2025) to locate the sections worth reading for the thesis. Full body read; claims below verified by grep over the complete text.
+- **Observation:**
+  - §5.2.1 + Table 4 restate the thesis's ablation axes in survey vocabulary: **noising** (necessity) vs **denoising** (sufficiency), crossed with zero / random-noise / mean / resample. Independent confirmation that the `(discovery-ablation, eval-ablation, patch-direction)` triple is the field's own axis set, not an invented one.
+  - §5.2.3 presents ablation choice as a **quality ordering** (resample > mean > zero/random), argued purely from out-of-distribution risk and citing Zhang & Nanda (2023), Chan et al. (2022), Geiger et al. (2021). It never asks whether the ranking of *algorithms* changes with the baseline.
+  - **Miller et al. (2024) is not cited anywhere in the survey.** The only "Miller" in the text is Alexander Miller in the Petroni et al. reference. So a 2025-revised practical review teaches the consensus ordering without the finding that the choice shifts conclusions.
+  - **Table 8's localization taxonomy contains only** zero/mean/resample ablation, path patching, ACDC, EAP, EAP-IG. "Edge Pruning" appears exactly once in the body (an aside that minimality is "also referred to as sparsity, Bhaskar et al. 2024"); "DiscoGP", "subnetwork probing", and "L0" appear **zero** times.
+  - §6.2.1 gives the five-step circuit workflow and the Wang faithfulness/minimality/completeness triad, with completeness defined the subset-K way (behavior under random ablation of circuit components), not DiscoGP's complement-at-chance way.
+  - §8.7.2 introduces **MIB** (Mueller et al. 2025), which benchmarks circuit localization on semi-synthetic *and* real pre-trained transformers and reports ACDC/EAP-IG strongest. It too excludes EP and DiscoGP, and it ranks methods under a single protocol.
+- **Significance:** Two usable results. (1) **Sub-RQ1 framing** (see the 2026-07-21 entry): the survey is direct evidence that optimization-based discovery is not in the toolkit a newcomer is handed, so integrating EP and DiscoGP into a standardized harness is a contribution rather than "just implement them". (2) **Sub-RQ3 framing under the neutral-framing constraint**: the gap can be stated without faulting anyone, because the field's own introductory text asserts the resample > mean > zero ordering that Pillar 1 measures, and does so without the Miller caveat. MIB must be acknowledged in Related Work as the nearest existing standardized comparison, with the distinction being that it ranks within one protocol while the thesis measures across the protocol square.
+- **Code pointer:** `docs/related_work/practical_review_mi.md` (includes a per-section reading guide); local text at `/storage/ukp/work/akdag/thesis/arxiv-papers/2407.02646v4.md`.
+
+### Zhang & Nanda: the ICLR 2024 precedent for methodology-relativity, and why our IOI corruption makes answer-probability suspect — 2026-08-08
+
+- **Context:** Read Zhang & Nanda, "Towards Best Practices of Activation Patching in Language Models: Metrics and Methods" (arXiv 2309.16042, ICLR 2024), the paper Rai et al. point to for metric reliability.
+- **Observation:**
+  - Four best practices: use symmetric token replacement (STR) not Gaussian noising (GN); avoid probability, prefer logit difference, KL "also reasonable"; try single-layer patching before sliding-window; vary which tokens are corrupted.
+  - **We satisfy the STR recommendation by construction.** AutoCircuit stores paired clean/corrupt *token* sequences of equal length (`auto_circuit/data.py:355` computes the divergence index), so all three tasks are STR: IOI swaps names, Greater-Than swaps the start year (`1363` → `1301`), Docstring swaps parameter names. GN is not expressible in this format.
+  - **Probability structurally cannot see negative components.** The patching effect `P_pt(r) − P_*(r)` is bounded below by `−P_*(r)` because `P_pt ≥ 0`. On IOI with STR, `P_*(IO)=0.03` while 2 SD below the mean is −0.027, so head 11.10 (−0.022) is missed. Under all-names-replaced corruption (`p_ABC`, `P_*(IO)=5e-4`) probability finds **neither** Negative Name Mover; logit difference finds both. This is a non-negativity bound, not saturation.
+  - **Our IOI dataset is `p_ABC`.** Verified in `datasets/ioi/ioi_vanilla_template_prompts.json`: `Marco…William…William` → `Roman…Ian…Crew`. That is exactly their worst-case condition for probability as a metric.
+  - Corruption method and metric each change the answer: GN's factual-recall peak is 2×–5× higher than STR's; on IOI, STR and GN detect **different sets of heads** at any fixed metric. Head 0.10 (which *helps* IOI) is detected with the **wrong sign** under GN because noise breaks its mechanism, not just its information.
+  - They test **denoising only**, and state that comparing the two directions is open: "Our work tests overriding corrupted activations by clean activations. The other direction ... is interesting to compare these two."
+  - Every configuration under-recovers the IOI circuit, missing most Name Movers; they conclude path patching and manual inspection remain necessary.
+- **Significance:** Three uses. (1) The denoising-only limitation is the cleanest **external** warrant for Pillar 1's patch-direction axis, better framing than asserting the gap ourselves, and it complements `Activation patching: direction = sufficiency/necessity — 2026-06-09` and `Completeness patch direction`. (2) The probability bound gives a principled reason to keep `ANSWER_PROB_METRIC` secondary, and reframes `DiscoGP-EP answer probability collapses despite strong logit-diff — 2026-05-19`: part of that collapse may be the metric near its floor rather than DiscoGP alone. **Not a proven transfer** (their quantity is a denoising patching effect, ours is circuit-vs-full-model probability), so it is a hypothesis to check at high sparsity and under zero-ablation eval. (3) Scope guard: their STR/GN axis is *prompt* corruption, orthogonal to our zero/resample/mean *activation-replacement* axis (see `How factorized edge patching works — 2026-06-01`), so "prefer STR" must not be cited as support for "prefer resample"; only the OOD argument is shared. Also note the apparent tension with our KL-primary hierarchy: their logit-diff recommendation is for **localization**, ours is for **faithfulness evaluation** where overshoot must be penalized both ways (see `Why DiscoGP-EP has high logit-diff AND high answer-pair KL — 2026-06-10`).
+- **Code pointer:** `docs/related_work/activation_patching_best_practices.md`; local text at `/storage/ukp/work/akdag/thesis/arxiv-papers/2309.16042v2.md`.
+
+### "Causal mediation analysis" is a framework, not a patch direction — 2026-08-08
+
+- **Context:** Rai et al. (§5.2.1) state "Denoising-based interventions have also been termed as causal tracing or causal mediation analysis (Meng et al., 2022)." Checked the claim against Heimersheim & Nanda (2404.15255), Miller (2407.08734) and Méloux et al. (2510.00845).
+- **Observation:**
+  - **Causal tracing = denoising checks out.** Heimersheim & Nanda's §2.3 table labels the `clean → corrupted` row "Denoising, Causal Tracing" and `corrupted → clean` "Noising, Resample Ablation"; Miller's Table 3 puts Meng et al. (2022) on the "Restore Clean" row. But Heimersheim & Nanda footnote that the term is used both for ROME-style Gaussian-noise patching and for clean→corrupt patching generally, and explicitly "recommend avoiding the name to avoid confusion"; Miller Appendix F uses it direction-agnostically ("Activation patching has previously also been called Causal Tracing or Interchange Intervention").
+  - **CMA = denoising does not.** CMA (Pearl 2001; VanderWeele 2016) partitions a total effect into direct/indirect paths through a mediator: it fixes *what* is estimated, not *which direction* is patched. Méloux et al. define the MI estimand as the natural indirect effect and give the standard estimator as **noising**: "a clean run with input x, and a counterfactual run where the mediator is set to the value it would take under a corrupted input x′".
+  - Méloux place CMA as the genus over **both** activation patching (Vig 2020; Geiger 2021) and causal tracing (Meng 2022); their §3.3 "Approximating CMA via the EAP family" treats EAP as a CMA approximation, and EAP's `grad·(corrupt − clean)` is noising by construction. So the field's most-used CMA approximation is a noising method.
+  - Rai cite only Meng (2022) for both labels. Meng is ROME (denoising), which carries "causal tracing" but not the general "CMA" gloss.
+- **Significance:** Direction vocabulary in the write-up should be noising/denoising (Heimersheim & Nanda) or Miller's Ablate Clean / Restore Clean, which is what the protocol tag already uses; "CMA" must never stand in for a direction. Knock-on: the phrase "EP and DiscoGP are neither EAP nor CMA-based" in `eap_ig_variance_stability.md` leans on the same loose usage, and the precise claim is that they do not compute and aggregate per-input effect scores, not that they fall outside causal analysis. Follow-up: Mueller et al. (2026), "The quest for the right mediator" (*Computational Linguistics*), is the dedicated CMA-in-MI survey and is not yet in related work; same author as MIB.
+- **Caveat:** Vig et al. (2020) could not be read directly (no arXiv HTML, PDF extraction unavailable), so the claim about the original NIE construction rests on Méloux's characterization.
+- **Code pointer:** `docs/related_work/practical_review_mi.md` (§5.2.1 findings block).
+
 ### Rome paper publishes per-method instability numbers — Pillar 2 gap re-scoped, not weakened — 2026-07-13
 
 - **Context:** User asked whether "All Circuits Lead to Rome" (Chen et al., ICML 2026, arXiv 2605.12671; already in related work) weakens the stability pillar; re-read the paper's stability-specific results (Tables 4–5, Figure 3).
@@ -283,6 +322,20 @@
   - Caveats for an EAP-zero variant: the paper itself shows the linearization is loose even at resample (R² = 0.27 vs activation patching, ~2× overestimation, concave curves for embedding edges), and a zero baseline is a larger, more off-distribution perturbation, so the approximation should degrade further. KL is unusable as EAP's discovery metric (zero gradient at the clean point), so any variant stays on logit-diff discovery vs KL evaluation.
 - **Significance:** *(Superseded in part 2026-07-16, see the erratum entry under Experiments: "single-protocol anchor" wrongly conflated "resample is EAP's paper-native baseline" with "EAP is ablation-independent"; EAP is now swept.)* Identifies resample as EAP's paper-native discovery ablation and the zero/mean variants as well-defined first-order extensions; also gives the citable reason why EAP cannot share the KL discovery objective.
 - **Code pointer:** `docs/related_work/edge_attribution_patching_syed2023.md`; `auto_circuit/prune_algos/mask_gradient.py:27`
+
+### The spine runs plain EAP, and AutoCircuit's IG variant is a named, benchmarked, losing variant — 2026-08-08
+
+- **Context:** Auditing which member of the EAP family the sub-RQ3 spine actually runs, against Hanna et al. (2024, COLM) App. C/D and Mueller et al. (2025, MIB) §3.2.
+- **Observation:**
+  - The spine's `eap` is **plain EAP** (m = 1, gradient at the clean point, logit-diff loss): `eap_prune_scores` passes `mask_val=0.0`, and `mask_gradient_prune_scores` asserts `mask_val XOR integrated_grad_samples`, so the IG loop never executes.
+  - The family splits on **what is interpolated**, not on the score form: EAP-IG-inputs (Hanna) interpolates **input embeddings**; EAP-IG-activations (Marks et al. 2024) interpolates **each node's output, layer by layer**, at O(m·L) passes.
+  - AutoCircuit's `integrated_grad_samples` path is not an unnamed extra: Hanna et al. App. D names it **"Partial EAP-IG in activation space (Miller et al., 2024)"**, gives its formula (their Eq. 6, all nodes interpolated *jointly* in one pass rather than per independent sublayer, which they flag as mathematically imprecise), and benchmarks it. It loses to EAP-IG-inputs on 5 of 6 tasks; **IOI is the sole exception**.
+  - IG's real payoff is the objective axis, not accuracy: at the clean point KL has zero gradient, so plain EAP cannot use it; blended inputs make KL usable (their `EAP-IG-KL`). App. F shows EAP-IG's *rank* correlation with true activation patching is **worse** than EAP's while its circuits are more faithful, so "better linearization" is not the mechanism.
+  - m = 5 suffices (App. C; m = 3 would do), and the trivial **Clean-Corrupted baseline** (average of the clean and corrupt gradients, no interpolation) beats EAP everywhere and loses to EAP-IG only on SVA. Our two registered IEG algos use 50 and **1000** samples, i.e. 200× past the useful point.
+  - MIB corroborates the scale at which the choice matters: EAP-IG-inputs is best overall, but on **IOI / GPT-2 EAP with counterfactual ablation ties it** (CMD 0.03 vs 0.03); the gap opens on Qwen/Gemma/Llama. MIB also runs `EAP (mean) / EAP (CF) / EAP (OA)`, an independent precedent for sweeping EAP's discovery ablation.
+  - Two implementation divergences: our IG grid is `range(m+1)` with `α = k/m`, so it evaluates the **fully-ablated endpoint**, which Hanna's `k = 1..m` sum never does; and selection is global top-k by `|score|` rather than Hanna's greedy connected search (App. E), which by construction avoids parentless/childless nodes.
+- **Significance:** Pre-empts the obvious reviewer question ("why not EAP-IG?"). The defensible answer is that IG's advantage lives on the objective axis the spine deliberately holds fixed for EAP, and vanishes at our exact operating point (GPT-2 small, IOI). It also means the IG algos already in the registry cannot be enabled as a quick upgrade: they are the variant Hanna measured as worse, not the one MIB ranks first.
+- **Code pointer:** `auto_circuit/prune_algos/prune_algos.py:121` (`eap_prune_scores`), `:172-193` (unused IEG registrations); `auto_circuit/prune_algos/mask_gradient.py:62,74-78`; `experiments/faithfulness_cells.py:20`
 
 ## Results
 
@@ -518,6 +571,311 @@
 
 ## Experiments
 
+### Status of the port-fidelity and `tail_divergence` work — as of 2026-08-11
+
+The entries below run roughly newest-first and record the investigation as it
+happened, including two framings that turned out to be wrong. This block is the
+current state; where an entry disagrees with it, this block wins.
+
+| question | answer | where |
+|---|---|---|
+| Is the DiscoGP port faithful? | **3 of 6 endpoints support fidelity** at the corrected margins; Clean KL and Logit-Diff are inconclusive on interval width, not on disagreement. Structural endpoints essentially exact (Spearman gap 1e-05). | margins erratum, 08-11 |
+| What explained the port gap? | Two things, both removable: the `b_O/n_heads` bias convention, and AutoCircuit's `tail_divergence` dataloader defect. Neither is a DiscoGP implementation error. | 08-09 bias entries, 08-10 re-run |
+| Is the `tail_divergence` defect fixed? | Yes, verified against a per-prompt reference on all three tasks. It is an upstream AutoCircuit bug, not a fork bug. | fix entry, 08-09 |
+| Reported upstream? | [issue #17](https://github.com/UFO-101/auto-circuit/issues/17) and [PR #18](https://github.com/UFO-101/auto-circuit/pull/18). | 08-11 |
+| Does Pillar 2 survive the fix? | Yes. Stability ordering unchanged (EAP > ACDC ≈ EP > DiscoGP), Random anchor and fixed budgets identical. | Methodology, Pillar-2 entries |
+| What still needs re-running? | **Pillars 1 and 3.** Every figure under `results/faithfulness_comparison/` predates the fix. | fix entry, 08-09 |
+
+Two claims made during this work were **withdrawn**, and are marked as such where
+they appear: that the defect was a padding-mask problem (Docstring has zero padding
+and was still wrong by 7.82), and that a per-batch cache was the correct fix (it
+leaves IOI at 3.3437).
+
+### Reported upstream: AutoCircuit issue #17 and PR #18 — 2026-08-11
+
+- **Context:** the `tail_divergence` defect is in stock AutoCircuit, not in this fork. `auto_circuit/data.py` was byte-identical to upstream `main` (blob `cf9199d`) before the fix, so the patch applies cleanly despite this fork being far ahead.
+- **Filed:** [issue #17](https://github.com/UFO-101/auto-circuit/issues/17) with the diagnosis, and [PR #18](https://github.com/UFO-101/auto-circuit/pull/18) with the fix plus a regression test, from the public fork `HanifiAkdag/auto-circuit-1` cut from upstream `8fc5afd`. The PR adds a test to upstream's own `tests/test_data.py` that fails on unmodified `main` and passes with the change.
+- **Significance for the write-up:** the fork now diverges from released AutoCircuit on a correctness-relevant line. Anyone reproducing with a pip-installed `auto-circuit` gets the defective behaviour, so the Limitations section must say so. Upstream has had no functional commit since 2024-11 (the last five are README edits), so the fix should not be assumed to land.
+- **Two upstream facts worth citing:** `tests/test_data.py::test_tail_divergence` passes only because `ioi_vanilla_template_prompts` happens to have a genuinely common prefix, uses `return_seq_length=True` (forbidding padding) and exactly one batch; and `test_unfactorized_edges` fails on unmodified upstream `main` (38 passed, 1 failed), so it is not a fork regression.
+
+### The `tail_divergence` fix works by disabling the feature on GPT-2, and the tests said less than claimed — 2026-08-11
+
+- **Context:** auditing my own fix after the Pillar-2 re-run validated it. Two things did not hold up: how much of the feature survives, and how much the test suite actually covers.
+- **Observation — the stripping path is inert on both GPT-2 tasks.** Measured `diverge_idx`: IOI 3 → **0**, GT 8 → **0**, Docstring 11 → **3**. GPT-2 sets `pad == bos == eos == 50256`, so a prepended BOS cannot be certified pad-free and stripping stops at position 0.
+    - **The cost of the guard is 2 tokens, not the whole prefix.** Without the pad guard the prompts genuinely agree to index 2 (IOI, of 15) and index 2 (GT, of 11). So GT's pre-fix `diverge_idx=8` was never an 8-token saving: 2 tokens of real prefix plus 6 of corruption.
+    - Being conservative here is the right call rather than merely the safe one: those are exactly the positions where TransformerLens' BOS-promotion rule misfires on a chunk, which is the mechanism that made the shared cache wrong.
+- **Observation — two of the three "no-op" test cases were vacuous.** `test_disabling_tail_divergence_changes_nothing` passes trivially on IOI and GT because `diverge_idx=0` makes toggling a literal no-op. Real coverage was 3 structural + 3 correctness + **1** meaningful no-op (Docstring), not the 9 tests previously claimed.
+- **Observation — the fix crashed on ragged input, and so did the code it replaced.** Clean and corrupt are tokenized separately, so they can be padded to different widths; `t.cat` then raises (`Sizes of tensors must match except in dimension 0`). The pre-fix `clean_prompts == corrupt_prompts` comparison would have raised too, so this is pre-existing fragility rather than a regression, but it is now guarded: unequal widths mean no position is comparable, so nothing is stripped.
+- **Observation — any padding at all disables stripping.** Unequal prompt lengths put a pad at position 0 for the shorter rows under left-padding, so `diverge_idx` collapses to 0. This is correct, and it means the optimization is inert on most real datasets, not just on GPT-2.
+- **Significance:** the correctness claim for the fix stands (end-to-end agreement with a per-prompt reference, all three tasks), but the *feature* it protects is now close to dead in this project. That is a defensible trade, and it should be stated as one rather than left implicit: the write-up should not describe `tail_divergence` as an active optimization.
+- **Tests added:** a non-vacuity guard that skips rather than silently passes when `diverge_idx == 0`; a test pinning the GPT-2 pad/bos collision and asserting the prompts agree past position 0, so a future change that re-enables stripping trips it; a synthetic deep-prefix fixture on `attn-only-4l` (distinct pad/bos ids, 26 of 27 tokens cached) that exercises the caching path at a depth no stock task reaches; and a ragged-input test pinning the collapse to 0. **11 passed, 4 skipped** (the skips are the honest report of the inert cases).
+- **Code pointer / Run:** `auto_circuit/data.py:354-377`; `tests/test_tail_divergence_correctness.py`.
+
+### Erratum: the Tier C margins were derived from pre-fix Pillar-2 data; recomputing them costs one endpoint — 2026-08-11
+
+- **Context:** the entry above scores Tier C against margins δ taken from the Pillar-2 within-implementation SD for DiscoGP × IOI × zero/zero × faithfulness at k=2000. Those SDs came from `stability_2026-08-05`, which was itself produced through the defective dataloader. The port cells were re-run on the fixed dataloader but the margins were not, so the verdicts mixed post-fix data with pre-fix noise estimates.
+- **Observation — every data-derived margin shrank once Pillar 2 was re-run** (`stability_v2_2026-08-11`):
+
+  | endpoint | δ pre-fix | δ post-fix | change |
+  |---|---|---|---|
+  | Clean KL Div | 1.0262 | 0.8716 | −15% |
+  | Logit Diff Percent | 84.3293 | 71.4485 | −15% |
+  | Answer Pair KL Div | 0.2404 | 0.1792 | −25% |
+  | Jaccard | 0.0337 | 0.0116 | **−66%** |
+
+  Spearman (0.10) and density (0.02) are chosen bounds rather than measured SDs, so they are unaffected.
+- **Significance — the direction is unfavourable.** A wider margin makes TOST equivalence easier to declare, so every pre-fix verdict was scored against noise estimates that were too generous. Re-running with the corrected δ flips **Clean KL Div** from "fidelity supported" to inconclusive: its 90% CI upper bound is 0.916 against the new margin of 0.8716, missing by about 5%. The headline becomes **3/6 endpoints supporting fidelity**, not 4/6. Answer-Pair KL (0.115 vs 0.1792) and Jaccard (gap 0.0013 vs 0.0116) survive comfortably; Jaccard survives despite its margin tightening by two thirds.
+- **Methodological point worth stating in the write-up:** the pre-registration fixed the *rule* for setting δ ("the Pillar-2 within-implementation SD"), not the literal numbers. Recomputing δ after Pillar 2 was corrected is what that rule requires; leaving the old numbers in place would have been the violation. Both value sets are recorded in the source so the change is auditable.
+- **Unchanged:** the negative-control sensitivity table is identical under the tighter margins (`port-neginv` 5/6, `orig-asshipped` 2/6, density missed by both), so the limited demonstrated power noted above still applies and is not improved by the tightening.
+- **Code pointer / Run:** job 418791; `experiments/port_comparison/fidelity_analysis.py:60-79` (DELTAS, both value sets); `results/port_fidelity/tier_c_v3_tightmargins/` alongside the superseded `tier_c_v2/`.
+
+### Port fidelity re-run after both fixes: the implementations agree — 2026-08-10
+
+- **Context:** the Tier C results were all discovered and scored through the defective dataloader, so they could not answer whether the port matches the original once the bias convention is matched. Re-ran the port arms (35 cells) on the fixed dataloader into a separate cache (`.port_fidelity_cache_v2`); the `orig*` arms build their own dataloaders (`run_cells.py:159-184`) and were carried over, though all arms were re-scored through the fixed harness. 55 cells, zero failures.
+- **Result, `port-split` vs `orig` (bias convention matched, unmodified GPT-2):**
+
+  | endpoint | pre-fix diff | post-fix diff | margin | verdict |
+  |---|---|---|---|---|
+  | edge density | −0.0013 | −0.0016 | 0.02 | fidelity supported (p=0.81) |
+  | Clean KL Div | 0.713 | **0.045** | 1.026 | fidelity supported (p=0.94) |
+  | Answer Pair KL | 0.008 | 0.005 | 0.240 | fidelity supported (p=0.95) |
+  | Jaccard gap | 0.0074 | **−0.0013** | 0.0337 | equivalent |
+  | Spearman gap | 0.0098 | **1.03e-05** | 0.10 | equivalent |
+  | Logit Diff Percent | +102.5 | **−29.6** | 84.33 | inconclusive (p=0.52) |
+
+  Four of six now support fidelity and the two structural endpoints are essentially exact (Spearman gap 1e-05). The remaining one is inconclusive on *interval width* only: its point estimate moved from +102.5, outside the margin, to −29.6, well inside it, so what is missing is precision rather than agreement.
+  - **Superseded 2026-08-11:** the margins in this table were derived from pre-fix Pillar-2 data. Recomputing them from the re-run Pillar 2 drops Clean KL to inconclusive, so the headline is **3 of 6, not 4 of 6**. See the margins erratum above; the verdicts here should not be quoted.
+- **The earlier hypothesis was right.** I had flagged the dataloader defect as the leading suspect for the two endpoints that stayed unresolved after matching the bias convention. Fixing it closed Clean KL (0.713 → 0.045) and moved logit-diff inside its margin. That is a prediction made before the fix and confirmed after it, not a post-hoc rationalisation.
+- **`port` vs `orig` as shipped is still a genuine discrepancy on all four functional endpoints**, as expected: the bias convention still differs there. Notably the structural endpoints now read equivalent (Jaccard gap 0.0319 < 0.0337), where pre-fix Jaccard was not.
+- **Control caveat:** with n=5, the negative controls are weaker than before. `port-neginv` is detected by 5/6 endpoints, but `orig-asshipped` by only 2/6 (Clean KL, Logit-Diff), down from 3/6, and density is now missed by both. The equivalence claims above should be read with that limited demonstrated power in mind.
+- **Code pointer / Run:** arrays 418375 (port arms) and 418396 (controls) on the `yolo` partition, 10-wide; `results/port_fidelity/tier_c_v2/`.
+
+### The `tail_divergence` defect is fixed, and it changes every cached result — 2026-08-09
+
+- **The fix** (`auto_circuit/data.py`, in the `tail_divergence` branch): `diverge_idx` was the minimum *within-pair* divergence, i.e. where each clean prompt starts to differ from **its own** corrupt partner. But the prefix KV cache is built once and reused for every batch, so the prefix must be identical for **every** prompt. The new computation keeps only the positions where all clean and corrupt prompts agree **and** none of them pads, and never strips the whole sequence.
+  - The pad-free condition matters independently: a padded position holds a real token for some rows and padding for others, so no single split index means the same thing for every row. This is also why the pad/BOS mask heuristic misfired, so one change fixes both defects.
+- **Effect on the stripping:** Docstring `diverge_idx` 11 → **3** (a genuinely common prefix survives), Greater-Than 8 → **0**, IOI 3 → **0**. On the latter two the optimisation is now correctly disabled, because those prompts do not share a pad-free prefix at all.
+- **Verified** by comparing a stock `Task` against each prompt run individually (batch of one, no padding, no cache); now enforced by `tests/test_tail_divergence_correctness.py`:
+
+  | task | before | after |
+  |---|---|---|
+  | Docstring | 7.8186 | **0.0000** |
+  | Greater-Than | 22.5883 | **0.0001** |
+  | IOI | 3.1310 | **0.0001** |
+
+  All three now agree with the reference on **100%** of top-1 predictions.
+- **Rejected alternatives, both measured** (throwaway script, removed once the numbers below were recorded): a per-batch cache fixes the unpadded tasks completely (Docstring 0.0000, GT 0.0001) but leaves IOI wrong (3.3437), and adding a corrected mask on top makes IOI *worse* (3.9754). So "rebuild the cache per batch" is not sufficient, and the mask correction alone is actively harmful. The independent verifier's claim that a per-batch cache "recovers the truth exactly on all four datasets" does not hold.
+- **Tests:** `tests/test_tail_divergence_correctness.py`. **Superseded 2026-08-11:** this originally claimed 9 tests giving three-way coverage; two of the three no-op cases were vacuous. See the audit entry above for the current 11-test suite and what it actually covers.
+- **Consequence, and it is large:** every cached result in this project was produced through the defective path, on all three tasks. Between-algorithm comparisons were internally consistent so their *direction* should survive, but absolute faithfulness numbers were computed against a model that was not the one being claimed. Pillar 1, Pillar 2, Pillar 3 and the port-fidelity Tier C runs all need re-running before any number goes in the write-up.
+
+### Correction: the dominant `tail_divergence` defect is a shared KV cache, not the padding mask — 2026-08-09
+
+- **Context:** an independent agent was asked to verify the padding-mask finding below without being told the mechanism, and was instructed to try to refute it. It found a larger, separate defect. I verified the pivotal claim myself before accepting it.
+- **The dominant defect:** `data.py` builds the prefix cache **once** from `clean_prompts[:batch_size, :diverge_idx]`, and `PatchableModel` (`patchable_model.py:129,143`) keeps exactly one cache per batch *size* and reuses it for **every batch**. The test loader's cache is built from the first `bs` entries of the same list, i.e. **train** prompts. `diverge_idx` is a *pairwise* quantity (clean vs corrupt of the same pair, `data.py:355-356`) and never checks the prefix is common *across* prompts, which it generally is not.
+- **Measured on the library's own `Task` objects, stock config, nothing ablated** (test set, 4 batches of 64):
+
+  | task | pad tokens in test set | max&#124;Δlogit&#124; | argmax agreement |
+  |---|---|---|---|
+  | IOI | 1148 | 2.67-3.13 | 90.6-96.9% |
+  | Greater-Than | 256 | **22.59** | **14.1%** |
+  | Docstring | **0** | **7.82** | 67-84% |
+
+  **Docstring has zero padding across the whole test set and is still badly wrong.** That refutes the "padding is the trigger" framing in the entry below. Cross-batch prefix mismatch is 64/64 on GT and Docstring for batches 1-3.
+- **Do not fix the mask alone.** The wrong mask incidentally masks out prefix positions holding another prompt's K/V; correcting it exposes those foreign values and makes IOI roughly 6x worse (max&#124;Δ&#124; ~2.2-3.1 rising to ~16.1-16.8).
+  - **Correction (2026-08-09, later the same day):** this entry originally went on to say "the demonstrated correct fix is a per-batch cache, which recovers the truth exactly". That was the independent verifier's claim and it is **wrong**. Measured: a per-batch cache leaves IOI at 3.3437, and adding a corrected mask on top makes it 3.9754. See the fix entry above.
+- **My methodological error:** `kv_effect_decomposition.py` built its cache from the very tokens it then evaluated, which structurally excludes the shared-cache defect, and I concluded from it that "the mask explains everything". A control that reconstructs the thing under test cannot detect a defect in how the real code constructs it. The same flaw invalidates the "uniform-length prompts agree to 2.0e-05" control.
+- **The library's own test hides it:** `tests/test_data.py::test_tail_divergence` asserts exactly the equality that fails here, but only under `ioi_vanilla_template_prompts` + `return_seq_length=True` (which forbids padding) + a single batch, the one configuration where both defects vanish.
+- **Consequence for the thesis:** unchanged in direction but larger in size than recorded below, and it now applies to Greater-Than and Docstring at least as strongly as to IOI. Discovery and evaluation both use the shared cache, so within-thesis between-algorithm comparisons stay like-for-like; absolute faithfulness numbers do not.
+- **Definitive end-to-end test** (since folded into `tests/test_tail_divergence_correctness.py`), built to remove the flaws in the two earlier attempts. The library arm is a stock `Task` constructed exactly as `run_cell.py` does, with **nothing monkeypatched**; the truth arm runs each prompt **individually** (batch of one, no padding, no cache, no AutoCircuit dataloader), which is correct by construction; both use `load_tl_model`, so only the input path can differ. Nothing is ablated. Alignment is asserted rather than assumed (what the library feeds must be the tail of that prompt's own tokenization: 0/64 misaligned on every task).
+
+  | task | pads in test set | control vs truth | **library vs truth** | argmax agreement |
+  |---|---|---|---|---|
+  | Docstring | **0** | 0.0000 | **7.8186** | 73.8% |
+  | Greater-Than | 256 | 0.0001 | **22.5883** | **21.9%** |
+  | IOI | 1148 | 0.0001 | **3.1310** | 93.4% |
+
+  The control is the library's own loader with only `tail_divergence` disabled, and it reproduces truth exactly on all three tasks. So the dataloader, padding, batching and the `PatchableModel` wrapper are all fine, the defect is `tail_divergence` specifically, and nothing downstream corrects it.
+  - Docstring is the cleanest single piece of evidence: zero padding, so the mask heuristic cannot fire, yet still wrong by 7.8 logits. That rules out the padding framing on its own.
+- **Code pointer / Run:** `tests/test_tail_divergence_correctness.py` (the definitive test, folded in from a since-removed script); the scratch probes were throwaway and are gone.
+
+### Superseded: the padding-mask account of the `tail_divergence` defect — 2026-08-09
+
+This entry originally diagnosed the defect as a padding-mask problem. That framing
+is **wrong** and was refuted the same day (see the correction entry above):
+Docstring has zero padding and was still off by 7.82. Kept in compressed form
+because three parts of it survived and are still load-bearing.
+
+- **The mask defect is real, but secondary.** `transformer_lens/utils.py:get_attention_mask`
+  has a rule for tokenizers where BOS and PAD share an id, which GPT-2's do (both 50256):
+  `attention_mask[arange(batch), is_leading_pad.sum(-1) - 1] = 1`, i.e. "the last leading
+  pad is really BOS". Correct for a whole sequence, but AutoCircuit calls the model once
+  per chunk and TransformerLens rebuilds the mask **per chunk**, so the rule fires on a
+  chunk containing no BOS and un-masks a genuine pad. Measured on one IOI batch:
+  **42 of 64 rows** get a wrong mask, always in the same direction (a pad wrongly
+  attended, never a real token wrongly ignored). Rows break iff their padding extends
+  past `diverge_idx`. Some heads place their entire attention on a pad (max weight 1.000
+  vs 0.000 on the whole-sequence path).
+- **The naive fix direction does not work.** Passing `attention_mask=` to
+  `HookedTransformer.forward` is silently discarded on the normal path: when
+  `start_at_layer is None` it overwrites the caller's argument with `input_to_embed`'s
+  return (`HookedTransformer.py:517-527`), and `input_to_embed` takes no such parameter.
+  That is why `ACDC.py:145` can pass one (it sets `start_at_layer`). No chunk-local fix
+  can work either, since whether a chunk's leading pads contain the BOS depends on tokens
+  outside it.
+- **Erratum on my own measurement.** An earlier version reported max 18.06 / 65.6% argmax
+  agreement for the padded case. That run was confounded: `HookedTransformer.forward`
+  computes a mask only when `padding_side == "left"` or a kv cache is passed, and a freshly
+  loaded model defaults to right padding, so the uncached arm did no masking at all. With
+  `padding_side="left"` on both arms, as AutoCircuit's loader does, the real batch gives
+  max **1.82** and **96.9%** agreement. Direction unchanged, magnitude inflated ~10x.
+- **Method note worth keeping:** the discarded decomposition script built its cache from
+  the very tokens it evaluated, which structurally excludes the shared-cache defect, and I
+  concluded from it that "the mask explains everything". A control that reconstructs the
+  thing under test cannot detect a defect in how the real code constructs it.
+
+### A third port difference: the KV-cache prefix is computed unmasked, and Tier B never tested it — 2026-08-09
+
+- **Context:** asked whether fixing the answer-token spacing and the attention-bias convention makes the two implementations identical. Auditing for anything else surfaced a difference that neither earlier tier could have caught.
+- **Observation:** `tasks.py:219` passes `tail_divergence=True` whenever a tokenizer is present, so the IOI loader strips the tokens shared by the clean and corrupt prompts into a KV cache. Measured on the frozen split: **`diverge_idx=3`, `kv_cache=yes`**, both splits. Those three positions are computed **once, unmasked**, and reused for every forward pass.
+  - The original has no such mechanism. It runs the full sequence with masks applied at every position.
+  - So edges feeding the first three token positions are effectively **un-ablatable in the port** and fully ablatable in the original.
+- **Why it was invisible until now:** the forward-equivalence comparison fed raw token ids directly to both models, with no KV cache, precisely to bypass the BOS and padding difference. That also bypassed this. The training comparison *did* use `task.train_loader`, so it carries the difference uncontrolled.
+- **Significance:** at the time this was a live candidate for the one endpoint that stayed non-equivalent after removing `b_O` (Answer-Pair KL, −0.212 against a 0.240 margin). **Resolved 2026-08-10:** it was the cause. Fixing the dataloader took Clean KL from 0.713 to 0.045 and moved logit-diff inside its margin, exactly as predicted before the fix.
+- **Method note:** the useful generalisation is that a test which controls a confound by *bypassing* a code path cannot say anything about that path. Feeding identical token ids made the comparison clean and simultaneously excluded the dataloader from the evidence.
+- **Code pointer / Run:** `auto_circuit/tasks.py:219`; the probe was throwaway and is gone.
+
+### The attention-bias divergence is removable, and splitting it makes the implementations function-identical on real GPT-2 — 2026-08-09
+
+- **Context:** follow-up to the `b_O` finding. The earlier proof that the port is exact relied on zeroing `b_O` in both implementations, which establishes agreement on a *modified* model. The question was whether the port can instead adopt the original's convention on the real model.
+- **It can, in about twelve lines.** TransformerLens computes `result = hook_result(z @ W_O)` per head and adds `b_O` only afterwards, so `b_O` sits outside the maskable decomposition. Adding `b_O / n_heads` inside `hook_result` via a permanent hook and zeroing `b_O` reproduces the original's `modules/attention.py:150` exactly. AutoCircuit's `PatchWrapperImpl.forward` calls the wrapped `HookPoint` and records *its* output as the source activation, so the share lands inside the part an edge can ablate.
+- **The model is unchanged:** full-model output before vs after differs by 2.1e-05 on a scale of 19, argmax identical on every prompt. The twelve shares sum back to `b_O`.
+- **The implementations become function-identical under masking, with nothing removed from either:**
+
+  | edge density | max&#124;Δlogit&#124; before splitting | after splitting | argmax agreement |
+  |---|---|---|---|
+  | 0.05 | 2.05e+01 | 2.9e-03 | 100% |
+  | 0.25 | 1.65e+01 | 5.8e-05 | 100% |
+  | 0.50 | 1.42e+01 | 3.3e-05 | 100% |
+  | 0.90 | 6.0e+00 | 2.9e-05 | 100% |
+
+  This is strictly stronger evidence than the zeroed-bias arm, which only showed agreement on a model neither codebase actually uses.
+- **Deliberately not the default.** Enabling it globally would change what an edge means for every algorithm, invalidating the 42-cell spine, the stability pass, and the null test, all measured under the current convention, and diverging from both AutoCircuit and Miller (2024). There is also no principled winner: `b_O` is a constant that no head produces, so splitting it twelve ways is as arbitrary as leaving it outside. Exposed as opt-in `split_attn_out_bias()` for the port-comparison study only.
+- **Code pointer:** `experiments/port_comparison/forward_equivalence.py`.
+
+### Matching the bias convention closes most of the port gap on unmodified GPT-2 — 2026-08-09
+
+- **Context:** the `b_O`-zeroed arm showed the implementations agree once the bias is removed, but on a model neither codebase uses. `split_attn_out_bias` instead gives each head its `b_O / n_heads` share, matching the original's convention while leaving GPT-2 exactly intact. Ten fresh discovery runs (`port-split`), compared against the existing ten `orig` runs.
+- **Result:** four of six endpoints move to equivalence, and none remains a discrepancy.
+
+  | endpoint | as shipped | with matched bias | margin | verdict |
+  |---|---|---|---|---|
+  | edge density | 5.00% vs 7.67% | **7.54% vs 7.67%** | 0.02 | fidelity supported (p=0.84) |
+  | Answer Pair KL | 0.826 vs 0.442 | **0.450 vs 0.442** | 0.240 | fidelity supported (p=0.95) |
+  | Jaccard gap | 0.0355 | **0.0074** | 0.0337 | equivalent |
+  | Spearman gap | 0.0546 | **0.0098** | 0.10 | equivalent |
+  | Clean KL Div | diff 3.293 | diff **0.713** | 1.026 | inconclusive (p=0.34) |
+  | Logit Diff Percent | diff 285.4 | diff **102.5** | 84.33 | inconclusive (p=0.07) |
+
+- **This resolves the residual the zeroed arm could not.** Answer-Pair KL was the one endpoint that stayed non-equivalent after removing `b_O` (−0.212 against a 0.240 margin); with the convention matched instead of the bias deleted it falls to 0.008. Confirms that splitting is the better control, and that the leftover was an artifact of running on a bias-free model rather than a real implementation difference.
+- **Two endpoints stay unresolved, and not purely from low power.** Clean KL sits at +0.713 with CI [−0.445, 1.86]; Logit-Diff-% at +102.5 with CI [20.2, 187], a **point estimate above its own margin**. Neither difference test is significant, so by the pre-registered grid both read "inconclusive", but the logit-diff point estimate is large enough that a real remaining difference cannot be excluded.
+  - Leading suspect is the KV-cache padding defect (next entry), which is uncontrolled in both arms and is known to change 3.1% of predictions with nothing ablated.
+- **Code pointer / Run:** `experiments/port_comparison/run_cells.py --arm port-split`, array 418280 (10/10, no failures); `results/port_fidelity/tier_c/summary.md`.
+
+### The bias divergence is per-edge, and only for edges out of attention heads — 2026-08-09
+
+- **Context:** the divergence is easy to describe loosely as "deleting a head takes its bias share with it", but circuit discovery ablates **edges**, never heads. The per-edge behaviour was measured rather than inferred.
+- **The mechanism stated precisely:** the two implementations assign different *values* to the same source node. The original's head source is `result_h + b_O/n_heads`; AutoCircuit's is `result_h`, with `b_O` added once into the residual stream outside the graph. Keeping an edge costs nothing because the sums reconcile. Ablating edge `(head_h -> D)` makes the original subtract `result_h + b_O/n_heads` from `D`'s input while AutoCircuit subtracts only `result_h`, leaving the share behind.
+- **Measured, one edge at a time into `blocks.11.hook_resid_post`:**
+
+  | source of the ablated edge | that layer's `b_O/n_heads` | max&#124;Δlogit&#124; |
+  |---|---|---|
+  | embedding | — | 1.6e-05 |
+  | head, layer 0 | 1.0351 | 8.90e-02 |
+  | head, layer 5 | 0.1993 | 2.83e-02 |
+  | head, layer 11 | 20.0493 | 7.41e-01 |
+  | MLP, layer 0 | — | 1.6e-05 |
+  | MLP, layer 11 | — | 1.7e-05 |
+
+  Edges from embeddings and MLPs disagree by nothing at all. Only attention-head sources do, and the size tracks that layer's share, compressed by `ln_final` (layer 11's share of 20 moves the logits by 0.74).
+- **It accumulates per edge, not per head.** One head feeding four destinations is four edges, and ablating all four leaves four separate residues. Disagreement is exactly linear in the number of ablated head-source edges at first (0.089, 0.178, 0.357, 0.725 for 1/2/4/8) then sub-linear as LayerNorm compresses (1.43 at 32, 2.52 at 128).
+- **Why the whole-circuit effect is large:** discovery keeps ~2,000 of 32,491 edges, so it ablates ~30,000, nearly all from head sources. That is how the per-edge residue compounds into the 14-20 disagreement seen on real discovered circuits.
+- **Code pointer / Run:** the per-edge probe was throwaway; the mechanism it measured is covered by `tests/prune_algos/test_disco_gp_equivalence.py` and `experiments/port_comparison/forward_equivalence.py` (`split_attn_out_bias`).
+
+### DiscoGP port fidelity, Tier C: the two implementations differ, and `b_O` explains it — 2026-08-08
+
+- **Context:** 45 matched discovery runs on the frozen IOI split (10 PORT + 10 ORIG primary, 5+5 `b_O`-zeroed mechanism, 5 no-BOS, 5+5 negative controls), all scored in one harness at k=2000. Endpoints, TOST margins, and the interpretation grid were fixed in `docs/superpowers/specs/2026-08-08-discogp-port-fidelity.md` **before** any run. Array 418206, 45/45 cells, zero failures.
+- **Primary result (both implementations as shipped): a genuine discrepancy on every functional endpoint.** Port reaches 5.00% edge density against the original's 7.67%; Clean KL 10.77 vs 7.47; Logit-Diff-% 389.5 vs 104.1; Answer-Pair KL 0.826 vs 0.442. All four survive Holm correction (p_holm 3.0e-04 to 3.6e-03), and none is equivalent at its pre-registered margin.
+  - Structurally the gap is marginal rather than dramatic: within-port Jaccard 0.177, within-orig 0.135, between 0.121, so the within-minus-between gap is 0.0355 against a margin of 0.0337. Spearman's gap (0.0546) is *inside* its margin. The implementations are only slightly less like each other than each is like itself.
+- **Mechanism arm settles the cause.** Removing `b_O` from **both** models collapses the discrepancy:
+
+  | endpoint | as-shipped gap | `b_O`-zeroed gap | margin | verdict when zeroed |
+  |---|---|---|---|---|
+  | Clean KL Div | 3.293 | **0.023** | 1.026 | fidelity supported (p=0.92) |
+  | density | 0.0268 | **0.0051** | 0.02 | fidelity supported (p=0.56) |
+  | Logit Diff Percent | 285.4 | **22.2** | 84.33 | equivalent (negligible shift) |
+  | Jaccard gap | 0.0355 | **0.0059** | 0.0337 | equivalent |
+  | Spearman gap | 0.0546 | **0.0099** | 0.10 | equivalent |
+  | Answer Pair KL Div | 0.385 | −0.212 | 0.2404 | still not equivalent |
+
+  Five of six endpoints move from "genuine discrepancy" to equivalence. The Tier B finding therefore does not merely coexist with the Tier C gap, it **accounts for** it: the entire practical difference between the two implementations is the `b_O / n_heads` decomposition, not a defect in the port.
+- **The residual:** Answer-Pair KL still differs by −0.212 with CI [−0.283, −0.148] against a margin of 0.240, so a small difference survives `b_O` removal on that endpoint alone. It is the metric most sensitive to the answer-pair margin the objective directly optimises, which is consistent with [[logit_diff_vs_answer_pair_kl]]. Not explained; report it rather than round it away.
+- **BOS / left-padding contributes nothing detectable.** `port-nobos` vs `port`: density equivalent (p=0.85), Answer-Pair KL equivalent, KL and logit-diff inconclusive but with small point estimates. The factor was measured rather than disclaimed, and it is not the story.
+  - Note this comparison is effectively **paired**: both arms are the port, so seed *s* gets the same mask init and batch order in each, and only BOS differs. That is why between-arm Jaccard (0.265) exceeds within-arm (0.177/0.190). Expected, not an artifact to fix.
+- **Negative controls demonstrate the power.** `port-neginv` (mask inversion removed) is flagged by 5 of 6 endpoints, `orig-asshipped` (unspaced answer tokens) by 3 of 6. Both misses are structural: Spearman fails on both, Jaccard and density fail on `orig-asshipped`. This confirms the pre-registered hierarchy, that functional endpoints carry the argument and structural ones are secondary, and it means a structural null must never be read as evidence of fidelity.
+  - Honest qualifier: with n=5 the control arms detect mostly by *rejecting equivalence* rather than by a significant difference test (e.g. `orig-asshipped` Clean KL has p=0.25 but a CI outside the margin). Detection here is the weaker of the two senses.
+- **Significance:** the study can now say something stronger than "the port matches". It says the port is exactly correct as an implementation (Tiers A, B), that as-shipped the two codebases nonetheless produce measurably different circuits, and that this difference is fully localised to one documented architectural choice about where the attention output bias lives. That is a much more useful claim for the thesis than a bare equivalence result, and it is the kind of thing a reviewer can check.
+- **Analysis bug caught before interpretation:** the first pass paired each `b_O`-zeroed arm against the *bias-intact* opposite implementation, which confounds the very factor the mechanism arm exists to isolate, and paired each negative control against the opposite implementation rather than the arm it perturbs. Every comparison must isolate exactly one factor. Fixed and re-run before any number was read.
+- **Code pointer / Run:** `experiments/port_comparison/{run_cells,fidelity_analysis,fidelity_stats}.py`; `tests/prune_algos/test_fidelity_stats.py` (19 pass). Results: `results/port_fidelity/tier_c/{summary.md,summary.csv,negative_controls.csv}`.
+
+### DiscoGP port fidelity, Tiers A and B: the port is exact, and the only divergence is `b_O / n_heads` — 2026-08-08
+
+- **Context:** Building the port-vs-original comparison the supervisor asked for. The study separates two claims that need different evidence: whether the two programs implement the same algorithm (deterministic, Tiers A/B) and whether they find the same circuits from the same data (distributional, Tier C). Tiers A and B are complete; Tier C is not yet run.
+  - Terminology: this measures **port fidelity**, not the thesis's `KL(full‖circuit)` faithfulness. The two must not share a word in the write-up.
+- **Tier A — component equivalence (22 assertions, all pass).** `tests/prune_algos/test_disco_gp_components.py` pairs each component of the port against the original under a shared seed. `gumbel_sigmoid` agrees **bitwise** (both draw `logits.new_empty([2, *shape]).uniform_(0,1)`, so they consume the RNG stream identically), including its straight-through gradient. `schedule_epoch_lambda`, the answer-margin faithfulness loss, the completeness loss, the sparsity normalisation `Σσ(l)/N_edge`, and the mask reversal all match exactly. What was previously established by reading source is now asserted in CI.
+  - The original's `gumbel_sigmoid` has **no `hard` flag** — it always applies the STE. So `hard=True` is the port setting that corresponds to the original, and the `hard=False` variant is an extension with no counterpart.
+  - The port guards its schedule divisor with `max(n_epoch_warmup, 1)` where the original does not. The guard is unreachable (the branch requires `epoch < n_epoch_warmup`), so it is not a behavioural difference. Pinned by a test so it cannot later be mistaken for one.
+- **Tier B — the edge bijection is exact.** The two implementations enumerate the same graph (157 sources, 445 head-level destinations, 32,491 edges) and order sources identically: embed, then per block `[head_0..head_11, mlp]`. The only layout difference is that the original stores Q/K/V masks as `(prev_nodes, n_heads)` where AutoCircuit uses `(n_heads, prev_nodes)`, so the map is a transpose for Q/K/V and the identity for MLP and final-residual masks (`experiments/port_comparison/edge_map.py`).
+- **Observation (the finding):** with the same circuit installed on both sides, the implementations agree at full density (max|Δlogit| = 3.0e-05 on a logit scale of 19) but diverge sharply under masking — median max|Δlogit| ≈ 14–20 at densities 0.05–0.75, with argmax agreement as low as 3.6%.
+  - Comparing all 157 node contributions directly localises it: the embedding node matches exactly (0.0), MLP nodes match to 2.3e-04, and **every attention-head node differs by exactly `b_O / n_heads`** (residual after subtracting that term: 1.4e-03).
+  - The original folds the attention output bias into each head (`modules/attention.py:150` adds `b_O / n_heads` per head), so ablating a head edge also removes `b_O / n_heads`. AutoCircuit's `hook_result` excludes `b_O`, which is added once outside the maskable decomposition, so ablating a head edge leaves the full `b_O` in place. The sums agree at full density, which is why this is invisible until something is masked.
+  - **Magnitude:** on GPT-2 small, `|b_O / n_heads|` at layer 11 is **20.05** — the same order as the entire logit scale. This is not a rounding detail.
+- **Confirmation that it is the *only* divergence:** re-running the whole sweep with `b_O` zeroed in **both** models collapses the deviation to the float floor — median max|Δlogit| = 3.3e-04 at density 0.25 and 3.5e-05 at 0.5–0.99, with **100% argmax agreement**. Below density 0.25 it rises (2.9e-02 at 0.1, 0.90 at 0.05), which is LayerNorm amplifying a near-zero residual sum, not a mask error.
+- **Significance:**
+  - The port's edge bijection, its `AC_mask = 1 - disco_mask` inversion, and the equivalence of AutoCircuit's zero-ablation with the original's dropping of terms from the node sum are all **verified exactly**, not argued. A permutation error inside any mask shape could not survive 40 random masks per density at 100% argmax agreement.
+  - But the two implementations do **not** compute the same function under masking. "Ablate this head" is a different operation on each side. Any port-vs-original circuit comparison inherits this, and it must be stated as a bound rather than disclaimed in passing.
+  - This sharpens the existing `ablation_patching_mechanics` note from a qualitative caveat into a measured quantity, and it applies to the thesis's own DiscoGP results, whose zero-ablation leaves `b_O` in place.
+- **Single-edge probes need care:** ablating index 0 of any mask only ever hits the *embedding* source, which carries no `b_O`, so such a probe passes at the float floor while testing nothing. The first version of this diagnostic did exactly that and reported a false all-clear. Probes must be selected by source **kind** (embed / head / MLP).
+- **Code pointer / Run:** `experiments/port_comparison/{edge_map,forward_equivalence}.py`; `tests/prune_algos/test_disco_gp_{components,equivalence}.py` (22 + 9 pass). Results: `results/port_fidelity/forward_equivalence/{deviations.csv,summary.json}` (64 prompts, 40 masks per density, 7 densities, both arms).
+
+### The original DiscoGP's IOI answer tokens omit the leading space, and ~48% of them are word fragments — 2026-08-07
+
+- **Context:** Scoping a head-to-head comparison of our DiscoGP port against the original implementation (`frankniujc/disco_gp`, cloned at pinned commit `54aef81`, vendored under `third_party/disco_gp`). Before matching hyperparameters it was necessary to check that both sides optimize the same objective.
+- **Observation:** they do not. The original builds the IOI prompt by truncating the full sentence immediately before the IO name (`setup_task.py:206`), so the prompt ends `"...gave a ring to"` with no trailing space and the correct continuation is `" Michael"`. But the answer token IDs are taken from the **bare** names (`setup_task.py:226-227`, `tokenizer(io_list)`), giving `"Michael"`. GPT-2 uses byte-level BPE, so these are different vocabulary entries.
+    - Verified on 200 prompts generated by the original's own pipeline: `target good` differs from the true continuation token on **200/200** examples.
+    - Under real GPT-2, their answer token is **never** the argmax (0.00%, median rank 724); the spaced token is the argmax 94% of the time (median rank 0).
+    - Full-model IOI accuracy is **80.5%** under their metric versus **100%** under the standard one; mean logit-difference +2.725 versus +3.850.
+- **Observation — the consequence the source alone does not reveal:** their own comment asserts "IO and S are expected to be single tokens", which holds only *with* the space. **46 of 99 names in their `NAMES` list fragment without it; 0 of 99 fragment with it** — the list was curated for the standard spaced convention. Because the code keeps only `token_ids[0]`, the answer becomes a word fragment: `Ashley→'Ash'`, `Stephanie→'Step'`, `Nicholas→'Nich'`, `Amber→'A'`.
+    - On 1000 generated examples, **47.6%** of IO answers and **48.5%** of S answers are fragments.
+    - Seven collision groups share a first token (`Daniel`/`Danielle`, `Amber`/`Alicia`, `Samantha`/`Sara`, …). In **0.4%** of examples `target_good == target_bad` exactly, so the 2-class cross-entropy is pinned at `log 2` and accuracy is forced to zero (the comparison is a strict `>`).
+- **Observation — it is confined to IOI.** Their BLiMP path does `targets_good.append(' ' + target_good)` (`setup_task.py:109`) and PARAREL does `ds_dict['answer'].append(' ' + target)` (`setup_task.py:352`). IOI is the only pipeline that omits the space, which is what marks it as unintentional rather than a deliberate convention.
+- **Observation — the defect is isolated to the answer token IDs; the rest of the data path is correct.** Audited 500 examples against explicit invariants (`.scratch/audit_data_path.py`): prompts never end with a trailing space (0/500), padding is right-side so real tokens are never displaced (0/500), and position `seq_lens-1` always holds the prompt's final token (0/500), i.e. the logits are read at the position that genuinely predicts the continuation. Meanwhile `target good` differs from the true next token on 500/500 and `target bad` on 500/500, with 245/500 (49%) of IO answers multi-token and 3/500 degenerate. So the fix is exactly the one line at `setup_task.py:226-227`, and a corrected arm is a clean single-variable change. (Note: the IO name does appear inside the prompt, but that is the IOI task by construction, not a leak, since the model must retrieve the earlier mention.)
+- **Observation — the published 100% accuracy is nevertheless reproducible with the bug present.** Running their own `search(modes='e')` end to end (seed 42, fp32, wandb off, edge-only) on both token variants:
+
+  | arm | baseline acc | pruned acc (train/eval/test) | edge density | KL (eval) |
+  |---|---|---|---|---|
+  | as-shipped (bare) | 85.1% | 99.5 / 100 / 100 | 10.48% | **0.189** |
+  | corrected (spaced) | 99.4% | 100 / 100 / 100 | 8.69% | **0.020** |
+  | paper Table 2 (joint) | — | 100 | 2.03% | **0.020** |
+
+    - Pruning **raises** accuracy from 85% to ~100% under the as-shipped metric, because the search spends 100 epochs maximizing precisely that margin. So the paper's headline IOI accuracy is attainable either way, and the bug does not invalidate it.
+    - The consequence is that **sheaf accuracy is an optimized quantity, not a preserved one**: the circuit outperforms the unpruned model by 15 points on the as-shipped metric. Accuracy alone therefore cannot separate a faithful circuit from an over-fitted mask, which is an argument for reporting KL alongside it (as the paper does) and for the spine's KL-primary convention.
+    - **KL is where the tokenization actually shows**: 0.189 as-shipped versus 0.020 corrected, against the paper's reported 0.020. This is consistent with the published numbers having been produced under correct tokenization, with the defect entering at the September 2025 "DiscoGP Release" refactor, but it is not conclusive: the paper's row is the joint weight+edge run whereas this is edge-only, so the densities (2.03% vs 8.69%) are not comparable and the KL agreement may be coincidental.
+    - The two arms find **measurably different circuits** from identical seeds and hyperparameters (10.48% vs 8.69% edge density), so the choice is not cosmetic for a structural comparison.
+- **Significance:** on roughly half its training signal the original's IOI objective maximizes a margin between word fragments rather than names, so it is not the logit difference used by ACDC, EAP, EP or AutoCircuit. Two consequences for sub-RQ1: (i) a port-versus-original comparison run on identical prompts would still be comparing **different objectives**, so the answer tokens must be controlled before any gap is attributable to the implementation; (ii) the original's published IOI numbers are computed against this objective and are therefore not directly commensurable with the spine. Our port is unaffected — all 1000 answers in `datasets/ioi/ioi_prompts.json` carry the leading space.
+- **Caveat on the baseline comparison in their Table 2:** ACDC (51.6%) and EAP (58.3%) do not optimize this margin, so they are scored at whatever accuracy their circuit happens to yield, against a full-model baseline that is only 85% under the as-shipped metric. Whether their reported baseline numbers were produced under the same tokenization cannot be determined from the release, and should not be asserted either way.
+- **Code pointer / Run:** `third_party/disco_gp/disco_gp/data/setup_task.py:206,226-227`; verification scripts `.scratch/verify_answer_tokens.py`, `.scratch/verify_name_fragmentation.py`, `.scratch/run_original_baseline.py` (`--prune`, `--corrected`); logs `.scratch/orig_prune_{asshipped,corrected}.log`.
+- **Environment note:** the release targets a newer TransformerLens than our 1.19. Three model-config attributes must be injected to run it: `attn_scale=sqrt(d_head)=8.0`, `use_qk_norm=False`, `init_range=0.02` (unused, `init_weights=False`). Also, `disco_gp.data.setup_task` resolves to the *function*, not the module (`data/__init__.py` re-exports it), so monkeypatching must go through `sys.modules`.
+
 ### Run-to-run nondeterminism is set-iteration order, not GPU floating point — 2026-08-01
 
 - **Context:** Scoping Pillar 2 (stability). Before varying the seed, checked whether re-running the *identical* command reproduces a cell. Probe: `docstring`, seed 42, each cell run twice per node on two nodes (`nelson`, `carl`), caches compared bitwise and by top-k Jaccard.
@@ -569,19 +927,59 @@
 
 ### Pillar-2 analysis: seed stability measured, and it tracks functional instability — 2026-08-03
 
-- **Context:** The analysis pass over the 195 cached stability cells (`experiments/stability_analysis.py`, figures in `experiments/stability_plots.py`, spec `docs/superpowers/specs/2026-08-02-pillar2-stability-analysis-design.md`). Structural pass (edge-set agreement between seeds) plus functional pass (each seed's circuit re-scored, faithfulness only, all three eval ablations). Run 416493, 25 min on one A100.
+- **Context:** The analysis pass over the 195 cached stability cells (`experiments/stability_analysis.py`, figures in `experiments/stability_plots.py`, spec `docs/superpowers/specs/2026-08-02-pillar2-stability-analysis-design.md`). Structural pass (edge-set agreement between seeds) plus functional pass (each seed's circuit re-scored). Run 416493, 25 min on one A100. **Correction (2026-08-05):** this entry originally described the functional pass as covering "all three eval ablations". It did not. Swept cells were scored only on the diagonal (eval ablation = discovery ablation); only the Random anchor, being ablation-independent at discovery, got all three. The full cross was added later the same week, see the entry below.
 - **Observation — a clear and consistent stability ordering, far above the chance floor.** Mean pairwise Jaccard at the published circuit size, worst→best across the three ablations:
     - **EAP 0.89–0.95** on every task and ablation. It is the only method that clears Méloux et al.'s 0.8 bar, and it does so nearly everywhere.
     - **ACDC 0.51–0.82**, **EP 0.31–0.90**, **DiscoGP 0.18–0.37**.
     - **Random 0.002–0.004**, so even DiscoGP is two orders of magnitude above chance: these are not noise, they are genuinely different circuits.
-- **Observation — the discovery ablation moves stability as much as the algorithm does.** EP on Docstring goes 0.42 (zero) → 0.90 (resample); on IOI 0.37 → 0.67. The ablation is not a nuisance parameter for stability any more than it is for faithfulness, which is the Pillar-1×Pillar-2 interaction Chen et al. preview with their ACDC 1.09%/6.76% interchange-vs-zero split.
-- **Observation — structural instability and functional instability go together here.** Spearman ρ between mean pairwise Jaccard and the across-seed standard deviation of the task metric is **−0.80 on IOI and on Greater-Than**, −0.30 on Docstring (weakened by four zero-ablation cells whose performance is ~0, where a small spread is trivial).
-    - **Significance:** this is the *opposite* of the reading Chen et al.'s OASR result invites. They show near-disjoint circuits can be engineered at equal performance; under plain reseeding at matched sparsity, the circuits that disagree structurally also disagree behaviourally. Non-uniqueness at equal quality is constructible but is not what unseeded re-runs produce.
-    - The lower-left quadrant of the stability-vs-function figure (structurally unstable, functionally equivalent) is **empty in all three tasks**. The figure carries no annotation claiming otherwise.
+- **Observation — the discovery ablation moves stability as much as the algorithm does.** EP on Docstring goes 0.42 (zero) → 0.90 (resample); on IOI 0.37 → 0.67. The ablation is not a nuisance parameter for stability any more than it is for faithfulness, which is the Pillar-1×Pillar-2 interaction Chen et al. preview with their ACDC 28.6%/4.3% interchange-vs-zero split (Table 4).
+- **Observation — structural instability shows up functionally on the primary metric, but on IOI it disappears on the two-class decision.** Spearman ρ between mean pairwise Jaccard and the across-seed standard deviation, over the 12 (algo × discovery-ablation) cells per task, each cell read at its own eval ablation and at its own headline budget:
+
+    | y-metric | IOI | Greater-Than | Docstring |
+    |---|---|---|---|
+    | Logit Diff Percent | −0.80 | −0.80 | not measured |
+    | Clean KL Div | −0.46 | −0.60 | −0.76 |
+    | Correct Answer Greater Than Incorrect Percent | **+0.11** | not measured | −0.76 |
+
+    (Metric coverage is not uniform: AutoCircuit registers no logit-diff for Docstring and no two-class accuracy for Greater-Than, `TASK_METRICS` in `faithfulness_comparison.py:110`. Those two panels are drawn empty rather than filled with a substitute.)
+    - **Why Greater-Than has no two-class accuracy, and why it is not an oversight.** `correct_answer_greater_than_incorrect_proportion` asserts `answers.shape == (1,)` (`tensor_ops.py:180,190`): it needs exactly one designated correct token per prompt, then checks whether that token outscores every wrong one. Docstring and IOI supply one (`datasets/docstring_prompts.json`: 1 answer, 13 wrong answers per prompt). Greater-Than cannot: its correct answer is any year above the given one, so a prompt carries 2 to 57 correct and 43 to 98 wrong tokens, and the count varies per prompt. The task has no unique right answer, so the metric is undefined rather than unimplemented. A generalisation (max over correct beats max over wrong) is definable, but it would be a different quantity from the one scored on IOI and Docstring and would silently break the row's comparability, which is the whole reason the rows are fixed.
+
+    - **The relationship vanishes exactly where the decision metric saturates.** On IOI every DiscoGP seed scores 98.4–100%, so the decision cannot separate circuits and only the margin does; on Docstring the circuits sit at 9–43%, far from the ceiling, so the decision still varies and tracks structure as strongly as KL does (−0.76 for both). Metric dependence here is a ceiling effect, not a uniform reversal: KL, which cannot saturate, holds a negative ρ on all three tasks.
+    - Logit-diff percent is unbounded and measures how far the circuit pushes the margin. Circuits at 334% and 470% are different computations that emit identical predictions.
+    - **Correction (2026-08-04):** an earlier version of this entry asserted that the lower-left quadrant of the stability-vs-function figure (structurally unstable, functionally equivalent) is "empty in all three tasks". It is not. It is occupied even on the primary axis (Docstring DiscoGP-zero J = 0.261 at sd 0.0; GT DiscoGP-resample J = 0.206 at sd 15.5), and on IOI's decision metric it holds high performers. The ρ = −0.80 figure itself was right; a first recomputation that reported −0.84/−0.53/+0.03 was joined without the budget column and is superseded by the table above.
+    - **Significance — we replicate Chen et al.'s seed-only result rather than contradicting it.** Their Table 10 (DiscoGP, random seeds only, no OASR) reports IOI pairwise IoU **18.5% with both sheaves at 100.0% accuracy**; Table 3 extends this to 20 runs at mutual IoU 0.15–0.30% and 99.6–99.95% accuracy; Table 9 gives a worst-case run of 99.70%. Our DiscoGP/IOI cells give J = 0.176 (zero) at 99.61 ± 0.61% two-class accuracy and J = 0.343 (mean) at 100.0 ± 0.0%: five structurally distinct circuits, every one solving the task. Non-uniqueness at equal quality is not only constructible via OASR, it is what plain reseeding produces on a saturated decision metric. Their Appendix G anticipates our reading directly: "sheaf multiplicity is easily overlooked when only a small number of random seeds are evaluated, as an IoU of approximately 20% may be misinterpreted as algorithmic stability".
+    - **For the write-up:** the stability-vs-function figure must name its y-metric in each panel, and any claim that instability is behaviourally consequential has to be stated relative to that metric and to whether the metric has headroom. Same margin-versus-match distinction as [[logit_diff_vs_answer_pair_kl]].
+    - **Figure:** `results/stability/<run>/figures/stability_vs_function.pdf` is a 3 × 3 grid, rows = the three metrics above, columns = task, linear y (an sd of exactly zero is a real and interesting value, and a log axis cannot show it without an arbitrary floor), per-panel ρ. `stability_vs_function_by_size.html` is the same grid with a slider over the edge budget: the published size, then 50 to 10 000. Worth sweeping because pairwise Jaccard rises with k for every method including the Random anchor, so an ordering read off one budget has to survive the sweep. ACDC is matched on realised size (its ~20 τ levels cannot hit an arbitrary k) and is dropped from a step when its nearest realised size is off by more than 4×.
 - **Observation — mutual IoU is much harsher than pairwise Jaccard.** Agreement of all five seeds at once: EAP 0.80–0.90, ACDC 0.23–0.66, EP 0.08–0.77, DiscoGP 0.02–0.13. DiscoGP's five Greater-Than circuits share 13 edges out of a 715-edge union under zero ablation. The gap between the pairwise mean and the all-five value is agreement that is pair-specific rather than common.
 - **Method note — the coefficient of variation is unusable as the functional axis.** It divides by a mean that several cells drive to zero: ACDC/IOI/mean averages 4.15% logit-diff, giving CV 2.2 purely from its denominator. Both task metrics are percentages of the full model, so the figures report the standard deviation in percentage points instead; `functional.csv` keeps both. The same objection applies to Clean KL, which approaches zero for a faithful circuit, so KL is carried as mean ± sd and never as a CV.
 - **Method note — ACDC is compared at matched τ, every other method at matched top-k**, decided per cell from the data (few distinct score levels ⇒ τ). This is what Chen et al. do (their Table 4 fixes τ = 0.00398). The τ grid must come from `algo_hyperparams(ACDC_PRUNE_ALGO)`: the 30 τ-split ACDC × {ioi, gt} cells are written by `merge_acdc_partials.py`, whose manifest has no `algo_hyperparams` block.
-- **Code pointer / Run:** `experiments/stability_analysis.py`, `experiments/stability_plots.py`, new helpers in `auto_circuit/metrics/analysis_utils.py` (`Budget`, `EdgeIndex`, `pairwise_stats`, `mutual_iou`, `selection_frequency`); results in `results/stability/stability_2026-08-02/`; job 416493.
+- **Method note — every budget sweep terminates at the unpruned model (added 2026-08-05).** The first analysis pass capped the functional grid at 10 000 edges and filtered `k < len(edges)` on both passes, so no curve reached the size where the methods coincide, and a reader could not tell an incomplete axis from a genuine failure to converge. ACDC stopped earlier still: the *smallest* τ is its right endpoint, and its grid tops out at 7 008 (IOI resample) to 21 000 (IOI zero) of 32 491 edges, so its line ended a fifth of the way along while the top-k methods ran to 30 000. Every grid now ends with a top-k of all edges, which is the unpruned model whatever the scores say. Faithfulness lands on KL = 0, structure on Jaccard = 1. Headline numbers at the published size are unchanged (verified identical across both runs).
+- **Code pointer / Run:** `experiments/stability_analysis.py`, `experiments/stability_plots.py`, new helpers in `auto_circuit/metrics/analysis_utils.py` (`Budget`, `EdgeIndex`, `pairwise_stats`, `mutual_iou`, `selection_frequency`); results in `results/stability/stability_2026-08-05/` (supersedes `stability_2026-08-02/`, same numbers plus the terminal point); jobs 416493, 417094.
+
+### Zero-ablation eval is a different measurement, but the cross-protocol claims do not hold — 2026-08-05
+
+- **Context:** Pillar-2's functional pass extended from the diagonal (eval ablation = discovery ablation, faithfulness only) to the full square: every cell scored under all three eval ablations and both patch directions. Job 417313, 65 min on one A100, 13 572 functional rows. Motivation: Pillar 1 sweeps the same cross with **one seed per cell**, so it can report how a *score* moves with the protocol but nothing about how the *spread* moves.
+- **Design note (the correction below turns on it) — the three eval ablations are not three independent protocols.** `RESAMPLE` substitutes activations sampled from the corrupt prompts and `TOKENWISE_MEAN_CORRUPT` substitutes the per-position mean of that same distribution, so mean is roughly the expectation of what resample draws; zero substitutes nothing from the data distribution. Measured on the same cells and budgets (Clean KL, faithfulness, n = 479): **resample ~ mean r = 0.914**, median |Δ| = 0.214; zero ~ resample r = 0.268, median |Δ| = 5.04; zero ~ mean r = 0.289. The 3 × 3 square is therefore 3 discovery ablations × **two** protocol families, with an internal replicate.
+    - That replicate is not waste, it is a **null**. Any rank statistic computed across eval protocols must be read against the resample~mean value, which is close to a self-comparison, and not against 1.0.
+- **Correction (2026-08-05, same day) — two claims first written here do not survive that null, and are withdrawn.** The user's objection was that resample and mean are near-identical protocols, so a cross-protocol agreement statistic is partly comparing a measurement with itself. Correct, and it removes the two stronger findings:
+    - *Withdrawn: "which cells look unstable does not survive a protocol change".* Spearman ρ between 12-cell sd vectors, control first: Docstring control 0.90 vs zero~resample 0.78, zero~mean 0.73; Greater-Than control 0.74 vs 0.64, 0.41; IOI control **0.00** vs −0.29, −0.03. Where the statistic has power, zero agrees with resample about as well as the two corrupt-family protocols agree with each other. On IOI the control is 0.00, so nothing is measurable there and the −0.29 is noise.
+    - *Withdrawn: "the ordering reverses".* The EP rank-4-to-rank-1 and DiscoGP rank-2-to-rank-4 swaps were read off IOI, the one task where the control says there is no signal. On Greater-Than and Docstring the ordering is largely preserved across protocols (EAP lowest sd, DiscoGP highest, in both families).
+- **Observation (survives, weakened) — zero-ablation evaluation is a different measurement, mostly in level.** Median over the 36 cells at the published size: zero KL 7.621 with sd 0.852, resample 1.205 with sd 0.084, mean 1.157 with sd 0.054. The absolute spread is 10–16× larger under zero, but so is the level, and the **relative** spread is only ~1.5–1.8× larger (sd/mean 0.098 vs 0.066 / 0.054). Most of the apparent instability is the higher operating point, not extra seed-sensitivity. (The standing objection to CV, that the mean approaches zero for a faithful circuit, does not bite here: these means are 1.2–7.6 and the comparison is of the same cells across protocols, not of cells within one.)
+- **Significance — the Pillar-2 headline stands unqualified.** "EAP most stable, DiscoGP least" was measured structurally, on edge sets, which have no eval ablation at all, and the functional evidence does not contradict it under any protocol. The methodological lesson is about **this experiment's own design**: with three ablations of which two are near-duplicates, any cross-protocol statistic needs its null stated alongside it, and a bare ρ between protocols is uninterpretable without one.
+- **Method note — completeness is measured for Pillar 2 for the first time here.** It postdates the patch-direction fix of 2026-07-31, so it is not comparable to any completeness figure in a results tree dated earlier. Sanity confirmed on Docstring: ablating a discovered circuit drives correct-answer percent to ~0 for every method, while the Random anchor's complement retains performance at small k and only decays as k grows, which is the expected knockout signature.
+- **Method note — presentation, so that nine protocol combinations cost no extra files.** Pillar 1 encodes four dimensions as directory levels (discovery / task / measure / eval) with the metric as filename and costs **367 files across 108 folders**. Here discovery × eval became the rows and columns of one 3 × 3 grid inside each figure, the task moved from a folder into the filename, and the grid figures skip the HTML sibling. Result: 14 figures → 28, folders 6 → 4, total 63 → 77 files, for 9× the protocol coverage and a second patch direction. Rule worth keeping: at most two dimensions become paths, the rest become geometry.
+- **Code pointer / Run:** `experiments/stability_analysis.py` (`_eval_ablations`, `_functional_rows` now loops `_PATCH_SEMANTICS`), `experiments/stability_plots.py` (`fig_measure_grid`, `_ring_diagonal`); `results/stability/stability_2026-08-05/figures/{faithfulness,completeness}/<task>__<metric>.pdf`; job 417313.
+
+### Near-identical eval baselines are not near-identical discovery baselines — 2026-08-05
+
+- **Context:** direct follow-up to the entry above. Having found that resample and mean are near-duplicates as *evaluation* protocols (r = 0.914), the open question was whether the same collapse holds on the *discovery* axis. If it did, the spine's "three discovery ablations" would really be two, a third of the discovery compute would be a replicate, and every claim of the form "the result depends on the discovery ablation" would have to narrow to "depends on zero versus the corrupt-baseline family". The existing CSVs cannot answer it: they record structural agreement only *within* a discovery ablation.
+- **Design — the within-ablation seed Jaccard is the null.** Two runs of the same ablation do not agree perfectly either, so a bare cross-ablation Jaccard cannot be read as "different". The comparison is cross-ablation agreement against same-ablation seed-to-seed agreement at matched budget, over all 12 (task, algo) cells × 3 ablations × 5 seeds. Exact top-k for EP/DiscoGP/EAP; matched τ for ACDC.
+- **Observation — the collapse does not carry over.** J(resample, mean) never reaches the null: ratio 0.32 to 0.98, mean 0.70 over the 12 cells (IOI: DiscoGP 0.32, EAP 0.44, ACDC 0.62, EP 0.82; Greater-Than 0.58 to 0.76; Docstring 0.62 to 0.98). The two-family structure nevertheless survives, since res~mean is 2 to 5× higher than either zero pairing in every cell. Three discovery conditions, unevenly spaced, resample and mean adjacent.
+    - A Spearman on the full score vectors reproduces the ordering in all 12 cells, so this is a shift in the ranking rather than a top-k boundary artifact.
+    - ACDC's matched-τ comparison also mismatches circuit size (resample/mean size ratio 0.58 on IOI, 0.74 on Greater-Than, 1.19 on Docstring), so its two GPT-2 ratios are lower bounds.
+- **Observation — seed-stability and protocol-insensitivity are separate properties, and EAP separates them cleanly.** EAP is the most seed-stable method in the study (within-ablation Jaccard 0.91 to 0.93) yet its IOI resample and mean circuits agree at only 0.41. Mechanically expected rather than anomalous: EAP scores grad·(corrupt − clean), so the baseline enters the score formula directly, shifting it systematically while adding no run-to-run variance. Nothing about a low seed spread predicts what happens when the baseline moves.
+- **Significance.** Optimization amplifies a baseline difference that evaluation smooths over. Evaluation is a single forward pass, smooth in the substituted activation, so two baselines that differ only by within-distribution variance give nearly the same number. Discovery contains thresholds and greedy choices, so the same difference selects different edges. The practical consequence for the write-up is that the eval-side caveat (state the r = 0.914 wherever the three eval ablations appear as separate columns) does **not** extend to the discovery side: "three discovery ablations" stands, and no Pillar-1 or Pillar-2 claim needs weakening on that account.
+- **Code pointer / Run:** `.scratch/discovery_ablation_null.py` (702 rows) and `.scratch/rank_null.py`, both CPU-only over `.prune_scores_cache/stability`; reuse `_load_cell` / `_acdc_tau_grid` from `experiments/stability_analysis.py`.
 
 ### Pillar-2 stability run complete: 195 cells, and two audit findings — 2026-08-02
 
@@ -855,6 +1253,14 @@
 - **Code pointer:** `auto_circuit/prune_algos/prune_algos.py` (τ config), `experiments/run_cell.py` (τ-split args), `experiments/merge_acdc_partials.py`, `acdc_ioi_partials.sh`, `acdc_ioi_merge.sh`.
 
 ## Notes
+
+- **2026-08-08** — Tier C of the port fidelity study is launched (SLURM array 418206, 45 cells: 10 PORT + 10 ORIG primary, 5+5 `b_O`-zeroed mechanism, 5 no-BOS, and 5+5 negative controls) and results are **not yet in**. Both runners are validated end-to-end on the frozen split: the original reaches 100% accuracy at 7.88% edge density with its own 2-class KL at 0.045, and the port converges to ~4% sparsity with faithfulness loss 0.007. The array is capped at 2 concurrent GPUs by `QOSMaxGRESPerUser`, so expect ~4.5 h wall time regardless of the `%8` throttle in the batch script. Endpoints, TOST margins, and the interpretation grid are frozen in `docs/superpowers/specs/2026-08-08-discogp-port-fidelity.md` and must not be revised after seeing results.
+- **2026-08-08** — The equivalence margins for Tier C are the Pillar-2 within-implementation SDs for DiscoGP × IOI × zero/zero × faithfulness at k=2000 (Clean KL 1.0262, Logit-Diff-% 84.3293, Answer-Pair KL 0.2404, Jaccard 0.0337). **Superseded 2026-08-11:** these are the pre-fix values; see the Tier C margins erratum for the recomputed set. Using the method's own run-to-run noise as the margin makes the claim "the shift between implementations is smaller than the shift between two runs of the same implementation", which avoids inventing a threshold. Caveat to state in the write-up: those SDs are themselves estimated from only 5 seeds.
+- **2026-08-08** — A non-significant difference test is **not** evidence of port fidelity, and the analysis is built so that conclusion cannot be reached by accident: `fidelity_stats.interpret` returns "inconclusive (underpowered)" for the (not significant, not equivalent) cell, and a test pins that behaviour. The positive claim comes only from TOST (90% bootstrap CI inside ±δ). Negative controls are what evidence achieved power; an endpoint that flags none of them is reported as uninformative rather than as support.
+
+- **2026-08-05** — Surveyed CS-specific advice on what a Background chapter is (Claypool/WPI, Ernst/UW, Elphinstone/UNSW, Watson/Auckland, TU Chemnitz CE guidelines) before drafting `background.tex`, and split the merged "Background / Related Work" section of `docs/writing/scientific_writing_guide.md` into two. The operative distinction: Background answers "what must the reader already know to follow my methodology", Related Work answers "what have others done about my problem". That places EP/DiscoGP/ACDC/EAP in Related Work, not Background, since they are attempts at this thesis's problem rather than machinery it presupposes. The load-bearing rule is that every background item states its downstream use explicitly (per-subsection test: name the later chapter that breaks without it), which orders the chapter as transformers-as-graph → circuit abstraction → activation patching and ablation types → AutoCircuit as architecture standardization → models and tasks, i.e. abstraction first and the concrete model last, so each subsection has a visible payoff. Target length ~10–15% of the body.
+
+- **2026-08-03** — Re-read both stability reference papers to check how they fix the circuit size a comparison is made at, and found an error in our own notes on Chen et al. **Neither paper compares methods at a shared size.** Chen sweeps EAP's top-k from 500 to 3000 and reports IoU falling 0.80 → 0.65 (Fig. 3b), fixes ACDC by threshold instead (τ = 0.00398, Table 4), and lets DiscoGP/EP sizes fall out of the sparsity objective (`#E` column of Tables 3 and 5, e.g. 987.0 edges on IOI at ~3% density). Méloux reports `Size` as a per-configuration outcome (Table 2: 3 to 33 edges on Llama-3.2-1B-Instruct), following "the implementation from the EAP-IG library using its default hyperparameters" (§4), so size is a result, not a control. Both therefore report structure *alongside* size rather than holding size fixed, which is what our matched-budget headline row adds. Méloux's Fig. 6 (edge selection frequency: of 32,491 gpt2-small edges only 464 are ever selected, 231 in ≥10% of circuits, 7 in >80%) is the direct precedent for our selection-frequency figure. **Correction:** the Chen entry in `docs/related_work/all_circuits_lead_to_rome.md` (and its CLAUDE.md summary line) read Table 4's `Edge D.` column, 1.09% / 6.76%, as an ACDC pairwise IoU. It is the mean **edge density** of the discovered circuits (`#E`/32,491 = 353.4 and 2194.7 over 32,491); Table 4 prints no IoU column at all, only Table 3 does. The mutual IoU implied by its |E∩| and |E∪| is 174/608 = **28.6%** (interchange) and 302/6951 = **4.3%** (zero). Both files corrected. The qualitative claim that survives is unchanged and is the one that matters for Pillar 2: ACDC's instability is far worse under zero ablation than under interchange, so instability interacts with the ablation protocol.
 
 - **2026-07-27** — τ-split ACDC verified equivalent to a single run, empirically, not just by argument: docstring ACDC over bases {1,5} × exps {-4,-3} run whole vs. as two single-base partials merged by element-wise min gives bit-identical PruneScores (1281 edges, 0 mismatches, identical +inf pattern). Rests on each τ pass resetting all masks (`ACDC.py:119`), accumulation being only `min(tao, curr)` from `+inf`, and the loaders being deterministic (`data.py:307` seeds one shuffle, both loaders `shuffle=False`) so every process sees the same first batch. Remaining caveat: partials run on heterogeneous GPUs, where a borderline `faith - prev_faith < tao` comparison could flip — ordinary hardware nondeterminism, not specific to the split.
 

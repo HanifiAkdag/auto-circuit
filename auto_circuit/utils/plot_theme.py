@@ -156,6 +156,60 @@ def apply_theme(
     return fig
 
 
+TITLE_SIZE = 19
+SUBTITLE_SIZE = 12.5
+
+
+def title_markup(title: str, subtitle: str = "") -> str:
+    """A title line over a muted subtitle line, as one block of markup.
+
+    Returned as markup rather than set on the figure so the heatmaps, which place
+    their title in an annotation, use the same two tiers as everything else.
+    """
+    head = f"<b>{title}</b>"
+    if not subtitle:
+        return head
+    return (
+        f"{head}<br>"
+        f'<span style="font-size:{SUBTITLE_SIZE}px;color:{INK_MUTED}">{subtitle}</span>'
+    )
+
+
+def header(
+    fig: go.Figure,
+    title: str,
+    subtitle: str = "",
+    *,
+    top: int = 150,
+    right: int = 28,
+    legend_y: float = 1.03,
+) -> go.Figure:
+    """Centred title block above the legend.
+
+    The subtitle says what is measured and how to read the marks. Findings belong in
+    the caption, not here.
+    """
+    # Plotly places a multi-line title from the first line's baseline, so a fixed y in
+    # paper units clips the ascenders on tall figures. Hold the gap constant in pixels.
+    height = fig.layout.height or 600
+    fig.update_layout(
+        margin=dict(t=top, r=right),
+        title=dict(
+            text=title_markup(title, subtitle),
+            font=dict(size=TITLE_SIZE, color=INK_PRIMARY, family=FONT_FAMILY),
+            # Centred on the plot area, not the canvas, so a legend column on the right
+            # does not push the title off the data it heads.
+            x=0.5,
+            xref="paper",
+            xanchor="center",
+            y=1 - (TITLE_SIZE + 15) / height,
+            yanchor="top",
+        ),
+        legend=dict(y=legend_y),
+    )
+    return fig
+
+
 def style_marks(fig: go.Figure, *, line_width: int = 2, marker_size: int = 7) -> go.Figure:
     """Thin lines, markers with a surface ring so overlaps stay readable."""
     fig.for_each_trace(

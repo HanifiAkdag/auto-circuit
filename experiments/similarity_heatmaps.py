@@ -40,6 +40,8 @@ from auto_circuit.utils.plot_theme import (
     INK_PRIMARY,
     INK_SECONDARY,
     SEQUENTIAL_BLUE,
+    TITLE_SIZE,
+    title_markup,
 )
 
 LabeledScores = List[Tuple[str, PruneScores]]
@@ -196,10 +198,9 @@ def _block_boundaries(labels: List[str]) -> List[float]:
 
 
 def _title(task_name: str, k: int) -> str:
-    return (
-        f"<b>{task_name} · circuit overlap · top-{k:,} edges</b><br>"
-        "<sup>each cell: share of edges the two circuits have in common"
-        " · 100% = identical</sup>"
+    return title_markup(
+        f"{task_name} · circuit overlap · top-{k:,} edges",
+        "Each cell: share of edges the two circuits have in common. 100% is identical.",
     )
 
 
@@ -266,10 +267,10 @@ def _fig_layout(title: str, labels: List[str]) -> go.Layout:
     # The title is an annotation, not layout.title: the latter caps y at 1.0, which
     # measures a two-line title from the top of the canvas and clips its first line.
     notes.append(dict(
-        text=title, xref="paper", x=0.0, xanchor="left",
+        text=title, xref="paper", x=0.5, xanchor="center",
         yref="paper", y=1 + 46 / plot_h, yanchor="bottom",
-        align="left", showarrow=False,
-        font=dict(size=15, color=INK_PRIMARY, family=FONT_FAMILY),
+        align="center", showarrow=False,
+        font=dict(size=TITLE_SIZE, color=INK_PRIMARY, family=FONT_FAMILY),
     ))
     return go.Layout(
         font=dict(family=FONT_FAMILY, size=12, color=INK_SECONDARY),

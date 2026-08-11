@@ -67,7 +67,9 @@ from faithfulness_comparison import (
     TASK_METRICS,
     _ABL_SHORT,
     _COMMON_METRICS,
+    _PATCH_SEMANTICS,
     _ablation_slug,
+    _reverse_clean_corrupt,
 )
 from run_cell import _ALGO_MAP, _TASK_TEMPLATES
 from stability_cells import (
@@ -97,7 +99,7 @@ STABILITY_METRIC: Dict[str, str] = {
     _TASK_TEMPLATES["docstring"].key: CORRECT_ANSWER_PERCENT_METRIC.key,
 }
 
-FUNCTIONAL_BUDGETS = [50, 100, 200, 500, 1000, 2000, 5000, 10000]
+FUNCTIONAL_BUDGETS = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
 
 _ABL_SHORT_INV = {v: k for k, v in _ABL_SHORT.items()}
 
@@ -108,9 +110,9 @@ STRUCTURAL_FIELDS = [
     "n_intersect", "n_union", "freq_5", "freq_4", "freq_3", "freq_2", "freq_1",
 ]
 FUNCTIONAL_FIELDS = [
-    "task", "algo", "discovery_ablation", "eval_ablation", "selector", "budget_label",
-    "realised_mean", "metric", "n_seeds", "metric_mean", "metric_sd", "metric_cv",
-    "metric_min", "metric_max", "metric_values",
+    "task", "algo", "discovery_ablation", "eval_ablation", "measure", "selector",
+    "budget_label", "realised_mean", "metric", "n_seeds", "metric_mean", "metric_sd",
+    "metric_cv", "metric_min", "metric_max", "metric_values",
 ]
 
 
@@ -200,11 +202,17 @@ def _load_cell(cache_dir: str, spec: Tuple[str, str, str], seeds: List[int]) -> 
 
 
 def _budgets(cell: Cell, edges: set, true_edge_count: Optional[int]) -> List[Budget]:
-    """The budget grid for a cell: matched top-k, or matched tau where scores are tied."""
+    """The budget grid for a cell: matched top-k, or matched tau where scores are tied.
+
+    The grid always ends at the unpruned model. ACDC's coarsest tau admits only ~21k of
+    the 32k edges, so without that terminal point its curve stops short of every other
+    method's and the sweep never reaches the size where all of them coincide.
+    """
+    full = Budget("top_k", len(edges))
     if cell.algo == "acdc":
-        return [Budget("threshold", tau) for tau in _acdc_tau_grid()]
+        return [Budget("threshold", tau) for tau in _acdc_tau_grid()] + [full]
     grid = matched_budgets(edges, true_edge_count)
-    return [Budget("top_k", k) for k in grid if 10 <= k < len(edges)]
+    return [Budget("top_k", k) for k in grid if 10 <= k < len(edges)] + [full]
 
 
 def _structural_rows(cell: Cell, index: EdgeIndex, budgets: List[Budget]) -> List[dict]:
@@ -245,15 +253,14 @@ def _structural_rows(cell: Cell, index: EdgeIndex, budgets: List[Budget]) -> Lis
 
 
 def _eval_ablations(cell: Cell) -> List[AblationType]:
-    """Swept cells are evaluated on the diagonal; the anchor in every panel it appears in.
+    """Every cell is evaluated under all three eval ablations.
 
-    Pillar 1 already sweeps eval ablation against discovery ablation for a single seed, so
-    repeating the full cross here would multiply every figure by three for no new question.
-    Random is ablation-independent at discovery, so it needs all three to act as a floor.
+    Pillar 1 sweeps the same cross with one seed per cell, so it reports how a score moves
+    with the protocol but not how the spread across seeds moves. Only the cross answers
+    whether a method's instability is a property of the method or of the protocol it was
+    discovered under.
     """
-    if cell.is_anchor:
-        return [_ABL_SHORT_INV[a] for a in DISCOVERY_ABLATIONS]
-    return [_ABL_SHORT_INV[cell.ablation]]
+    return [_ABL_SHORT_INV[a] for a in DISCOVERY_ABLATIONS]
 
 
 def _functional_rows(
@@ -261,20 +268,23 @@ def _functional_rows(
     index: EdgeIndex,
     budgets: List[Budget],
     device_scores: List[PruneScores],
+    patch_types: List[PatchType],
 ) -> List[dict]:
-    """Re-score each seed's circuit, one `measure_prune_metrics` call per seed.
+    """Re-score each seed's circuit, one `measure_prune_metrics` call per (seed, measure).
 
     Not one call per seed-group: ACDC resolves a budget to a different edge count in each
-    seed, and `test_edge_counts` is shared across the algos in a single call.
+    seed, and `test_edge_counts` is shared across the algos in a single call. The patch
+    type is a scalar argument, so the two measures are separate calls as well.
     """
     task = TASK_DICT[cell.task_key]
     metrics = TASK_METRICS.get(cell.task_key, _COMMON_METRICS)
     eval_ablations = _eval_ablations(cell)
     n_edges = len(index)
 
-    # (eval, metric, budget_label) -> {seed: value}; realised counts are per seed.
-    collected: Dict[Tuple[str, str, str], Dict[int, float]] = defaultdict(dict)
+    # (measure, eval, metric, budget_label) -> {seed: value}; realised counts are per seed.
+    collected: Dict[Tuple[str, str, str, str], Dict[int, float]] = defaultdict(dict)
     realised_by_budget: Dict[str, List[int]] = defaultdict(list)
+    kind_by_budget = {b.label: b.kind for b in budgets}
 
     for seed, ps in zip(cell.seeds, device_scores):
         # Resolved on the vector, not per Edge: the loop over 32k Edge objects costs
@@ -283,32 +293,35 @@ def _functional_rows(
         realised = {b.label: int(budget_mask(scores, b).sum()) for b in budgets}
         for label, count in realised.items():
             realised_by_budget[label].append(count)
-        counts = sorted({c for c in realised.values() if 0 < c < n_edges})
+        counts = sorted({c for c in realised.values() if 0 < c <= n_edges})
         if not counts:
             print(f"WARNING: {cell} seed {seed}: no usable budgets, skipping")
             continue
-        measurements = measure_prune_metrics(
-            ablation_types=eval_ablations,
-            metrics=metrics,
-            task_prune_scores={cell.task_key: {cell.algo_key: ps}},
-            patch_type=PatchType.TREE_PATCH,
-            reverse_clean_corrupt=False,
-            test_edge_counts=counts,
-        )
-        for ablation in eval_ablations:
-            for metric in metrics:
-                series = dict(
-                    extract_metric(
-                        measurements, ablation, metric.key, cell.task_key, cell.algo_key
+        for patch_type in patch_types:
+            measure = _PATCH_SEMANTICS[patch_type]
+            measurements = measure_prune_metrics(
+                ablation_types=eval_ablations,
+                metrics=metrics,
+                task_prune_scores={cell.task_key: {cell.algo_key: ps}},
+                patch_type=patch_type,
+                reverse_clean_corrupt=_reverse_clean_corrupt(patch_type),
+                test_edge_counts=counts,
+            )
+            for ablation in eval_ablations:
+                for metric in metrics:
+                    series = dict(
+                        extract_metric(
+                            measurements, ablation, metric.key, cell.task_key,
+                            cell.algo_key,
+                        )
                     )
-                )
-                for label, count in realised.items():
-                    if count in series:
-                        key = (_ablation_slug(ablation), metric.key, label)
-                        collected[key][seed] = float(series[count])
+                    for label, count in realised.items():
+                        if count in series:
+                            key = (measure, _ablation_slug(ablation), metric.key, label)
+                            collected[key][seed] = float(series[count])
 
     rows = []
-    for (eval_slug, metric_key, label), by_seed in sorted(collected.items()):
+    for (measure, eval_slug, metric_key, label), by_seed in sorted(collected.items()):
         values = np.array([by_seed[s] for s in sorted(by_seed)], dtype=np.float64)
         mean = float(values.mean())
         sd = float(values.std(ddof=0))
@@ -318,7 +331,8 @@ def _functional_rows(
                 algo=cell.short_name,
                 discovery_ablation="anchor" if cell.is_anchor else cell.ablation,
                 eval_ablation=eval_slug,
-                selector=budgets[0].kind,
+                measure=measure,
+                selector=kind_by_budget[label],
                 budget_label=label,
                 realised_mean=float(np.mean(realised_by_budget[label])),
                 metric=metric_key,
@@ -349,13 +363,16 @@ def _summary_rows(
     """Join structure and function at the reference budget, one row per cell.
 
     Both reference papers print the two together; read apart, a low Jaccard cannot be
-    distinguished from an unreliable algorithm.
+    distinguished from an unreliable algorithm. Faithfulness only, so the headline keeps
+    the meaning it had before completeness was measured.
     """
     by_cell: Dict[Tuple[str, str, str], List[dict]] = defaultdict(list)
     for row in structural:
         by_cell[(row["task"], row["algo"], row["discovery_ablation"])].append(row)
     func_by_cell: Dict[Tuple[str, str, str], List[dict]] = defaultdict(list)
     for row in functional:
+        if row.get("measure", "faithfulness") != "faithfulness":
+            continue
         func_by_cell[(row["task"], row["algo"], row["discovery_ablation"])].append(row)
 
     rows = []
@@ -486,6 +503,12 @@ def main() -> None:
     parser.add_argument("--ablations", nargs="+", default=DISCOVERY_ABLATIONS)
     parser.add_argument("--seeds", type=int, nargs="+", default=SEEDS)
     parser.add_argument("--functional-budgets", type=int, nargs="+", default=FUNCTIONAL_BUDGETS)
+    parser.add_argument(
+        "--measures",
+        nargs="+",
+        choices=sorted(_PATCH_SEMANTICS.values()),
+        default=sorted(_PATCH_SEMANTICS.values()),
+    )
     parser.add_argument("--skip-functional", action="store_true", help="CPU-only pass")
     parser.add_argument("--skip-figures", action="store_true")
     parser.add_argument(
@@ -525,8 +548,8 @@ def main() -> None:
         "git": git_state(),
         "discovery_cache_dir": args.cache_dir,
         "seeds": args.seeds,
-        "eval_protocol": "faithfulness only (TREE_PATCH); eval ablation = discovery "
-        "ablation for swept algos, all three for the Random anchor",
+        "eval_protocol": f"measures {sorted(args.measures)} x all three eval ablations, "
+        "every cell",
         "eval_data": "TASK_DICT template test_loader, identical for every seed",
         "stability_metric": STABILITY_METRIC,
         "stable_bar": STABLE_BAR,
@@ -539,6 +562,7 @@ def main() -> None:
 
     structural: List[dict] = []
     functional: List[dict] = []
+    patch_types = [p for p, m in _PATCH_SEMANTICS.items() if m in args.measures]
     for cell in cells:
         if len(cell.seeds) < 2:
             print(f"WARNING: {cell} has {len(cell.seeds)} seed(s), skipping")
@@ -559,7 +583,8 @@ def main() -> None:
         if cell.algo != "acdc":
             wanted = sorted(set(args.functional_budgets + ([task.true_edge_count] if task.true_edge_count else [])))
             fbudgets = [Budget("top_k", k) for k in wanted if 0 < k < len(edges)]
-        functional += _functional_rows(cell, index, fbudgets, on_device)
+            fbudgets.append(Budget("top_k", len(edges)))
+        functional += _functional_rows(cell, index, fbudgets, on_device, patch_types)
 
     _write_csv(folder / "structural.csv", structural, STRUCTURAL_FIELDS)
     if functional:

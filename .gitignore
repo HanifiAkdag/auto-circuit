@@ -4,6 +4,9 @@ __pycache__/
 .autoencoder_cache/
 .measurement_cache/
 .prune_scores_cache/
+.prune_scores_cache_v2/
+.port_fidelity_cache/
+.port_fidelity_cache_v2/
 .ruff_cache/
 figure*/
 results/
@@ -18,4 +21,10 @@ logs/
 CLAUDE.md
 *.pkl
 hpo/results/
+docs/related_work/.scratch/
+.scratch/
 docs/related_work/
+# Vendored comparison code, kept out of the repo. Clone it yourself:
+#   git clone https://github.com/frankniujc/disco_gp.git third_party/disco_gp
+#   git -C third_party/disco_gp checkout 54aef81
+third_party/
