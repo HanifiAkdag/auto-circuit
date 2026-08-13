@@ -71,7 +71,7 @@ def _build(tmpl) -> Task:
 def _skip_if_inert(diverge_idx: int, name: str) -> None:
     """Refuse to pass a test that the stripping path never reaches.
 
-    On the stock GPT-2 tasks `diverge_idx` is 0, which makes `tail_divergence` a
+    On the ragged tasks `diverge_idx` is 0, which makes `tail_divergence` a
     literal no-op, so any test of its behaviour would pass without exercising
     anything. Skipping keeps that visible instead of counting as coverage.
     """
@@ -98,9 +98,11 @@ def _test_prompts(tmpl):
 
 @pytest.mark.parametrize("name,tmpl,_model", TASKS)
 def test_stripped_prefix_is_common_to_every_prompt(name, tmpl, _model):
-    """Whatever is stripped must be identical across all prompts and pad-free.
+    """Whatever is stripped must be identical across all prompts and unpadded.
 
-    Anything else makes the shared cache invalid for some row.
+    Anything else makes the shared cache invalid for some row. Padding is read
+    from the row lengths, not from token ids: on GPT-2 pad and bos share an id,
+    so an id cannot say which one a position holds.
     """
     task = _build(tmpl)
     diverge_idx = task.train_loader.diverge_idx
@@ -109,14 +111,18 @@ def test_stripped_prefix_is_common_to_every_prompt(name, tmpl, _model):
     path = repo_path_to_abs_path(f"datasets/{tmpl._dataset_name}.json")
     prompts = json.loads(Path(path).read_text())["prompts"]
     tokenizer = task.model.tokenizer
-    bos, pad = tokenizer.bos_token, tokenizer.pad_token_id
+    bos = tokenizer.bos_token
 
-    prefixes = set()
+    prefixes, lengths = set(), set()
     for p in prompts[:200]:
         for key in ("clean", "corrupt"):
-            ids = tokenizer(bos + p[key])["input_ids"][:diverge_idx]
-            assert pad not in ids, f"{name}: stripped prefix contains padding"
-            prefixes.add(tuple(ids))
+            ids = tokenizer(bos + p[key])["input_ids"]
+            lengths.add(len(ids))
+            prefixes.add(tuple(ids[:diverge_idx]))
+    assert len(lengths) == 1, (
+        f"{name}: prompts have {len(lengths)} distinct lengths, so some row is "
+        f"left-padded and its position {diverge_idx - 1} is not the same token"
+    )
     assert len(prefixes) == 1, (
         f"{name}: {len(prefixes)} distinct prefixes are being stripped, but the "
         f"cache holds only one"
@@ -197,37 +203,45 @@ def test_disabling_tail_divergence_changes_nothing(name, tmpl, model_name):
 
 
 @pytest.mark.parametrize("name,tmpl", [(n, m) for n, m, k in TASKS if k == "gpt2"])
-def test_gpt2_strips_nothing_because_pad_and_bos_share_an_id(name, tmpl):
-    """On GPT-2 the guard gives up the whole prefix, and that is deliberate.
+def test_gpt2_strips_only_when_no_row_is_padded(name, tmpl):
+    """The gate is padding, not token ids, and on GPT-2 that distinction matters.
 
     GPT-2 sets pad == bos == eos == 50256, so a prepended BOS is indistinguishable
-    from padding and position 0 can never be certified pad-free. Stripping stops
-    there. The prompts themselves agree further than that, so this records the
-    cost of the guard rather than a property of the data: it is the exact position
-    where TransformerLens' BOS-promotion rule misfires on a chunk, which is what
-    made the shared cache wrong in the first place.
+    from padding by its id. The gate therefore reads the tokenizer's attention
+    mask: a prefix is stripped only when no row is padded, which is when every row
+    starts at the same absolute position. IOI is ragged and strips nothing;
+    Greater-Than is uniform and strips its shared prefix.
 
-    If a future change makes GPT-2 strip a prefix again, this test should fail and
-    the BOS-promotion interaction must be re-checked before it is accepted.
+    If this changes, TransformerLens' BOS-promotion rule must be re-checked on a
+    split sequence before the new behaviour is accepted: promoting the last
+    leading-pad position is what made the shared cache wrong in the first place.
     """
     task = _build(tmpl)
     tokenizer = task.model.tokenizer
     assert tokenizer.pad_token_id == tokenizer.bos_token_id, (
         "this test only describes tokenizers where pad and bos collide"
     )
-    assert task.train_loader.diverge_idx == 0
 
-    loader = task.train_loader
-    prompts = t.cat(
-        [t.cat([b.clean for b in loader]), t.cat([b.corrupt for b in loader])], dim=0
-    )
-    agree = (prompts == prompts[0]).all(dim=0)
-    agree[-1] = False
-    agree_only_idx = int((~agree).int().argmax().item())
-    assert agree_only_idx > 0, (
-        f"{name}: expected the prompts to agree past position 0, so that "
-        f"diverge_idx=0 is attributable to the pad guard rather than the data"
-    )
+    path = repo_path_to_abs_path(f"datasets/{tmpl._dataset_name}.json")
+    prompts = json.loads(Path(path).read_text())["prompts"]
+    bos = tokenizer.bos_token
+    lengths = {
+        len(tokenizer(bos + p[key])["input_ids"])
+        for p in prompts[:200]
+        for key in ("clean", "corrupt")
+    }
+
+    diverge_idx = task.train_loader.diverge_idx
+    if len(lengths) > 1:
+        assert diverge_idx == 0, (
+            f"{name}: rows have {len(lengths)} distinct lengths, so some row is "
+            f"padded and no fixed prefix is common to all of them"
+        )
+    else:
+        assert diverge_idx > 0, (
+            f"{name}: no row is padded and the prompts share a prefix, so the "
+            f"cache should be in use"
+        )
 
 
 # --- the stripping path, exercised deeply -------------------------------------

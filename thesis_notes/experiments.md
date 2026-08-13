@@ -1,5 +1,56 @@
 # Experiments
 
+### The pad-id guard was unsound reasoning that happened to be safe; gating on the attention mask restores Greater-Than's prefix cache — 2026-08-13
+
+- **Context:** deciding whether the stability pillar needs re-running, which required establishing what `data.py` on `main` actually does versus the version on the upstream PR branch (`55084a7`, review round 2).
+- **Observation — the first fix (`05433b0`) reasons from token ids, which cannot decide the question.** It rejected any position where some row holds `pad_token_id`. On GPT-2 `pad == bos == 50256`, so the legitimate prepended BOS at position 0 was read as padding and rejected on every dataset. The guard was safe only because it over-rejected; the inference it makes ("this id is the pad id, therefore this position is padding") is not valid.
+- **Observation — the second fix gates on the tokenizer's own `attention_mask` instead.** Strip only when no row is padded. Under that condition every row has the same length, so position *i* is the same absolute position for every prompt and equal token ids at *i* really are sufficient. This is an argument rather than a coincidence, and it no longer depends on `pad_id != bos_id`.
+- **Observation — measured `diverge_idx` on the real spine loaders** (same fork code, only `data.py` swapped, three tasks, 704 train + 256 test):
+
+    | task | pre-fix | pre-fix max &#124;Δlogit&#124; | v1 `05433b0` | PR `55084a7` |
+    |---|---|---|---|---|
+    | IOI | 3 | **16.01** | 0 | 0 |
+    | Greater-Than | 8 | **24.56** | 0 | **2** |
+    | Docstring | 11 | **12.87** | 3 | 3 |
+
+    Post-fix error is 0.0 or 1e-4 (float floor) under either revision.
+- **Significance — supersedes the 2026-08-11 entry below.** That entry concluded the optimization is "close to dead in this project" and that the write-up should not describe `tail_divergence` as active. Both were artifacts of the v1 guard. The feature is inert exactly on the ragged datasets (IOI) and active on the uniform ones (GT, Docstring). The correctness claim is unchanged; only the framing was wrong.
+- **Significance — all three spine tasks were materially wrong pre-fix**, not just Greater-Than. No cell discovered before `05433b0` is comparable with one discovered after, which independently confirms the confounding recorded in the 2026-08-13 EP entry below.
+- **Tests:** two fork tests failed on adopting the PR version, both because they pinned the v1 rule rather than a correctness property: one asserted `pad_token_id not in` the stripped prefix (the same unsound id-based inference), the other was a deliberate tripwire demanding the BOS-promotion interaction be re-checked before GPT-2 strips again. That re-check is the two behavioural tests, which pass for GT under the PR version: agreement with each prompt run alone (batch of one, no padding, no cache, no dataloader) and toggling `tail_divergence` being a no-op. Both tests rewritten to assert the padding gate. **18 passed, 2 skipped** (`--runslow`), the skips being IOI's genuinely inert cases.
+- **Code pointer / Run:** `auto_circuit/data.py:342-370`; `tests/test_tail_divergence_correctness.py`; `tests/test_data.py::test_tail_divergence_only_strips_a_cacheable_prefix`.
+
+### Adopting EP's paper-faithful mask sampling makes it the least stable method, not the second-most — 2026-08-13
+
+- **Context:** the EP port-fidelity study (Tier C) found the port's per-example hard-concrete sampling to be the whole cause of its disagreement with the reference, so `shared_mask_sample=True` became the library default on 2026-08-12. That invalidated every cached EP cell. All 54 were re-run (9 Pillar-1 spine, 45 Pillar-2 stability; `experiments/ep_rerun_cells.py`) and Pillar 2 was re-analysed as `stability_v3_2026-08-13`.
+- **Observation — the re-run touched only EP.** Every non-EP row in `structural.csv` is bit-identical to `stability_v2_2026-08-11` (delta exactly 0.000 for DiscoGP, EAP, ACDC and Random across all three tasks and ablations). That confirms the scope of the re-run. It is **not** a control for correctness: those rows are identical precisely because those cells were not recomputed.
+- **Correction, found while writing this entry — the cached cells are not all at one configuration, and this was believed otherwise.** Checked by `git merge-base --is-ancestor` on each manifest's recorded commit rather than by file date. The `data.py` `tail_divergence` fix is `05433b0` (2026-08-11). Every non-EP cell in **both** pillars was discovered at `4d2d65e` (2026-08-05), which is **pre-fix**; only the re-run EP cells (`baeef64`) are post-fix.
+    - The belief that "Pillar 2 is post-fix" came from the *analysis* run being dated 2026-08-11. The analysis date says nothing about when the cells it reads were discovered. `stability_v2_2026-08-11` reads cells discovered on 08-10.
+    - Consequence: the v2 → v3 EP comparison below is **confounded**, differing by the `data.py` fix as well as by sampling. And any EP-vs-other-method claim from `stability_v3` compares a post-fix EP against pre-fix rivals.
+    - **Lesson: date the cells by their recorded git commit, never by the results directory's name or mtime.** Same class of error as [[hpo-stale-cache-lexical-sort]], one level up: there the wrong file was loaded, here the right file was loaded and its provenance assumed.
+- **Second correction, more serious — the re-run relaxed a controlled variable, so the v3 margins are provisional.** `stability_discovery_v2.sh` pins `#SBATCH --constraint="gpu_model:a180"` and says why in its own header: seed repeats are comparable only within one GPU architecture, and cross-architecture EP runs differ at about the magnitude of the effect being measured. The re-run script constrained on GPU **memory** instead, to dodge a 24 GB OOM, and SLURM scattered the 54 cells over **four architectures**: a180/ampere (penelope, rubeus, remus, severus), a6000/ampere (moe), l40/lovelace (itchy), titanrtx/turing (turtok).
+    - δ *is* a standard deviation, so this put node variance directly into the quantity the port-fidelity margins are defined as. The 1.3× / 3.1× / 3.9× widening is an **upper bound** with an unknown hardware component, and the Jaccard drop is inflated by an unknown amount too.
+    - Re-submitted pinned to `gpu_model:a180` (job 420561). Verified with `scontrol show node` that the four a180 machines are one architecture and that moe/itchy/turtok are genuinely not; the constraint is honoured, so `remus` and `severus` are legitimate a180 members that the launcher's header (written when the pool was penelope+rubeus) does not list.
+    - **Lesson: when a launcher documents a constraint as a controlled variable, a new script for the same cells inherits the constraint, not just the cell list.** The OOM that motivated relaxing it is solved by the a180 pin as well, since every a180 node is 80 GB. Cost: one full re-run of 54 cells, and every number in this entry demoted to provisional.
+- **Observation — EP's structural stability falls on all nine cells.** Mean pairwise Jaccard at the published budget:
+
+    | task | ablation | v2 | v3 |
+    |---|---|---|---|
+    | IOI | resample | 0.622 | **0.241** |
+    | IOI | mean | 0.512 | 0.327 |
+    | IOI | zero | 0.333 | 0.202 |
+    | Greater-Than | zero | 0.264 | 0.178 |
+    | Docstring | resample | 0.708 | 0.668 |
+
+    - **Attribution, given the confound above.** Tier C isolates the sampling factor cleanly, because `port` and `port-sharedz` ran at one commit on one frozen split and differ in nothing else: within-arm Jaccard 0.642 against 0.265. That is the same magnitude as the spine's 0.622 → 0.241, so the drop is the sampling change and the `data.py` fix contributes little. The spine comparison alone could not have established this.
+    - **No cross-method claim yet.** It is tempting to write "EP is now least stable, below DiscoGP's 0.375", and that would be wrong: DiscoGP's 0.375 is a pre-fix number. The Pillar-2 headline stays "EAP most stable, DiscoGP least" until the non-EP cells are re-run. See [[stability_tracks_function]].
+    - The damage is task-dependent: IOI resample loses 0.38, Docstring mean loses 0.005. It is not a uniform noise increase.
+- **Observation — faithfulness gets worse by a measured amount.** Clean KL at matched budget, discovery = eval ablation: IOI resample 0.155 → 0.269, Greater-Than resample 0.034 → 0.051, Docstring resample 0.099 → 0.196. Under zero ablation the shift is larger still (IOI 0.99 → 2.45, GT 0.49 → 2.70).
+- **Significance — this is the correct baseline, and the direction matters for the argument.** The thesis compares methods and proposes improvements, so EP has to be the authors' EP; a variance-reduced port would have credited the method with an improvement belonging to the port. The per-example estimator is kept behind a flag because it is now a finding rather than an accident: the paper leaves sampling granularity unspecified (no batch index anywhere in §3, the Lagrangian, or Eq. 3), and resolving it the other way improves faithfulness ~45% at matched sparsity on IOI.
+- **Significance — the pre-registered margin rule did real work.** δ is defined as EP's own Pillar-2 within-implementation SD, so changing EP obliged recomputing it *before* reading any verdict. Three of four margins widened (Clean KL 0.0260 → 0.0326, Logit Diff 5.34 → 16.36, Answer Pair KL 0.0131 → 0.0514), which makes equivalence easier to declare for a reason unrelated to the port. Stating that ordering in advance is the only thing separating "the margins moved" from "the result improved". All §5.4 verdicts survive the widening.
+    - The Jaccard margin instead *narrowed* (0.00825 → 0.00540), which is a floor effect and not improved consistency: mean overlap fell 0.622 → 0.241 over the same change and low overlap has less room to vary. Same level-versus-spread trap as the 2026-08-05 zero-ablation entry below.
+- **Observation — one Tier C endpoint changed verdict, and one control went quiet.** `port-sharedz` vs `orig` Answer Pair KL now reads *fidelity supported* (diff −0.013, p = 0.71). Clean KL is still *inconclusive*, and by a hair: 90% CI half-width 0.031 against δ = 0.0326, missing by 0.0016. That is the `0.74δ` power ceiling the pre-registration named in advance doing exactly what was predicted, the same trap that left DiscoGP's Clean KL inconclusive. Separately, the `port-negkl` control fell from 2/6 endpoints to 1/6, because the Answer Pair KL margin widened past the control's effect.
+- **Code pointer / Run:** `experiments/ep_rerun_cells.py`; `results/stability/stability_v3_2026-08-13/`; `results/port_fidelity/tier_c_ep_v3/`; margins in `experiments/port_comparison/fidelity_analysis.py` (`EP_DELTAS`, all three columns retained); write-up §5.2 in `docs/port_validation/edge_pruning.md`. SLURM jobs 419953, 420039, 420044.
+
 ### Status of the port-fidelity and `tail_divergence` work — as of 2026-08-11
 
 The entries below run roughly newest-first and record the investigation as it
@@ -28,6 +79,8 @@ leaves IOI at 3.3437).
 - **Two upstream facts worth citing:** `tests/test_data.py::test_tail_divergence` passes only because `ioi_vanilla_template_prompts` happens to have a genuinely common prefix, uses `return_seq_length=True` (forbidding padding) and exactly one batch; and `test_unfactorized_edges` fails on unmodified upstream `main` (38 passed, 1 failed), so it is not a fork regression.
 
 ### The `tail_divergence` fix works by disabling the feature on GPT-2, and the tests said less than claimed — 2026-08-11
+
+> **Partly superseded 2026-08-13** (see the top entry). The "inert on GPT-2" observations describe the v1 pad-id guard, not the version now on `main`: Greater-Than strips 2 tokens again. The coverage and ragged-input observations still hold.
 
 - **Context:** auditing my own fix after the Pillar-2 re-run validated it. Two things did not hold up: how much of the feature survives, and how much the test suite actually covers.
 - **Observation — the stripping path is inert on both GPT-2 tasks.** Measured `diverge_idx`: IOI 3 → **0**, GT 8 → **0**, Docstring 11 → **3**. GPT-2 sets `pad == bos == eos == 50256`, so a prepended BOS cannot be certified pad-free and stripping stops at position 0.

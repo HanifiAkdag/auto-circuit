@@ -342,6 +342,12 @@ def load_datasets_from_json(
             assert t.all(clean_prompts["attention_mask"] == 1)
             assert t.all(corrupt_prompts["attention_mask"] == 1)
             seq_len = clean_prompts["input_ids"].shape[1]
+        # Padded prompts start at different positions, so no fixed prefix is
+        # common to all of them.
+        no_padding = bool(
+            clean_prompts["attention_mask"].all()
+            and corrupt_prompts["attention_mask"].all()
+        )
         ans_dicts: List[Dict] = [tokenizer(a, return_tensors="pt") for a in answer_strs]
         wrong_ans_dicts: List[Dict] = [
             tokenizer(a, return_tensors="pt") for a in wrong_answer_strs
@@ -351,18 +357,14 @@ def load_datasets_from_json(
         answers = [a["input_ids"].squeeze(-1).to(device) for a in ans_dicts]
         wrong_answers = [a["input_ids"].squeeze(-1).to(device) for a in wrong_ans_dicts]
 
-        if tail_divergence:
-            # The prefix cache is built once and reused for every batch, so the
-            # stripped prefix must be common to all prompts, not just to each pair.
+        if tail_divergence and no_padding:
+            # One cache serves every batch, so every prompt must hold the same
+            # token at each cached position.
             if clean_prompts.shape[1] == corrupt_prompts.shape[1]:
                 all_prompts = t.cat([clean_prompts, corrupt_prompts], dim=0)
-                same_everywhere = (all_prompts == all_prompts[0]).all(dim=0)
-                pad_id = getattr(model.tokenizer, "pad_token_id", None)
-                if pad_id is not None:
-                    # A padded position is a real token for some rows only.
-                    same_everywhere &= (all_prompts != pad_id).all(dim=0)
-                same_everywhere[-1] = False  # always run at least one token
-                diverge_idx = int((~same_everywhere).int().argmax().item())
+                cacheable = (all_prompts == all_prompts[0]).all(dim=0)
+                cacheable[-1] = False  # always run at least one token
+                diverge_idx = int((~cacheable).int().argmax().item())
         if diverge_idx > 0:
             seq_labels = seq_labels[diverge_idx:] if seq_labels is not None else None
             prefixs, cfg, device = [], model.cfg, model.cfg.device
