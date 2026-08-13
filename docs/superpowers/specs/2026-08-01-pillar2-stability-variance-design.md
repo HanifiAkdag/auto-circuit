@@ -21,7 +21,7 @@ process. A seed sweep would have measured that ordering noise, not the seed.
 
 Fixed by canonical iteration order (`PatchableModel.ordered_dest_wrappers`, ACDC's
 total-order sort key). Same node + same seed is now bitwise identical for all four
-algorithms. Full write-up in `thesis.md`, "Run-to-run nondeterminism" and "Making
+algorithms. Full write-up in `thesis_notes/experiments.md`, "Run-to-run nondeterminism" and "Making
 discovery reproducible" (both 2026-08-01).
 
 ## Hardware is a controlled variable

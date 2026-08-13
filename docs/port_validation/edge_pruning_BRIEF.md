@@ -34,7 +34,7 @@ this).
    **Negative controls are not optional**: an endpoint that detects nothing has no
    demonstrated power.
 5. Write `docs/port_validation/edge_pruning.md` in the same shape, and add a
-   `thesis.md` entry.
+   `thesis_notes/` entry.
 
 ## Known differences to start from, not to rediscover
 

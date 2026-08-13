@@ -592,7 +592,8 @@ CLI-driven (has `if __name__ == "__main__"` guard). Runs discovery + adversarial
 | Test file | What it covers |
 |---|---|
 | `test_prune.py` | Exact numerical correctness of circuit patching on MicroModel |
-| `test_edge_pruning_smoke.py` | L0/HC math + EP import check (run as script, not pytest) |
+| `prune_algos/test_edge_pruning_components.py` | Tier A of the EP port-fidelity study: 25 bitwise tests of hard-concrete L0, the Lagrangian, the sparsity schedule and KL, driven against the reference's own code (skips if `third_party/edge_pruning` is absent) |
+| `prune_algos/test_edge_pruning_equivalence.py` | Tier B: edge bijection + forward equivalence under masking vs a measured numerical floor (`--runslow`, one GPU) |
 | `test_experiment_utils.py` | IOI faithfulness regression vs hardcoded reference values |
 | `utils/test_graph_utils.py` | `edge_counts_util` edge count specs |
 | `utils/test_tensor_ops.py` | Answer scoring and KL div functions |

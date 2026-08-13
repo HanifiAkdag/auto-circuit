@@ -6,7 +6,7 @@
 
 > **Corrections since drafting (2026-06 onward):**
 > - **RQ numbering is outdated here.** Murano was dropped (supervisor decision). The final structure is one primary RQ + three sub-RQs: Sub-RQ 1 = Integration, **Sub-RQ 2 = Faithfulness**, **Sub-RQ 3 = Reliability** (stability + null test). Where this doc says "sub-RQ3", read it as the *Reliability* sub-RQ; "sub-RQ2 (Murano)" no longer exists.
-> - **Null-test overclaim (§1, below).** "The null test has never been run on circuit-discovery algorithms" is too strong: Méloux et al. *prescribe* it but run it empirically on probing only, and a prior circuit-level hypothesis test exists (Shi et al. 2024). The defensible gap is *instantiating* the prescribed randomized-weight test for the gradient-based optimizers EP/DiscoGP (vs ACDC/EAP) in the unified harness. See `thesis.md` (2026-06-19 dead-salmon entry) and [[subrq3-experiment-design]].
+> - **Null-test overclaim (§1, below).** "The null test has never been run on circuit-discovery algorithms" is too strong: Méloux et al. *prescribe* it but run it empirically on probing only, and a prior circuit-level hypothesis test exists (Shi et al. 2024). The defensible gap is *instantiating* the prescribed randomized-weight test for the gradient-based optimizers EP/DiscoGP (vs ACDC/EAP) in the unified harness. See `thesis_notes/introduction.md` (2026-06-19 dead-salmon entry) and [[subrq3-experiment-design]].
 
 ---
 
@@ -28,7 +28,7 @@ Gap verified 2026-06-02 against: EAP-IG variance (2510.00845v4), Dead Salmon (25
 - **Library:** AutoCircuit (this fork), edge-level factorized graphs, cached `PruneScores` per discovery run.
 - **Methods:** EP, DiscoGP (registered variants), ACDC, EAP. Anchors: `RANDOM_PRUNE_ALGO`, `GROUND_TRUTH_PRUNE_ALGO`.
 - **Tasks / models:** IOI, Greater-Than (GPT-2 Small); Docstring (4L attention-only `Attn_Only_4L512W_C4_Code`).
-- **Task → metric mapping** (from `thesis.md`, grounded in each task's origin paper):
+- **Task → metric mapping** (from `thesis_notes/experiments.md`, grounded in each task's origin paper):
   | Task | Primary | Secondary | Avoid |
   |---|---|---|---|
   | IOI | `LOGIT_DIFF_PERCENT_METRIC` | `CLEAN_KL_DIV_METRIC` | — |

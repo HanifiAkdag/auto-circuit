@@ -25,7 +25,7 @@ on both sides), or **remains**.
 | 1 | **Attention output bias `b_O`** | The original folds `b_O / n_heads` into each head's output (`modules/attention.py:150`); AutoCircuit adds `b_O` once into the residual stream, outside the maskable decomposition | **Removed** for the primary comparison by `split_attn_out_bias()`, which zeroes `b_O` and re-adds the per-head share through a permanent hook |
 | 2 | **Answer-token spacing** | The original omits the leading space on IOI answer strings, so 46 of 99 names fragment and ~48% of answers are word fragments rather than whole names | **Controlled**: the corrected (spaced) tokenization is used on both sides in the primary arm; the as-shipped form becomes a negative control |
 | 3 | **`tail_divergence` KV cache** | AutoCircuit strips the prompts' shared prefix into a KV cache; the original has no such mechanism and runs the full sequence | **Removed** by fixing the defect it contained (§4), after which it is inert on GPT-2 |
-| 4 | **BOS and padding** | The port prepends BOS and left-pads; the original does neither | **Controlled and measured**: a 5-seed `port-nobos` arm estimates its contribution rather than disclaiming it |
+| 4 | **BOS and padding** | The port prepends BOS and left-pads; the original does neither | **Controlled and measured**: a 5-seed `port-nobos` arm estimates its contribution rather than disclaiming it. **Qualified 2026-08-12**: `prepend_bos=False` also breaks AutoCircuit's left-padded batching -- the forward reads `cfg.default_prepend_bos` (True) instead of how the tokens were built, so one genuine pad per row is attended -- meaning that arm measures "what happens when BOS is turned off in this harness", defect included, rather than what the BOS convention costs (see [`edge_pruning.md`](edge_pruning.md) §4). The primary and control arms all run with BOS and are unaffected, and `orig` cannot be contaminated at all: it runs through the original's own dataloader, which neither prepends BOS nor left-pads, while Tier C scoring happens in the AutoCircuit harness with BOS. The 3/6 verdict stands |
 | 5 | **Train/test split** | The original's `train_test_split` is unseeded (`setup_task.py:175`) | **Removed**: both sides consume one frozen 704/256 split, `datasets/port_fidelity/ioi_frozen.json` |
 | 6 | **Numeric precision** | The original defaults to bf16, including AdamW state | **Controlled**: fp32 on both sides |
 | 7 | **Optimizer step count** | 704/64 with `drop_last` gives the port 11 batches × 100 epochs; the original's own split gives 13 × 100 | **Controlled** via the frozen split, so both reach the same number of steps |
@@ -160,7 +160,14 @@ faithfulness numbers do not.
 ### 5.1 Design
 
 Both arms consume the frozen split. All circuits are scored in the **same**
-AutoCircuit harness at matched edge count `k = 2000`, using randomized-tie `top-k`.
+AutoCircuit harness at matched edge count `k = 2000`.
+
+> **Correction (2026-08-12).** This section previously said selection used
+> "randomized-tie `top-k`". It does not: `budget_mask` and
+> `prune_scores_threshold` both select with a deterministic `>=`, so a tie block
+> straddling `k` is admitted whole. DiscoGP's continuous scores effectively never
+> tie, so no number in this document changes; the claim was simply wrong. Ties are
+> real only for ACDC.
 
 | arm | n | purpose |
 |---|---|---|
@@ -168,7 +175,7 @@ AutoCircuit harness at matched edge count `k = 2000`, using randomized-tie `top-
 | `orig` | 10 | the original, as shipped |
 | `port-split` | 10 | the port with the bias convention matched (**primary**) |
 | `port-bOzero` / `orig-bOzero` | 5 + 5 | mechanism: `b_O` removed from both |
-| `port-nobos` | 5 | isolates the BOS/padding factor |
+| `port-nobos` | 5 | the input convention (BOS/padding); see the note below |
 | `port-neginv` | 5 | negative control: mask inversion removed |
 | `orig-asshipped` | 5 | negative control: unspaced answer tokens |
 

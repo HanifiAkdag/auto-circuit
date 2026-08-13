@@ -8,7 +8,7 @@ attributed to the implementations. Two confounds are removed here:
   seed**, so its split differs run to run.
 * The original's IOI answer tokens omit the leading space (`setup_task.py:226-227`),
   which makes ~48% of them word fragments and its objective different from the
-  port's even on identical prompts. See `thesis.md` §Experiments 2026-08-07.
+  port's even on identical prompts. See `thesis_notes/experiments.md` (2026-08-07).
 
 The artifact is written in this repo's own dataset schema, so the port consumes it
 through the ordinary `Task` machinery with no special-casing. `load_for_original`

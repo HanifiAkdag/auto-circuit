@@ -67,6 +67,50 @@ def _soft_mask(log_alpha: t.Tensor) -> t.Tensor:
     return t.sigmoid(log_alpha / TEMPERATURE * FACTOR)
 
 
+def _target_sparsity(
+    global_step: int, start: float, target: float, warmup_steps: int
+) -> float:
+    """Linear sparsity-target ramp, matching the original's
+    ``get_current_edge_target_sparsity`` (``fpt2_ioi.py:94-108``).
+
+    The operation order mirrors the original exactly: ``(target - start) * step /
+    warmup``, not ``(target - start) * (step / warmup)``. The two differ in the last
+    ulp, which is enough to break a bitwise comparison.
+    """
+    if global_step < warmup_steps:
+        return start + (target - start) * global_step / warmup_steps
+    return target
+
+
+def _lagrangian(
+    sparsity: t.Tensor, target: float, lambda_1: t.Tensor, lambda_2: t.Tensor
+) -> t.Tensor:
+    """``λ₁(s − t) + λ₂(s − t)²``, matching ``modeling_fpt2.py:1377-1396``."""
+    gap = sparsity - target
+    return lambda_1 * gap + lambda_2 * gap**2
+
+
+def _sample_mask(log_alpha: t.Tensor, batch_size: int, shared: bool) -> t.Tensor:
+    """Hard-concrete mask sample, shaped ``(batch_size, *log_alpha.shape)``.
+
+    ``shared=True`` (the default) draws **one** sample and broadcasts it across the
+    batch, which is what the original does: ``sample_z_from_log_alpha``
+    (``l0.py:43-48``) draws ``u`` with the shape of ``log_alpha`` and no batch
+    dimension.
+
+    ``shared=False`` draws an independent sample per example and the caller averages
+    them, which is a lower-variance gradient estimator. Both readings are consistent
+    with the paper, whose hard-concrete equations and Eq. 3 carry no batch index at
+    all, but they are not the same algorithm: the port-fidelity study found this
+    single choice accounts for the entire discrepancy between the two
+    implementations, worth ~0.12 nats of faithfulness at matched sparsity.
+    """
+    if not shared:
+        return sample_hard_concrete(log_alpha, batch_size)
+    one = sample_hard_concrete(log_alpha, 1)
+    return one.expand(batch_size, *one.shape[1:])
+
+
 def edge_pruning_prune_scores(
     model: PatchableModel,
     dataloader: PromptDataLoader,
@@ -85,6 +129,8 @@ def edge_pruning_prune_scores(
     # --- Node pruning ---
     use_node_masks: bool = True,
     disable_node_loss: bool = False,
+    # --- Mask sampling ---
+    shared_mask_sample: bool = True,
     # --- Misc ---
     show_train_graph: bool = False,
     init_log_alpha: float = 10.0,
@@ -133,6 +179,13 @@ def edge_pruning_prune_scores(
             parameters are frozen buffers at 0.  This matches the default IOI sweep in
             the original paper (``--disable_node_loss``).  Set to ``False`` to actively
             drive node sparsity toward ``target_node_sparsity``.
+        shared_mask_sample: Draw one hard-concrete sample per step and share it
+            across the batch, as the original does (``l0.py:43-48`` draws ``u`` with
+            no batch dimension).  ``False`` draws an independent sample per example,
+            a lower-variance gradient estimator that finds sparser, more faithful
+            circuits but is *not* what the reference implementation runs.  The paper
+            does not specify which is intended; see
+            ``docs/port_validation/edge_pruning.md`` §5.5.
         show_train_graph: Whether to write a Plotly training-metrics HTML file.
         init_log_alpha: Magnitude of the initial log_alpha values.  Stored as
             ``-init_log_alpha`` so that HC samples start near 0 (edges *kept*) in
@@ -283,9 +336,12 @@ def edge_pruning_prune_scores(
 
         # --- Sparsity warmup: ramp targets based on optimizer step count ---
         # Matches original's get_current_edge_target_sparsity(state.global_step).
-        warmup_frac = min(global_step / max(sparsity_warmup_steps, 1), 1.0)
-        t_edge = start_edge_sparsity + (target_edge_sparsity - start_edge_sparsity) * warmup_frac
-        t_node = start_node_sparsity + (target_node_sparsity - start_node_sparsity) * warmup_frac
+        t_edge = _target_sparsity(
+            global_step, start_edge_sparsity, target_edge_sparsity, sparsity_warmup_steps
+        )
+        t_node = _target_sparsity(
+            global_step, start_node_sparsity, target_node_sparsity, sparsity_warmup_steps
+        )
 
         batch = next(batch_cycle)
         batch_size = batch.clean.shape[0]
@@ -295,7 +351,7 @@ def edge_pruning_prune_scores(
         sampled_edge_z: Dict[str, t.Tensor] = {}
         all_edge_z_flat: List[t.Tensor] = []
         for mod_name, ela in edge_log_alphas.items():
-            z = sample_hard_concrete(ela, batch_size)  # (batch, *mask_shape)
+            z = _sample_mask(ela, batch_size, shared_mask_sample)
             sampled_edge_z[mod_name] = z
             all_edge_z_flat.append(z.mean(dim=0).flatten())  # avg over batch
 
@@ -304,7 +360,7 @@ def edge_pruning_prune_scores(
         all_node_z_flat: List[t.Tensor] = []
         if use_node_masks:
             for src_idx, nla in node_log_alphas.items():
-                z = sample_hard_concrete(nla, batch_size)  # (batch, 1)
+                z = _sample_mask(nla, batch_size, shared_mask_sample)  # (batch, 1)
                 sampled_node_z[src_idx] = z
                 all_node_z_flat.append(z.mean(dim=0).flatten())
 
@@ -376,9 +432,7 @@ def edge_pruning_prune_scores(
         # matching original's `model_edge_sparsity = 1 - z_sum/n_edges` (z=1→keep).
         all_edge_z = t.cat(all_edge_z_flat)
         edge_sparsity = all_edge_z.sum() / n_edges
-        edge_reg = lambda_edge_1 * (edge_sparsity - t_edge) + lambda_edge_2 * (
-            edge_sparsity - t_edge
-        ) ** 2
+        edge_reg = _lagrangian(edge_sparsity, t_edge, lambda_edge_1, lambda_edge_2)
 
         # --- Node sparsity & regularisation ---
         # node_reg stays 0 when disable_node_loss=True (frozen λ buffers).
@@ -388,9 +442,7 @@ def edge_pruning_prune_scores(
             all_node_z = t.cat(all_node_z_flat)
             node_sparsity = all_node_z.sum() / n_srcs
             node_sparsity_val = node_sparsity.item()
-            node_reg = lambda_node_1 * (node_sparsity - t_node) + lambda_node_2 * (
-                node_sparsity - t_node
-            ) ** 2
+            node_reg = _lagrangian(node_sparsity, t_node, lambda_node_1, lambda_node_2)
 
         # --- Total loss & optimiser step ---
         loss = kl_loss + edge_reg + node_reg

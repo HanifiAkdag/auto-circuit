@@ -61,7 +61,7 @@ is that the original folds `b_O / n_heads` into each attention head
 (`modules/attention.py:150`) while AutoCircuit adds `b_O` once outside the
 maskable decomposition. Node-by-node the head gap is *exactly* that term
 (residual 1.4e-03); `|b_O / n_heads|` at layer 11 is **20.05**, the same order as
-the logit scale. Full write-up: `thesis.md` §Experiments 2026-08-08.
+the logit scale. Full write-up: `thesis_notes/experiments.md` (2026-08-08).
 
 **Consequence for Tier C:** "ablate this head" is a different operation on each
 side, so Tier C compares two subtly different objectives. This is handled by a
