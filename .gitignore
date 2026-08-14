@@ -3,10 +3,8 @@ __pycache__/
 .venv2/
 .autoencoder_cache/
 .measurement_cache/
-.prune_scores_cache/
-.prune_scores_cache_v2/
-.port_fidelity_cache/
-.port_fidelity_cache_v2/
+.prune_scores_cache*/
+.port_fidelity_cache*/
 .ruff_cache/
 figure*/
 results/
