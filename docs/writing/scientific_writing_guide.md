@@ -1,6 +1,6 @@
 # Scientific & Thesis Writing Guide
 
-Reference for writing and revising every chapter of the thesis (`thesis/chapters/*.tex`).
+Reference for writing and revising every chapter of the thesis (`thesis-overleaf/Thesis/chapters/*.tex`).
 Operationalized as a checklist by the `writing-thesis-prose` skill; this file is the depth
 reference behind it.
 
