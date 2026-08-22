@@ -34,3 +34,4 @@ third_party/
 
 # Overleaf clone of the thesis write-up (separate git repo, remote git.overleaf.com)
 thesis-overleaf/
+.claude/

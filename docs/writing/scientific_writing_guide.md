@@ -43,6 +43,8 @@ Conclusion). Keep the jobs separate.
 - **One idea per sentence.** Three or more commas usually means split it.
 - **Hedge only when warranted.** Prefer confident, citation-backed claims to "it could be
   argued" or "it is believed"; hedge where the evidence is genuinely uncertain.
+- **Write for a reader who knows the field.** The graders are the supervisors, and the intended reader is someone taking a course on the topic. Presume transformers, attention, backpropagation and cross-entropy. Never explain what such a reader knows, never restate a displayed equation in prose, and never state one fact twice in different words. Supervisor review of Background Section 2.1 (2026-08-21) rejected the draft as "not professional and even childish" on exactly these three counts.
+- **State the reason a practice exists, not its mechanics.** "An edge into a head terminates at one of the three" describes bookkeeping and says nothing. Read the source for why the practice exists, then give the consequence at the level the section is about. The reason must not itself be textbook material.
 - **Cite or own every non-trivial claim.** A factual claim is either supported by a
   citation or presented explicitly as a contribution of this thesis. Nothing floats.
 
@@ -188,6 +190,16 @@ Introduction (2026-07-07); extend this table as new patterns are flagged.
 | new information buried mid-sentence | stress position wasted (§3) | move the payload to the sentence end |
 | a Related-Work paragraph per paper | summary, not synthesis (§4) | organize by theme; one claim per paragraph, citations as evidence |
 | interpreting results in the Results chapter | chapter-job bleed (§1, §4) | move the "why" to Discussion; keep Results factual |
+| "The distribution is produced by a stack of blocks" | ELI5 register, informal noun (§2) | "Its computation is organized into blocks" |
+| explaining what queries, keys and values do before saying why the split matters | over-explaining known material (§2) | give only the consequence for the section's own object: the split makes an edge record which input it enters |
+| "Edges point only from earlier nodes to later ones, so the graph is a DAG", after already stating every node has an edge from each predecessor | one fact stated twice (§2) | fold the consequence into the sentence that establishes it |
+| "The heads read $x_l$ in parallel, and the MLP reads the stream after they have written to it", printed above that equation | prose restating a display (§2) | delete; the equation carries it |
+| "a running sum ...: it is initialized ..., and every component reads its current state and adds its own output back into it" | overlong sentence, two referents for "it" (§3) | split into two sentences, one referent per pronoun |
+| "a connected pair need not interact", "a sum of this kind", "the same count at every node" | vague or unprofessional referent (§2) | name the mechanism, or delete the sentence if the point survives without it |
+| "an edge into a head terminates at one of the three" | mechanics stated without the reason (§2) | read the source for why the practice exists (Wang §3.2: heads are influenced through value, key or query), then state the graph-level consequence |
+| "the granularity is chosen to suit the explanation being sought" | ornate word choice (§2) | "the granularity of the graph is set by the level of detail an explanation requires" |
+| a paragraph of true but unrelated facts (normalization, same-block heads, edge count) | disconnected paragraphs (§3) | move each fact beside what it qualifies; a fact with no home in the section belongs to a later chapter |
+| a section-local fact that is really a later chapter's premise (quadratic edge count) | scope creep (§1) | cut it and record in `thesis_notes/` where it is owed |
 
 ---
 
