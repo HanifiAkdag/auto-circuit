@@ -122,3 +122,9 @@
 - **Handling:** reported as pre-registered rather than rescaled after seeing the data, and flagged. The `equivalent` flag on this row must never be cited as fidelity support. A ratio margin, or one derived from Pillar-2 spread, would have been correct.
 - **Transferable point:** an equivalence margin chosen on an absolute scale before knowing the quantity's range can be vacuous, and vacuity looks exactly like success. The negative-control discipline catches an endpoint with no power; it does not catch an endpoint with a margin too wide to fail. Density detected 2 of 3 controls, so it passed that check while still being uninformative here.
 - **Code pointer / Run:** `experiments/port_comparison/fidelity_analysis.py` (`EP_DELTAS["density"]`), `docs/port_validation/edge_pruning.md` §5.4.
+
+### Streetlight interpretability, owed from Background — 2026-08-26
+
+- **Context:** cut from Background §2.3.1, where it was too thin for its own paragraph and a non-sequitur inside the dataset paragraph.
+- **Observation:** "The tasks studied so far have been deliberately selected to be simple to define and study mechanistically ... This gives a misleading impression of the level of difficulty involved in implementing circuit discovery for any arbitrary task that a network implements" (`sharkey2025openproblems` §2.3). Cite Sharkey, not `rai2025practicalreview` §9.2, which only repeats it.
+- **Significance:** the three tasks in this thesis are exactly the templated kind the claim is about, so it belongs in Limitations rather than being asserted and left unanswered in Background.

@@ -9,7 +9,7 @@ the index; do not add entries here.
 | Section | File | Entries |
 |---------|------|---------|
 | Introduction | [`thesis_notes/introduction.md`](thesis_notes/introduction.md) | 10 |
-| Related Work | [`thesis_notes/related-work.md`](thesis_notes/related-work.md) | 21 |
+| Related Work | [`thesis_notes/related-work.md`](thesis_notes/related-work.md) | 38 |
 | Methodology | [`thesis_notes/methodology.md`](thesis_notes/methodology.md) | 7 (HPO · Patching & Ablation Mechanics) |
 | Experiments | [`thesis_notes/experiments.md`](thesis_notes/experiments.md) | 37 |
 | Results | [`thesis_notes/results.md`](thesis_notes/results.md) | 4 |
