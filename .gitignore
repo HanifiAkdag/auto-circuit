@@ -35,3 +35,10 @@ third_party/
 # Overleaf clone of the thesis write-up (separate git repo, remote git.overleaf.com)
 thesis-overleaf/
 .claude/
+# Thesis material: kept on the local machine, not published to the code repo
+thesis.md
+thesis_notes/
+docs/CODEBASE_MAP.md
+docs/writing/
+docs/superpowers/
+docs/port_validation/
