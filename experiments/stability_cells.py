@@ -23,7 +23,7 @@ the spine does; `CELLS` still lists them so the analysis sees the full matrix.
 Cell count: 4 swept x 3 tasks x 3 ablations x 5 seeds + 3 tasks x 5 seeds (Random) = 195.
 """
 import argparse
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 TASKS: List[str] = ["ioi", "gt", "docstring"]
 SWEPT_ALGOS: List[str] = ["ep", "discogp-ep", "acdc", "eap"]  # run under each ablation
@@ -68,6 +68,70 @@ ARRAY_CELLS: List[Dict[str, str]] = [
 ]
 
 
+# ── Variance decomposition (spec 2026-09-02) ──────────────────────────────────────────
+# The seed drives two independent sources at once: the prompt draw and the mask init.
+# Holding one at the anchor isolates the other. All three conditions contain
+# (42, 42), so each needs only 4 new runs and they share a common anchor point.
+ANCHOR_SEED: int = 42
+CONDITIONS: List[str] = ["joint", "data", "init"]
+
+# Only these consume both seeds. Every other algorithm reads exactly one, so its
+# conditions are either the joint cells it already has or constant by construction.
+DECOMP_ALGOS: List[str] = ["ep", "discogp-ep"]
+
+
+def condition_of(data_seed: int, init_seed: int) -> str:
+    """Name the condition a (data, init) pair belongs to. Derived, never stored, so a
+    mislabelled manifest is impossible."""
+    if data_seed == init_seed:
+        return "joint"
+    if init_seed == ANCHOR_SEED:
+        return "data"
+    if data_seed == ANCHOR_SEED:
+        return "init"
+    raise ValueError(
+        f"({data_seed}, {init_seed}) is on no condition axis: one seed must be the "
+        f"anchor {ANCHOR_SEED} unless both are equal"
+    )
+
+
+def seeds_for(condition: str, seed: int) -> Tuple[int, int]:
+    """The (data_seed, init_seed) pair for one condition at one seed level."""
+    if condition == "joint":
+        return seed, seed
+    if condition == "data":
+        return seed, ANCHOR_SEED
+    if condition == "init":
+        return ANCHOR_SEED, seed
+    raise ValueError(f"unknown condition {condition!r}, expected one of {CONDITIONS}")
+
+
+def _build_decomp_cells() -> List[Dict[str, str]]:
+    cells: List[Dict[str, str]] = []
+    for condition in ("data", "init"):
+        for seed in SEEDS:
+            if seed == ANCHOR_SEED:
+                continue  # (42, 42) is the shared anchor; the joint run already has it
+            data_seed, init_seed = seeds_for(condition, seed)
+            for task in TASKS:
+                for algo in DECOMP_ALGOS:
+                    for ablation in DISCOVERY_ABLATIONS:
+                        cells.append(
+                            {
+                                "task": task,
+                                "algo": algo,
+                                "ablation": ablation,
+                                "seed": str(data_seed),
+                                "init_seed": str(init_seed),
+                                "condition": condition,
+                            }
+                        )
+    return cells
+
+
+DECOMP_CELLS: List[Dict[str, str]] = _build_decomp_cells()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -78,12 +142,21 @@ def main() -> None:
     parser.add_argument(
         "--count", action="store_true", help="Print cell counts and exit."
     )
+    parser.add_argument(
+        "--decomp", action="store_true", help="Print the 144 variance-decomposition cells."
+    )
     args = parser.parse_args()
+
+    if args.decomp:
+        for c in DECOMP_CELLS:
+            print(f"{c['task']} {c['algo']} {c['ablation']} {c['seed']} {c['init_seed']}")
+        return
 
     if args.count:
         print(f"CELLS       {len(CELLS)}")
         print(f"ARRAY_CELLS {len(ARRAY_CELLS)}  (array bounds: 0-{len(ARRAY_CELLS) - 1})")
         print(f"tau-split   {len(CELLS) - len(ARRAY_CELLS)}")
+        print(f"DECOMP_CELLS {len(DECOMP_CELLS)}")
         return
 
     for c in ARRAY_CELLS if args.array else CELLS:
