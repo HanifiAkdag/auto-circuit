@@ -280,10 +280,13 @@ def latest_per_cell(
     """Deduplicate loaded cells, keeping the newest per cell identity.
 
     A cell is identified by its manifest's ``cell`` block
-    (task, algo, ablation, seed, null_test); the newest is chosen by ``saved_at``.
-    Re-running a failed/OOM cell just adds a newer timestamped file, so the analysis
-    pass transparently picks it up. Cells without a manifest ``cell`` block are kept
-    as-is (keyed by their object id, never deduplicated).
+    (task, algo, ablation, seed, init_seed, null_test); the newest is chosen by
+    ``saved_at``. A manifest with no ``init_seed`` is a legacy joint cell (mask init
+    coupled to the data seed), so it keys the same as an explicit ``init_seed == seed``
+    manifest instead of getting its own identity slot. Re-running a failed/OOM cell just
+    adds a newer timestamped file, so the analysis pass transparently picks it up. Cells
+    without a manifest ``cell`` block are kept as-is (keyed by their object id, never
+    deduplicated).
     """
     best: Dict[tuple, Tuple[str, Optional[Dict], TaskPruneScores]] = {}
     for manifest, tps in loaded:
@@ -296,6 +299,7 @@ def latest_per_cell(
             cell.get("algo"),
             cell.get("ablation"),
             cell.get("seed"),
+            cell.get("init_seed", cell.get("seed")),
             cell.get("null_test"),
         )
         saved = (manifest or {}).get("saved_at", "")

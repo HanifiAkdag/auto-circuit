@@ -17,12 +17,13 @@ import argparse
 import json
 import os
 import random
+import socket
 import sys
 from copy import deepcopy
 from datetime import datetime
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import torch as t
 import transformer_lens as tl
@@ -115,6 +116,35 @@ def _build_null_model(model_def: str, device: t.device) -> t.nn.Module:
     return model
 
 
+def _cache_stem(
+    task: str,
+    algo: str,
+    ablation: str,
+    seed: int,
+    init_seed: Optional[int],
+    null_test: bool = False,
+    partial_tag: Optional[str] = None,
+) -> str:
+    """Cache identity. The init tag appears only when the init seed differs from the data
+    seed, so joint cells keep the names the existing cells already use and --skip-if-exists
+    stays idempotent against them."""
+    init_tag = "" if init_seed is None or init_seed == seed else f"_init{init_seed}"
+    null_tag = "_null" if null_test else ""
+    ptag = f"__{partial_tag}" if partial_tag else ""
+    algo_slug = algo.replace("-", "_")
+    return f"cell_{task}_{algo_slug}_{ablation}_seed{seed}{init_tag}{null_tag}{ptag}"
+
+
+def _hardware() -> dict[str, Any]:
+    """Seed repeats are only comparable within one GPU architecture and nothing else in the
+    cache records which one ran them."""
+    return {
+        "node": os.environ.get("SLURMD_NODENAME") or socket.gethostname(),
+        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+        "gpu": t.cuda.get_device_name(0) if t.cuda.is_available() else None,
+    }
+
+
 def _data_budget(task: Task) -> dict[str, Any]:
     """Record the data budget: nothing else in the cache identifies it, so cells from
     different tasks.py settings are otherwise indistinguishable. Both fields may be a
@@ -176,10 +206,10 @@ def main():
     args = parser.parse_args()
 
     # ── Cache identity (computed up front so we can skip/resume) ──
-    null_tag = "_null" if args.null_test else ""
-    partial_tag = f"__{args.partial_tag}" if args.partial_tag else ""
-    algo_slug = args.algo.replace("-", "_")
-    base_filename = f"cell_{args.task}_{algo_slug}_{args.ablation}_seed{args.seed}{null_tag}{partial_tag}"
+    base_filename = _cache_stem(
+        args.task, args.algo, args.ablation, args.seed, args.init_seed,
+        args.null_test, args.partial_tag,
+    )
     folder = repo_path_to_abs_path(args.output_dir)
     folder.mkdir(parents=True, exist_ok=True)
 
@@ -254,11 +284,13 @@ def main():
             "algo_key": algo.key,
             "ablation": args.ablation,
             "seed": args.seed,
+            "init_seed": args.seed if args.init_seed is None else args.init_seed,
             "null_test": args.null_test,
         },
         "cache_file": cache_path.name,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
         "git": git_state(),
+        "hardware": _hardware(),
         "data_budget": _data_budget(task),
         "algo_hyperparams": algo_hyperparams(algo),
     }

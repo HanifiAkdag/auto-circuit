@@ -209,3 +209,33 @@ def test_latest_per_cell():
     tags = {tps["tps"] for _, tps in kept}
     assert "new" in tags and "old" not in tags
     assert {"new", "other-abl", "other-cell"} == tags
+
+
+def _cell_manifest(seed, init_seed, saved, tag, task="ioi", algo="ep", abl="resample"):
+    cell = {"task": task, "algo": algo, "ablation": abl, "seed": seed, "null_test": False}
+    if init_seed is not None:
+        cell["init_seed"] = init_seed
+    return ({"cell": cell, "saved_at": saved}, {"tps": tag})
+
+
+def test_latest_per_cell_separates_init_seed():
+    """A data-only cell (43, init 42) must not evict the joint cell (43, init 43)."""
+    loaded = [
+        _cell_manifest(43, 43, "2026-09-01T10:00:00", "joint"),
+        _cell_manifest(43, 42, "2026-09-02T10:00:00", "data-only"),  # newer
+    ]
+    kept = latest_per_cell(loaded)
+    assert len(kept) == 2
+    assert {tps["tps"] for _, tps in kept} == {"joint", "data-only"}
+
+
+def test_latest_per_cell_legacy_manifest_is_a_joint_cell():
+    """A manifest with no init_seed IS a joint cell, so it dedupes against an explicit
+    init_seed == seed manifest rather than sitting beside it."""
+    loaded = [
+        _cell_manifest(42, None, "2026-08-15T10:00:00", "legacy"),
+        _cell_manifest(42, 42, "2026-09-02T10:00:00", "explicit"),  # newer wins
+    ]
+    kept = latest_per_cell(loaded)
+    assert len(kept) == 1
+    assert kept[0][1]["tps"] == "explicit"
