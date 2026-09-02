@@ -161,6 +161,7 @@ def main():
     parser.add_argument("--algo", required=True, choices=list(_ALGO_MAP), help="Algorithm short name")
     parser.add_argument("--ablation", required=True, choices=list(_ABLATION_MAP), help="Discovery ablation type")
     parser.add_argument("--seed", type=int, default=42, help="Random seed (data shuffle + mask init)")
+    parser.add_argument("--init-seed", type=int, default=None, help="Mask-init seed, decoupled from --seed (data draw). Omit for the legacy coupled path.")
     parser.add_argument("--output-dir", default=".prune_scores_cache", help="Cache folder (relative to repo root)")
     parser.add_argument("--null-test", action="store_true", help="Use randomly-initialized model weights (dead-salmon null)")
     parser.add_argument("--skip-if-exists", action="store_true", help="Skip if this cell is already cached (requeue-safe)")
@@ -224,7 +225,15 @@ def main():
 
     task = _build_task(args.task, args.seed, args.null_test)
 
-    print(f"Running: task={args.task}  algo={algo.key}  ablation={args.ablation}  seed={args.seed}  null_test={args.null_test}")
+    # --init-seed decouples mask initialisation from the prompt draw. load_datasets_from_json
+    # re-seeds torch itself, so the seed has to land after the loaders are built; init_task is
+    # idempotent. Omitting the flag leaves the legacy path untouched.
+    if args.init_seed is not None:
+        task.init_task()
+        t.manual_seed(args.init_seed)
+        random.seed(args.init_seed)
+
+    print(f"Running: task={args.task}  algo={algo.key}  ablation={args.ablation}  seed={args.seed}  init_seed={args.init_seed}  null_test={args.null_test}")
     task_prune_scores = run_prune_algos([task], [algo])
 
     # ── Save cache + manifest ──
