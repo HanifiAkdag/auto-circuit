@@ -95,6 +95,12 @@ def _read(path: Path) -> List[dict]:
     return rows
 
 
+def _joint_only(rows: List[dict]) -> List[dict]:
+    """The existing figures describe total run-to-run variance, which is the joint
+    condition. A CSV written before the column existed is joint by construction."""
+    return [r for r in rows if r.get("condition", "joint") == "joint"]
+
+
 def _tasks(rows: List[dict]) -> List[str]:
     present = {r["task"] for r in rows}
     return [t for t in TASK_ORDER if t in present] + sorted(present - set(TASK_ORDER))
@@ -1061,6 +1067,42 @@ def _ring_diagonal(fig, n_cols: int) -> None:
         )
 
 
+def fig_variance_decomposition(summary: List[dict]) -> go.Figure:
+    """Spread of the task's primary metric under each condition, grouped by algorithm.
+
+    Read together the three bars say how much of an algorithm's run-to-run variance is the
+    prompt draw and how much is the mask init. Bars, not a stacked share: the components
+    are estimated separately and need not sum to the joint value.
+    """
+    conditions = ["joint", "data", "init"]
+    tasks = _tasks(summary)
+    fig = make_subplots(
+        rows=1, cols=len(tasks), subplot_titles=tasks, shared_yaxes=True,
+    )
+    for condition in conditions:
+        for col, task in enumerate(tasks, start=1):
+            rows = [
+                r for r in summary
+                if r.get("condition", "joint") == condition and r["task"] == task
+            ]
+            rows.sort(key=lambda r: r["algo"])
+            fig.add_trace(
+                go.Bar(
+                    name=condition,
+                    x=[r["algo"] for r in rows],
+                    y=[_num(r.get("primary_sd")) for r in rows],
+                    legendgroup=condition,
+                    showlegend=col == 1,
+                ),
+                row=1,
+                col=col,
+            )
+    fig.update_layout(barmode="group", title="Seed-variance decomposition")
+    fig.update_yaxes(title_text="sd of the primary metric", row=1, col=1)
+    _facet_titles(fig)
+    return fig
+
+
 # ── driver ──────────────────────────────────────────────────────────────────────────
 
 
@@ -1093,9 +1135,18 @@ def _save(
 
 
 def write_all_figures(folder: Path) -> None:
-    structural = _read(folder / "structural.csv")
-    functional = _read(folder / "functional.csv")
-    summary = _read(folder / "summary.csv")
+    """Render every figure into `folder/figures`.
+
+    All figures except the new decomposition one describe total run-to-run variance, so
+    they are built from joint-condition rows only; a data/init cell existing alongside
+    them changes nothing about the figures already in the write-up.
+    """
+    all_structural = _read(folder / "structural.csv")
+    all_functional = _read(folder / "functional.csv")
+    all_summary = _read(folder / "summary.csv")
+    structural = _joint_only(all_structural)
+    functional = _joint_only(all_functional)
+    summary = _joint_only(all_summary)
     figures = folder / "figures"
     print(f"Figures -> {figures}")
 
@@ -1125,6 +1176,12 @@ def write_all_figures(folder: Path) -> None:
             fig_measure_grid(functional, task, metric, measure),
             figures / measure / f"{task_slug}__{slug}.pdf",
             formats=("pdf", "png"),
+        )
+
+    if {r.get("condition", "joint") for r in all_summary} != {"joint"}:
+        _save(
+            fig_variance_decomposition(all_summary),
+            figures / "variance_decomposition.pdf",
         )
 
 
