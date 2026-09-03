@@ -37,6 +37,9 @@ PARTIAL_SPLIT_CELLS: List[tuple] = [("acdc", "ioi"), ("acdc", "gt")]
 
 
 def _build_cells() -> List[Dict[str, str]]:
+    """Build the full Pillar-2 matrix: swept algos x tasks x discovery ablations x
+    seeds, plus one ablation-independent Random cell per (task, seed) as the noise
+    ceiling. Populates module-level `CELLS`."""
     cells: List[Dict[str, str]] = []
     for seed in SEEDS:
         for task in TASKS:
@@ -107,6 +110,11 @@ def seeds_for(condition: str, seed: int) -> Tuple[int, int]:
 
 
 def _build_decomp_cells() -> List[Dict[str, str]]:
+    """Build the variance-decomposition cells: for each of the "data" and "init"
+    conditions, the 4 non-anchor seeds x tasks x DECOMP_ALGOS x ablations, with the
+    other seed pinned to ANCHOR_SEED via `seeds_for`. The seed == ANCHOR_SEED point is
+    skipped because it coincides with the joint cell each condition already shares.
+    Populates module-level `DECOMP_CELLS`."""
     cells: List[Dict[str, str]] = []
     for condition in ("data", "init"):
         for seed in SEEDS:

@@ -47,6 +47,8 @@ class Budget:
 
 
 def as_budget(budget: "Budget | int") -> Budget:
+    """Normalise a bare int into a top-k Budget, so every budget-taking function below
+    can accept either without its own isinstance check."""
     return budget if isinstance(budget, Budget) else Budget("top_k", budget)
 
 
@@ -133,6 +135,12 @@ class EdgeIndex:
 
 
 def edge_index(edges: Set[Edge], prune_scores: PruneScores) -> EdgeIndex:
+    """Build the canonical EdgeIndex for `edges`.
+
+    `prune_scores` is only consulted for tensor shapes, to compute each edge's flat
+    position within its destination module (via `patch_idx`); the actual score values
+    are read later, through `EdgeIndex.gather`, from whichever run is being compared.
+    """
     order = sorted(edges, key=lambda e: e.name)
     per_module: Dict[str, List[Tuple[int, int]]] = defaultdict(list)
     for pos, edge in enumerate(order):
@@ -156,6 +164,8 @@ def edge_score_vector(index: EdgeIndex, prune_scores: PruneScores) -> np.ndarray
 
 
 def vector_threshold(scores: np.ndarray, budget: "Budget | int") -> float:
+    """Numpy analogue of `budget_threshold`, for scores already gathered into
+    `EdgeIndex` order rather than living in a `PruneScores` dict."""
     budget = as_budget(budget)
     if budget.kind == "threshold":
         return budget.value
@@ -166,6 +176,9 @@ def vector_threshold(scores: np.ndarray, budget: "Budget | int") -> float:
 def budget_mask(
     scores: np.ndarray, budget: "Budget | int", exclude_zero: bool = False
 ) -> np.ndarray:
+    """Vector analogue of `select_edges`: the same `|score| >= threshold` rule, applied
+    directly to an `EdgeIndex`-ordered score array and returned as a boolean mask rather
+    than a `Set[Edge]`. Used by `overlap_matrix`, where masks are stacked and compared."""
     budget = as_budget(budget)
     if budget.kind == "top_k" and budget.value == 0:
         return np.zeros(scores.shape, dtype=bool)

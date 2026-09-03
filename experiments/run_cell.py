@@ -90,6 +90,9 @@ _TASK_MODEL_DEF: dict[str, str] = {
 
 
 def _serialize(obj: Any) -> Any:
+    """`json.dump(default=...)` fallback for the manifest: renders an AblationType (or
+    any other enum) as its member name and a Path as a plain string, otherwise falls
+    back to `repr` rather than raising on an unrecognised type."""
     import enum
     if isinstance(obj, enum.Enum):
         return str(obj).split(".")[-1]

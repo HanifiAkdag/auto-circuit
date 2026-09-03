@@ -478,6 +478,8 @@ def _summary_rows(
 
 
 def _write_csv(path: Path, rows: List[dict], fields: List[str]) -> None:
+    """Write `rows` as a CSV with a fixed column order, silently dropping any extra
+    dict keys not in `fields` (rows from different passes carry different extras)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
@@ -534,6 +536,10 @@ def _write_summary_md(path: Path, rows: List[dict]) -> None:
 
 
 def _experiment_folder(name: Optional[str]) -> Path:
+    """Resolve (and create) the output folder for one analysis run. An explicit `name`
+    is reused as-is, so re-running with the same name overwrites in place; the default
+    date-stamped name gets an HHMM suffix appended if that folder already exists today,
+    so two unnamed runs on the same day never collide."""
     base = repo_path_to_abs_path(RESULTS_DIR)
     folder = base / (name or f"stability_{datetime.now():%Y-%m-%d}")
     if folder.exists() and name is None:

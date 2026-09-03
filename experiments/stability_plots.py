@@ -123,6 +123,9 @@ def _series(rows: List[dict], task: str, algo: str, ablation: str) -> List[dict]
 
 
 def _band(fig, xs, lo, hi, color: str, row: int, col: int) -> None:
+    """Draw a min-max range band as a filled polygon (forward along `hi`, back along
+    reversed `lo`) — the seed-pair range used throughout, never a confidence interval
+    (see module docstring)."""
     fig.add_trace(
         go.Scatter(
             x=list(xs) + list(xs)[::-1],
@@ -145,6 +148,9 @@ def _facet_titles(fig, size: int = 14) -> None:
 
 
 def _grid(tasks: List[str], ablations: List[str]):
+    """Shared subplot scaffold for the ablation-rows x task-columns figures: axes are
+    shared across panels so they read on one scale, and only the first row gets task
+    titles (later rows are labelled by `_row_labels` instead of repeating them)."""
     fig = make_subplots(
         rows=len(ablations),
         cols=len(tasks),
@@ -179,6 +185,10 @@ def _row_labels(fig, ablations: List[str], n_cols: int, suffix: str = " discover
 
 
 def fig_jaccard_vs_budget(rows: List[dict]) -> go.Figure:
+    """Pairwise Jaccard vs. circuit size, faceted by task (columns) and discovery
+    ablation (rows). Answers: do five seeds land on the same circuit, and does that
+    agreement hold as the requested circuit grows or shrinks? Bands are the min-max
+    range over the ten seed pairs; Random (dashed) is the chance floor."""
     tasks, algos = _tasks(rows), _algos(rows)
     colors = algo_colors(algos)
     symbols = algo_symbols(algos)
@@ -242,6 +252,10 @@ def fig_jaccard_vs_budget(rows: List[dict]) -> go.Figure:
 
 
 def fig_mutual_iou_vs_budget(rows: List[dict]) -> go.Figure:
+    """Mutual IoU (|intersection of all five seeds| / |union|) vs. circuit size, same
+    task x ablation grid as `fig_jaccard_vs_budget`. Answers: how much survives
+    agreement of every seed at once, a stricter bar than the best or average pairwise
+    overlap."""
     tasks, algos = _tasks(rows), _algos(rows)
     colors, symbols = algo_colors(algos), algo_symbols(algos)
     fig = _grid(tasks, ABLATION_ORDER)
@@ -366,6 +380,10 @@ def fig_jaccard_compact(rows: List[dict]) -> go.Figure:
 
 
 def fig_selection_frequency(summary: List[dict]) -> go.Figure:
+    """Stacked horizontal bars: for each (algo, discovery ablation), what share of the
+    union of all five seeds' circuits was found by exactly 1..5 of them. Answers: is
+    disagreement a reproducible core with a noisy periphery (mass in "5 of 5") or spread
+    evenly across seeds (mass in "1 of 5")? Cut at each task's ground-truth circuit size."""
     tasks, algos = _tasks(summary), _algos(summary)
     # Name each panel with the circuit size it is cut at: the task's ground-truth count.
     sizes = {
@@ -488,6 +506,9 @@ def _ranks(values: List[float]) -> List[float]:
 
 
 def _spearman(xs: List[float], ys: List[float]) -> Optional[float]:
+    """Spearman rank correlation, hand-rolled (Pearson over `_ranks`, which averages
+    tied ranks) to avoid a scipy dependency for this one statistic. None below 3 points
+    or when either axis has zero variance."""
     if len(xs) < 3:
         return None
     rx, ry = _ranks(xs), _ranks(ys)
@@ -527,6 +548,8 @@ ROW_METRICS = ["Logit Diff Percent", "Clean KL Div", DECISION_METRIC]
 
 
 def _struct_rows(structural: List[dict]) -> Dict[tuple, List[dict]]:
+    """Group structural.csv rows by (task, algo, discovery_ablation), each group sorted
+    by circuit size — the per-cell budget grid `_pick_budget` searches over."""
     out: Dict[tuple, List[dict]] = {}
     for r in structural:
         out.setdefault((r["task"], r["algo"], r["discovery_ablation"]), []).append(r)
@@ -563,6 +586,11 @@ def _panel_points(
     target: float,
     algos: List[str],
 ) -> List[dict]:
+    """One panel's (structural agreement, functional spread) points for `task`/`metric`:
+    for each algo x discovery-ablation, pick the row nearest `target` edges (usually the
+    task's published circuit size, via `_pick_budget`) and pair its Jaccard range with the
+    across-seed sd of `metric` at that same cell. Skips combinations with no budget match
+    or no sd on record."""
     points = []
     for algo in algos:
         for ablation in ABLATION_ORDER:
@@ -588,6 +616,9 @@ def _panel_points(
 
 
 def _published_sizes(summary: List[dict], tasks: List[str]) -> Dict[str, float]:
+    """Each task's ground-truth circuit size, read off summary.csv — the `target` budget
+    `_panel_points` matches against, so structure and function are compared at the size
+    the literature actually reports rather than an arbitrary edge count."""
     return {
         t: next((r["true_edge_count"] for r in summary if r["task"] == t), 0) for t in tasks
     }
