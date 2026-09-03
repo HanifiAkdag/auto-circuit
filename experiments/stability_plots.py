@@ -44,6 +44,7 @@ from auto_circuit.utils.plot_theme import (
     INK_PRIMARY,
     INK_SECONDARY,
     SEQUENTIAL_BLUE,
+    SLOTS,
     SURFACE,
     algo_colors,
     algo_symbols,
@@ -1072,34 +1073,56 @@ def fig_variance_decomposition(summary: List[dict]) -> go.Figure:
 
     Read together the three bars say how much of an algorithm's run-to-run variance is the
     prompt draw and how much is the mask init. Bars, not a stacked share: the components
-    are estimated separately and need not sum to the joint value.
+    are estimated separately and need not sum to the joint value. Faceted by discovery
+    ablation like the other grid figures, since `summary` holds one row per (task, algo,
+    ablation, condition) and three conditions at one x position would overplot otherwise.
+    Random has no ablation of its own (`_series`'s "anchor" convention), so its single
+    value is repeated in every ablation row.
     """
     conditions = ["joint", "data", "init"]
-    tasks = _tasks(summary)
-    fig = make_subplots(
-        rows=1, cols=len(tasks), subplot_titles=tasks, shared_yaxes=True,
+    condition_colors = dict(zip(conditions, SLOTS))
+    tasks, algos = _tasks(summary), _algos(summary)
+    fig = _grid(tasks, ABLATION_ORDER)
+
+    for r_i, ablation in enumerate(ABLATION_ORDER, start=1):
+        for task_i, task in enumerate(tasks, start=1):
+            for condition in conditions:
+                by_algo = {}
+                for r in summary:
+                    want = "anchor" if r["algo"] == "Random" else ablation
+                    if (
+                        r["task"] == task
+                        and r.get("condition", "joint") == condition
+                        and r["discovery_ablation"] == want
+                    ):
+                        by_algo[r["algo"]] = r
+                present = [a for a in algos if a in by_algo]
+                fig.add_trace(
+                    go.Bar(
+                        name=condition,
+                        x=present,
+                        y=[_num(by_algo[a].get("primary_sd")) for a in present],
+                        legendgroup=condition,
+                        showlegend=(r_i == 1 and task_i == 1),
+                        marker=dict(color=condition_colors[condition]),
+                    ),
+                    row=r_i,
+                    col=task_i,
+                )
+
+    apply_theme(fig, width=1080, height=960, margin_left=96)
+    header(
+        fig,
+        "Seed-variance decomposition",
+        "Standard deviation of the primary metric across five seeds, split into the "
+        "prompt draw (data) and the mask init, against the total (joint).",
+        top=170,
+        right=120,
     )
-    for condition in conditions:
-        for col, task in enumerate(tasks, start=1):
-            rows = [
-                r for r in summary
-                if r.get("condition", "joint") == condition and r["task"] == task
-            ]
-            rows.sort(key=lambda r: r["algo"])
-            fig.add_trace(
-                go.Bar(
-                    name=condition,
-                    x=[r["algo"] for r in rows],
-                    y=[_num(r.get("primary_sd")) for r in rows],
-                    legendgroup=condition,
-                    showlegend=col == 1,
-                ),
-                row=1,
-                col=col,
-            )
-    fig.update_layout(barmode="group", title="Seed-variance decomposition")
-    fig.update_yaxes(title_text="sd of the primary metric", row=1, col=1)
+    fig.update_layout(barmode="group")
+    fig.update_yaxes(title=dict(text="sd of the primary metric"), col=1)
     _facet_titles(fig)
+    _row_labels(fig, ABLATION_ORDER, len(tasks))
     return fig
 
 
