@@ -260,8 +260,10 @@ def main():
 
     # --init-seed decouples mask initialisation from the prompt draw. load_datasets_from_json
     # re-seeds torch itself, so the seed has to land after the loaders are built; init_task is
-    # idempotent. Omitting the flag leaves the legacy path untouched.
-    if args.init_seed is not None:
+    # idempotent. Omitting the flag, or passing it equal to --seed, leaves the legacy path
+    # untouched -- _cache_stem already gives both the same filename, so this makes that
+    # equivalence enforced rather than incidental.
+    if args.init_seed is not None and args.init_seed != args.seed:
         task.init_task()
         t.manual_seed(args.init_seed)
         random.seed(args.init_seed)

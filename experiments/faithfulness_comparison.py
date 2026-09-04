@@ -207,14 +207,17 @@ def _group_cells_by_discovery_ablation(loaded, seed: int):
     holds exactly one (task, algo) entry; we re-key it to the BASE algo key (the
     variant key "Edge Pruning [zero]" is not in PRUNE_ALGO_DICT, the base
     "Edge Pruning" is) so downstream lookups and legends are clean — the discovery
-    ablation lives in the output path, not the algo name.
+    ablation lives in the output path, not the algo name. Cells are matched on
+    both `seed` (data) and `init_seed` (mask init, defaulting to `seed` for
+    joint/legacy manifests) so decomposition cells sharing a data seed with a
+    joint cell don't silently overwrite each other.
     """
     groups = {d: defaultdict(dict) for d in DISCOVERY_ABLATIONS}
     consumed: list = []
     for manifest, tps in loaded:
         cell = (manifest or {}).get("cell", {})
         task_short, algo_short, abl = cell.get("task"), cell.get("algo"), cell.get("ablation")
-        if cell.get("seed") != seed or cell.get("null_test"):
+        if cell.get("seed") != seed or cell.get("init_seed", cell.get("seed")) != seed or cell.get("null_test"):
             continue
         if task_short not in _TASK_TEMPLATES or algo_short not in _ALGO_MAP:
             continue

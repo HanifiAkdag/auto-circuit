@@ -267,18 +267,26 @@ def _budgets(cell: Cell, edges: set, true_edge_count: Optional[int]) -> List[Bud
     return [Budget("top_k", k) for k in grid if 10 <= k < len(edges)] + [full]
 
 
-def _structural_rows(cell: Cell, index: EdgeIndex, budgets: List[Budget]) -> List[dict]:
+def _structural_rows(
+    cell: Cell, index: EdgeIndex, budgets: List[Budget], n_seeds_expected: int
+) -> List[dict]:
     """One row per budget: pairwise Jaccard, mutual IoU and the selection-frequency
-    histogram over the cell's five seeds, at that budget's realised edge set."""
+    histogram over the cell's seeds, at that budget's realised edge set.
+
+    `n_seeds_expected` is `len(args.seeds)`, not a fixed 5: the freq_1..freq_5 columns
+    silently mis-report if a cell has fewer seeds than requested (a missing cache file),
+    so we assert completeness once per cell rather than per budget. A cell with too few
+    seeds to compute stats at all (< 2) is filtered out by the caller before this runs.
+    """
     vectors = [edge_score_vector(index, ps) for ps in cell.scores]
     task_name = TASK_DICT[cell.task_key].name
+    assert len(cell.seeds) == n_seeds_expected, (
+        f"{cell} has {len(cell.seeds)} of the {n_seeds_expected} requested seeds; the "
+        f"freq_1..freq_5 columns would silently mis-report on a partial condition"
+    )
     rows = []
     for budget in budgets:
         masks = np.stack([budget_mask(v, budget) for v in vectors])
-        assert len(cell.seeds) == 5, (
-            f"{cell} has {len(cell.seeds)} seeds; the freq_1..freq_5 columns assume 5 "
-            f"and would silently mis-report"
-        )
         sizes = masks.sum(1)
         stats = pairwise_stats(pairwise_jaccard(masks))
         iou, n_intersect, n_union = mutual_iou(masks)
@@ -660,7 +668,7 @@ def main() -> None:
         index = edge_index(edges, cell.scores[0])
         budgets = _budgets(cell, edges, task.true_edge_count)
 
-        structural += _structural_rows(cell, index, budgets)
+        structural += _structural_rows(cell, index, budgets, len(args.seeds))
         print(f"[structural] {cell}: {len(cell.seeds)} seeds, {len(budgets)} budgets")
 
         if args.skip_functional:

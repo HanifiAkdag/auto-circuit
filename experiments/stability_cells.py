@@ -20,7 +20,17 @@ ACDC on IOI and GT is the long pole (~13 GPU-h and ~4 GPU-h per cell). Those 30 
 excluded from `ARRAY_CELLS` and run tau-split via `stability_acdc_partials.sh`, exactly as
 the spine does; `CELLS` still lists them so the analysis sees the full matrix.
 
-Cell count: 4 swept x 3 tasks x 3 ablations x 5 seeds + 3 tasks x 5 seeds (Random) = 195.
+Cell count (`CELLS`): 4 swept x 3 tasks x 3 ablations x 5 seeds + 3 tasks x 5 seeds
+(Random) = 195. Each of these is a "joint" cell: one seed drives both the prompt draw
+and the mask init.
+
+Variance decomposition (`DECOMP_CELLS`, 144 cells, spec 2026-09-02) splits that single
+seed into two independent axes for EP and DiscoGP-EP (`DECOMP_ALGOS`), the only algorithms
+that consume both: `CONDITIONS = ["joint", "data", "init"]` name which axis varies while
+the other is pinned to `ANCHOR_SEED` (42) — "data" varies the prompt draw, "init" varies
+the mask init, "joint" (already in `CELLS`) varies both together. All three conditions
+share the (42, 42) point, so `DECOMP_CELLS` covers only the 4 non-anchor seeds x 3 tasks
+x 2 algos x 3 ablations x 2 conditions = 144 new cells.
 """
 import argparse
 from typing import Dict, List, Tuple

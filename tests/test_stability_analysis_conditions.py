@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
 
 import json  # noqa: E402
 
+from run_cell import _cache_stem  # noqa: E402
 from stability_analysis import (  # noqa: E402
     _cell_specs,
     _effective_condition,
@@ -41,10 +42,10 @@ def test_cell_specs_skips_constant_combinations():
 
 
 def _write_cell(folder, task, algo, ablation, seed, init_seed, value):
-    stem = f"cell_{task}_{algo}_{ablation}_seed{seed}"
-    if init_seed != seed:
-        stem += f"_init{init_seed}"
-    stem += "-01-01-2026_00-00-00"
+    """Writes a fake cached cell + manifest, naming the file via the production
+    `_cache_stem` so this test would catch a stem/loader divergence instead of just
+    re-verifying a hand-rolled stem built to match it by construction."""
+    stem = _cache_stem(task, algo, ablation, seed, init_seed) + "-01-01-2026_00-00-00"
     t.save({"T": {"A": {"m": t.tensor([float(value)])}}}, folder / f"{stem}.pkl")
     manifest = {
         "cell": {
