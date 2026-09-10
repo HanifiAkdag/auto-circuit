@@ -43,3 +43,5 @@ docs/writing/
 docs/superpowers/
 docs/port_validation/
 docs/issues/
+.codex/
+AGENTS.md
