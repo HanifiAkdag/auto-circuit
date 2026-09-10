@@ -53,6 +53,7 @@ from experiments.port_comparison.fidelity_stats import (  # noqa: E402
     summarise_endpoint,
     within_between_means,
 )
+from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
 from experiments.port_comparison.run_cells import BATCH_SIZE, FROZEN_DATASET  # noqa: E402
 
 PRIMARY_K = 2000
@@ -291,7 +292,8 @@ def build_task(seed: int = 0, batch_size: int = BATCH_SIZE,
         _true_edge_func=tmpl._true_edge_func, slice_output=tmpl.slice_output,
         dtype=tmpl.dtype, seed=seed, _model_def=tmpl._model_def,
     )
-    task.init_task()
+    with fixed_split_loader():
+        task.init_task()
     return task
 
 

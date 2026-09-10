@@ -49,6 +49,7 @@ from experiments.port_comparison.forward_equivalence import (  # noqa: E402
     MODEL,
     TL_COMPAT,
 )
+from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
 
 FROZEN_DATASET = "port_fidelity/ioi_frozen"
 ARMS = (
@@ -91,17 +92,6 @@ def seed_everything(seed: int) -> None:
 def run_port(arm: str, seed: int, device: t.device) -> Dict[str, t.Tensor]:
     from auto_circuit.prune_algos import disco_gp as dg
 
-    if arm == "port-nobos":
-        # The port prepends BOS and left-pads; the original does neither. Binding
-        # prepend_bos=False makes that factor measurable instead of assumed.
-        import auto_circuit.data as ac_data
-        import auto_circuit.tasks as ac_tasks
-        from functools import partial
-
-        ac_tasks.load_datasets_from_json = partial(
-            ac_data.load_datasets_from_json, prepend_bos=False
-        )
-
     if arm == "port-neginv":
         # Negative control: drop the AutoCircuit convention flip, so kept edges are
         # ablated and vice versa. The study must detect this.
@@ -124,7 +114,12 @@ def run_port(arm: str, seed: int, device: t.device) -> Dict[str, t.Tensor]:
         _true_edge_func=tmpl._true_edge_func, slice_output=tmpl.slice_output,
         dtype=tmpl.dtype, seed=seed, _model_def=tmpl._model_def,
     )
-    task.init_task()
+    prepend_bos = False if arm == "port-nobos" else None
+    with fixed_split_loader(prepend_bos=prepend_bos):
+        task.init_task()
+    # Dataset construction sets global RNG state. Make the run seed's role in
+    # mask initialisation and stochastic optimisation explicit.
+    seed_everything(seed)
 
     if arm == "port-bOzero":
         with t.no_grad():
@@ -289,6 +284,7 @@ def main() -> None:
         "edge_density_at_threshold": density,
         "n_edges": sum(v.numel() for v in scores.values()),
         "dataset": FROZEN_DATASET,
+        "dataset_shuffle": False,
         "batch_size": BATCH_SIZE,
         "edge_hparams": EDGE_HPARAMS,
         "saved_at": datetime.now().isoformat(timespec="seconds"),

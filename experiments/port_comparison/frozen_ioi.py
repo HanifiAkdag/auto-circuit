@@ -14,9 +14,9 @@ The artifact is written in this repo's own dataset schema, so the port consumes 
 through the ordinary `Task` machinery with no special-casing. `load_for_original`
 converts it into the dict the original's dataloader expects.
 
-Batch *order* within an epoch stays seed-dependent on both sides; only membership
-is frozen. Matching batch order across two different implementations is not
-achievable and is not what "same data" means here.
+The artifact fixes train/test membership. AutoCircuit and the DiscoGP reference
+preserve its row order, while the Edge Pruning reference retains its trainer's
+native batching behaviour. Training order is not matched across implementations.
 
 Run::
 
@@ -26,8 +26,9 @@ Run::
 import argparse
 import json
 import random
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, Iterator, List
 
 REPO = Path(__file__).resolve().parents[2]
 SOURCE = REPO / "datasets" / "ioi" / "ioi_prompts.json"
@@ -37,6 +38,26 @@ FROZEN = REPO / "datasets" / "port_fidelity" / "ioi_frozen.json"
 N_TRAIN = 704
 N_TEST = 256
 SPLIT_SEED = 0  # fixed; the per-run seed varies mask init, not the split
+
+
+@contextmanager
+def fixed_split_loader(prepend_bos: bool | None = None) -> Iterator[None]:
+    """Preserve the train/test membership encoded by the frozen artifact."""
+    import auto_circuit.tasks as ac_tasks
+
+    original_loader = ac_tasks.load_datasets_from_json
+
+    def load_fixed(*args, **kwargs):
+        kwargs["shuffle"] = False
+        if prepend_bos is not None:
+            kwargs["prepend_bos"] = prepend_bos
+        return original_loader(*args, **kwargs)
+
+    ac_tasks.load_datasets_from_json = load_fixed
+    try:
+        yield
+    finally:
+        ac_tasks.load_datasets_from_json = original_loader
 
 
 def build(split_seed: int = SPLIT_SEED, n_train: int = N_TRAIN, n_test: int = N_TEST) -> dict:

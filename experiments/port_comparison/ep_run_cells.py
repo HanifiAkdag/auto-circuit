@@ -60,6 +60,7 @@ from experiments.port_comparison.ep_edge_map import (  # noqa: E402
     read_log_alphas,
     write_log_alphas,
 )
+from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
 
 FROZEN_DATASET = "port_fidelity/ioi_frozen"
 FROZEN_EP_DIR = repo_path_to_abs_path("datasets/port_fidelity/ioi_frozen_ep")
@@ -104,20 +105,6 @@ def seed_everything(seed: int) -> None:
 def run_port(arm: str, seed: int, device: t.device) -> Dict[str, t.Tensor]:
     from auto_circuit.prune_algos import edge_pruning as ep
 
-    if arm == "port-nobos":
-        # The port prepends BOS and left-pads; the reference does neither. NOTE: Tier B
-        # showed `prepend_bos=False` also breaks AutoCircuit's left-padded batching,
-        # because GPT-2's pad token *is* its BOS token, so this arm measures the input
-        # convention as a whole and not BOS alone.
-        from functools import partial
-
-        import auto_circuit.data as ac_data
-        import auto_circuit.tasks as ac_tasks
-
-        ac_tasks.load_datasets_from_json = partial(
-            ac_data.load_datasets_from_json, prepend_bos=False
-        )
-
     # Mask sampling is pinned explicitly on both arms rather than inherited from the
     # library default. The default changed to the reference's behaviour on 2026-08-12
     # *as a result of this study*, so leaving it implicit would silently redefine what
@@ -146,7 +133,13 @@ def run_port(arm: str, seed: int, device: t.device) -> Dict[str, t.Tensor]:
         _true_edge_func=tmpl._true_edge_func, slice_output=tmpl.slice_output,
         dtype=tmpl.dtype, seed=seed, _model_def=tmpl._model_def,
     )
-    task.init_task()
+    prepend_bos = False if arm == "port-nobos" else None
+    with fixed_split_loader(prepend_bos=prepend_bos):
+        task.init_task()
+
+    # Task construction may consume or reset random-number streams. The run seed
+    # controls optimisation and mask sampling independently of loader construction.
+    seed_everything(seed)
 
     scores = ep.edge_pruning_prune_scores(
         task.model, task.train_loader, None,
@@ -272,6 +265,7 @@ def main() -> None:
         "edge_density_at_threshold": density,
         "n_edges": n_edges,
         "dataset": FROZEN_DATASET,
+        "dataset_shuffle": False,
         "batch_size": BATCH_SIZE,
         "batch_count": list(BATCH_COUNT),
         "hparams": HPARAMS,
