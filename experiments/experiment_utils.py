@@ -2,9 +2,13 @@ import enum
 import functools
 import inspect
 import json
+import os
+import socket
 import subprocess
 from pathlib import Path
 from typing import Any
+
+import torch as t
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -23,6 +27,15 @@ def git_state() -> dict[str, Any]:
     )
     dirty_files = [l[3:] for l in status.splitlines() if l.strip()]
     return {"commit": commit, "dirty": bool(dirty_files), "dirty_files": dirty_files}
+
+
+def hardware_state() -> dict[str, Any]:
+    """Record the hardware that produced a cached result."""
+    return {
+        "node": os.environ.get("SLURMD_NODENAME") or socket.gethostname(),
+        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+        "gpu": t.cuda.get_device_name(0) if t.cuda.is_available() else None,
+    }
 
 
 def algo_hyperparams(algo: Any) -> dict[str, Any]:

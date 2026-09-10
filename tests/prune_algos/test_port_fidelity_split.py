@@ -5,6 +5,7 @@ import torch as t
 
 import auto_circuit.tasks as ac_tasks
 from auto_circuit.prune_algos import disco_gp, edge_pruning
+from experiments.experiment_utils import hardware_state
 from experiments.port_comparison import ep_run_cells, fidelity_analysis, run_cells
 
 
@@ -12,6 +13,19 @@ RUNNERS = (
     (run_cells, disco_gp, "disco_gp_prune_scores"),
     (ep_run_cells, edge_pruning, "edge_pruning_prune_scores"),
 )
+
+
+def test_hardware_state_records_slurm_node_and_gpu(monkeypatch):
+    monkeypatch.setenv("SLURMD_NODENAME", "test-node")
+    monkeypatch.setenv("SLURM_JOB_ID", "123")
+    monkeypatch.setattr(t.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(t.cuda, "get_device_name", lambda _: "Test GPU")
+
+    assert hardware_state() == {
+        "node": "test-node",
+        "slurm_job_id": "123",
+        "gpu": "Test GPU",
+    }
 
 
 @pytest.mark.parametrize(("runner", "algorithm", "prune_name"), RUNNERS)

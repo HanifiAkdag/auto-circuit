@@ -42,7 +42,7 @@ for extra in (REPO, REPO / "experiments", REPO / "third_party" / "disco_gp"):
 from auto_circuit.tasks import IOI_COMPONENT_CIRCUIT_TASK, Task  # noqa: E402
 from auto_circuit.types import AblationType  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
-from experiment_utils import git_state  # noqa: E402
+from experiment_utils import git_state, hardware_state  # noqa: E402
 
 from experiments.port_comparison.edge_map import keep_mask_to_prune_scores  # noqa: E402
 from experiments.port_comparison.forward_equivalence import (  # noqa: E402
@@ -288,6 +288,7 @@ def main() -> None:
         "batch_size": BATCH_SIZE,
         "edge_hparams": EDGE_HPARAMS,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
+        "hardware": hardware_state(),
         "git": git_state(),
     }
     mpath = folder / f"{full_stem}_manifest.json"
