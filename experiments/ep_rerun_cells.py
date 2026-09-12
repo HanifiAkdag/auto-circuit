@@ -7,8 +7,8 @@ recomputed. See `docs/port_validation/edge_pruning.md` §5.5.2.
 
 Two pillars are affected, with different cache directories:
 
-- Pillar 1 (faithfulness spine): 9 cells, `.prune_scores_cache/faithfulness_v2`
-- Pillar 2 (stability): 45 cells, `.prune_scores_cache_v2/stability`
+- Pillar 1 (faithfulness spine): 9 cells, `.prune_scores/final/benchmark`
+- Pillar 2 (stability): 45 cells, `.prune_scores/final/benchmark`
 
 Pillar 3 (null test) has never been run, so there is nothing to invalidate there.
 
@@ -21,8 +21,8 @@ from typing import List, Tuple
 from experiments.faithfulness_cells import CELLS as FAITHFULNESS_CELLS
 from experiments.stability_cells import CELLS as STABILITY_CELLS
 
-FAITHFULNESS_DIR = ".prune_scores_cache/faithfulness_v2"
-STABILITY_DIR = ".prune_scores_cache_v2/stability"
+FAITHFULNESS_DIR = ".prune_scores/final/benchmark"
+STABILITY_DIR = ".prune_scores/final/benchmark"
 
 # (task, ablation, seed, output_dir)
 CELLS: List[Tuple[str, str, int, str]] = [

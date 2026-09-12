@@ -321,7 +321,9 @@ def functional_scores(task: Task, scores: dict,
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--study", default="discogp", choices=sorted(STUDIES))
-    ap.add_argument("--cache-dir", default=".port_fidelity_cache")
+    ap.add_argument(
+        "--cache-dir", default=".prune_scores/final/port_fidelity/discogp"
+    )
     ap.add_argument("--out", default="results/port_fidelity/tier_c")
     ap.add_argument("--skip-functional", action="store_true",
                     help="structural / score-level / density only (no GPU needed)")

@@ -222,7 +222,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", required=True, choices=ARMS)
     ap.add_argument("--seed", type=int, required=True)
-    ap.add_argument("--output-dir", default=".port_fidelity_ep_cache")
+    ap.add_argument(
+        "--output-dir", default=".prune_scores/final/port_fidelity/edge_pruning"
+    )
     ap.add_argument("--skip-if-exists", action="store_true")
     ap.add_argument("--force", action="store_true")
     args = ap.parse_args()

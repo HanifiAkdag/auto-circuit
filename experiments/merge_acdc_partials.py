@@ -9,8 +9,8 @@ associative, +inf is its identity, and each tao pass is independent of the other
 
 Usage:
     python experiments/merge_acdc_partials.py --task ioi --ablation resample \\
-        --partials-dir .prune_scores_cache/faithfulness_v2/partials \\
-        --output-dir  .prune_scores_cache/faithfulness_v2
+        --partials-dir .prune_scores/final/benchmark/partials \\
+        --output-dir  .prune_scores/final/benchmark
 """
 import argparse
 import json
@@ -37,8 +37,8 @@ def main():
     p.add_argument("--task", required=True)
     p.add_argument("--ablation", required=True)
     p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--partials-dir", default=".prune_scores_cache/faithfulness_v2/partials")
-    p.add_argument("--output-dir", default=".prune_scores_cache/faithfulness_v2")
+    p.add_argument("--partials-dir", default=".prune_scores/final/benchmark/partials")
+    p.add_argument("--output-dir", default=".prune_scores/final/benchmark")
     p.add_argument("--expect", type=int, default=5, help="Required partial count (one per tao base)")
     args = p.parse_args()
 

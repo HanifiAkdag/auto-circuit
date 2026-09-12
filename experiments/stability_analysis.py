@@ -1,6 +1,6 @@
 """Pillar-2 stability analysis pass (sub-RQ3, issue #5).
 
-Re-reads the cached discovery cells in `.prune_scores_cache/stability/` (4 algorithms ×
+Re-reads the cached discovery cells in `.prune_scores/final/benchmark/` (4 algorithms ×
 3 tasks × 3 discovery ablations × 5 seeds, plus a Random anchor × 3 tasks × 5 seeds) and
 asks how much of a discovered circuit is an artifact of the random draw.
 
@@ -84,7 +84,7 @@ from stability_cells import (
     condition_of,
 )
 
-STABILITY_CACHE_DIR = ".prune_scores_cache_v3/stability"
+STABILITY_CACHE_DIR = ".prune_scores/final/benchmark"
 RESULTS_DIR = "results/stability"
 
 # Méloux et al. (2025) propose mean pairwise Jaccard > 0.8 (at n >= 100 bootstrap

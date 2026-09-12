@@ -4,6 +4,7 @@ __pycache__/
 .autoencoder_cache/
 .measurement_cache/
 .prune_scores_cache*/
+.prune_scores/
 .port_fidelity_cache*/
 .ruff_cache/
 figure*/
