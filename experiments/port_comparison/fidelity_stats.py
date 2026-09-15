@@ -77,6 +77,23 @@ def bootstrap_diff_ci(
     return float(a.mean() - b.mean()), *np.quantile(draws, [tail, 1.0 - tail])
 
 
+def bootstrap_tost_p(draws: np.ndarray, delta: float) -> float:
+    """Invert bootstrap tails at the two equivalence bounds.
+
+    The maximum one-sided tail probability is the TOST p-value. At alpha=0.05,
+    rejecting non-equivalence is equivalent to the 90% percentile interval lying
+    entirely inside ``[-delta, delta]``.
+    """
+    draws = np.asarray(draws, float)
+    draws = draws[np.isfinite(draws)]
+    if not draws.size:
+        return float("nan")
+    n = draws.size
+    lower = (np.count_nonzero(draws <= -delta) + 1) / (n + 1)
+    upper = (np.count_nonzero(draws >= delta) + 1) / (n + 1)
+    return float(max(lower, upper))
+
+
 def tost_equivalent(low: float, high: float, delta: float) -> bool:
     """TOST at alpha=0.05 via a 90% CI: equivalence iff the CI sits inside +/-delta."""
     return bool(low > -delta and high < delta)
@@ -156,6 +173,93 @@ def within_between_means(similarity: np.ndarray, n_a: int) -> Dict[str, float]:
     }
 
 
+def _similarity_gap(similarity: np.ndarray, n_a: int) -> float:
+    """Mean within-arm similarity minus mean between-arm similarity."""
+    similarity = np.asarray(similarity, float)
+    n = similarity.shape[0]
+    iu = np.triu_indices(n, k=1)
+    labels = np.arange(n) < n_a
+    same = labels[iu[0]] == labels[iu[1]]
+    values = similarity[iu]
+    if not same.any() or same.all():
+        return float("nan")
+    return float(values[same].mean() - values[~same].mean())
+
+
+def _resampled_similarity_gap(
+    similarity: np.ndarray, selected: np.ndarray, n_a: int
+) -> float:
+    """Evaluate a seed bootstrap draw without counting duplicate seeds as pairs."""
+    sampled = similarity[np.ix_(selected, selected)]
+    iu = np.triu_indices(selected.size, k=1)
+    distinct = selected[iu[0]] != selected[iu[1]]
+    labels = np.arange(selected.size) < n_a
+    same = labels[iu[0]] == labels[iu[1]]
+    values = sampled[iu]
+    within = values[distinct & same]
+    between = values[distinct & ~same]
+    if not within.size or not between.size:
+        return float("nan")
+    return float(within.mean() - between.mean())
+
+
+def bootstrap_similarity_gap_ci(
+    similarity: np.ndarray, n_a: int, level: float = 0.90,
+    n_boot: int = 10_000, seed: int = 0,
+) -> Tuple[float, float, float]:
+    """Bootstrap the within-minus-between gap by resampling seeds within each arm."""
+    similarity = np.asarray(similarity, float)
+    n = similarity.shape[0]
+    if not 1 < n_a < n - 1:
+        return float("nan"), float("nan"), float("nan")
+
+    draws = _bootstrap_similarity_gap_draws(similarity, n_a, n_boot, seed)
+    tail = (1.0 - level) / 2.0
+    low, high = np.nanquantile(draws, [tail, 1.0 - tail])
+    return _similarity_gap(similarity, n_a), float(low), float(high)
+
+
+def _bootstrap_similarity_gap_draws(
+    similarity: np.ndarray, n_a: int, n_boot: int, seed: int,
+) -> np.ndarray:
+    """Generate seed-level bootstrap draws for a structural similarity contrast."""
+    n = similarity.shape[0]
+    rng = np.random.default_rng(seed)
+    draws = np.empty(n_boot)
+    for i in range(n_boot):
+        idx_a = rng.choice(n_a, n_a, replace=True)
+        idx_b = rng.choice(np.arange(n_a, n), n - n_a, replace=True)
+        selected = np.concatenate([idx_a, idx_b])
+        draws[i] = _resampled_similarity_gap(similarity, selected, n_a)
+    return draws
+
+
+def summarise_similarity_endpoint(
+    similarity: np.ndarray, n_a: int, delta: float, seed: int = 0,
+) -> Dict[str, object]:
+    """Difference and equivalence report for a seed-dependent similarity matrix."""
+    test = seed_label_permutation_test(similarity, n_a=n_a, seed=seed)
+    point, low, high = bootstrap_similarity_gap_ci(similarity, n_a=n_a, seed=seed)
+    draws = _bootstrap_similarity_gap_draws(
+        np.asarray(similarity, float), n_a, n_boot=10_000, seed=seed
+    )
+
+    equivalent = tost_equivalent(low, high, delta)
+    p_tost = bootstrap_tost_p(draws, delta)
+    return {
+        **within_between_means(similarity, n_a=n_a),
+        "gap_within_minus_between": point,
+        "ci90_low": low,
+        "ci90_high": high,
+        "delta": delta,
+        "equivalent": equivalent,
+        "p_tost": p_tost,
+        "p_permutation": test["p_value"],
+        "exact": bool(test["exact"]),
+        "reading": interpret(test["p_value"], equivalent),
+    }
+
+
 def holm(p_values: Dict[str, float], alpha: float = 0.05) -> Dict[str, dict]:
     """Holm-Bonferroni step-down correction over a family of tests."""
     ordered = sorted(p_values.items(), key=lambda kv: kv[1])
@@ -166,6 +270,23 @@ def holm(p_values: Dict[str, float], alpha: float = 0.05) -> Dict[str, dict]:
         adjusted = max(previous, min(1.0, (m - i) * p))
         previous = adjusted
         out[key] = {"p_raw": p, "p_holm": adjusted, "reject": adjusted < alpha}
+    return out
+
+
+def apply_holm_to_reports(reports: Dict[str, dict]) -> Dict[str, dict]:
+    """Correct difference and equivalence tests over one endpoint family."""
+    diff = holm({key: row["p_permutation"] for key, row in reports.items()})
+    tost = holm({key: row["p_tost"] for key, row in reports.items()})
+    out: Dict[str, dict] = {}
+    for key, row in reports.items():
+        corrected = dict(row)
+        corrected["p_difference_holm"] = diff[key]["p_holm"]
+        corrected["p_tost_holm"] = tost[key]["p_holm"]
+        corrected["equivalent"] = bool(tost[key]["reject"])
+        corrected["reading"] = interpret(
+            corrected["p_difference_holm"], corrected["equivalent"]
+        )
+        out[key] = corrected
     return out
 
 
@@ -190,7 +311,14 @@ def summarise_endpoint(
 ) -> Dict[str, object]:
     """Full report for one scalar endpoint: difference test plus equivalence test."""
     perm = exact_permutation_test(a, b, seed=seed)
-    point, low, high = bootstrap_diff_ci(a, b, level=0.90, seed=seed)
+    rng = np.random.default_rng(seed)
+    a_arr, b_arr = np.asarray(a, float), np.asarray(b, float)
+    draws = np.empty(10_000)
+    for i in range(draws.size):
+        draws[i] = (rng.choice(a_arr, a_arr.size, replace=True).mean()
+                    - rng.choice(b_arr, b_arr.size, replace=True).mean())
+    point = float(a_arr.mean() - b_arr.mean())
+    low, high = np.quantile(draws, [0.05, 0.95])
     equivalent = tost_equivalent(low, high, delta)
     return {
         "n_a": len(a), "n_b": len(b),
@@ -199,6 +327,7 @@ def summarise_endpoint(
         "sd_b": float(np.std(b, ddof=1)) if len(b) > 1 else 0.0,
         "diff": point, "ci90_low": float(low), "ci90_high": float(high),
         "delta": delta, "equivalent": equivalent,
+        "p_tost": bootstrap_tost_p(draws, delta),
         "p_permutation": perm["p_value"], "exact": bool(perm["exact"]),
         "reading": interpret(perm["p_value"], equivalent),
     }

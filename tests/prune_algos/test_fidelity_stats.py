@@ -16,6 +16,8 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from experiments.port_comparison.fidelity_stats import (  # noqa: E402
+    apply_holm_to_reports,
+    bootstrap_similarity_gap_ci,
     bootstrap_diff_ci,
     exact_permutation_test,
     holm,
@@ -23,6 +25,7 @@ from experiments.port_comparison.fidelity_stats import (  # noqa: E402
     pairwise_matrix,
     seed_label_permutation_test,
     summarise_endpoint,
+    summarise_similarity_endpoint,
     tost_equivalent,
     within_between_means,
 )
@@ -107,6 +110,15 @@ def test_wide_arms_are_not_equivalent_even_with_equal_means():
     assert report["reading"] == "inconclusive (underpowered)"
 
 
+def test_scalar_report_exposes_tost_p_value_consistent_with_interval():
+    rng = np.random.default_rng(17)
+    a = rng.normal(loc=0.01, scale=0.02, size=10)
+    b = rng.normal(loc=0.00, scale=0.02, size=10)
+    report = summarise_endpoint(a, b, delta=0.2)
+    assert report["equivalent"]
+    assert report["p_tost"] < 0.05
+
+
 def test_interpretation_grid():
     assert interpret(0.9, True) == "fidelity supported"
     assert interpret(0.9, False) == "inconclusive (underpowered)"
@@ -170,6 +182,23 @@ def test_seed_label_statistic_is_nan_when_a_group_of_pairs_is_empty():
     assert np.isnan(seed_label_permutation_test(m, n_a=1)["observed"])
 
 
+def test_structural_bootstrap_resamples_seed_labels_not_similarity_pairs():
+    m = _blocked_similarity(6, 6, within=0.52, between=0.50, noise=0.01, seed=4)
+    point, low, high = bootstrap_similarity_gap_ci(m, n_a=6, seed=9)
+    observed = seed_label_permutation_test(m, n_a=6)["observed"]
+    assert point == pytest.approx(observed)
+    assert low < point < high
+
+
+def test_structural_report_requires_interval_inside_margin():
+    m = _blocked_similarity(6, 6, within=0.51, between=0.50, noise=0.01, seed=8)
+    report = summarise_similarity_endpoint(m, n_a=6, delta=0.2)
+    assert report["equivalent"]
+    assert report["p_tost"] < 0.05
+    assert report["ci90_low"] > -0.2
+    assert report["ci90_high"] < 0.2
+
+
 def test_pairwise_matrix_is_symmetric_with_unit_diagonal():
     vectors = [np.array([1.0, 0, 0]), np.array([0, 1.0, 0]), np.array([1.0, 1.0, 0])]
     m = pairwise_matrix(vectors, lambda x, y: float(np.dot(x, y)))
@@ -194,3 +223,16 @@ def test_holm_never_reduces_a_p_value():
     raw = {"a": 0.01, "b": 0.2, "c": 0.9}
     out = holm(raw)
     assert all(out[k]["p_holm"] >= raw[k] for k in raw)
+
+
+def test_holm_correction_updates_both_tests_and_the_reading():
+    reports = {
+        "a": {"p_permutation": 0.01, "p_tost": 0.01},
+        "b": {"p_permutation": 0.04, "p_tost": 0.04},
+    }
+    corrected = apply_holm_to_reports(reports)
+    assert corrected["a"]["p_difference_holm"] == pytest.approx(0.02)
+    assert corrected["a"]["p_tost_holm"] == pytest.approx(0.02)
+    assert corrected["a"]["reading"] == "real but negligible shift"
+    assert corrected["b"]["p_difference_holm"] == pytest.approx(0.04)
+    assert corrected["b"]["p_tost_holm"] == pytest.approx(0.04)

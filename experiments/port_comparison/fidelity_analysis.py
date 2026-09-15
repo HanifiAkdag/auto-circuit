@@ -47,11 +47,10 @@ from auto_circuit.types import AblationType, PatchType  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
 
 from experiments.port_comparison.fidelity_stats import (  # noqa: E402
-    holm,
+    apply_holm_to_reports,
     pairwise_matrix,
-    seed_label_permutation_test,
     summarise_endpoint,
-    within_between_means,
+    summarise_similarity_endpoint,
 )
 from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
 from experiments.port_comparison.run_cells import BATCH_SIZE, FROZEN_DATASET  # noqa: E402
@@ -393,33 +392,24 @@ def main() -> None:
         masks = [budget_mask(v, PRIMARY_K) for v in pooled]
         sim = pairwise_matrix(masks, lambda x, y: float((x & y).sum() / max((x | y).sum(), 1)))
         n_a = len(vectors[arm_a])
-        test = seed_label_permutation_test(sim, n_a=n_a)
-        means = within_between_means(sim, n_a=n_a)
         structural[f"jaccard::{arm_a}_vs_{arm_b}"] = {
             "endpoint": "jaccard", "arm_a": arm_a, "arm_b": arm_b,
-            **means, "gap_within_minus_between": test["observed"],
-            "p_permutation": test["p_value"], "exact": bool(test["exact"]),
-            "delta": deltas["jaccard"],
-            "equivalent": abs(test["observed"]) < deltas["jaccard"],
+            **summarise_similarity_endpoint(sim, n_a, deltas["jaccard"]),
         }
 
         from scipy.stats import spearmanr
         rho = pairwise_matrix(pooled, lambda x, y: float(spearmanr(x, y).statistic))
-        rho_test = seed_label_permutation_test(rho, n_a=n_a)
         structural[f"spearman::{arm_a}_vs_{arm_b}"] = {
             "endpoint": "spearman", "arm_a": arm_a, "arm_b": arm_b,
-            **within_between_means(rho, n_a=n_a),
-            "gap_within_minus_between": rho_test["observed"],
-            "p_permutation": rho_test["p_value"], "exact": bool(rho_test["exact"]),
-            "delta": deltas["spearman"],
-            "equivalent": abs(rho_test["observed"]) < deltas["spearman"],
+            **summarise_similarity_endpoint(rho, n_a, deltas["spearman"]),
         }
 
     # --- multiplicity: Holm within the primary comparison ---------------------
     primary_keys = [k for k in {**reports, **structural}
                     if k.endswith(f"::{PRIMARY_A}_vs_{PRIMARY_B}")]
     merged = {**reports, **structural}
-    corrected = holm({k: merged[k]["p_permutation"] for k in primary_keys})
+    corrected = apply_holm_to_reports({k: merged[k] for k in primary_keys})
+    merged.update(corrected)
 
     # --- negative-control sensitivity ----------------------------------------
     sensitivity = []
@@ -443,8 +433,6 @@ def main() -> None:
     for key, row in merged.items():
         row = dict(row)
         row["comparison"] = key
-        if key in corrected:
-            row.update(p_holm=corrected[key]["p_holm"])
         rows.append(row)
     fieldnames = sorted({k for r in rows for k in r})
     with open(out_dir / "summary.csv", "w", newline="") as f:
@@ -464,24 +452,28 @@ def main() -> None:
     for arm_a, arm_b in comparisons:
         lines += [f"## `{arm_a}` vs `{arm_b}`", "",
                   labels.get((arm_a, arm_b), ""), "",
-                  "| endpoint | mean A | mean B | diff | 90% CI | delta | equivalent | p | reading |",
+                  "| endpoint | arm summaries | difference or gap | 90% CI | delta | equivalent | p(diff) | p(TOST) | reading |",
                   "|---|---|---|---|---|---|---|---|---|"]
         for key, row in merged.items():
             if (row["arm_a"], row["arm_b"]) != (arm_a, arm_b):
                 continue
-            if "ci90_low" in row:
+            p_diff = row.get("p_difference_holm", row["p_permutation"])
+            p_tost = row.get("p_tost_holm", row["p_tost"])
+            if "diff" in row:
                 lines.append(
-                    f"| {row['endpoint']} | {row['mean_a']:.4g} | {row['mean_b']:.4g} | "
+                    f"| {row['endpoint']} | {row['mean_a']:.4g} / {row['mean_b']:.4g} | "
                     f"{row['diff']:.4g} | [{row['ci90_low']:.3g}, {row['ci90_high']:.3g}] | "
                     f"{row['delta']:.4g} | {row['equivalent']} | "
-                    f"{row['p_permutation']:.4g} | {row['reading']} |"
+                    f"{p_diff:.4g} | {p_tost:.4g} | {row['reading']} |"
                 )
             else:
                 lines.append(
-                    f"| {row['endpoint']} | within {row['within_a']:.4g} | "
-                    f"within {row['within_b']:.4g} | between {row['between']:.4g} | "
-                    f"gap {row['gap_within_minus_between']:.4g} | {row['delta']:.4g} | "
-                    f"{row['equivalent']} | {row['p_permutation']:.4g} | |"
+                    f"| {row['endpoint']} | within {row['within_a']:.4g} / "
+                    f"{row['within_b']:.4g}; between {row['between']:.4g} | "
+                    f"{row['gap_within_minus_between']:.4g} | "
+                    f"[{row['ci90_low']:.3g}, {row['ci90_high']:.3g}] | "
+                    f"{row['delta']:.4g} | {row['equivalent']} | "
+                    f"{p_diff:.4g} | {p_tost:.4g} | {row['reading']} |"
                 )
         lines.append("")
     if sensitivity:
