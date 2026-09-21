@@ -5,16 +5,14 @@ The faithfulness analysis pass dumps the raw curve data to
 HTMLs — so styling tweaks in `interactive_curves.py` can be applied in seconds
 without re-measuring any metric (no GPU, no model load).
 
-    python experiments/replot_interactive.py results/faithfulness_comparison/<experiment>
+    python -m experiments.thesis.replot_interactive results/faithfulness_comparison/<experiment>
 """
 import argparse
 import pickle
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from faithfulness_comparison import _write_interactive
+from .faithfulness_comparison import _write_interactive
 
 
 def main():

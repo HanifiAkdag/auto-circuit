@@ -2,8 +2,8 @@
 
 Pillar 2 asks how much of a discovered circuit is an artifact of the random draw: each
 cell of the faithfulness spine is re-run under N=5 seeds and the resulting circuits are
-compared. Imported by the analysis pass and printed one cell per line by the SLURM array
-launcher (`stability_discovery.sh`), so the launcher and the analysis can never disagree
+compared. Imported by the analysis pass and available as one cell per line when a cluster
+driver invokes this module, so the discovery driver and the analysis can never disagree
 on what the matrix is.
 
 Differences from the faithfulness spine (`faithfulness_cells.py`):
@@ -17,8 +17,8 @@ Seed 42 is included deliberately: those cells double as a spine re-run under the
 canonical-ordering fix (2026-08-01), before which no cell was reproducible at all.
 
 ACDC on IOI and GT is the long pole (~13 GPU-h and ~4 GPU-h per cell). Those 30 cells are
-excluded from `ARRAY_CELLS` and run tau-split via `stability_acdc_partials.sh`, exactly as
-the spine does; `CELLS` still lists them so the analysis sees the full matrix.
+excluded from `ARRAY_CELLS` and run tau-split by a cluster driver, exactly as the spine
+does; `CELLS` still lists them so the analysis sees the full matrix.
 
 Cell count (`CELLS`): 4 swept x 3 tasks x 3 ablations x 5 seeds + 3 tasks x 5 seeds
 (Random) = 195. Each of these is a "joint" cell: one seed drives both the prompt draw

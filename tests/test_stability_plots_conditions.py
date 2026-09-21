@@ -1,9 +1,7 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
-
-from stability_plots import _joint_only, fig_variance_decomposition  # noqa: E402
+from experiments.thesis.stability_plots import (  # noqa: E402
+    _joint_only,
+    fig_variance_decomposition,
+)
 
 
 def _row(condition, algo="EP", task="IOI", jaccard=0.5, sd=0.1):

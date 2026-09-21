@@ -10,7 +10,7 @@ artifact of two different evaluation stacks. Scores are aligned through
 
 Run::
 
-    srun --gres=gpu:1 --mem=64G python -m experiments.port_comparison.fidelity_analysis
+    srun --gres=gpu:1 --mem=64G python -m experiments.thesis.port_comparison.fidelity_analysis
 """
 
 import argparse
@@ -25,7 +25,7 @@ from typing import Dict, List
 import numpy as np
 import torch as t
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 for extra in (REPO, REPO / "experiments"):
     if str(extra) not in sys.path:
         sys.path.insert(0, str(extra))
@@ -46,14 +46,14 @@ from auto_circuit.tasks import IOI_COMPONENT_CIRCUIT_TASK, Task  # noqa: E402
 from auto_circuit.types import AblationType, PatchType  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
 
-from experiments.port_comparison.fidelity_stats import (  # noqa: E402
+from .fidelity_stats import (  # noqa: E402
     apply_holm_to_reports,
     pairwise_matrix,
     summarise_endpoint,
     summarise_similarity_endpoint,
 )
-from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
-from experiments.port_comparison.run_cells import BATCH_SIZE, FROZEN_DATASET  # noqa: E402
+from .frozen_ioi import fixed_split_loader  # noqa: E402
+from .run_cells import BATCH_SIZE, FROZEN_DATASET  # noqa: E402
 
 PRIMARY_K = 2000
 BUDGETS = (500, 739, 1000, 2000, 5000)
@@ -102,8 +102,7 @@ CONTROLS = ("port-neginv", "orig-asshipped")
 #
 # v1 -> v2 is the 2026-08-11 `data.py` fix. v2 -> v3 is this study's own change:
 # `shared_mask_sample=True` became the default on 2026-08-12, so all 45 stability
-# cells were re-run (`experiments/ep_rerun_cells.py`) and re-analysed as
-# `results/stability/stability_v3_2026-08-13`.
+# cells were re-run and re-analysed as `results/stability/stability_v3_2026-08-13`.
 #
 # v3 was PROVISIONAL and is superseded. Its re-run constrained on GPU *memory* and
 # scattered the 54 cells over four architectures (a180/ampere, a6000/ampere,

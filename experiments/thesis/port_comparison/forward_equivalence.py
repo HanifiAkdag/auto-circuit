@@ -25,7 +25,7 @@ nondeterminism from re-running one implementation on a permuted batch.
 
 Run::
 
-    srun --gres=gpu:1 --mem=48G python -m experiments.port_comparison.forward_equivalence
+    srun --gres=gpu:1 --mem=48G python -m experiments.thesis.port_comparison.forward_equivalence
 """
 
 import argparse
@@ -38,7 +38,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import torch as t
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 if str(REPO / "third_party" / "disco_gp") not in sys.path:
     sys.path.insert(0, str(REPO / "third_party" / "disco_gp"))
 
@@ -48,7 +48,7 @@ from auto_circuit.types import AblationType  # noqa: E402
 from auto_circuit.utils.ablation_activations import src_ablations  # noqa: E402
 from auto_circuit.utils.graph_utils import patchable_model  # noqa: E402
 
-from experiments.port_comparison.edge_map import (  # noqa: E402
+from .edge_map import (  # noqa: E402
     ac_to_orig,
     expected_shapes,
     total_edges,

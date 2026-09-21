@@ -8,24 +8,21 @@ partials is therefore identical to one process running all tao (min is commutati
 associative, +inf is its identity, and each tao pass is independent of the others).
 
 Usage:
-    python experiments/merge_acdc_partials.py --task ioi --ablation resample \\
+    python -m experiments.thesis.merge_acdc_partials --task ioi --ablation resample \\
         --partials-dir .prune_scores/final/benchmark/partials \\
         --output-dir  .prune_scores/final/benchmark
 """
 import argparse
 import json
 import os
-import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import torch as t
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path
-from experiment_utils import git_state
+from .experiment_utils import git_state
 
 
 def _serialize(obj: Any) -> Any:

@@ -19,7 +19,7 @@ for _extra in (REPO, _EP_ROOT / "src" / "modeling", _EP_ROOT / "src" / "prune"):
     if str(_extra) not in sys.path:
         sys.path.insert(0, str(_extra))
 
-from experiments.port_comparison.ep_edge_map import (  # noqa: E402
+from experiments.thesis.port_comparison.ep_edge_map import (  # noqa: E402
     ac_to_orig,
     expected_shapes,
     n_sources,
@@ -126,7 +126,7 @@ def _require_reference():
 @pytest.fixture(scope="module")
 def bench():
     _require_reference()
-    fe = pytest.importorskip("experiments.port_comparison.ep_forward_equivalence")
+    fe = pytest.importorskip("experiments.thesis.port_comparison.ep_forward_equivalence")
 
     from auto_circuit.experiment_utils import load_tl_model
     from auto_circuit.utils.graph_utils import patchable_model

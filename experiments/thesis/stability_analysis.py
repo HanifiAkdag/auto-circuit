@@ -20,12 +20,11 @@ one table.
 Writes `structural.csv`, `functional.csv`, `summary.csv`, `summary.md` and the figures.
 `stability_plots.py` can redraw every figure from the two CSVs alone (no cache, no GPU).
 
-    srun --gres=gpu:1 python experiments/stability_analysis.py
-    srun python experiments/stability_analysis.py --skip-functional   # CPU only
+    srun --gres=gpu:1 --mem=64G python -m experiments.thesis.stability_analysis
+    srun --mem=8G python -m experiments.thesis.stability_analysis --skip-functional   # CPU only
 """
 import argparse
 import csv
-import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -33,8 +32,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.analysis_utils import (
     Budget,
@@ -62,8 +59,8 @@ from auto_circuit.tasks import TASK_DICT
 from auto_circuit.types import AblationType, PatchType, PruneScores
 from auto_circuit.utils.misc import repo_path_to_abs_path
 
-from experiment_utils import algo_hyperparams, git_state, write_manifest
-from faithfulness_comparison import (
+from .experiment_utils import algo_hyperparams, git_state, write_manifest
+from .faithfulness_comparison import (
     TASK_METRICS,
     _ABL_SHORT,
     _COMMON_METRICS,
@@ -71,8 +68,8 @@ from faithfulness_comparison import (
     _ablation_slug,
     _reverse_clean_corrupt,
 )
-from run_cell import _ALGO_MAP, _TASK_TEMPLATES
-from stability_cells import (
+from .run_cell import _ALGO_MAP, _TASK_TEMPLATES
+from .stability_cells import (
     ANCHOR_ABLATION,
     ANCHOR_ALGOS,
     ANCHOR_SEED,
@@ -562,7 +559,7 @@ def _rebuild_summary(folder: Path, skip_figures: bool = False) -> None:
     Changing how the table is summarised should not cost a GPU run. Task keys come back
     from the display names in the CSVs, resolved against the three spine tasks.
     """
-    from stability_plots import _read
+    from .stability_plots import _read
 
     structural = _read(folder / "structural.csv")
     functional = _read(folder / "functional.csv")
@@ -576,7 +573,7 @@ def _rebuild_summary(folder: Path, skip_figures: bool = False) -> None:
     _write_csv(folder / "summary.csv", summary, list(summary[0].keys()))
     _write_summary_md(folder / "summary.md", summary)
     if not skip_figures:
-        from stability_plots import write_all_figures
+        from .stability_plots import write_all_figures
 
         write_all_figures(folder)
 
@@ -698,7 +695,7 @@ def main() -> None:
     write_manifest(folder / "manifest.json", manifest)
 
     if not args.skip_figures:
-        from stability_plots import write_all_figures
+        from .stability_plots import write_all_figures
 
         write_all_figures(folder)
     print(f"\nDone. Results in: {folder}")

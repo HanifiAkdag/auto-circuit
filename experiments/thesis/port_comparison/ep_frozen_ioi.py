@@ -13,7 +13,7 @@ split's leading-space convention matters and is asserted here.
 
 Run::
 
-    srun --mem=16G python -m experiments.port_comparison.ep_frozen_ioi
+    srun --mem=16G python -m experiments.thesis.port_comparison.ep_frozen_ioi
 """
 
 import json

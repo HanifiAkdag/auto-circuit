@@ -14,20 +14,17 @@ Called by faithfulness_comparison.py after the eval matrix; also runnable standa
 (CPU-only — models are loaded just for the edge graph) to regenerate heatmaps from
 cached cells without re-measuring anything:
 
-  srun python experiments/similarity_heatmaps.py --cache-dir .prune_scores/final/benchmark
+  srun --mem=8G python -m experiments.thesis.similarity_heatmaps --cache-dir .prune_scores/final/benchmark
 """
 import argparse
 import csv
 import math
-import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 import plotly.graph_objects as go
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.analysis_utils import jaccard, top_k_edge_set
 from auto_circuit.prune_algos.prune_algos import PRUNE_ALGO_DICT
@@ -411,9 +408,9 @@ def write_all_similarity_heatmaps(
 def main() -> None:
     from auto_circuit.metrics.analysis_utils import latest_per_cell, load_many_caches
     from auto_circuit.utils.misc import repo_path_to_abs_path
-    from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS
-    from faithfulness_comparison import _group_cells_by_discovery_ablation
-    from run_cell import _ALGO_MAP
+    from .faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS
+    from .faithfulness_comparison import _group_cells_by_discovery_ablation
+    from .run_cell import _ALGO_MAP
 
     parser = argparse.ArgumentParser(description="Circuit-similarity heatmaps from cached cells.")
     parser.add_argument("--cache-dir", default=".prune_scores/final/benchmark")

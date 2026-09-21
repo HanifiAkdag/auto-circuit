@@ -1,6 +1,6 @@
 """Tier B of the DiscoGP port fidelity study: same-mask function equivalence.
 
-A fast regression version of ``experiments/port_comparison/forward_equivalence.py``.
+A fast regression version of ``experiments/thesis/port_comparison/forward_equivalence.py``.
 The script produces the numbers reported in the thesis; these tests pin the
 conclusions so a later refactor cannot silently break them.
 
@@ -25,8 +25,8 @@ for extra in (REPO, REPO / "third_party" / "disco_gp"):
 
 pytestmark = pytest.mark.slow
 
-fe = pytest.importorskip("experiments.port_comparison.forward_equivalence")
-from experiments.port_comparison.edge_map import (  # noqa: E402
+fe = pytest.importorskip("experiments.thesis.port_comparison.forward_equivalence")
+from experiments.thesis.port_comparison.edge_map import (  # noqa: E402
     ac_to_orig,
     expected_shapes,
     orig_to_ac,

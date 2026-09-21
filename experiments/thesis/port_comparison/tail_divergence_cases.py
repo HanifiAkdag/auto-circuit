@@ -7,7 +7,7 @@ Nothing re-implements the rule.
 Run it once per checkout and compare:
 
     W=/mnt/beegfs/work/akdag/thesis/auto-circuit/.worktrees
-    S=/mnt/beegfs/work/akdag/thesis/auto-circuit/experiments/port_comparison/tail_divergence_cases.py
+    S=/mnt/beegfs/work/akdag/thesis/auto-circuit/experiments/thesis/port_comparison/tail_divergence_cases.py
     git -C $W/.. worktree add $W/pre  upstream/main            # before the PR
     git -C $W/.. worktree add $W/v1   2fb93d8                  # first commit
     # $W/pr-tail is already the current commit

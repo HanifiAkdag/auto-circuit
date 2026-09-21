@@ -10,7 +10,7 @@ from typing import Any
 
 import torch as t
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Base-function args that are runtime inputs, not hyperparameters.
 _NON_HPARAM_ARGS = {"model", "dataloader", "official_edges"}

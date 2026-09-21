@@ -1,10 +1,5 @@
 """Tests for the cross-cell circuit-similarity heatmaps (faithfulness spine, #4)."""
-import sys
-from pathlib import Path
-
 import pytest
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
 
 from auto_circuit.metrics.analysis_utils import top_k_edge_set  # noqa: E402
 from auto_circuit.model_utils.micro_model_utils import MicroModel  # noqa: E402
@@ -12,9 +7,13 @@ from auto_circuit.prune_algos.prune_algos import PRUNE_ALGO_DICT  # noqa: E402
 from auto_circuit.utils.graph_utils import patchable_model  # noqa: E402
 from tests.conftest import DEVICE  # noqa: E402
 
-from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS  # noqa: E402
-from run_cell import _ALGO_MAP  # noqa: E402
-from similarity_heatmaps import (  # noqa: E402
+from experiments.thesis.faithfulness_cells import (  # noqa: E402
+    ANCHOR_ALGOS,
+    DISCOVERY_ABLATIONS,
+    SWEPT_ALGOS,
+)
+from experiments.thesis.run_cell import _ALGO_MAP  # noqa: E402
+from experiments.thesis.similarity_heatmaps import (  # noqa: E402
     _jaccard_matrix,
     collect_labeled_scores,
     save_similarity_heatmaps,

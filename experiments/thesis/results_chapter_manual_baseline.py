@@ -1,6 +1,6 @@
 """Evaluate deterministic official circuits at their native task ablations.
 
-Run on a CPU compute node before results_chapter_size_curves.py.
+Run on a CPU compute node before `experiments.thesis.results_chapter_size_curves`.
 """
 from __future__ import annotations
 
@@ -22,14 +22,21 @@ from auto_circuit.tasks import TASK_DICT
 from auto_circuit.types import AblationType, PatchType
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / ".prune_scores/final/benchmark"
 OUT = ROOT / "results/results_chapter/size_curves"
 TASKS = {
     "ioi": ("cell_ioi_gt_resample_seed42", "mean", 739),
+    "gt": ("cell_gt_gt_resample_seed42", "resample", 235),
+    "docstring": ("cell_docstring_gt_resample_seed42", "resample", 24),
 }
-METRICS = [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC,
-           CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC]
+TASK_METRICS = {
+    "ioi": [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC,
+            CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC],
+    "gt": [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC],
+    "docstring": [CLEAN_KL_DIV_METRIC,
+                   CORRECT_ANSWER_GREATER_THAN_INCORRECT_PERCENT_METRIC],
+}
 
 
 def main():
@@ -52,11 +59,11 @@ def main():
         ablation = (AblationType.TOKENWISE_MEAN_CORRUPT if ablation_name == "mean"
                     else getattr(AblationType, ablation_name.upper()))
         measurements = measure_prune_metrics(
-            ablation_types=[ablation], metrics=METRICS,
+            ablation_types=[ablation], metrics=TASK_METRICS[task_key],
             task_prune_scores=task_prune_scores,
             patch_type=PatchType.TREE_PATCH, test_edge_counts=[expected_edges],
         )
-        for metric in METRICS:
+        for metric in TASK_METRICS[task_key]:
             series = extract_metric(measurements, ablation, metric.key,
                                     task_key_loaded, algo_key)
             assert len(series) == 1 and int(series[0][0]) == expected_edges, series
@@ -83,7 +90,7 @@ def main():
         writer.writerows(rows)
     manifest = {
         "sources": source_records,
-        "metrics": [m.key for m in METRICS],
+        "metrics": {k: [m.key for m in v] for k, v in TASK_METRICS.items()},
         "test_loader": "TASK_DICT task template test_loader (256 examples)",
         "patch_type": str(PatchType.TREE_PATCH),
         "selection": "all binary-positive edges in each canonical deterministic official circuit cache",

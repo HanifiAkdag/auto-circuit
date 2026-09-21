@@ -29,8 +29,7 @@ docs/related_work/
 third_party/
 .port_fidelity_ep_cache*/
 
-# git worktrees for cross-version comparisons (recreated by
-# experiments/port_comparison/run_tail_divergence_cases.sh)
+# Temporary git worktrees for cross-version comparisons.
 .worktrees/
 
 # Overleaf clone of the thesis write-up (separate git repo, remote git.overleaf.com)

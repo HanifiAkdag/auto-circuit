@@ -15,7 +15,7 @@ REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from experiments.port_comparison.fidelity_stats import (  # noqa: E402
+from experiments.thesis.port_comparison.fidelity_stats import (  # noqa: E402
     apply_holm_to_reports,
     bootstrap_similarity_gap_ci,
     bootstrap_diff_ci,

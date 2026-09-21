@@ -1,11 +1,6 @@
-import sys
-from pathlib import Path
-
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
-
-from stability_cells import (  # noqa: E402
+from experiments.thesis.stability_cells import (  # noqa: E402
     ANCHOR_SEED,
     CONDITIONS,
     DECOMP_ALGOS,

@@ -5,17 +5,18 @@ Random ignores the data, so its circuit must not move with --seed. Sweeping all 
 cells would burn GPU hours on results knowable in advance, so this runs one pair per
 algorithm on the cheapest task and asserts the pair is tensor-identical.
 
-The two cells of each pair are produced beforehand by decomp_verify.sh (one `run_cell.py`
-call per cell, into a throwaway --output-dir); this script only compares the results.
+The two cells of each pair are produced beforehand by the variance-decomposition driver
+(one `run_cell.py` call per cell, into a throwaway `--output-dir`); this script only
+compares the results.
 
-    srun --gres=gpu:1 python experiments/verify_degenerate_conditions.py
+    srun --gres=gpu:1 --mem=8G python -m experiments.thesis.verify_degenerate_conditions
 """
 from pathlib import Path
 
 import torch as t
 
 # (algo, why) — the actual seed/init/ablation values that produced each pair live in
-# decomp_verify.sh, which owns the run configuration; this script only compares outputs.
+# The variance-decomposition driver owns the run configuration; this script only compares outputs.
 PAIRS = [
     ("acdc", "ACDC reads no torch RNG"),
     ("eap", "EAP reads no torch RNG"),

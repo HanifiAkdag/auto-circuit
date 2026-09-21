@@ -26,7 +26,7 @@ Arms (see ``docs/superpowers/specs/2026-08-11-edge-pruning-port-fidelity.md``):
 
 Run::
 
-    srun --gres=gpu:1 --mem=48G python -m experiments.port_comparison.ep_run_cells \\
+    srun --gres=gpu:1 --mem=48G python -m experiments.thesis.port_comparison.ep_run_cells \\
         --arm port --seed 0
 """
 
@@ -44,7 +44,7 @@ from typing import Dict
 import numpy as np
 import torch as t
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 _EP_ROOT = REPO / "third_party" / "edge_pruning"
 for _extra in (REPO, REPO / "experiments", _EP_ROOT / "src" / "modeling"):
     if str(_extra) not in sys.path:
@@ -53,14 +53,14 @@ for _extra in (REPO, REPO / "experiments", _EP_ROOT / "src" / "modeling"):
 from auto_circuit.tasks import IOI_COMPONENT_CIRCUIT_TASK, Task  # noqa: E402
 from auto_circuit.types import AblationType  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
-from experiment_utils import git_state, hardware_state  # noqa: E402
+from ..experiment_utils import git_state, hardware_state  # noqa: E402
 
-from experiments.port_comparison.ep_edge_map import (  # noqa: E402
+from .ep_edge_map import (  # noqa: E402
     log_alphas_to_prune_scores,
     read_log_alphas,
     write_log_alphas,
 )
-from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
+from .frozen_ioi import fixed_split_loader  # noqa: E402
 
 FROZEN_DATASET = "port_fidelity/ioi_frozen"
 FROZEN_EP_DIR = repo_path_to_abs_path("datasets/port_fidelity/ioi_frozen_ep")

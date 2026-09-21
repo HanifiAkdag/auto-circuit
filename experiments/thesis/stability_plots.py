@@ -4,7 +4,7 @@ Reads `structural.csv` and `functional.csv` from a results folder and writes eve
 Nothing here touches the score caches, a model or a GPU, so figure design can be iterated
 in seconds:
 
-    srun python experiments/stability_plots.py --from results/stability/<experiment>
+    srun --mem=8G python -m experiments.thesis.stability_plots --from results/stability/<experiment>
 
 Figures, and the question each answers:
 
@@ -24,15 +24,12 @@ four of them), so a standard error has no sampling interpretation.
 import argparse
 import csv
 import math
-import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.utils.plot_theme import (
     AXIS,
@@ -1185,7 +1182,7 @@ def _save(
         fig.write_html(
             str(path.with_suffix(".html")), include_plotlyjs="cdn", full_html=True
         )
-    print(f"  {path.relative_to(path.parents[1])}")
+    print(f"  {path.relative_to(path.parents[2])}")
 
 
 def write_all_figures(folder: Path) -> None:
@@ -1216,7 +1213,7 @@ def write_all_figures(folder: Path) -> None:
     if slider is not None:
         path = figures / "stability_vs_function_by_size.html"
         slider.write_html(str(path), include_plotlyjs="cdn", full_html=True)
-        print(f"  {path.relative_to(path.parents[1])}")
+        print(f"  {path.relative_to(path.parents[2])}")
 
     # The task lives in the filename, not a folder: two folders of fourteen beat six of
     # four or five, and the measure is the only dimension that earns a directory.

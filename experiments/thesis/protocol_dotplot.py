@@ -16,7 +16,7 @@ excluded here and reported on their own, since they answer a different question:
 evaluation protocol behaves as an instrument, rather than how the algorithms compare.
 Pass --all-protocols to draw all nine cells instead, with fill giving the evaluation.
 
-    python experiments/protocol_dotplot.py --summary <path/to/summary.csv>
+    python -m experiments.thesis.protocol_dotplot --summary <path/to/summary.csv>
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """Render final five-run matched-ablation size curves for all tasks.
 
-Run on a CPU compute node: srun python experiments/results_chapter_size_curves.py
+Run on a CPU compute node: srun --mem=8G python -m experiments.thesis.results_chapter_size_curves
 """
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from plotly.subplots import make_subplots
 from pypdf import PdfReader, PdfWriter
 
 
-ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "results/stability/decomposition_2026-09"
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE = ROOT / "results/stability/stability_v5_2026-09-19"
 OUT = ROOT / "results/results_chapter"
 SIZE_OUT = OUT / "size_curves"
 INSPECTION = Path("/tmp/auto-circuit-results-inspection/size_curves")
@@ -37,17 +37,38 @@ STYLE = {
 }
 METRICS = (("Clean KL Div", "Clean KL divergence"),
            ("Logit Diff Percent", "Recovered logit difference (%)"),
-           ("Correct Answer Greater Than Incorrect Percent", "Accuracy (%)"))
+           ("Correct Answer Greater Than Incorrect Percent",
+            "Correct-over-incorrect accuracy (%)"))
 TASK_METRICS = {
     "ioi": METRICS,
     "gt": METRICS[:2],
     "docstring": (METRICS[0], METRICS[2]),
 }
+MANUAL_BUDGETS = {"ioi": 739, "gt": 235, "docstring": 24}
 
 
 def read_csv(path):
     with path.open(newline="") as f:
         return list(csv.DictReader(f))
+
+
+def metric_ylim(task_rows, metric):
+    """Return one y-range for every ablation column in a metric row."""
+    values = []
+    for row in task_rows:
+        if row["metric"] != metric:
+            continue
+        mean = float(row["metric_mean"])
+        sd = float(row["metric_sd"])
+        values.extend((mean - sd, mean + sd))
+    assert values, f"No values found for {metric}"
+    lower, upper = min(values), max(values)
+    if metric == "Clean KL Div":
+        lower = max(0.0, lower)
+    if metric in {"Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent"}:
+        upper = max(upper, 100.0)
+    padding = max((upper - lower) * 0.06, 1e-3)
+    return [lower if lower == 0 else lower - padding, upper + padding]
 
 
 def main():
@@ -62,7 +83,7 @@ def main():
     manual_file = SIZE_OUT / "manual_baselines.csv"
     assert manual_file.exists(), "Run results_chapter_manual_baseline.py first"
     manual_rows = read_csv(manual_file)
-    assert len(manual_rows) == len(METRICS)
+    assert len(manual_rows) == sum(len(v) for v in TASK_METRICS.values())
     rows = []
     for task_key, (task_name, _) in TASKS.items():
         task_metrics = TASK_METRICS[task_key]
@@ -92,13 +113,13 @@ def main():
         task_key = next(k for k, v in TASKS.items() if v[0] == task_name)
         task_metrics = TASK_METRICS[task_key]
         expected = (3 * len(METHODS) + 3) * len(task_metrics)
-        if task_name == TASKS["ioi"][0]:
-            expected += len(task_metrics)
+        expected += len(task_metrics)
         assert len(seen) == expected
         assert all((a, m, metric) in seen for a in ABLATIONS
                    for m in (*METHODS, "Random") for metric, _ in task_metrics)
-        if task_name == TASKS["ioi"][0]:
-            assert all(("mean", "Manual circuit", metric) in seen for metric, _ in task_metrics)
+        native_manual_ablation = "mean" if task_key == "ioi" else "resample"
+        assert all((native_manual_ablation, "Manual circuit", metric) in seen
+                   for metric, _ in task_metrics)
     for r in rows:
         r["realised_mean"] = float(r["realised_mean"])
         r["metric_mean"] = float(r["metric_mean"])
@@ -123,6 +144,10 @@ def main():
     for task_key, (task_name, task_label) in TASKS.items():
         task_rows = [r for r in rows if r["task"] == task_name]
         task_metrics = TASK_METRICS[task_key]
+        row_ranges = {metric: metric_ylim(task_rows, metric)
+                      for metric, _ in task_metrics}
+        manual_budget = MANUAL_BUDGETS[task_key]
+        native_manual_ablation = "mean" if task_key == "ioi" else "resample"
         fig = make_subplots(rows=len(task_metrics), cols=3, horizontal_spacing=.075,
                             vertical_spacing=.09,
                             subplot_titles=[a.capitalize() for a in ABLATIONS]
@@ -141,7 +166,7 @@ def main():
                     if method == "Manual circuit":
                         fig.add_trace(go.Scatter(
                         x=x, y=y, mode="markers", name=label, legendgroup=method,
-                        showlegend=i == 0 and j == 2,
+                        showlegend=i == 0 and ablation == native_manual_ablation,
                         marker=dict(symbol="star", size=11, color=color)),
                             row=i+1, col=j+1)
                         continue
@@ -160,21 +185,25 @@ def main():
                     line=dict(color=color, width=2),
                     hovertemplate="%{x:.0f} edges<br>%{y:.3g}<extra>%{fullData.name}</extra>"
                     ), row=i+1, col=j+1)
-                fig.add_vline(x=739, row=i+1, col=j+1, line_color="#999999",
+                fig.add_vline(x=manual_budget, row=i+1, col=j+1, line_color="#999999",
                           line_width=.8, line_dash="dot", layer="below")
-                if i == len(task_metrics) - 1:
+                if metric == "Logit Diff Percent":
                     fig.add_hline(y=100, row=i+1, col=j+1, line_color="#999999",
                               line_width=.8, line_dash="dot", layer="below")
                 fig.update_xaxes(type="log", range=[.9, 4.65], row=i+1, col=j+1,
                              showline=True, linecolor="#666666", linewidth=.7,
                              ticks="outside", tickvals=[10, 100, 1000, 10000],
-                             ticktext=["10", "100", "1k", "10k"],
+                             ticktext=["10", "100", "1,000", "10,000"],
+                             showticklabels=i == len(task_metrics) - 1,
                              showgrid=False, tickfont=dict(size=15),
                              title_font=dict(size=15),
                                  title_text="Circuit size (edges)" if i == len(task_metrics) - 1 else None)
                 fig.update_yaxes(title_text=ylabel if j == 0 else None, row=i+1, col=j+1,
+                             range=row_ranges[metric],
                              showline=True, linecolor="#666666", linewidth=.7,
-                             ticks="outside", gridcolor="#e4e4e4", gridwidth=.5,
+                             ticks="outside",
+                             showticklabels=j == 0,
+                             gridcolor="#e4e4e4", gridwidth=.5,
                              zeroline=False, tickfont=dict(size=15),
                                  title_font=dict(size=14))
         fig.update_layout(width=1060, height=900, margin=dict(l=83, r=28, t=40, b=116),
@@ -205,14 +234,14 @@ def main():
         "source_sha256": hashlib.sha256(functional.read_bytes()).hexdigest(),
         "stability_manifest": str(stability_manifest.relative_to(ROOT)),
         "stability_manifest_sha256": hashlib.sha256(stability_manifest.read_bytes()).hexdigest(),
-        "filters": "All tasks; four methods at joint matched discovery/evaluation; ablation-independent Random at each evaluation; manual circuit only for IOI at native mean ablation",
+        "filters": "All tasks; four methods at joint matched discovery/evaluation; ablation-independent Random at each evaluation; official circuit marker at each task's native ablation",
         "values": "functional.csv five-run metric_mean and population metric_sd (ddof=0); colored band is mean plus/minus 1 SD; manual is one deterministic evaluation",
         "random_source": str(functional.relative_to(ROOT)),
         "manual_source": str(manual_file.relative_to(ROOT)),
         "manual_source_sha256": hashlib.sha256(manual_file.read_bytes()).hexdigest(),
-        "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its native mean evaluation ablation",
+        "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its task's native evaluation ablation (mean for IOI, resample for Greater-Than and Docstring)",
         "acdc": "Only recorded threshold boundaries and full-circuit point are plotted; lines connect observations without adding intermediate values",
-        "rows": len(rows), "manual_budgets": {"ioi": 739},
+        "rows": len(rows), "manual_budgets": MANUAL_BUDGETS,
     }
     (SIZE_OUT / "size_curves_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"Wrote {len(rows)} plotted rows")

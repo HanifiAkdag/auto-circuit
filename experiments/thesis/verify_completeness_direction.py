@@ -1,6 +1,6 @@
 """Assert the completeness curves are knockouts, and that faithfulness did not move.
 
-Usage: python experiments/verify_completeness_direction.py NEW_TREE [OLD_TREE]
+Usage: python -m experiments.thesis.verify_completeness_direction NEW_TREE [OLD_TREE]
 """
 import csv
 import pickle

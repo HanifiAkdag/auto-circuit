@@ -36,7 +36,7 @@ Two arms, because a test that bypasses a code path says nothing about that path:
 
 Run::
 
-    srun --gres=gpu:1 --mem=48G python -m experiments.port_comparison.ep_forward_equivalence
+    srun --gres=gpu:1 --mem=48G python -m experiments.thesis.port_comparison.ep_forward_equivalence
 """
 
 import argparse
@@ -48,7 +48,7 @@ from typing import Dict, List, Tuple
 
 import torch as t
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 _EP_ROOT = REPO / "third_party" / "edge_pruning"
 for _extra in (REPO, _EP_ROOT / "src" / "modeling", _EP_ROOT / "src" / "prune"):
     if str(_extra) not in sys.path:
@@ -60,7 +60,7 @@ from auto_circuit.utils.ablation_activations import src_ablations  # noqa: E402
 from auto_circuit.utils.graph_utils import patch_mode, patchable_model  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
 
-from experiments.port_comparison.ep_edge_map import (  # noqa: E402
+from .ep_edge_map import (  # noqa: E402
     ac_to_orig,
     expected_shapes,
     n_sources,

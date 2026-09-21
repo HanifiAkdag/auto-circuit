@@ -20,7 +20,7 @@ native batching behaviour. Training order is not matched across implementations.
 
 Run::
 
-    srun --mem=32G python -m experiments.port_comparison.frozen_ioi
+    srun --mem=32G python -m experiments.thesis.port_comparison.frozen_ioi
 """
 
 import argparse
@@ -30,7 +30,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Iterator, List
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 SOURCE = REPO / "datasets" / "ioi" / "ioi_prompts.json"
 FROZEN = REPO / "datasets" / "port_fidelity" / "ioi_frozen.json"
 

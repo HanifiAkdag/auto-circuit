@@ -1,10 +1,5 @@
 #%%
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
-
-from faithfulness_cells import (  # noqa: E402
+from experiments.thesis.faithfulness_cells import (  # noqa: E402
     ANCHOR_ABLATION,
     ANCHOR_ALGOS,
     CELLS,

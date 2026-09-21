@@ -1,9 +1,9 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
-
-from run_cell import _cache_stem  # noqa: E402
+from experiments.thesis.run_cell import (  # noqa: E402
+    _EP_TASK_HPARAMS,
+    _bind_task_hyperparams,
+    _cache_stem,
+)
+from auto_circuit.prune_algos.prune_algos import EDGE_PRUNING_PRUNE_ALGO  # noqa: E402
 
 
 def test_joint_stem_matches_the_legacy_name():
@@ -29,3 +29,14 @@ def test_joint_glob_does_not_match_a_decoupled_cell():
     joint = _cache_stem("ioi", "ep", "resample", 43, 43)
     decoupled = _cache_stem("ioi", "ep", "resample", 43, 42)
     assert not f"{decoupled}-2026.pkl".startswith(f"{joint}-")
+
+
+def test_edge_pruning_uses_released_task_specific_targets():
+    assert _EP_TASK_HPARAMS["ioi"]["target_node_sparsity"] == 0.72
+    assert _EP_TASK_HPARAMS["gt"]["target_node_sparsity"] == 0.68
+    assert _EP_TASK_HPARAMS["docstring"]["target_node_sparsity"] == 0.72
+
+    gt = _bind_task_hyperparams(EDGE_PRUNING_PRUNE_ALGO, "ep", "gt")
+    assert gt.func.keywords["target_edge_sparsity"] == 1.1
+    assert gt.func.keywords["target_node_sparsity"] == 0.68
+    assert gt.key == EDGE_PRUNING_PRUNE_ALGO.key

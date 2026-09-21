@@ -2,8 +2,8 @@
 
 The faithfulness spine is the full discovery x evaluation matrix comparing circuit
 discovery methods. Imported by the analysis pass (`faithfulness_comparison.py`) and
-printed one cell per line by the SLURM array launcher (`faithfulness_discovery.sh`),
-so the launcher and the analysis can never disagree on what the matrix is.
+available as one cell per line when a cluster driver invokes this module, so the
+discovery driver and the analysis can never disagree on what the matrix is.
 
 Full discovery x eval matrix (single seed): EP / DiscoGP / ACDC / EAP are each
 run under every discovery ablation {zero, resample, mean} (EAP via the mask-gradient

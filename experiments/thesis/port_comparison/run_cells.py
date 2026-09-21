@@ -18,7 +18,7 @@ Arms (see `docs/superpowers/specs/2026-08-08-discogp-port-fidelity.md`):
 
 Run::
 
-    srun --gres=gpu:1 python -m experiments.port_comparison.run_cells \
+    srun --gres=gpu:1 --mem=48G python -m experiments.thesis.port_comparison.run_cells \
         --arm port --seed 0
 """
 
@@ -34,7 +34,7 @@ from typing import Dict
 import numpy as np
 import torch as t
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 for extra in (REPO, REPO / "experiments", REPO / "third_party" / "disco_gp"):
     if str(extra) not in sys.path:
         sys.path.insert(0, str(extra))
@@ -42,14 +42,14 @@ for extra in (REPO, REPO / "experiments", REPO / "third_party" / "disco_gp"):
 from auto_circuit.tasks import IOI_COMPONENT_CIRCUIT_TASK, Task  # noqa: E402
 from auto_circuit.types import AblationType  # noqa: E402
 from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
-from experiment_utils import git_state, hardware_state  # noqa: E402
+from ..experiment_utils import git_state, hardware_state  # noqa: E402
 
-from experiments.port_comparison.edge_map import keep_mask_to_prune_scores  # noqa: E402
-from experiments.port_comparison.forward_equivalence import (  # noqa: E402
+from .edge_map import keep_mask_to_prune_scores  # noqa: E402
+from .forward_equivalence import (  # noqa: E402
     MODEL,
     TL_COMPAT,
 )
-from experiments.port_comparison.frozen_ioi import fixed_split_loader  # noqa: E402
+from .frozen_ioi import fixed_split_loader  # noqa: E402
 
 FROZEN_DATASET = "port_fidelity/ioi_frozen"
 ARMS = (
@@ -126,7 +126,7 @@ def run_port(arm: str, seed: int, device: t.device) -> Dict[str, t.Tensor]:
             for block in task.model.blocks:
                 block.attn.b_O.zero_()
     elif arm == "port-split":
-        from experiments.port_comparison.forward_equivalence import split_attn_out_bias
+        from .forward_equivalence import split_attn_out_bias
 
         split_attn_out_bias(task.model)
 
@@ -158,7 +158,7 @@ def _build_dls(model, as_shipped: bool):
     from datasets import Dataset
     from torch.utils.data import DataLoader
 
-    from experiments.port_comparison.frozen_ioi import FROZEN, load_for_original
+    from .frozen_ioi import FROZEN, load_for_original
 
     def make(split: str):
         d = load_for_original(model.tokenizer, split=split, path=FROZEN)

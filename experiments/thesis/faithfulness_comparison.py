@@ -1,8 +1,8 @@
 """Faithfulness spine — discovery x eval matrix ANALYSIS pass (sub-RQ3, issue #4).
 
-Discovery is run separately as a SLURM array of per-cell jobs
-(`faithfulness_discovery.sh` -> `run_cell.py`), producing one cached `PruneScores` per
-(method, task, discovery-ablation) in `.prune_scores/final/benchmark/`. This script
+Discovery is run separately as per-cell `run_cell.py` jobs, producing one cached
+`PruneScores` per (method, task, discovery-ablation) in `.prune_scores/final/benchmark`.
+This script
 LOADS those cells (no retraining), groups them by discovery-ablation, and produces the
 full discovery x eval matrix:
 
@@ -15,21 +15,18 @@ full discovery x eval matrix:
 Every number is tagged with its (discovery-ablation, eval-ablation, patch-direction)
 triple via the directory path and the summary-table columns (Miller 2024).
 
-Run discovery first:   sbatch faithfulness_discovery.sh
-Then this analysis:    sbatch run_faithfulness.sh   (or: srun python experiments/faithfulness_comparison.py)
+Run this analysis after discovery, for example with
+`srun --mem=8G python -m experiments.thesis.faithfulness_comparison`.
 
 Spec: docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md
 """
 import argparse
 import csv
 import pickle
-import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.analysis_utils import (
     extract_metric,
@@ -60,12 +57,12 @@ from auto_circuit.tasks import (
 from auto_circuit.types import AblationType, PatchType
 from auto_circuit.utils.misc import repo_path_to_abs_path
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
-from experiment_utils import git_state, write_manifest
-from interactive_curves import save_interactive_curves
+from .experiment_utils import git_state, write_manifest
+from .interactive_curves import save_interactive_curves
 
-from faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS
-from run_cell import _ALGO_MAP, _TASK_TEMPLATES
-from similarity_heatmaps import (
+from .faithfulness_cells import ANCHOR_ALGOS, DISCOVERY_ABLATIONS, SWEPT_ALGOS
+from .run_cell import _ALGO_MAP, _TASK_TEMPLATES
+from .similarity_heatmaps import (
     DEFAULT_SIMILARITY_EDGE_COUNTS,
     write_all_similarity_heatmaps,
 )

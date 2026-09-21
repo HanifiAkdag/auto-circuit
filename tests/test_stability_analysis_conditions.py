@@ -1,14 +1,9 @@
-import sys
-from pathlib import Path
-
 import torch as t
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "experiments"))
 
 import json  # noqa: E402
 
-from run_cell import _cache_stem  # noqa: E402
-from stability_analysis import (  # noqa: E402
+from experiments.thesis.run_cell import _cache_stem  # noqa: E402
+from experiments.thesis.stability_analysis import (  # noqa: E402
     _cell_specs,
     _effective_condition,
     _is_constant,

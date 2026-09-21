@@ -61,7 +61,7 @@ from auto_circuit.types import (
 )
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path, save_cache
 from auto_circuit.visualize_circuit_slider import save_circuit_sankey_slider
-from experiment_utils import algo_hyperparams, git_state, write_manifest
+from thesis.experiment_utils import algo_hyperparams, git_state, write_manifest
 
 figs: list = []  # list of (fig, name) tuples
 

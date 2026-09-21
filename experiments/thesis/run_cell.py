@@ -4,10 +4,10 @@ Runs exactly one (method, task, discovery-ablation, seed) cell and saves the res
 PruneScores to a uniquely-named cache file alongside a manifest JSON.
 
 SLURM-array usage (one cell per array task):
-    srun python experiments/run_cell.py --task ioi --algo ep --ablation resample --seed 42
+    srun --mem=64G python -m experiments.thesis.run_cell --task ioi --algo ep --ablation resample --seed 42
 
 For the null test (randomly-initialized model weights):
-    srun python experiments/run_cell.py --task ioi --algo ep --ablation resample \\
+    srun --mem=64G python -m experiments.thesis.run_cell --task ioi --algo ep --ablation resample \\
         --seed 42 --null-test
 
 See docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md §3
@@ -18,7 +18,6 @@ import json
 import os
 import random
 import socket
-import sys
 from copy import deepcopy
 from datetime import datetime
 from functools import partial
@@ -27,8 +26,6 @@ from typing import Any, Optional
 
 import torch as t
 import transformer_lens as tl
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.prune_algos.prune_algos import (
     ACDC_PRUNE_ALGO,
@@ -51,7 +48,7 @@ from auto_circuit.tasks import (
 )
 from auto_circuit.types import AblationType
 from auto_circuit.utils.misc import repo_path_to_abs_path
-from experiment_utils import algo_hyperparams, git_state
+from .experiment_utils import algo_hyperparams, git_state
 
 # Algos that accept an ablation_type parameter (EP, DiscoGP variants, ACDC, EAP).
 # GT and Random are ablation-independent.
@@ -87,6 +84,26 @@ _TASK_MODEL_DEF: dict[str, str] = {
     "gt": "gpt2-small",
     "docstring": "attn-only-4l",
 }
+
+# EP's released GPT-2 scripts use a task-specific node-sparsity target. The common
+# 0.72 setting remains the fallback for tasks without a released EP configuration.
+_EP_TASK_HPARAMS: dict[str, dict[str, float]] = {
+    "ioi": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.72},
+    "gt": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.68},
+    "docstring": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.72},
+}
+
+
+def _bind_task_hyperparams(algo: PruneAlgo, algo_short: str, task_short: str) -> PruneAlgo:
+    """Bind released task-specific settings without changing the algorithm identity."""
+    if algo_short != "ep":
+        return algo
+    return PruneAlgo(
+        key=algo.key,
+        name=algo.name,
+        func=partial(algo.func, **_EP_TASK_HPARAMS[task_short]),
+        _short_name=algo.short_name,
+    )
 
 
 def _serialize(obj: Any) -> Any:
@@ -236,6 +253,7 @@ def main():
 
     ablation_type = _ABLATION_MAP[args.ablation]
     base_algo = _ALGO_MAP[args.algo]
+    base_algo = _bind_task_hyperparams(base_algo, args.algo, args.task)
 
     # ACDC tao-sweep override (partial jobs). partial() lets outer kwargs win, so this
     # overrides the tao_bases/tao_exps already bound in ACDC_PRUNE_ALGO.func.

@@ -21,26 +21,23 @@ Two modes:
 
 Usage:
     # Diagnose all cached DiscoGP cells (CPU/GPU, just reads tensors):
-    srun --gres=gpu:1 python experiments/edge_prob_diagnostic.py
+    srun --gres=gpu:1 --mem=64G python -m experiments.thesis.edge_prob_diagnostic
 
     # Sample & evaluate one cell (needs the task model -> GPU). Prefix selects the cell:
-    srun --gres=gpu:1 python experiments/edge_prob_diagnostic.py --evaluate \
+    srun --gres=gpu:1 --mem=64G python -m experiments.thesis.edge_prob_diagnostic --evaluate \
         --prefix cell_docstring_discogp_ep_zero --n-samples 20 --temp 1.0
 
     # Train a fresh DiscoGP mask first instead of loading cache:
-    srun --gres=gpu:1 python experiments/edge_prob_diagnostic.py --run-fresh --task ioi --ablation zero
+    srun --gres=gpu:1 --mem=64G python -m experiments.thesis.edge_prob_diagnostic --run-fresh --task ioi --ablation zero
 """
 import argparse
 import csv
-import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from auto_circuit.metrics.analysis_utils import load_many_caches
 from auto_circuit.utils.misc import repo_path_to_abs_path
@@ -160,7 +157,7 @@ def run_fresh(task_short: str, ablation_short: str, seed: int) -> List[Cell]:
     """Train one DiscoGP edge-only mask and return it as a single cell."""
     import torch as t
     from auto_circuit.prune_algos.prune_algos import make_ablation_variant, run_prune_algos
-    from run_cell import _ALGO_MAP, _ABLATION_MAP, _build_task
+    from .run_cell import _ALGO_MAP, _ABLATION_MAP, _build_task
 
     t.manual_seed(seed)
     algo = make_ablation_variant(_ALGO_MAP["discogp-e"], _ABLATION_MAP[ablation_short])

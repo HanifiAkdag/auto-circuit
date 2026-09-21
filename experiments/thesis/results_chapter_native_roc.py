@@ -1,6 +1,6 @@
 """Exact full-ranking manual-circuit AUC and native-ablation ROC panels.
 
-Run on a CPU compute node: srun python experiments/results_chapter_native_roc.py
+Run on a CPU compute node: srun --mem=8G python -m experiments.thesis.results_chapter_native_roc
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ import torch
 from scipy.stats import mannwhitneyu, rankdata
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / ".prune_scores/final/benchmark"
 OUT = ROOT / "results/results_chapter"
 ROC_OUT = OUT / "native_roc"
@@ -201,12 +201,12 @@ def main():
 
     fig = make_subplots(rows=1, cols=3, shared_xaxes=True, shared_yaxes=True,
                         horizontal_spacing=.085,
-                        subplot_titles=[f"{chr(65+i)}  {name} ({native})"
+                        subplot_titles=[f"{name} ({native})"
                                         for i, (_, (name, native, _, _)) in enumerate(TASKS.items())])
     for i, (task, (name, native, _, _)) in enumerate(TASKS.items()):
         col = i + 1
         fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(color="#999999",
-                      width=1, dash="dot"), name="Chance", showlegend=i == 0,
+                      width=1, dash="dot"), name="Chance level", showlegend=i == 0,
                       legendgroup="chance"), row=1, col=col)
         for method, (label, color) in METHODS.items():
             rr = [r for r in plotted if r["task"] == task and r["method"] == method]
