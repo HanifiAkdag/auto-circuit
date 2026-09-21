@@ -58,83 +58,35 @@ from .run_cells import BATCH_SIZE, FROZEN_DATASET  # noqa: E402
 PRIMARY_K = 2000
 BUDGETS = (500, 739, 1000, 2000, 5000)
 
-# Pre-registered margins: the Pillar-2 within-implementation SD for
-# DiscoGP x IOI x zero/zero x faithfulness at k=2000. The pre-registration fixed
-# the *rule*, not the number, so the tail_divergence fix in data.py obliges
-# recomputing them from the re-run Pillar 2
-# (results/stability/stability_v2_2026-08-11/). Pre-fix values, from
-# results/stability/stability_2026-08-05/, are kept for the record; every one of
-# them was wider, so they made equivalence easier to declare.
-#                        pre-fix     post-fix
-#   Clean KL Div          1.0262  ->  0.8716
-#   Logit Diff Percent   84.3293  -> 71.4485
-#   Answer Pair KL Div    0.2404  ->  0.1792
-#   jaccard               0.0337  ->  0.0116
-# spearman and density are chosen bounds, not measured SDs, so they are unchanged.
+# Equivalence margins are one population SD of the relevant final IOI stability
+# values at k=2000. For DiscoGP these are the joint-seed, zero-ablation runs;
+# the functional and Jaccard values come from the final stability analysis and
+# density and Spearman use the same rule applied to the final score tensors.
+# The constants below are recorded from those final artifacts so that the
+# comparison script is self-contained and reproducible.
 DELTAS = {
     "Clean KL Div": 0.8716,
     "Logit Diff Percent": 71.4485,
     "Answer Pair KL Div": 0.1792,
     "jaccard": 0.0116,
-    "spearman": 0.10,
-    "density": 0.02,
+    "spearman": 0.0144272053,
+    "density": 0.0075117999,
 }
 METRICS = [CLEAN_KL_DIV_METRIC, LOGIT_DIFF_PERCENT_METRIC, ANSWER_PAIR_KL_DIV_METRIC]
 
 PRIMARY_A, PRIMARY_B = "port", "orig"
 CONTROLS = ("port-neginv", "orig-asshipped")
 
-# Edge Pruning margins: the Pillar-2 within-implementation SD for
-# EP x IOI x resample/resample x faithfulness at k=2000. The rule is identical to
-# DiscoGP's; only the cell it is read from differs, because resample is EP's native
-# ablation where DiscoGP's is zero.
-#
-# The margins have been recomputed twice, and both columns are kept because the
-# pre-registration binds the *rule*, not the numbers: changing what EP does obliges
-# re-measuring its own spread before any verdict is read off.
-#
-#                        pre-fix     post-fix    post-sampling
-#                        (v1)        (v2)        (v3, current)
-#   Clean KL Div         0.00901  ->  0.02595  ->  0.03259
-#   Logit Diff Percent    3.9621  ->   5.3445  ->  16.3605
-#   Answer Pair KL Div   0.01413  ->  0.01314  ->  0.05142
-#   jaccard             0.008928  -> 0.008246  ->  0.00540
-#
-# v1 -> v2 is the 2026-08-11 `data.py` fix. v2 -> v3 is this study's own change:
-# `shared_mask_sample=True` became the default on 2026-08-12, so all 45 stability
-# cells were re-run and re-analysed as `results/stability/stability_v3_2026-08-13`.
-#
-# v3 was PROVISIONAL and is superseded. Its re-run constrained on GPU *memory* and
-# scattered the 54 cells over four architectures (a180/ampere, a6000/ampere,
-# l40/lovelace, titanrtx/turing) where the rest of Pillar 2 pins `gpu_model:a180`;
-# since delta *is* a standard deviation, node variance entered the measured quantity.
-# v4 re-runs the same cells pinned to a180, under the 2026-08-13 `no_padding` gate
-# (`2a9c0e0`), with every manifest verified to carry that commit.
-#
-#                        v1 pre-fix  v2 post-fix  v3 provisional  v4 (current)
-#   Clean KL Div         0.00901  ->  0.02595  ->  0.03259     ->  0.02808
-#   Logit Diff Percent    3.9621  ->   5.3445  ->  16.3605     ->  10.8835
-#   Answer Pair KL Div   0.01413  ->  0.01314  ->  0.05142     ->  0.05500
-#   jaccard             0.008928  -> 0.008246  ->  0.00540     ->  0.00663
-#
-# What the v3 -> v4 move shows. Hardware scatter inflated the two margins that moved
-# most (Clean KL and Logit Diff pull back by 14% and 33%), so v3 did overstate them.
-# It did NOT manufacture the effect: mean pairwise Jaccard is 0.2409 at v3 against
-# 0.2445 at v4, i.e. the fall from v2's 0.6224 survives pinning intact, and no EP cell
-# moved by more than 0.028 across all nine task x ablation combinations. The drop is
-# the sampling change, not the hardware and not the `no_padding` gate.
-#
-# Relative to v2 the three functional margins are still wider (1.1x, 2.0x, 4.2x): the
-# reference's one-draw-per-step estimator is genuinely noisier across seeds. The
-# jaccard margin is narrower, and that remains a floor effect rather than improved
-# consistency, since overlap at 0.24 has less room to vary than at 0.62.
+# Edge Pruning uses the same rule, with the joint-seed, resample-ablation IOI
+# stability runs as its native reference. The values below are recorded from
+# the final, GPU-pinned stability artifacts.
 EP_DELTAS = {
     "Clean KL Div": 0.02808,
     "Logit Diff Percent": 10.8835,
     "Answer Pair KL Div": 0.05500,
     "jaccard": 0.00663,
-    "spearman": 0.10,
-    "density": 0.02,
+    "spearman": 0.0171401920,
+    "density": 0.0002179795,
 }
 
 
