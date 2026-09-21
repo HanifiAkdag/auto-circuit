@@ -141,19 +141,30 @@ def main():
         writer.writeheader()
         writer.writerows({k: r[k] for k in fields} for r in rows)
 
-    for task_key, (task_name, task_label) in TASKS.items():
+    def render_task_figure(task_key, task_name, task_label, plot_ablations, suffix):
         task_rows = [r for r in rows if r["task"] == task_name]
         task_metrics = TASK_METRICS[task_key]
-        row_ranges = {metric: metric_ylim(task_rows, metric)
+        range_rows = (task_rows if len(plot_ablations) > 1 else
+                      [r for r in task_rows if r["discovery_ablation"] in plot_ablations])
+        row_ranges = {metric: metric_ylim(range_rows, metric)
                       for metric, _ in task_metrics}
         manual_budget = MANUAL_BUDGETS[task_key]
         native_manual_ablation = "mean" if task_key == "ioi" else "resample"
-        fig = make_subplots(rows=len(task_metrics), cols=3, horizontal_spacing=.075,
+        horizontal_layout = len(plot_ablations) == 1
+        n_rows = 1 if horizontal_layout else len(task_metrics)
+        n_cols = len(task_metrics) if horizontal_layout else len(plot_ablations)
+        subplot_titles = ([ylabel for _, ylabel in task_metrics]
+                          if horizontal_layout else
+                          [a.capitalize() for a in plot_ablations]
+                          + [""] * ((len(task_metrics) - 1) * len(plot_ablations)))
+        fig = make_subplots(rows=n_rows, cols=n_cols,
+                            horizontal_spacing=.075,
                             vertical_spacing=.09,
-                            subplot_titles=[a.capitalize() for a in ABLATIONS]
-                            + [""] * ((len(task_metrics) - 1) * len(ABLATIONS)))
+                            subplot_titles=subplot_titles)
         for i, (metric, ylabel) in enumerate(task_metrics):
-            for j, ablation in enumerate(ABLATIONS):
+            for j, ablation in enumerate(plot_ablations):
+                plot_row = 1 if horizontal_layout else i + 1
+                plot_col = i + 1 if horizontal_layout else j + 1
                 for method in (*METHODS, "Random", "Manual circuit"):
                     rr = sorted((r for r in task_rows if r["discovery_ablation"] == ablation
                              and r["algo"] == method and r["metric"] == metric),
@@ -168,7 +179,7 @@ def main():
                         x=x, y=y, mode="markers", name=label, legendgroup=method,
                         showlegend=i == 0 and ablation == native_manual_ablation,
                         marker=dict(symbol="star", size=11, color=color)),
-                            row=i+1, col=j+1)
+                            row=plot_row, col=plot_col)
                         continue
                     upper = [r["metric_mean"] + r["metric_sd"] for r in rr]
                     lower = [r["metric_mean"] - r["metric_sd"] for r in rr]
@@ -177,42 +188,50 @@ def main():
                     x=x + x[::-1], y=upper + lower[::-1], fill="toself",
                     fillcolor=f"rgba({rgb[0]},{rgb[1]},{rgb[2]},0.14)",
                     line=dict(width=0), hoverinfo="skip", showlegend=False),
-                        row=i+1, col=j+1)
+                        row=plot_row, col=plot_col)
                     fig.add_trace(go.Scatter(
                     x=x, y=y, mode="lines+markers", name=label,
                     legendgroup=method, showlegend=i == 0 and j == 0,
                     marker=dict(symbol="circle", size=4, color=color),
                     line=dict(color=color, width=2),
                     hovertemplate="%{x:.0f} edges<br>%{y:.3g}<extra>%{fullData.name}</extra>"
-                    ), row=i+1, col=j+1)
-                fig.add_vline(x=manual_budget, row=i+1, col=j+1, line_color="#999999",
+                    ), row=plot_row, col=plot_col)
+                fig.add_vline(x=manual_budget, row=plot_row, col=plot_col, line_color="#999999",
                           line_width=.8, line_dash="dot", layer="below")
                 if metric == "Logit Diff Percent":
-                    fig.add_hline(y=100, row=i+1, col=j+1, line_color="#999999",
+                    fig.add_hline(y=100, row=plot_row, col=plot_col, line_color="#999999",
                               line_width=.8, line_dash="dot", layer="below")
-                fig.update_xaxes(type="log", range=[.9, 4.65], row=i+1, col=j+1,
+                fig.update_xaxes(type="log", range=[.9, 4.65], row=plot_row, col=plot_col,
                              showline=True, linecolor="#666666", linewidth=.7,
                              ticks="outside", tickvals=[10, 100, 1000, 10000],
                              ticktext=["10", "100", "1,000", "10,000"],
-                             showticklabels=i == len(task_metrics) - 1,
+                             showticklabels=(plot_row == n_rows),
                              showgrid=False, tickfont=dict(size=15),
                              title_font=dict(size=15),
-                                 title_text="Circuit size (edges)" if i == len(task_metrics) - 1 else None)
-                fig.update_yaxes(title_text=ylabel if j == 0 else None, row=i+1, col=j+1,
+                                 title_text="Circuit size (edges)" if plot_row == n_rows else None)
+                fig.update_yaxes(title_text=None if horizontal_layout else ylabel if j == 0 else None,
+                             row=plot_row, col=plot_col,
                              range=row_ranges[metric],
                              showline=True, linecolor="#666666", linewidth=.7,
                              ticks="outside",
-                             showticklabels=j == 0,
+                             showticklabels=True if horizontal_layout else plot_col == 1,
                              gridcolor="#e4e4e4", gridwidth=.5,
                              zeroline=False, tickfont=dict(size=15),
                                  title_font=dict(size=14))
-        fig.update_layout(width=1060, height=900, margin=dict(l=83, r=28, t=40, b=116),
+        figure_width = 1060 if len(plot_ablations) == 3 else 560
+        if horizontal_layout:
+            figure_width = 1060
+            figure_height = 430
+        else:
+            figure_height = 900 if len(task_metrics) == 3 else 700
+        fig.update_layout(width=figure_width, height=figure_height,
+                      margin=dict(l=83, r=28, t=40, b=116),
                       paper_bgcolor="white", plot_bgcolor="white",
                       font=dict(family="Arial", size=15, color="#222222"),
                       legend=dict(orientation="h", x=.5, xanchor="center", y=-.18,
                                   yanchor="top", font=dict(size=16), itemsizing="constant"))
         fig.update_annotations(font=dict(size=17), yshift=4)
-        pdf_path = SIZE_OUT / f"{TASK_SLUGS[task_key]}_size_curves.pdf"
+        pdf_path = SIZE_OUT / f"{TASK_SLUGS[task_key]}{suffix}_size_curves.pdf"
         fig.write_image(str(pdf_path))
         reader = PdfReader(pdf_path)
         if len(reader.pages) > 1:
@@ -224,10 +243,24 @@ def main():
             with single.open("wb") as f:
                 writer.write(f)
             single.replace(pdf_path)
-        fig.write_image(str(INSPECTION / f"{TASK_SLUGS[task_key]}_size_curves.png"), scale=1.4)
-        print(f"Wrote {task_label} size curves")
+        fig.write_image(str(INSPECTION / f"{TASK_SLUGS[task_key]}{suffix}_size_curves.png"), scale=1.4)
+        print(f"Wrote {task_label} {suffix or 'all-ablation'} size curves")
+
+    for task_key, (task_name, task_label) in TASKS.items():
+        render_task_figure(task_key, task_name, task_label, ABLATIONS, "")
+        if task_key in {"ioi", "gt"}:
+            native_ablation = "mean" if task_key == "ioi" else "resample"
+            render_task_figure(task_key, task_name, task_label, (native_ablation,), "_native")
     manifest = {
         "figures": [f"{TASK_SLUGS[k]}_size_curves.pdf" for k in TASKS],
+        "main_figures": {
+            "ioi": "ioi_native_size_curves.pdf",
+            "gt": "greater_than_native_size_curves.pdf",
+        },
+        "main_figure_ablations": {
+            "ioi": "mean",
+            "gt": "resample",
+        },
         "tasks": {k: v[0] for k, v in TASKS.items()},
         "metrics": {k: [m for m, _ in TASK_METRICS[k]] for k in TASKS},
         "source": str(functional.relative_to(ROOT)),
