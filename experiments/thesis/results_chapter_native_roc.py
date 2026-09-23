@@ -95,8 +95,11 @@ def exact_auc(y, x):
     return float((ranks[y].sum() - n_pos * (n_pos + 1) / 2) / (n_pos * n_neg))
 
 
-def step_at(fpr, tpr, grid):
-    return tpr[np.maximum(0, np.searchsorted(fpr, grid, side="right") - 1)]
+def vertical_at(fpr, tpr, grid):
+    """Linearly interpolate the highest TPR at each common false-positive rate."""
+    unique_fpr, starts = np.unique(fpr, return_index=True)
+    highest_tpr = np.maximum.reduceat(tpr, starts)
+    return np.interp(grid, unique_fpr, highest_tpr)
 
 
 def roc_points(labels, scores):
@@ -146,7 +149,7 @@ def render_native_figures(plotted, mean_rows):
                     row=1, col=col)
                 fig.add_trace(go.Scatter(
                     x=fpr, y=avg, mode="lines",
-                    line=dict(color=color, width=3, shape="hv"),
+                    line=dict(color=color, width=3, shape="linear"),
                     name=names[method], hovertemplate=(
                         f"{names[method]}<br>FPR=%{{x:.3f}}<br>TPR=%{{y:.3f}}<extra></extra>"),
                     showlegend=False), row=1, col=col)
@@ -186,9 +189,11 @@ def render_native_figures(plotted, mean_rows):
                              gridwidth=.7, scaleanchor=f"x{suffix}", scaleratio=1,
                              row=1, col=col)
 
-        fig.update_layout(width=1450 if len(task_keys) == 2 else 620,
-                          height=760 if len(task_keys) == 2 else 680,
-                          margin=dict(l=90, r=25, t=70, b=100),
+        compact = len(task_keys) == 1
+        fig.update_layout(width=1450 if not compact else 620,
+                          height=760 if not compact else 620,
+                          margin=(dict(l=90, r=25, t=70, b=100) if not compact
+                                  else dict(l=85, r=20, t=48, b=72)),
                           paper_bgcolor="white", plot_bgcolor="white",
                           font=dict(family="Arial", size=19, color="#222222"),
                           showlegend=False)
@@ -237,6 +242,10 @@ def main():
     INSPECTION.mkdir(parents=True, exist_ok=True)
     index = cache_index()
     assert exact_auc(np.array([True, False, True, False]), np.ones(4)) == .5
+    tied_fpr, tied_tpr = roc_points(np.array([True, False, True, False]),
+                                    np.ones(4))
+    tie_grid = np.linspace(0, 1, 5)
+    assert np.allclose(vertical_at(tied_fpr, tied_tpr, tie_grid), tie_grid)
     summary = list(csv.DictReader((STABILITY / "summary.csv").open(newline="")))
     used = []
     auc_rows, mean_rows, seed_curves, plotted = [], [], [], []
@@ -286,7 +295,7 @@ def main():
                         assert fpr[0] == tpr[0] == 0 and fpr[-1] == tpr[-1] == 1
                         assert np.all(np.diff(fpr) >= 0) and np.all(np.diff(tpr) >= 0)
                         assert abs(float(np.trapz(tpr, fpr)) - auc) < 1e-10
-                        vals = step_at(fpr, tpr, grid)
+                        vals = vertical_at(fpr, tpr, grid)
                         curve_values.append(vals)
                         seed_curves.extend({"task": task, "method": method,
                                             "discovery_ablation": ablation, "seed": seed,
@@ -336,7 +345,7 @@ def main():
         "candidate_edges": "all entries of each PruneScores tensor, aligned by module name and tensor shape",
         "score": "absolute edge score", "labels": "positive iff deterministic official-circuit cache score is 1",
         "auc": "Mann-Whitney probability; scipy average ranks give half credit for ties; sample SD (ddof=1)",
-        "roc": "all distinct scores, tied blocks together; step interpolation on 1001 common FPR points; mean and five-run min/max",
+        "roc": "all distinct scores, tied blocks together; linear interpolation at the highest TPR on 1001 common FPR points; average and five-run min-max",
         "all_tied_auc": exact_auc(np.array([True, False, True, False]), np.ones(4)),
         "independent_auc_check": trusted_check,
         "acdc_selected_boundary_check": [{"task": t, "ablation": a, "seed": s,
