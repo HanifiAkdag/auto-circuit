@@ -4,9 +4,11 @@ Run on a CPU compute node: srun --mem=8G python -m experiments.thesis.results_ch
 """
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -20,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / ".prune_scores/final/benchmark"
 OUT = ROOT / "results/results_chapter"
 ROC_OUT = OUT / "native_roc"
-INSPECTION = Path("/tmp/auto-circuit-results-inspection/native_roc")
+INSPECTION = ROC_OUT / "inspection"
 STABILITY = ROOT / "results/stability/decomposition_2026-09"
 TASKS = {"ioi": ("IOI", "mean", 739, "Indirect Object Identification"),
          "gt": ("Greater-Than", "resample", 235, "Greaterthan"),
@@ -106,6 +108,128 @@ def roc_points(labels, scores):
     tp = np.cumsum(positive)[last]
     fp = last + 1 - tp
     return np.r_[0, fp / (~labels).sum()], np.r_[0, tp / labels.sum()]
+
+
+def render_native_figures(plotted, mean_rows):
+    """Render main-text IOI/Greater-Than panels and a separate Docstring panel."""
+    names = {key: value[0] for key, value in METHODS.items()}
+    native = {task: values[1] for task, values in TASKS.items()}
+    auc = {(row["task"], row["method"], row["discovery_ablation"]): row
+           for row in mean_rows}
+
+    def make_figure(task_keys, pdf_path, png_path):
+        fig = make_subplots(rows=1, cols=len(task_keys), shared_xaxes=True,
+                            shared_yaxes=True, horizontal_spacing=.12,
+                            subplot_titles=[TASKS[key][0] for key in task_keys])
+        for col, task in enumerate(task_keys, start=1):
+            ablation = native[task]
+            suffix = "" if col == 1 else str(col)
+            xref, yref = f"x{suffix} domain", f"y{suffix} domain"
+            fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines",
+                          line=dict(color="#777777", width=1.5, dash="dot"),
+                          hoverinfo="skip", showlegend=False), row=1, col=col)
+            for method, (_, color) in METHODS.items():
+                rows = [row for row in plotted
+                        if row["task"] == task and row["method"] == method
+                        and row["discovery_ablation"] == ablation]
+                rows.sort(key=lambda row: float(row["fpr"]))
+                fpr = np.array([float(row["fpr"]) for row in rows])
+                avg = np.array([float(row["tpr_mean"]) for row in rows])
+                low = np.array([float(row["tpr_min"]) for row in rows])
+                high = np.array([float(row["tpr_max"]) for row in rows])
+                assert len(fpr) >= 1000 and np.all(np.diff(fpr) >= 0)
+
+                fig.add_trace(go.Scatter(
+                    x=np.r_[fpr, fpr[::-1]], y=np.r_[high, low[::-1]],
+                    fill="toself", fillcolor=color, opacity=.10,
+                    line=dict(width=0), hoverinfo="skip", showlegend=False),
+                    row=1, col=col)
+                fig.add_trace(go.Scatter(
+                    x=fpr, y=avg, mode="lines",
+                    line=dict(color=color, width=3, shape="hv"),
+                    name=names[method], hovertemplate=(
+                        f"{names[method]}<br>FPR=%{{x:.3f}}<br>TPR=%{{y:.3f}}<extra></extra>"),
+                    showlegend=False), row=1, col=col)
+
+            # Panel-local key reports the AUC for the same task and native
+            # discovery ablation, avoiding a misleading shared AUC legend.
+            fig.add_shape(type="rect", xref=xref, yref=yref,
+                          x0=.35, x1=.99, y0=.025, y1=.325,
+                          line=dict(color="#999999", width=.8),
+                          fillcolor="rgba(255,255,255,0.94)", layer="above")
+            fig.add_annotation(x=.37, y=.292, xref=xref, yref=yref,
+                               text="AUC (average ± SD)", showarrow=False,
+                               xanchor="left", yanchor="middle",
+                               font=dict(size=19, color="#222222"))
+            for line, (method, (_, color)) in enumerate(METHODS.items()):
+                stats = auc[(task, method, ablation)]
+                text = (f"{names[method]}  "
+                        f"{float(stats['auc_mean']):.3f} ± "
+                        f"{float(stats['auc_sd']):.3f}")
+                fig.add_annotation(x=.37, y=.238 - line * .058,
+                                   xref=xref, yref=yref, text=text,
+                                   showarrow=False, xanchor="left", yanchor="middle",
+                                   font=dict(size=19, color=color))
+
+            fig.update_xaxes(range=[0, 1], tickvals=[0, .25, .5, .75, 1],
+                             tickformat=".2g", title_text="False-positive rate",
+                             showline=True, linecolor="#555555", linewidth=1,
+                             ticks="outside", tickfont=dict(size=24),
+                             title_font=dict(size=26), gridcolor="#e5e5e5",
+                             gridwidth=.7, row=1, col=col)
+            fig.update_yaxes(range=[0, 1], tickvals=[0, .25, .5, .75, 1],
+                             tickformat=".2g",
+                             title_text="True-positive rate" if col == 1 else None,
+                             showline=True, linecolor="#555555", linewidth=1,
+                             ticks="outside", tickfont=dict(size=24),
+                             title_font=dict(size=26), gridcolor="#e5e5e5",
+                             gridwidth=.7, scaleanchor=f"x{suffix}", scaleratio=1,
+                             row=1, col=col)
+
+        fig.update_layout(width=1450 if len(task_keys) == 2 else 620,
+                          height=760 if len(task_keys) == 2 else 680,
+                          margin=dict(l=90, r=25, t=70, b=100),
+                          paper_bgcolor="white", plot_bgcolor="white",
+                          font=dict(family="Arial", size=19, color="#222222"),
+                          showlegend=False)
+        for annotation in fig.layout.annotations[:len(task_keys)]:
+            annotation.font.size = 26
+            annotation.font.color = "#222222"
+        if pdf_path is not None:
+            fig.write_image(str(pdf_path))
+        fig.write_image(str(png_path), scale=1.2)
+
+    inspection = INSPECTION
+    inspection.mkdir(parents=True, exist_ok=True)
+    make_figure(("ioi",), ROC_OUT / "ioi_native_roc.pdf",
+                inspection / "ioi_native_roc.png")
+    make_figure(("gt",), ROC_OUT / "greater_than_native_roc.pdf",
+                inspection / "greater_than_native_roc.png")
+    make_figure(("ioi", "gt"), None, inspection / "manual_native_roc.png")
+    thesis_images = ROOT / "thesis-overleaf/Thesis/Images"
+    thesis_images.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROC_OUT / "ioi_native_roc.pdf", thesis_images / "ioi_native_roc.pdf")
+    shutil.copyfile(ROC_OUT / "greater_than_native_roc.pdf",
+                    thesis_images / "greater_than_native_roc.pdf")
+    make_figure(("docstring",), ROC_OUT / "docstring_native_roc.pdf",
+                inspection / "docstring_native_roc.png")
+
+
+def replot_saved_results():
+    """Re-render plots from the audited CSVs without loading score caches."""
+    with (ROC_OUT / "manual_native_roc_plotted.csv").open(newline="") as f:
+        plotted = list(csv.DictReader(f))
+    with (ROC_OUT / "manual_circuit_auc.csv").open(newline="") as f:
+        mean_rows = list(csv.DictReader(f))
+    assert len(mean_rows) == len(TASKS) * len(METHODS) * len(ABLATIONS)
+    for task, (_, ablation, _, _) in TASKS.items():
+        assert sum(row["task"] == task and row["discovery_ablation"] == ablation
+                   for row in plotted) >= 4 * 1000
+        assert all((task, method, ablation) in {
+            (row["task"], row["method"], row["discovery_ablation"])
+            for row in mean_rows} for method in METHODS)
+    render_native_figures(plotted, mean_rows)
+    print("Rendered two single-panel main ROC PDFs, a composite preview, and a separate Docstring appendix panel.")
 
 
 def main():
@@ -199,53 +323,7 @@ def main():
     write_csv(ROC_OUT / "manual_native_roc_plotted.csv", plotted,
               ["task", "method", "discovery_ablation", "fpr", "tpr_mean", "tpr_min", "tpr_max"])
 
-    fig = make_subplots(rows=1, cols=3, shared_xaxes=True, shared_yaxes=True,
-                        horizontal_spacing=.085,
-                        subplot_titles=[f"{name} ({native})"
-                                        for i, (_, (name, native, _, _)) in enumerate(TASKS.items())])
-    for i, (task, (name, native, _, _)) in enumerate(TASKS.items()):
-        col = i + 1
-        fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(color="#999999",
-                      width=1, dash="dot"), name="Chance level", showlegend=i == 0,
-                      legendgroup="chance"), row=1, col=col)
-        for method, (label, color) in METHODS.items():
-            rr = [r for r in plotted if r["task"] == task and r["method"] == method]
-            fpr = np.array([r["fpr"] for r in rr])
-            mean = np.array([r["tpr_mean"] for r in rr])
-            lo = np.array([r["tpr_min"] for r in rr])
-            hi = np.array([r["tpr_max"] for r in rr])
-            # Fill is a five-run range at a common FPR grid. Mean is a step
-            # function; no smoothing or sparse-budget trapezoids enter AUC.
-            xx = np.r_[fpr, fpr[::-1]]
-            yy = np.r_[hi, lo[::-1]]
-            fig.add_trace(go.Scatter(x=xx, y=yy, fill="toself", fillcolor=color,
-                          opacity=.085, line=dict(width=0), hoverinfo="skip",
-                          showlegend=False), row=1, col=col)
-            fig.add_trace(go.Scatter(x=fpr, y=mean, mode="lines",
-                          line=dict(color=color, width=2.3, shape="hv"),
-                          name=label, legendgroup=method,
-                          showlegend=i == 0), row=1, col=col)
-        fig.update_xaxes(range=[0, 1], dtick=.25, title_text="False-positive rate",
-                         showline=True, linecolor="#666666", linewidth=.7,
-                         ticks="outside", gridcolor="#e8e8e8", gridwidth=.5,
-                         title_font=dict(size=16), tickfont=dict(size=15),
-                         row=1, col=col)
-        fig.update_yaxes(range=[0, 1.025], dtick=.25,
-                         title_text="True-positive rate" if i == 0 else None,
-                         showline=True, linecolor="#666666", linewidth=.7,
-                         ticks="outside", gridcolor="#e8e8e8", gridwidth=.5,
-                         title_font=dict(size=16), tickfont=dict(size=15),
-                         row=1, col=col)
-    fig.update_layout(width=1060, height=405, margin=dict(l=78, r=25, t=50, b=85),
-                      paper_bgcolor="white", plot_bgcolor="white", showlegend=True,
-                      legend=dict(orientation="h", x=.5, xanchor="center", y=-.24,
-                                  yanchor="top", font=dict(size=17),
-                                  traceorder="normal", itemsizing="constant"),
-                      font=dict(family="Arial", size=15, color="#222222"))
-    for annotation in fig.layout.annotations[:3]:
-        annotation.font.size = 17
-    fig.write_image(str(ROC_OUT / "manual_native_roc.pdf"))
-    fig.write_image(str(INSPECTION / "manual_native_roc.png"), scale=1.4)
+    render_native_figures(plotted, mean_rows)
 
     identities = [{"cache_file": p.name, "cache_manifest": mpath.name,
                    "cell": meta["cell"], "saved_at": meta["saved_at"]}
@@ -274,4 +352,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--plot-only", action="store_true",
+                        help="Re-render existing audited CSVs without loading score caches")
+    args = parser.parse_args()
+    if args.plot_only:
+        replot_saved_results()
+    else:
+        main()
