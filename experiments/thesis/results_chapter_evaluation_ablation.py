@@ -116,12 +116,12 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     label_center = 45
     strip_left = -(left_margin - label_center + 19) / plot_width
     strip_right = -(left_margin - label_center - 19) / plot_width
-    axis_tick_size = 16
-    method_label_size = 17
-    title_size = 18
-    discovery_label_size = 14
+    axis_tick_size = 17
+    method_label_size = 18
+    title_size = 19
+    discovery_label_size = 15
     marker_size = 9
-    legend_size = 16
+    legend_size = 17
     headings = {
         "Clean KL Div": "Clean KL divergence",
         "Logit Diff Percent": "Logit difference (%)",
@@ -199,10 +199,10 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     for annotation in fig.layout.annotations[:len(metrics)]:
         annotation.update(font=dict(size=title_size, color="#222222"), y=1.04)
     fig.update_layout(template="simple_white", width=width,
-                      height=640, margin=dict(l=left_margin, r=right_margin, t=115, b=55),
+                      height=690, margin=dict(l=left_margin, r=right_margin, t=115, b=115),
                       font=dict(family="Arial", color="#222222", size=legend_size),
                       legend=dict(orientation="h", x=0.5, xanchor="center",
-                                  y=1.16, yanchor="bottom",
+                                  y=-0.14, yanchor="top",
                                   title="Evaluation ablation: ", font=dict(size=legend_size),
                                   title_font=dict(size=legend_size), bgcolor="rgba(0,0,0,0)"),
                       paper_bgcolor="white", plot_bgcolor="rgba(0,0,0,0)")
