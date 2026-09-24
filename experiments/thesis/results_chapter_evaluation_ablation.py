@@ -108,17 +108,27 @@ def select() -> list[dict[str, object]]:
 
 def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]:
     slug, title, _, metrics = TASKS[task]
+    is_ioi = task == "Indirect Object Identification"
     width = 1160 if len(metrics) == 3 else 920
-    plot_width = width - 245
-    table_left = -135 / plot_width
-    strip_left, strip_right = -195 / plot_width, -157 / plot_width
+    left_margin, right_margin = 195, 35
+    plot_width = width - left_margin - right_margin
+    table_left = -(left_margin - 75) / plot_width
+    label_center = 45
+    strip_left = -(left_margin - label_center + 19) / plot_width
+    strip_right = -(left_margin - label_center - 19) / plot_width
+    axis_tick_size = 16
+    method_label_size = 17
+    title_size = 18
+    discovery_label_size = 14
+    marker_size = 9
+    legend_size = 16
     headings = {
         "Clean KL Div": "Clean KL divergence",
         "Logit Diff Percent": "Logit difference (%)",
         "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
     }
     fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True,
-                        horizontal_spacing=0.065,
+                        horizontal_spacing=0.04,
                         subplot_titles=[headings[metric] for metric in metrics])
     offsets = {"zero": 0.18, "resample": 0.0, "mean": -0.18}
     row_y = {
@@ -155,7 +165,7 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
                    for r in group],
                 mode="markers", name=evaluation.capitalize(), legendgroup=evaluation,
                 showlegend=col == 1,
-                marker=dict(color=color, symbol=symbol, size=8,
+                marker=dict(color=color, symbol=symbol, size=marker_size,
                             line=dict(color="white", width=0.6)),
                 error_x=dict(type="data", array=[float(r["metric_sd"]) for r in group],
                              symmetric=True, color=color, thickness=1.0, width=2),
@@ -163,13 +173,13 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
             ), row=1, col=col)
 
         fig.update_xaxes(range=ranges[metric], showline=True, linecolor="#333333",
-                         linewidth=1, ticks="outside", tickfont=dict(size=15),
+                         linewidth=1, ticks="outside", tickfont=dict(size=axis_tick_size),
                          showgrid=True, gridcolor="#E4E6E8", zeroline=False,
                          row=1, col=col)
         if task == "Indirect Object Identification" and metric == "Logit Diff Percent":
             fig.update_xaxes(tickvals=[0, 100, 200, 300, 400], row=1, col=col)
         fig.update_yaxes(range=[-2.85, 12.65], tickvals=tickvals, ticktext=ticktext,
-                         showticklabels=col == 1, tickfont=dict(size=16), ticks="",
+                         showticklabels=col == 1, tickfont=dict(size=method_label_size), ticks="",
                          showgrid=False,
                          zeroline=False, showline=False, row=1, col=col)
 
@@ -184,17 +194,17 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
         fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=y, yref="y",
                            text=f"<b>{discovery.capitalize()} discovery</b>", textangle=-90,
                            showarrow=False, xanchor="center", yanchor="middle",
-                           font=dict(size=13, color="#303030"))
+                           font=dict(size=discovery_label_size, color="#303030"))
 
     for annotation in fig.layout.annotations[:len(metrics)]:
-        annotation.update(font=dict(size=17, color="#222222"), y=1.04)
+        annotation.update(font=dict(size=title_size, color="#222222"), y=1.04)
     fig.update_layout(template="simple_white", width=width,
-                      height=640, margin=dict(l=210, r=35, t=115, b=55),
-                      font=dict(family="Arial", color="#222222", size=15),
+                      height=640, margin=dict(l=left_margin, r=right_margin, t=115, b=55),
+                      font=dict(family="Arial", color="#222222", size=legend_size),
                       legend=dict(orientation="h", x=0.5, xanchor="center",
                                   y=1.16, yanchor="bottom",
-                                  title="Evaluation ablation: ", font=dict(size=15),
-                                  title_font=dict(size=15), bgcolor="rgba(0,0,0,0)"),
+                                  title="Evaluation ablation: ", font=dict(size=legend_size),
+                                  title_font=dict(size=legend_size), bgcolor="rgba(0,0,0,0)"),
                       paper_bgcolor="white", plot_bgcolor="rgba(0,0,0,0)")
     pdf = IMAGES / f"{slug}_evaluation_ablation.pdf"
     png = OUT / f"{slug}_evaluation_ablation.png"
