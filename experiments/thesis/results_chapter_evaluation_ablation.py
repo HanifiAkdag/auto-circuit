@@ -131,8 +131,9 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
                         horizontal_spacing=0.04,
                         subplot_titles=[headings[metric] for metric in metrics])
     offsets = {"zero": 0.18, "resample": 0.0, "mean": -0.18}
+    group_spacing = 6.0
     row_y = {
-        (discovery, method): 12 - 5.6 * discovery_idx - method_idx
+        (discovery, method): 12 - group_spacing * discovery_idx - method_idx
         for discovery_idx, discovery in enumerate(ABLATIONS)
         for method_idx, method in enumerate(METHODS)
     }
@@ -178,7 +179,8 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
                          row=1, col=col)
         if task == "Indirect Object Identification" and metric == "Logit Diff Percent":
             fig.update_xaxes(tickvals=[0, 100, 200, 300, 400], row=1, col=col)
-        fig.update_yaxes(range=[-2.85, 12.65], tickvals=tickvals, ticktext=ticktext,
+        fig.update_yaxes(range=[min(tickvals) - 0.65, max(tickvals) + 0.65],
+                         tickvals=tickvals, ticktext=ticktext,
                          showticklabels=col == 1, tickfont=dict(size=method_label_size), ticks="",
                          showgrid=False,
                          zeroline=False, showline=False, row=1, col=col)
@@ -190,7 +192,7 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
                           x0=table_left, x1=1, y0=y - 0.48, y1=y + 0.48,
                           fillcolor="#F3F4F5", line_width=0, layer="below")
     for i, discovery in enumerate(ABLATIONS):
-        y = 10.5 - 5.6 * i
+        y = 10.5 - group_spacing * i
         fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=y, yref="y",
                            text=f"<b>{discovery.capitalize()} discovery</b>", textangle=-90,
                            showarrow=False, xanchor="center", yanchor="middle",
@@ -199,7 +201,7 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     for annotation in fig.layout.annotations[:len(metrics)]:
         annotation.update(font=dict(size=title_size, color="#222222"), y=1.04)
     fig.update_layout(template="simple_white", width=width,
-                      height=690, margin=dict(l=left_margin, r=right_margin, t=115, b=115),
+                      height=740, margin=dict(l=left_margin, r=right_margin, t=115, b=115),
                       font=dict(family="Arial", color="#222222", size=legend_size),
                       legend=dict(orientation="h", x=0.5, xanchor="center",
                                   y=-0.14, yanchor="top",
