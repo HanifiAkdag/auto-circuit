@@ -1,5 +1,8 @@
 from experiments.thesis.stability_plots import (  # noqa: E402
+    _diagonal_sd,
     _joint_only,
+    _panel_points,
+    _struct_rows,
     fig_variance_decomposition,
 )
 
@@ -21,6 +24,34 @@ def test_joint_only_passes_through_legacy_rows_without_the_column():
     """CSVs written before the condition column are joint by construction."""
     legacy = {k: v for k, v in _row("joint").items() if k != "condition"}
     assert _joint_only([legacy]) == [legacy]
+
+
+def test_structure_function_points_do_not_mix_seed_conditions():
+    structural = [
+        {
+            "task": "IOI", "algo": "EP", "discovery_ablation": "resample",
+            "condition": condition, "selector": "top_k", "budget_label": "200",
+            "budget_value": 200, "realised_mean": 200,
+            "jaccard_mean": jaccard, "jaccard_min": jaccard,
+            "jaccard_max": jaccard,
+        }
+        for condition, jaccard in [("data", 0.9), ("joint", 0.4)]
+    ]
+    functional = [
+        {
+            "task": "IOI", "algo": "EP", "discovery_ablation": "resample",
+            "condition": condition, "eval_ablation": "resample",
+            "measure": "faithfulness", "budget_label": "200",
+            "metric": "Clean KL Div", "metric_sd": sd,
+        }
+        for condition, sd in [("joint", 0.2), ("data", 0.8)]
+    ]
+
+    points = _panel_points(
+        _struct_rows(structural), _diagonal_sd(functional),
+        "IOI", "Clean KL Div", 200, ["EP"],
+    )
+    assert [(point["jaccard"], point["sd"]) for point in points] == [(0.4, 0.2)]
 
 
 def test_variance_decomposition_figure_has_a_trace_per_condition():

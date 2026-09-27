@@ -518,7 +518,7 @@ def _spearman(xs: List[float], ys: List[float]) -> Optional[float]:
 
 
 def _diagonal_sd(functional: List[dict]) -> Dict[tuple, float]:
-    """Across-seed sd keyed by cell and metric, each cell read at its own eval ablation.
+    """Joint-condition sd keyed by cell and metric, at the matched eval ablation.
 
     Faithfulness only. The stability-vs-function plane is an argument about how much of a
     circuit's behaviour survives reseeding, and mixing in the complement's behaviour would
@@ -526,6 +526,8 @@ def _diagonal_sd(functional: List[dict]) -> Dict[tuple, float]:
     """
     out: Dict[tuple, float] = {}
     for r in functional:
+        if r.get("condition", "joint") != "joint":
+            continue
         if r.get("measure", "faithfulness") != "faithfulness":
             continue
         if r["eval_ablation"] != r["discovery_ablation"]:
@@ -545,10 +547,12 @@ ROW_METRICS = ["Logit Diff Percent", "Clean KL Div", DECISION_METRIC]
 
 
 def _struct_rows(structural: List[dict]) -> Dict[tuple, List[dict]]:
-    """Group structural.csv rows by (task, algo, discovery_ablation), each group sorted
-    by circuit size — the per-cell budget grid `_pick_budget` searches over."""
+    """Group joint-condition rows by (task, algo, discovery_ablation), sorted by
+    circuit size — the per-cell budget grid `_pick_budget` searches over."""
     out: Dict[tuple, List[dict]] = {}
     for r in structural:
+        if r.get("condition", "joint") != "joint":
+            continue
         out.setdefault((r["task"], r["algo"], r["discovery_ablation"]), []).append(r)
     for rows in out.values():
         rows.sort(key=lambda r: r["realised_mean"])
