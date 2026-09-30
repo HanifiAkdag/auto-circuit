@@ -100,7 +100,7 @@ def paired_rows(first, second):
 def table_source(rows):
     lookup = {(r['task'], r['algo'], r['ablation_a'], r['ablation_b']): r for r in rows}
     lines = [r'\begin{table}[!ht]', r'\centering', r'\small',
-             r'\caption{Edge-set agreement across discovery ablations at the requested comparison sizes of 739 edges (IOI) and 235 edges (Greater-Than). Entries summarise five comparisons pairing identical dataset and PyTorch seed identifiers (42--46). Ranges are descriptive. ACDC is approximately size matched using its selected threshold for each ablation; attained sizes are reported in \Cref{tab:within-ablation-stability}.}',
+             r'\caption{Edge-set agreement across discovery ablations at the requested comparison sizes of 739 edges (IOI) and 235 edges (Greater-Than). Entries summarise five comparisons pairing identical dataset and PyTorch seeds (42--46). Ranges are descriptive. ACDC is approximately size matched using its selected threshold for each ablation; attained sizes are reported in \Cref{tab:within-ablation-stability}.}',
              r'\label{tab:cross-discovery-stability}', r'\setlength{\tabcolsep}{5pt}',
              r'\renewcommand{\arraystretch}{1.10}', r'\begin{tabular}{@{}lccc@{}}', r'\toprule',
              r'& \multicolumn{3}{c}{Jaccard: average [minimum, maximum]} \\',
@@ -194,7 +194,7 @@ def main():
                 'generator_sha256': digest(Path(__file__)), 'git': git_state(), 'source_sha256': hashes,
                 'selected_rows_sha256': digest(selected_path), 'cache_sources': sources,
                 'seeds': list(SEEDS), 'selection': 'absolute magnitude >= float64 threshold; retain all ties',
-                'pairing': 'equal dataset and PyTorch seed identifiers, joint condition only',
+                'pairing': 'equal dataset and PyTorch seeds, joint condition only',
                 'edge_alignment': {t: {'module_order': list(k), 'tensor_shapes': s} for t, (k, s) in schemas.items()},
                 'within_ablation_cells_reproduced': 24, 'pairwise_rows': 120, 'aggregate_rows': 24,
                 'output_sha256': {name: digest(OUTPUT / name) for name in outputs}}
