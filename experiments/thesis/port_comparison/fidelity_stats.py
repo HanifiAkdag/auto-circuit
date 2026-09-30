@@ -129,15 +129,18 @@ def seed_label_permutation_test(
     labels[:n_a] = True
     observed = statistic(labels)
 
-    # The statistic is invariant under swapping the two arm names, so enumerating
-    # assignments that contain seed 0 covers every distinct split exactly once.
-    n_assign = comb(n - 1, n_a - 1)
+    # Complementary allocations belong to the same fixed-size null only when
+    # both groups have equal size. Otherwise enumerate every C(n, n_a) allocation.
+    balanced = n_a == n - n_a
+    n_assign = comb(n - 1, n_a - 1) if balanced else comb(n, n_a)
     if n_assign <= MAX_EXACT:
         count = 0
-        rest = np.arange(1, n)
-        for pick in combinations(rest, n_a - 1):
+        picks = (combinations(range(1, n), n_a - 1) if balanced
+                 else combinations(range(n), n_a))
+        for pick in picks:
             members = np.zeros(n, dtype=bool)
-            members[0] = True
+            if balanced:
+                members[0] = True
             members[list(pick)] = True
             count += statistic(members) >= observed - 1e-12
         return {"observed": float(observed), "p_value": count / n_assign,
@@ -333,11 +336,24 @@ def summarise_endpoint(
     }
 
 
+def control_outcomes(report: dict) -> Dict[str, bool]:
+    """Separate demonstrated detection from equivalence and an unresolved result."""
+    p_difference = report.get("p_difference_holm", report["p_permutation"])
+    difference = bool(p_difference < 0.05)
+    equivalent = bool(report["equivalent"])
+    return {
+        "detected": difference,
+        "difference_detected": difference,
+        "equivalence_established": equivalent,
+        "inconclusive": not difference and not equivalent,
+    }
+
+
 def detected(control: Sequence[float], reference: Sequence[float], delta: float,
              seed: int = 0) -> bool:
-    """Did an endpoint flag a negative control? Used to evidence achieved power."""
+    """Did the difference test detect a negative control at alpha=0.05?"""
     report = summarise_endpoint(control, reference, delta, seed=seed)
-    return bool(report["p_permutation"] < 0.05 or not report["equivalent"])
+    return control_outcomes(report)["detected"]
 
 
 def pairwise_matrix(vectors: List[np.ndarray], metric) -> np.ndarray:

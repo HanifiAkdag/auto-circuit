@@ -32,8 +32,8 @@ STYLE = {
     "EAP": ("#7B2CBF", "EAP"),
     "EP": ("#0072B2", "Edge Pruning"),
     "DiscoGP": ("#D55E00", "DiscoGP"),
-    "Random": ("#777777", "Random"),
-    "Manual circuit": ("#222222", "Manual circuit"),
+    "Random": ("#777777", "Random circuit"),
+    "Manual circuit": ("#222222", "Ground truth"),
 }
 METRICS = (("Clean KL Div", "Clean KL divergence"),
            ("Logit Diff Percent", "Recovered logit difference (%)"),
@@ -222,13 +222,19 @@ def main():
         if horizontal_layout:
             figure_width = 1060
             figure_height = 430
+            left_margin = 65
+            bottom_margin = 116
+            legend_y = -.23
         else:
             figure_height = 900 if len(task_metrics) == 3 else 700
+            left_margin = 83
+            bottom_margin = 116
+            legend_y = -.18
         fig.update_layout(width=figure_width, height=figure_height,
-                      margin=dict(l=83, r=28, t=40, b=116),
+                      margin=dict(l=left_margin, r=28, t=40, b=bottom_margin),
                       paper_bgcolor="white", plot_bgcolor="white",
                       font=dict(family="Arial", size=15, color="#222222"),
-                      legend=dict(orientation="h", x=.5, xanchor="center", y=-.18,
+                      legend=dict(orientation="h", x=.5, xanchor="center", y=legend_y,
                                   yanchor="top", font=dict(size=16), itemsizing="constant"))
         fig.update_annotations(font=dict(size=17), yshift=4)
         pdf_path = SIZE_OUT / f"{TASK_SLUGS[task_key]}{suffix}_size_curves.pdf"

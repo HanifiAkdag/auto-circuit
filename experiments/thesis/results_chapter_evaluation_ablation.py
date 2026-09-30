@@ -241,7 +241,7 @@ def render_table(rows: list[dict[str, object]], task: str, metric: str) -> str:
              "\\caption{" + title + " " + caption_metric[0].lower() + caption_metric[1:]
              + " under each evaluation ablation. Values are five-run average $\\pm$ population SD.}",
              "\\label{tab:" + slug.replace("_", "-") + "-evaluation-" + METRIC_SLUGS[metric].replace("_", "-") + "}",
-             r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llrrr@{}}", r"\toprule",
+             r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccc@{}}", r"\toprule",
              "Discovery & Method & Zero & Resample & Mean \\\\", r"\midrule"]
     for discovery in ABLATIONS:
         for i, method in enumerate(METHODS):

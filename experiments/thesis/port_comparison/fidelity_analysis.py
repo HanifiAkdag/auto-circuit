@@ -48,6 +48,7 @@ from auto_circuit.utils.misc import repo_path_to_abs_path  # noqa: E402
 
 from .fidelity_stats import (  # noqa: E402
     apply_holm_to_reports,
+    control_outcomes,
     pairwise_matrix,
     summarise_endpoint,
     summarise_similarity_endpoint,
@@ -370,9 +371,9 @@ def main() -> None:
         for key, row in merged.items():
             if row["arm_a"] != control:
                 continue
-            flagged = row["p_permutation"] < 0.05 or not row["equivalent"]
             sensitivity.append({"control": control, "endpoint": row["endpoint"],
-                                "detected": flagged,
+                                "comparator": row["arm_b"],
+                                **control_outcomes(row),
                                 "p_permutation": row["p_permutation"],
                                 "equivalent": row["equivalent"]})
 
@@ -429,10 +430,12 @@ def main() -> None:
         lines.append("")
     if sensitivity:
         lines += ["", "## Negative controls", "",
-                  "An endpoint that detects nothing has no demonstrated power and is",
-                  "reported as uninformative, not as evidence of equivalence.", "",
-                  "| control | endpoint | detected |", "|---|---|---|"]
-        lines += [f"| {s['control']} | {s['endpoint']} | {s['detected']} |"
+                  "Detection requires a significant difference test. Failure to establish",
+                  "equivalence alone is inconclusive and does not demonstrate detection power.", "",
+                  "| control | comparator | endpoint | difference detected | equivalent | inconclusive |",
+                  "|---|---|---|---|---|---|"]
+        lines += [f"| {s['control']} | {s['comparator']} | {s['endpoint']} | "
+                  f"{s['difference_detected']} | {s['equivalence_established']} | {s['inconclusive']} |"
                   for s in sensitivity]
     (out_dir / "summary.md").write_text("\n".join(lines) + "\n")
 

@@ -5,6 +5,7 @@ are tested against cases with known answers rather than trusted by inspection.
 """
 
 import sys
+from itertools import combinations
 from math import comb
 from pathlib import Path
 
@@ -15,10 +16,12 @@ REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
+from experiments.thesis.port_comparison import fidelity_stats  # noqa: E402
 from experiments.thesis.port_comparison.fidelity_stats import (  # noqa: E402
     apply_holm_to_reports,
     bootstrap_similarity_gap_ci,
     bootstrap_diff_ci,
+    detected,
     exact_permutation_test,
     holm,
     interpret,
@@ -129,6 +132,59 @@ def test_interpretation_grid():
 # --- seed-label permutation --------------------------------------------------
 
 
+def _exhaustive_seed_test(matrix, n_a):
+    """Independent oracle: partition explicit unordered pairs for every allocation."""
+    n = len(matrix)
+    pairs = list(combinations(range(n), 2))
+
+    def gap(group):
+        within, between = [], []
+        for i, j in pairs:
+            destination = within if (i in group) == (j in group) else between
+            destination.append(matrix[i, j])
+        return np.average(within) - np.average(between)
+
+    observed = gap(set(range(n_a)))
+    distribution = [gap(set(group)) for group in combinations(range(n), n_a)]
+    exceedances = np.count_nonzero(np.asarray(distribution) >= observed - 1e-12)
+    return observed, exceedances / len(distribution)
+
+
+@pytest.mark.parametrize("n_a,n_b", [(3, 3), (2, 5), (5, 2), (5, 10), (10, 5)])
+def test_seed_test_agrees_with_independent_full_enumeration(n_a, n_b):
+    rng = np.random.default_rng(31)
+    matrix = rng.uniform(-1, 1, size=(n_a + n_b, n_a + n_b))
+    matrix = (matrix + matrix.T) / 2
+    observed, p_value = _exhaustive_seed_test(matrix, n_a)
+    result = seed_label_permutation_test(matrix, n_a)
+    assert result["observed"] == pytest.approx(observed)
+    assert result["p_value"] == pytest.approx(p_value)
+    allocations = comb(n_a + n_b, n_a)
+    expected_count = allocations // 2 if n_a == n_b else allocations
+    assert result["n_permutations"] == expected_count
+
+
+@pytest.mark.parametrize("n_a,n_b", [(3, 3), (2, 5), (5, 10)])
+def test_seed_test_is_invariant_to_swapping_groups(n_a, n_b):
+    rng = np.random.default_rng(41)
+    matrix = rng.normal(size=(n_a + n_b, n_a + n_b))
+    matrix = (matrix + matrix.T) / 2
+    order = list(range(n_a, n_a + n_b)) + list(range(n_a))
+    result = seed_label_permutation_test(matrix, n_a)
+    swapped = seed_label_permutation_test(matrix[np.ix_(order, order)], n_b)
+    assert swapped["observed"] == pytest.approx(result["observed"])
+    assert swapped["p_value"] == pytest.approx(result["p_value"])
+
+
+def test_unequal_group_exact_cutoff_uses_all_allocations(monkeypatch):
+    monkeypatch.setattr(fidelity_stats, "MAX_EXACT", 10)
+    matrix = _blocked_similarity(2, 5, within=0.8, between=0.2)
+    result = seed_label_permutation_test(matrix, n_a=2, n_mc=100)
+    # C(7, 2)=21 exceeds the cutoff; conditioning on seed 0 would give only 6.
+    assert result["exact"] == 0.0
+    assert result["n_permutations"] == 100
+
+
 def _blocked_similarity(n_a, n_b, within, between, noise=0.0, seed=0):
     rng = np.random.default_rng(seed)
     n = n_a + n_b
@@ -236,3 +292,34 @@ def test_holm_correction_updates_both_tests_and_the_reading():
     assert corrected["a"]["reading"] == "real but negligible shift"
     assert corrected["b"]["p_difference_holm"] == pytest.approx(0.04)
     assert corrected["b"]["p_tost_holm"] == pytest.approx(0.04)
+
+
+@pytest.mark.parametrize("p_value,equivalent,difference,inconclusive", [
+    (0.01, False, True, False),
+    (0.01, True, True, False),
+    (0.5, True, False, False),
+    (0.5, False, False, True),
+])
+def test_control_outcomes_separate_detection_from_equivalence(
+    p_value, equivalent, difference, inconclusive
+):
+    result = fidelity_stats.control_outcomes({
+        "p_permutation": p_value, "equivalent": equivalent,
+    })
+    assert result["detected"] == difference
+    assert result["difference_detected"] == difference
+    assert result["equivalence_established"] == equivalent
+    assert result["inconclusive"] == inconclusive
+
+
+def test_control_outcomes_respect_existing_multiplicity_adjustment():
+    result = fidelity_stats.control_outcomes({
+        "p_permutation": 0.01, "p_difference_holm": 0.06, "equivalent": False,
+    })
+    assert not result["detected"]
+    assert result["inconclusive"]
+
+
+def test_inconclusive_control_does_not_demonstrate_detection_power():
+    values = [-100.0, 0.0, 100.0]
+    assert not detected(values, values, delta=0.01)
