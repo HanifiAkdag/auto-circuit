@@ -180,21 +180,26 @@ STUDIES = {
 }
 
 
-def edge_density(scores: dict, rule: str) -> float:
+def edge_density(scores: dict, rule: str, *, exclude_embedding_edges: bool = False) -> float:
     """Fraction of edges the implementation's own discretisation keeps.
 
     ``threshold``: DiscoGP thresholds at ``logit > 0``, i.e. ``sigmoid(logit) > 0.5``.
 
     ``expected_l0``: Edge Pruning does *not* use a fixed threshold. It zeroes, per
     mask tensor, as many entries as the stretched-concrete distribution expects to
-    be zero (``l0.py:23-41``), then binary-searches the cut so the discrete sparsity
-    matches the continuous one. Applying ``deterministic_z`` per tensor is that rule.
+    be zero (``l0.py:23-41``). Applying ``deterministic_z`` per tensor preserves
+    that expected-zero rounding and bottom-k extraction rule.
     Both arms export ``sigmoid(log_alpha / T * F)``, so the log-alphas are recovered
     by inverting that transform.
+
+    ``exclude_embedding_edges`` restricts counting, not extraction, to sources after
+    index 0 in the factorized graph. This is the post-hoc common-edge EP endpoint.
     """
     if rule == "threshold":
-        total = sum(v.numel() for v in scores.values())
-        return float(sum((v > 0.5).sum() for v in scores.values()) / total)
+        masks = [(v > 0.5) for v in scores.values()]
+        if exclude_embedding_edges:
+            masks = [mask[..., 1:] for mask in masks]
+        return float(sum(mask.sum() for mask in masks) / sum(mask.numel() for mask in masks))
 
     from auto_circuit.utils.l0_utils import FACTOR, TEMPERATURE, deterministic_z
 
@@ -203,8 +208,11 @@ def edge_density(scores: dict, rule: str) -> float:
     for tensor in scores.values():
         probs = tensor.detach().float().clamp(1e-6, 1 - 1e-6)
         log_alpha = t.log(probs / (1 - probs)) * TEMPERATURE / FACTOR
-        kept += int((deterministic_z(log_alpha) > 0).sum())
-        total += tensor.numel()
+        mask = deterministic_z(log_alpha) > 0
+        if exclude_embedding_edges:
+            mask = mask[..., 1:]
+        kept += int(mask.sum())
+        total += mask.numel()
     return kept / total
 
 

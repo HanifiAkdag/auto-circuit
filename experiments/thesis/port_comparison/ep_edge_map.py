@@ -36,7 +36,8 @@ the embeddings unconditionally at every read site
 
 So the correspondence is: AutoCircuit ``src_idx i`` ↔ original writer ``i - 1``,
 with AutoCircuit's ``src_idx 0`` (the embed column, index 0 of every mask's source
-axis) having no counterpart and being held always-kept.
+axis) having no counterpart and being kept in converted reference scores.
+This conversion does not freeze the port's own embedding masks during training.
 
 Do not trust this module on its shape assertions alone: a permutation error within
 a shape would pass every check here. It is verified *functionally* in
@@ -334,8 +335,8 @@ def log_alphas_to_prune_scores(
     Node masks are folded in as the port does, ``keep = keep_edge · keep_node``,
     so the two arms' scores mean the same thing.
 
-    AutoCircuit's embed edges are held always-kept, matching the original adding the
-    embeddings unconditionally at every read site.
+    Without separate embedding writers, converted reference scores keep the embedding
+    edges, matching unconditional addition. The port's trained scores remain learned.
     """
     from auto_circuit.utils.l0_utils import FACTOR, TEMPERATURE
 
