@@ -102,6 +102,8 @@ class Task:
     autoencoder_prune_with_corrupt: Optional[bool] = None
     dtype: t.dtype = t.float32
     seed: int = 42
+    split_seed: Optional[int] = None
+    dataset_shuffle: bool = True
     __init_complete__: bool = False
 
     @property
@@ -198,6 +200,8 @@ class Task:
             self.token_circuit,
             self.device,
             self.seed,
+            self.split_seed,
+            self.dataset_shuffle,
         )
         if dataset_cache_key in DATASET_CACHE:
             self._train_loader, self._test_loader = DATASET_CACHE[dataset_cache_key]
@@ -219,6 +223,8 @@ class Task:
                 tail_divergence=True if has_tokenizer else False,
                 pad=True,
                 random_seed=self.seed,
+                split_seed=self.split_seed,
+                shuffle=self.dataset_shuffle,
             )
             DATASET_CACHE[dataset_cache_key] = (train_loader, test_loader)
             self._train_loader, self._test_loader = (train_loader, test_loader)

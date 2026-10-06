@@ -1,4 +1,4 @@
-"""Reproducible exhibits for Results Section 4.3.1."""
+"""Reproducible structural and functional stability exhibits for Results."""
 
 import csv
 import hashlib
@@ -18,6 +18,7 @@ SOURCE_HASHES = {
     "manifest.json": "d2b3ebb0f3b72e06263c5b839bdb0b3cf930155e3ea2eb475e7aae6064c8e13a",
     "structural.csv": "ef51c93308f91bfeb2dfa689e21bb721b1b8045f659c884ce4284f9bb0b51ff9",
     "summary.csv": "eed0490613bd253a170d35345c0780a20ddd2faa47ea4bc7c6a0af8039c1ec9e",
+    "functional.csv": "b41262bd64051a4614fb6dd22cfaddf0a997da181abe9160980ebc9505a3f145",
 }
 TASKS = {"Indirect Object Identification": ("IOI", 739), "Greaterthan": ("Greater-Than", 235)}
 METHODS = ("ACDC", "EAP", "EP", "DiscoGP")
@@ -97,7 +98,7 @@ def _table(records):
         r"\begin{table}[!ht]",
         r"\centering",
         r"\small",
-        r"\caption{Pairwise edge-set Jaccard similarity across five joint-seed runs at the task-specific comparison size (739 edges for IOI and 235 for Greater-Than). Columns denote discovery ablation. Jaccard entries give the average and minimum--maximum of ten dependent run pairs. The indented ACDC rows give average attained edge counts and their five-run ranges. Other methods attain the target size exactly. All ranges are descriptive.}",
+        r"\caption{Pairwise edge-set Jaccard similarity across five joint-seed runs at the task-specific comparison size (739 edges for the IOI task and 235 for the Greater-Than task). Columns denote discovery ablation. Jaccard entries give the average and minimum--maximum of ten dependent run pairs. The indented ACDC rows give average attained edge counts and their five-run ranges. Other methods attain the target size exactly. All ranges are descriptive.}",
         r"\label{tab:within-ablation-stability}",
         r"\setlength{\tabcolsep}{5pt}",
         r"\renewcommand{\arraystretch}{1.10}",
@@ -141,13 +142,13 @@ def _condition_table(records):
         r"\begin{table}[!ht]",
         r"\centering",
         r"\small",
-        r"\caption{Pairwise edge-set Jaccard similarity under joint and isolated seed variation. Entries give the average $\pm$ population SD of ten dependent run pairs from five circuits at 739 edges (IOI) or 235 edges (Greater-Than). In the joint condition both seeds vary. The data-only condition fixes the PyTorch seed, and the PyTorch-only condition fixes the dataset seed.}",
+        r"\caption{Pairwise edge-set Jaccard under joint and isolated seed variation. Entries give the average $\pm$ population SD of ten dependent pairs from five runs, at requested sizes of 739 edges for the IOI task and 235 for the Greater-Than task. Threshold ties give 739--741 edges for IOI Edge Pruning with resample discovery ablation under PyTorch-only variation, and 235--236 edges for Greater-Than Edge Pruning with mean discovery ablation under data-only variation. Both seeds vary in the joint condition; data-only fixes the PyTorch seed, and PyTorch-only fixes the dataset seed.}",
         r"\label{tab:seed-condition-jaccard}",
         r"\setlength{\tabcolsep}{4.5pt}",
         r"\renewcommand{\arraystretch}{1.08}",
-        r"\begin{tabular}{@{}cclccc@{}}",
+        r"\begin{tabular}{@{}lllccc@{}}",
         r"\toprule",
-        r"\multirow{2}{*}{Task} & \multirow{2}{*}{Method} & \multirow{2}{*}{Ablation} & \multicolumn{3}{c}{Jaccard (average $\pm$ SD)} \\",
+        r"\multirow{2}{*}{Task} & \multirow{2}{*}{Method} & \shortstack[l]{Discovery\\ablation} & \multicolumn{3}{c}{Jaccard (average $\pm$ SD)} \\",
         r"\cmidrule(lr){4-6}",
         r"& & & Both seeds & Data only & PyTorch only \\",
         r"\midrule",
@@ -233,14 +234,109 @@ def _condition_figure(records, output):
     fig.write_image(output / "seed_condition_jaccard.png", scale=2)
 
 
-def main():
+def structure_function_records(joint, quality):
+    from experiments.thesis.stability_plots import _spearman
+
+    metrics = ("Clean KL Div", "Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent")
+    selected, summaries = [], []
+    assert len(joint) == 24
+    for task, (label, target) in TASKS.items():
+        cells = [r for r in joint if r["task"] == task]
+        assert len(cells) == 12
+        assert {(r["algo"], r["discovery_ablation"]) for r in cells} == {
+            (method, ablation) for method in METHODS for ablation in ABLATIONS
+        }
+        for metric in metrics if label == "IOI" else metrics[:2]:
+            points = []
+            for cell in cells:
+                assert cell["condition"] == "joint" and int(cell["n_seeds"]) == 5
+                assert int(cell["n_pairs"]) == 10 and int(cell["target"]) == target
+                matches = [r for r in quality if (r["task"], r["algo"], r["ablation"], r["metric"]) ==
+                           (task, cell["algo"], cell["discovery_ablation"], metric)]
+                assert len(matches) == 1, (task, cell["algo"], cell["discovery_ablation"], metric)
+                row = matches[0]
+                assert row["selector"] == cell["selector"]
+                assert float(row["budget_label"]) == float(cell["budget_label"])
+                assert float(row["realised_mean"]) == float(cell["realised_mean"])
+                assert int(row["n_seeds"]) == 5 and int(row["target_edges"]) == target
+                points.append(dict(task=task, algo=cell["algo"],
+                                   discovery_ablation=cell["discovery_ablation"], condition="joint",
+                                   eval_ablation=cell["discovery_ablation"], target_edges=target,
+                                   selector=cell["selector"], budget_label=cell["budget_label"],
+                                   realised_mean=float(cell["realised_mean"]), metric=metric,
+                                   n_seeds=5, n_pairs=10, jaccard_mean=float(cell["jaccard_mean"]),
+                                   metric_mean=float(row["metric_mean"]), metric_sd=float(row["metric_sd"])))
+            rho = _spearman([r["jaccard_mean"] for r in points], [r["metric_sd"] for r in points])
+            assert rho is not None
+            selected.extend(points)
+            summaries.append(dict(task=task, task_label=label, metric=metric, n_cells=12, rho=rho))
+    assert len(selected) == 60 and len(summaries) == 5
+    return selected, summaries
+
+
+def write_structure_function(joint):
+    quality_path = OUTPUT.parent / "controlled_comparison/matched_quality.csv"
+    quality_manifest = quality_path.with_name("matched_quality_manifest.json")
+    provenance = json.loads(quality_manifest.read_text())
+    source_meta = json.loads((SOURCE / 'manifest.json').read_text())
+    if source_meta.get('evaluation_protocol_id'):
+        from .evaluation_protocol import require_same_protocol
+        require_same_protocol(source_meta, provenance)
+    assert _hash(ROOT / provenance["source"]) == provenance["source_sha256"]
+    assert _hash(ROOT / provenance["source_manifest"]) == provenance["source_manifest_sha256"]
+    selected, summary = structure_function_records(joint, _rows(quality_path))
+    for name, rows in (("structure_function_selected.csv", selected),
+                       ("structure_function_summary.csv", summary)):
+        with (OUTPUT / name).open("w", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
+    lookup = {(r["task_label"], r["metric"]): r["rho"] for r in summary}
+    lines = [r"\begin{table}[!ht]", r"\centering", r"\small",
+             r"\caption{Descriptive Spearman correlations between average pairwise Jaccard and across-run population SD of each functional metric. Each coefficient compares 12 method--discovery-ablation cells under joint seed variation and matched evaluation ablation, at requested sizes of 739 edges for the IOI task and 235 for the Greater-Than task. ACDC uses the same nearest attained thresholds as the preceding tables. These are cell-level associations, not pairwise output-similarity tests. Correct-over-incorrect accuracy is not reported for the Greater-Than task.}",
+             r"\label{tab:structure-function-association}", r"\begin{tabular}{@{}lccc@{}}",
+             r"\toprule", r"& \multicolumn{3}{c}{$\rho$ with across-run SD} \\",
+             r"\cmidrule(lr){2-4}",
+             r"Task & Clean KL & \shortstack[c]{Logit difference\\percent} & \shortstack[c]{Correct-over-incorrect\\accuracy} \\",
+             r"\midrule"]
+    for label in ("IOI", "Greater-Than"):
+        metrics = ("Clean KL Div", "Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent")
+        values = [f"${lookup[(label, m)]:.3f}$" if (label, m) in lookup else "--" for m in metrics]
+        lines.append(label + " & " + " & ".join(values) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    (OUTPUT / "structure_function_table.tex").write_text("\n".join(lines) + "\n")
+    names = ("structure_function_selected.csv", "structure_function_summary.csv", "structure_function_table.tex")
+    inputs = (SOURCE / "functional.csv", SOURCE / "structural.csv", SOURCE / "manifest.json",
+              OUTPUT / "within_ablation_selected.csv", quality_path, quality_manifest)
+    (OUTPUT / "structure_function_manifest.json").write_text(json.dumps({
+        "evaluation_protocol_id": source_meta.get('evaluation_protocol_id'),
+        "inputs": {str(p.relative_to(ROOT)): _hash(p) for p in inputs},
+        "selection": "Joint five-run cells; matched discovery/evaluation ablations; identical selected thresholds and budgets to quality and within-ablation tables; Random and manual excluded.",
+        "measure": "Spearman with average ranks for ties; population metric SD; descriptive across 12 cells per task/metric.",
+        "rows": len(selected), "coefficients": len(summary),
+        "outputs": {name: _hash(OUTPUT / name) for name in names},
+    }, indent=2) + "\n")
+
+
+def main(source_dir=None, output_root=None):
+    global SOURCE, OUTPUT
+    if source_dir is not None:
+        if output_root is None:
+            raise ValueError('An alternate source requires separate output artifacts')
+        SOURCE = (ROOT / source_dir).resolve()
+        OUTPUT = (ROOT / output_root).resolve() / 'stability'
     actual = {name: _hash(SOURCE / name) for name in SOURCE_HASHES}
-    assert actual == SOURCE_HASHES, actual
+    if source_dir is None:
+        assert actual == SOURCE_HASHES, actual
     manifest = json.loads((SOURCE / "manifest.json").read_text())
     assert manifest["seeds"] == [42, 43, 44, 45, 46]
-    assert manifest["discovery_cache_dir"] == ".prune_scores/final/benchmark"
+    if source_dir is None:
+        assert manifest["discovery_cache_dir"] == ".prune_scores/final/benchmark"
     summary, structural = _rows(SOURCE / "summary.csv"), _rows(SOURCE / "structural.csv")
-    assert len(summary) == 96 and len(structural) == 2588
+    if source_dir is None:
+        assert len(summary) == 96 and len(structural) == 2588
+    else:
+        assert manifest['complete'] and manifest['evaluation_protocol_id']
     joint = [select_cell(summary, structural, task, method, ablation, "joint", target)
              for task, (_, target) in TASKS.items() for ablation in ABLATIONS for method in METHODS]
     conditions = [select_cell(summary, structural, task, method, ablation, condition, target)
@@ -251,11 +347,13 @@ def main():
     _write_csv(OUTPUT / "seed_condition_selected.csv", conditions)
     (OUTPUT / "within_ablation_table.tex").write_text(_table(joint))
     (OUTPUT / "seed_condition_table.tex").write_text(_condition_table(conditions))
+    write_structure_function(joint)
     _condition_figure(conditions, OUTPUT)
     outputs = ("within_ablation_selected.csv", "seed_condition_selected.csv",
                "within_ablation_table.tex", "seed_condition_table.tex",
                "seed_condition_jaccard.pdf", "seed_condition_jaccard.png")
     (OUTPUT / "exhibit_manifest.json").write_text(json.dumps({
+        "evaluation_protocol_id": manifest.get('evaluation_protocol_id'),
         "section": "Results 4.3.1", "source": str(SOURCE.relative_to(ROOT)),
         "source_sha256": actual, "source_row_counts": {"summary": len(summary), "structural": len(structural)},
         "seeds": manifest["seeds"], "target_edges": {label: target for label, target in TASKS.values()},
@@ -265,4 +363,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    args = parser.parse_args()
+    main(args.source_dir, args.output_root)

@@ -1,0 +1,2564 @@
+{
+  "prompts": [
+    {
+      "clean": "Then, Anna and Prince were thinking about going to the garden. Prince wanted to give a basketball to",
+      "corrupt": "Then, Mary and Christopher were thinking about going to the garden. Jonathan wanted to give a basketball to",
+      "answers": [
+        " Anna"
+      ],
+      "wrong_answers": [
+        " Prince"
+      ]
+    },
+    {
+      "clean": "Then, Ford and Laura had a long argument, and afterwards Laura said to",
+      "corrupt": "Then, Russell and Kate had a long argument, and afterwards Andre said to",
+      "answers": [
+        " Ford"
+      ],
+      "wrong_answers": [
+        " Laura"
+      ]
+    },
+    {
+      "clean": "Then, Stephen and Madison had a lot of fun at the hospital. Madison gave a kiss to",
+      "corrupt": "Then, Roman and Blake had a lot of fun at the hospital. Eva gave a kiss to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Madison"
+      ]
+    },
+    {
+      "clean": "When Lewis and Michael got a ring at the hospital, Michael decided to give it to",
+      "corrupt": "When Victoria and Edward got a ring at the hospital, Grant decided to give it to",
+      "answers": [
+        " Lewis"
+      ],
+      "wrong_answers": [
+        " Michael"
+      ]
+    },
+    {
+      "clean": "Then, Robert and Louis had a lot of fun at the house. Louis gave a computer to",
+      "corrupt": "Then, Sullivan and Arthur had a lot of fun at the house. Crew gave a computer to",
+      "answers": [
+        " Robert"
+      ],
+      "wrong_answers": [
+        " Louis"
+      ]
+    },
+    {
+      "clean": "When Sarah and Scott went to the office, Scott gave a bone to",
+      "corrupt": "When Jordan and Jacob went to the office, Jeremy gave a bone to",
+      "answers": [
+        " Sarah"
+      ],
+      "wrong_answers": [
+        " Scott"
+      ]
+    },
+    {
+      "clean": "After Adam and Austin went to the garden, Adam gave a kiss to",
+      "corrupt": "After Kyle and Andre went to the garden, Taylor gave a kiss to",
+      "answers": [
+        " Austin"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "Then, Blake and Anna went to the restaurant. Anna gave a ring to",
+      "corrupt": "Then, Joseph and Andy went to the restaurant. Ford gave a ring to",
+      "answers": [
+        " Blake"
+      ],
+      "wrong_answers": [
+        " Anna"
+      ]
+    },
+    {
+      "clean": "When Joshua and Elizabeth went to the school, Joshua gave a drink to",
+      "corrupt": "When Ruby and Robert went to the school, Edward gave a drink to",
+      "answers": [
+        " Elizabeth"
+      ],
+      "wrong_answers": [
+        " Joshua"
+      ]
+    },
+    {
+      "clean": "Then, James and Jessica had a long argument, and afterwards James said to",
+      "corrupt": "Then, Ford and Christopher had a long argument, and afterwards Ryan said to",
+      "answers": [
+        " Jessica"
+      ],
+      "wrong_answers": [
+        " James"
+      ]
+    },
+    {
+      "clean": "Then, Aaron and Crystal had a lot of fun at the school. Aaron gave a bone to",
+      "corrupt": "Then, Sullivan and Grant had a lot of fun at the school. Jeremy gave a bone to",
+      "answers": [
+        " Crystal"
+      ],
+      "wrong_answers": [
+        " Aaron"
+      ]
+    },
+    {
+      "clean": "After Christian and Kevin went to the restaurant, Kevin gave a kiss to",
+      "corrupt": "After Sullivan and Ian went to the restaurant, Eric gave a kiss to",
+      "answers": [
+        " Christian"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "Then, Crystal and Brian had a lot of fun at the restaurant. Brian gave a ring to",
+      "corrupt": "Then, Tyler and Morgan had a lot of fun at the restaurant. Victoria gave a ring to",
+      "answers": [
+        " Crystal"
+      ],
+      "wrong_answers": [
+        " Brian"
+      ]
+    },
+    {
+      "clean": "When Ruby and Morgan went to the school, Morgan gave a drink to",
+      "corrupt": "When Jennifer and Michael went to the school, Kevin gave a drink to",
+      "answers": [
+        " Ruby"
+      ],
+      "wrong_answers": [
+        " Morgan"
+      ]
+    },
+    {
+      "clean": "Then, Andre and Alex went to the restaurant. Alex gave a snack to",
+      "corrupt": "Then, Jamie and Michael went to the restaurant. Ruby gave a snack to",
+      "answers": [
+        " Andre"
+      ],
+      "wrong_answers": [
+        " Alex"
+      ]
+    },
+    {
+      "clean": "Then, Arthur and Roman had a long argument, and afterwards Roman said to",
+      "corrupt": "Then, Kate and Prince had a long argument, and afterwards Justin said to",
+      "answers": [
+        " Arthur"
+      ],
+      "wrong_answers": [
+        " Roman"
+      ]
+    },
+    {
+      "clean": "Then, Cole and Andrew were working at the garden. Cole decided to give a drink to",
+      "corrupt": "Then, Michael and Martin were working at the garden. Luke decided to give a drink to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Cole"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Brandon had a lot of fun at the restaurant. Brandon gave a necklace to",
+      "corrupt": "Then, Michelle and William had a lot of fun at the restaurant. David gave a necklace to",
+      "answers": [
+        " Eric"
+      ],
+      "wrong_answers": [
+        " Brandon"
+      ]
+    },
+    {
+      "clean": "Then, David and Kelly had a long argument, and afterwards David said to",
+      "corrupt": "Then, Alan and Rose had a long argument, and afterwards William said to",
+      "answers": [
+        " Kelly"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "Then, Jacob and David had a lot of fun at the hospital. David gave a basketball to",
+      "corrupt": "Then, River and Amy had a lot of fun at the hospital. Anna gave a basketball to",
+      "answers": [
+        " Jacob"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "Then, Kevin and Laura had a long argument, and afterwards Kevin said to",
+      "corrupt": "Then, Blake and Patrick had a long argument, and afterwards Warren said to",
+      "answers": [
+        " Laura"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "Then, Rachel and Michael had a lot of fun at the store. Rachel gave a snack to",
+      "corrupt": "Then, Charlie and Jack had a lot of fun at the store. Henry gave a snack to",
+      "answers": [
+        " Michael"
+      ],
+      "wrong_answers": [
+        " Rachel"
+      ]
+    },
+    {
+      "clean": "After Crew and Patrick went to the hospital, Crew gave a ring to",
+      "corrupt": "After Connor and Dean went to the hospital, Louis gave a ring to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Crew"
+      ]
+    },
+    {
+      "clean": "When Arthur and Brandon got a bone at the garden, Brandon decided to give it to",
+      "corrupt": "When Richard and Stephen got a bone at the garden, Stephen decided to give it to",
+      "answers": [
+        " Arthur"
+      ],
+      "wrong_answers": [
+        " Brandon"
+      ]
+    },
+    {
+      "clean": "When Jennifer and Amy got a basketball at the restaurant, Jennifer decided to give it to",
+      "corrupt": "When Warren and Carter got a basketball at the restaurant, Jack decided to give it to",
+      "answers": [
+        " Amy"
+      ],
+      "wrong_answers": [
+        " Jennifer"
+      ]
+    },
+    {
+      "clean": "Then, Thomas and Simon had a lot of fun at the store. Simon gave a computer to",
+      "corrupt": "Then, Jacob and Crew had a lot of fun at the store. Jane gave a computer to",
+      "answers": [
+        " Thomas"
+      ],
+      "wrong_answers": [
+        " Simon"
+      ]
+    },
+    {
+      "clean": "After Amy and Christopher went to the restaurant, Amy gave a drink to",
+      "corrupt": "After Jeremy and Anna went to the restaurant, Jacob gave a drink to",
+      "answers": [
+        " Christopher"
+      ],
+      "wrong_answers": [
+        " Amy"
+      ]
+    },
+    {
+      "clean": "Then, Steven and Roman were working at the restaurant. Steven decided to give a bone to",
+      "corrupt": "Then, Maria and Max were working at the restaurant. Martin decided to give a bone to",
+      "answers": [
+        " Roman"
+      ],
+      "wrong_answers": [
+        " Steven"
+      ]
+    },
+    {
+      "clean": "Then, Stephen and Jack had a long argument, and afterwards Jack said to",
+      "corrupt": "Then, Eric and Grant had a long argument, and afterwards Robert said to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Jack"
+      ]
+    },
+    {
+      "clean": "Then, Lewis and Blake were working at the station. Lewis decided to give a bone to",
+      "corrupt": "Then, Arthur and Justin were working at the station. Mary decided to give a bone to",
+      "answers": [
+        " Blake"
+      ],
+      "wrong_answers": [
+        " Lewis"
+      ]
+    },
+    {
+      "clean": "Then, Henry and Thomas were working at the school. Henry decided to give a snack to",
+      "corrupt": "Then, Anna and Stephen were working at the school. Joshua decided to give a snack to",
+      "answers": [
+        " Thomas"
+      ],
+      "wrong_answers": [
+        " Henry"
+      ]
+    },
+    {
+      "clean": "Then, Georgia and Alice went to the station. Georgia gave a necklace to",
+      "corrupt": "Then, Jake and Amy went to the station. Luke gave a necklace to",
+      "answers": [
+        " Alice"
+      ],
+      "wrong_answers": [
+        " Georgia"
+      ]
+    },
+    {
+      "clean": "Then, Kate and Cole were thinking about going to the office. Cole wanted to give a necklace to",
+      "corrupt": "Then, Ian and Thomas were thinking about going to the office. Elizabeth wanted to give a necklace to",
+      "answers": [
+        " Kate"
+      ],
+      "wrong_answers": [
+        " Cole"
+      ]
+    },
+    {
+      "clean": "Then, Kevin and Charlie were thinking about going to the office. Charlie wanted to give a bone to",
+      "corrupt": "Then, Blake and Mark were thinking about going to the office. Jack wanted to give a bone to",
+      "answers": [
+        " Kevin"
+      ],
+      "wrong_answers": [
+        " Charlie"
+      ]
+    },
+    {
+      "clean": "Then, Brian and Amy had a lot of fun at the house. Brian gave a bone to",
+      "corrupt": "Then, Ian and Edward had a lot of fun at the house. Emily gave a bone to",
+      "answers": [
+        " Amy"
+      ],
+      "wrong_answers": [
+        " Brian"
+      ]
+    },
+    {
+      "clean": "Then, Joshua and Blake were thinking about going to the store. Joshua wanted to give a computer to",
+      "corrupt": "Then, Prince and Jennifer were thinking about going to the store. Jonathan wanted to give a computer to",
+      "answers": [
+        " Blake"
+      ],
+      "wrong_answers": [
+        " Joshua"
+      ]
+    },
+    {
+      "clean": "After Austin and Lewis went to the store, Austin gave a basketball to",
+      "corrupt": "After Peter and Blake went to the store, Taylor gave a basketball to",
+      "answers": [
+        " Lewis"
+      ],
+      "wrong_answers": [
+        " Austin"
+      ]
+    },
+    {
+      "clean": "Then, David and Morgan were thinking about going to the school. David wanted to give a ring to",
+      "corrupt": "Then, Marcus and Steven were thinking about going to the school. Kyle wanted to give a ring to",
+      "answers": [
+        " Morgan"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "After George and Charles went to the house, Charles gave a basketball to",
+      "corrupt": "After Tyler and Jake went to the house, Carter gave a basketball to",
+      "answers": [
+        " George"
+      ],
+      "wrong_answers": [
+        " Charles"
+      ]
+    },
+    {
+      "clean": "After Andy and Louis went to the restaurant, Andy gave a drink to",
+      "corrupt": "After Sarah and Grant went to the restaurant, Luke gave a drink to",
+      "answers": [
+        " Louis"
+      ],
+      "wrong_answers": [
+        " Andy"
+      ]
+    },
+    {
+      "clean": "Then, Ryan and Andrew had a lot of fun at the store. Ryan gave a ring to",
+      "corrupt": "Then, Dean and Ian had a lot of fun at the store. Crystal gave a ring to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Ryan"
+      ]
+    },
+    {
+      "clean": "Then, Sullivan and Mark went to the garden. Sullivan gave a basketball to",
+      "corrupt": "Then, Leon and Ian went to the garden. Laura gave a basketball to",
+      "answers": [
+        " Mark"
+      ],
+      "wrong_answers": [
+        " Sullivan"
+      ]
+    },
+    {
+      "clean": "Then, Joshua and Blake had a long argument, and afterwards Joshua said to",
+      "corrupt": "Then, Jake and Jamie had a long argument, and afterwards Rose said to",
+      "answers": [
+        " Blake"
+      ],
+      "wrong_answers": [
+        " Joshua"
+      ]
+    },
+    {
+      "clean": "When William and Taylor went to the hospital, William gave a snack to",
+      "corrupt": "When Michael and Scott went to the hospital, Emily gave a snack to",
+      "answers": [
+        " Taylor"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "Then, Matthew and Crystal were thinking about going to the office. Matthew wanted to give a computer to",
+      "corrupt": "Then, Sarah and Alan were thinking about going to the office. Kate wanted to give a computer to",
+      "answers": [
+        " Crystal"
+      ],
+      "wrong_answers": [
+        " Matthew"
+      ]
+    },
+    {
+      "clean": "Then, Austin and Max went to the restaurant. Max gave a drink to",
+      "corrupt": "Then, Sarah and Georgia went to the restaurant. Brian gave a drink to",
+      "answers": [
+        " Austin"
+      ],
+      "wrong_answers": [
+        " Max"
+      ]
+    },
+    {
+      "clean": "Then, Laura and Maria went to the house. Maria gave a kiss to",
+      "corrupt": "Then, Jessica and Jamie went to the house. Sullivan gave a kiss to",
+      "answers": [
+        " Laura"
+      ],
+      "wrong_answers": [
+        " Maria"
+      ]
+    },
+    {
+      "clean": "When Andy and Jeremy got a necklace at the restaurant, Jeremy decided to give it to",
+      "corrupt": "When Daniel and Christopher got a necklace at the restaurant, Ian decided to give it to",
+      "answers": [
+        " Andy"
+      ],
+      "wrong_answers": [
+        " Jeremy"
+      ]
+    },
+    {
+      "clean": "Then, Cole and Alan went to the hospital. Alan gave a computer to",
+      "corrupt": "Then, Connor and Brian went to the hospital. Ian gave a computer to",
+      "answers": [
+        " Cole"
+      ],
+      "wrong_answers": [
+        " Alan"
+      ]
+    },
+    {
+      "clean": "Then, Jay and Adam went to the office. Adam gave a kiss to",
+      "corrupt": "Then, Christian and Blake went to the office. Emily gave a kiss to",
+      "answers": [
+        " Jay"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "Then, Austin and James went to the restaurant. James gave a necklace to",
+      "corrupt": "Then, Clark and Collins went to the restaurant. Alex gave a necklace to",
+      "answers": [
+        " Austin"
+      ],
+      "wrong_answers": [
+        " James"
+      ]
+    },
+    {
+      "clean": "When Justin and Max went to the restaurant, Max gave a snack to",
+      "corrupt": "When Joshua and Charlie went to the restaurant, Alice gave a snack to",
+      "answers": [
+        " Justin"
+      ],
+      "wrong_answers": [
+        " Max"
+      ]
+    },
+    {
+      "clean": "Then, John and Richard were thinking about going to the office. John wanted to give a kiss to",
+      "corrupt": "Then, Adam and Lewis were thinking about going to the office. Anderson wanted to give a kiss to",
+      "answers": [
+        " Richard"
+      ],
+      "wrong_answers": [
+        " John"
+      ]
+    },
+    {
+      "clean": "Then, Tyler and Grant had a lot of fun at the house. Tyler gave a snack to",
+      "corrupt": "Then, Ian and Collins had a lot of fun at the house. Roman gave a snack to",
+      "answers": [
+        " Grant"
+      ],
+      "wrong_answers": [
+        " Tyler"
+      ]
+    },
+    {
+      "clean": "Then, David and Luke were working at the house. Luke decided to give a drink to",
+      "corrupt": "Then, Andre and Ruby were working at the house. Russell decided to give a drink to",
+      "answers": [
+        " David"
+      ],
+      "wrong_answers": [
+        " Luke"
+      ]
+    },
+    {
+      "clean": "Then, Jennifer and Andy were thinking about going to the garden. Jennifer wanted to give a drink to",
+      "corrupt": "Then, Brandon and Amy were thinking about going to the garden. Anthony wanted to give a drink to",
+      "answers": [
+        " Andy"
+      ],
+      "wrong_answers": [
+        " Jennifer"
+      ]
+    },
+    {
+      "clean": "Then, Mark and Kyle had a long argument, and afterwards Kyle said to",
+      "corrupt": "Then, Patrick and Frank had a long argument, and afterwards Anna said to",
+      "answers": [
+        " Mark"
+      ],
+      "wrong_answers": [
+        " Kyle"
+      ]
+    },
+    {
+      "clean": "When Joseph and Michael got a computer at the house, Michael decided to give it to",
+      "corrupt": "When Crystal and Madison got a computer at the house, Anna decided to give it to",
+      "answers": [
+        " Joseph"
+      ],
+      "wrong_answers": [
+        " Michael"
+      ]
+    },
+    {
+      "clean": "When Anderson and Jacob got a computer at the store, Anderson decided to give it to",
+      "corrupt": "When Alex and Andrew got a computer at the store, Matthew decided to give it to",
+      "answers": [
+        " Jacob"
+      ],
+      "wrong_answers": [
+        " Anderson"
+      ]
+    },
+    {
+      "clean": "Then, Frank and Sean went to the station. Frank gave a snack to",
+      "corrupt": "Then, Jordan and Matthew went to the station. Rachel gave a snack to",
+      "answers": [
+        " Sean"
+      ],
+      "wrong_answers": [
+        " Frank"
+      ]
+    },
+    {
+      "clean": "Then, Andrew and Jeremy had a long argument, and afterwards Andrew said to",
+      "corrupt": "Then, Aaron and Anna had a long argument, and afterwards Louis said to",
+      "answers": [
+        " Jeremy"
+      ],
+      "wrong_answers": [
+        " Andrew"
+      ]
+    },
+    {
+      "clean": "After Jonathan and Anthony went to the store, Anthony gave a necklace to",
+      "corrupt": "After Jane and Jordan went to the store, Anna gave a necklace to",
+      "answers": [
+        " Jonathan"
+      ],
+      "wrong_answers": [
+        " Anthony"
+      ]
+    },
+    {
+      "clean": "Then, Kyle and Luke had a long argument, and afterwards Kyle said to",
+      "corrupt": "Then, Thomas and Rose had a long argument, and afterwards Sarah said to",
+      "answers": [
+        " Luke"
+      ],
+      "wrong_answers": [
+        " Kyle"
+      ]
+    },
+    {
+      "clean": "After Anna and Max went to the garden, Anna gave a computer to",
+      "corrupt": "After Alice and Ryan went to the garden, Emily gave a computer to",
+      "answers": [
+        " Max"
+      ],
+      "wrong_answers": [
+        " Anna"
+      ]
+    },
+    {
+      "clean": "When Paul and Jay got a drink at the school, Jay decided to give it to",
+      "corrupt": "When John and Martin got a drink at the school, Morgan decided to give it to",
+      "answers": [
+        " Paul"
+      ],
+      "wrong_answers": [
+        " Jay"
+      ]
+    },
+    {
+      "clean": "Then, Ford and Mary had a long argument, and afterwards Mary said to",
+      "corrupt": "Then, Prince and Lisa had a long argument, and afterwards Paul said to",
+      "answers": [
+        " Ford"
+      ],
+      "wrong_answers": [
+        " Mary"
+      ]
+    },
+    {
+      "clean": "When John and Justin got a bone at the office, John decided to give it to",
+      "corrupt": "When Jake and Peter got a bone at the office, Sarah decided to give it to",
+      "answers": [
+        " Justin"
+      ],
+      "wrong_answers": [
+        " John"
+      ]
+    },
+    {
+      "clean": "Then, Jonathan and Carter had a lot of fun at the hospital. Carter gave a necklace to",
+      "corrupt": "Then, Peter and Charles had a lot of fun at the hospital. Kelly gave a necklace to",
+      "answers": [
+        " Jonathan"
+      ],
+      "wrong_answers": [
+        " Carter"
+      ]
+    },
+    {
+      "clean": "After Adam and Kevin went to the house, Kevin gave a basketball to",
+      "corrupt": "After Tyler and Eva went to the house, Richard gave a basketball to",
+      "answers": [
+        " Adam"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "Then, Joseph and Charlie were working at the house. Charlie decided to give a basketball to",
+      "corrupt": "Then, Patrick and Brian were working at the house. Russell decided to give a basketball to",
+      "answers": [
+        " Joseph"
+      ],
+      "wrong_answers": [
+        " Charlie"
+      ]
+    },
+    {
+      "clean": "After Jonathan and Jessica went to the station, Jessica gave a ring to",
+      "corrupt": "After Eric and Martin went to the station, Joshua gave a ring to",
+      "answers": [
+        " Jonathan"
+      ],
+      "wrong_answers": [
+        " Jessica"
+      ]
+    },
+    {
+      "clean": "Then, Roman and Michael went to the restaurant. Michael gave a bone to",
+      "corrupt": "Then, Anthony and Adam went to the restaurant. Jennifer gave a bone to",
+      "answers": [
+        " Roman"
+      ],
+      "wrong_answers": [
+        " Michael"
+      ]
+    },
+    {
+      "clean": "Then, Richard and Ruby were working at the station. Ruby decided to give a kiss to",
+      "corrupt": "Then, Alan and Michael were working at the station. Maria decided to give a kiss to",
+      "answers": [
+        " Richard"
+      ],
+      "wrong_answers": [
+        " Ruby"
+      ]
+    },
+    {
+      "clean": "Then, Georgia and Adam were thinking about going to the store. Adam wanted to give a bone to",
+      "corrupt": "Then, Lewis and Madison were thinking about going to the store. Daniel wanted to give a bone to",
+      "answers": [
+        " Georgia"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "After Alice and Luke went to the office, Luke gave a necklace to",
+      "corrupt": "After Roman and Charlie went to the office, Ian gave a necklace to",
+      "answers": [
+        " Alice"
+      ],
+      "wrong_answers": [
+        " Luke"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Alex were thinking about going to the garden. Eric wanted to give a bone to",
+      "corrupt": "Then, Carter and Blake were thinking about going to the garden. Emily wanted to give a bone to",
+      "answers": [
+        " Alex"
+      ],
+      "wrong_answers": [
+        " Eric"
+      ]
+    },
+    {
+      "clean": "Then, Russell and Lisa went to the garden. Russell gave a necklace to",
+      "corrupt": "Then, Kyle and Marco went to the garden. Stephen gave a necklace to",
+      "answers": [
+        " Lisa"
+      ],
+      "wrong_answers": [
+        " Russell"
+      ]
+    },
+    {
+      "clean": "After Kyle and Joseph went to the restaurant, Kyle gave a kiss to",
+      "corrupt": "After Robert and Mark went to the restaurant, Roman gave a kiss to",
+      "answers": [
+        " Joseph"
+      ],
+      "wrong_answers": [
+        " Kyle"
+      ]
+    },
+    {
+      "clean": "Then, Michelle and Edward had a lot of fun at the restaurant. Michelle gave a basketball to",
+      "corrupt": "Then, Austin and Thomas had a lot of fun at the restaurant. Brandon gave a basketball to",
+      "answers": [
+        " Edward"
+      ],
+      "wrong_answers": [
+        " Michelle"
+      ]
+    },
+    {
+      "clean": "Then, Marco and Warren were thinking about going to the school. Marco wanted to give a basketball to",
+      "corrupt": "Then, Adam and Austin were thinking about going to the school. Luke wanted to give a basketball to",
+      "answers": [
+        " Warren"
+      ],
+      "wrong_answers": [
+        " Marco"
+      ]
+    },
+    {
+      "clean": "Then, Charles and Lewis were working at the office. Charles decided to give a computer to",
+      "corrupt": "Then, Victoria and Jay were working at the office. Ruby decided to give a computer to",
+      "answers": [
+        " Lewis"
+      ],
+      "wrong_answers": [
+        " Charles"
+      ]
+    },
+    {
+      "clean": "Then, William and Rachel had a long argument, and afterwards Rachel said to",
+      "corrupt": "Then, Simon and Rose had a long argument, and afterwards Maria said to",
+      "answers": [
+        " William"
+      ],
+      "wrong_answers": [
+        " Rachel"
+      ]
+    },
+    {
+      "clean": "Then, Andrew and Clark had a lot of fun at the store. Clark gave a necklace to",
+      "corrupt": "Then, Scott and Grant had a lot of fun at the store. Taylor gave a necklace to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Clark"
+      ]
+    },
+    {
+      "clean": "Then, John and Jake were working at the store. Jake decided to give a computer to",
+      "corrupt": "Then, Michael and Marco were working at the store. Matthew decided to give a computer to",
+      "answers": [
+        " John"
+      ],
+      "wrong_answers": [
+        " Jake"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Mary were thinking about going to the hospital. Eric wanted to give a drink to",
+      "corrupt": "Then, Maria and Christian were thinking about going to the hospital. Andy wanted to give a drink to",
+      "answers": [
+        " Mary"
+      ],
+      "wrong_answers": [
+        " Eric"
+      ]
+    },
+    {
+      "clean": "Then, Jennifer and Crystal went to the house. Jennifer gave a drink to",
+      "corrupt": "Then, Joshua and Robert went to the house. Anderson gave a drink to",
+      "answers": [
+        " Crystal"
+      ],
+      "wrong_answers": [
+        " Jennifer"
+      ]
+    },
+    {
+      "clean": "When Patrick and Stephen got a computer at the hospital, Patrick decided to give it to",
+      "corrupt": "When Graham and Graham got a computer at the hospital, Frank decided to give it to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Patrick"
+      ]
+    },
+    {
+      "clean": "Then, Thomas and Patrick had a long argument, and afterwards Thomas said to",
+      "corrupt": "Then, Eric and Mark had a long argument, and afterwards Crew said to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Thomas"
+      ]
+    },
+    {
+      "clean": "Then, Jack and Madison had a lot of fun at the office. Jack gave a snack to",
+      "corrupt": "Then, Michelle and Crew had a lot of fun at the office. Alice gave a snack to",
+      "answers": [
+        " Madison"
+      ],
+      "wrong_answers": [
+        " Jack"
+      ]
+    },
+    {
+      "clean": "Then, Crystal and Jessica had a long argument, and afterwards Crystal said to",
+      "corrupt": "Then, David and Andre had a long argument, and afterwards Joseph said to",
+      "answers": [
+        " Jessica"
+      ],
+      "wrong_answers": [
+        " Crystal"
+      ]
+    },
+    {
+      "clean": "Then, Lisa and Jessica were working at the hospital. Jessica decided to give a snack to",
+      "corrupt": "Then, Jack and Crystal were working at the hospital. Kevin decided to give a snack to",
+      "answers": [
+        " Lisa"
+      ],
+      "wrong_answers": [
+        " Jessica"
+      ]
+    },
+    {
+      "clean": "Then, Justin and Russell were thinking about going to the store. Justin wanted to give a bone to",
+      "corrupt": "Then, Louis and Ford were thinking about going to the store. Christian wanted to give a bone to",
+      "answers": [
+        " Russell"
+      ],
+      "wrong_answers": [
+        " Justin"
+      ]
+    },
+    {
+      "clean": "Then, David and Carter were thinking about going to the house. David wanted to give a basketball to",
+      "corrupt": "Then, Laura and Crystal were thinking about going to the house. Richard wanted to give a basketball to",
+      "answers": [
+        " Carter"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "Then, Arthur and Kelly went to the garden. Arthur gave a necklace to",
+      "corrupt": "Then, Marco and Frank went to the garden. Richard gave a necklace to",
+      "answers": [
+        " Kelly"
+      ],
+      "wrong_answers": [
+        " Arthur"
+      ]
+    },
+    {
+      "clean": "Then, Lisa and River were working at the school. Lisa decided to give a bone to",
+      "corrupt": "Then, Anderson and Blake were working at the school. Dean decided to give a bone to",
+      "answers": [
+        " River"
+      ],
+      "wrong_answers": [
+        " Lisa"
+      ]
+    },
+    {
+      "clean": "Then, Jessica and Georgia were working at the house. Georgia decided to give a computer to",
+      "corrupt": "Then, Patrick and Sarah were working at the house. Anna decided to give a computer to",
+      "answers": [
+        " Jessica"
+      ],
+      "wrong_answers": [
+        " Georgia"
+      ]
+    },
+    {
+      "clean": "When Jeremy and Andy got a bone at the office, Jeremy decided to give it to",
+      "corrupt": "When Christian and Jordan got a bone at the office, Steven decided to give it to",
+      "answers": [
+        " Andy"
+      ],
+      "wrong_answers": [
+        " Jeremy"
+      ]
+    },
+    {
+      "clean": "After Alex and Jason went to the store, Alex gave a drink to",
+      "corrupt": "After Alan and Jane went to the store, Connor gave a drink to",
+      "answers": [
+        " Jason"
+      ],
+      "wrong_answers": [
+        " Alex"
+      ]
+    },
+    {
+      "clean": "Then, Christian and River had a lot of fun at the store. Christian gave a bone to",
+      "corrupt": "Then, Prince and Taylor had a lot of fun at the store. Simon gave a bone to",
+      "answers": [
+        " River"
+      ],
+      "wrong_answers": [
+        " Christian"
+      ]
+    },
+    {
+      "clean": "Then, Charles and Kyle had a long argument, and afterwards Charles said to",
+      "corrupt": "Then, Ruby and Andy had a long argument, and afterwards Brandon said to",
+      "answers": [
+        " Kyle"
+      ],
+      "wrong_answers": [
+        " Charles"
+      ]
+    },
+    {
+      "clean": "Then, David and Charles were working at the hospital. David decided to give a basketball to",
+      "corrupt": "Then, Simon and Georgia were working at the hospital. Morgan decided to give a basketball to",
+      "answers": [
+        " Charles"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "Then, William and Marcus went to the store. William gave a bone to",
+      "corrupt": "Then, Crew and Louis went to the store. Louis gave a bone to",
+      "answers": [
+        " Marcus"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "When Emily and Joshua went to the house, Emily gave a basketball to",
+      "corrupt": "When Cole and Roman went to the house, Marcus gave a basketball to",
+      "answers": [
+        " Joshua"
+      ],
+      "wrong_answers": [
+        " Emily"
+      ]
+    },
+    {
+      "clean": "Then, Dean and Justin were thinking about going to the restaurant. Justin wanted to give a bone to",
+      "corrupt": "Then, Louis and Grant were thinking about going to the restaurant. Jessica wanted to give a bone to",
+      "answers": [
+        " Dean"
+      ],
+      "wrong_answers": [
+        " Justin"
+      ]
+    },
+    {
+      "clean": "When Maria and Edward got a drink at the station, Maria decided to give it to",
+      "corrupt": "When Mark and Morgan got a drink at the station, Christopher decided to give it to",
+      "answers": [
+        " Edward"
+      ],
+      "wrong_answers": [
+        " Maria"
+      ]
+    },
+    {
+      "clean": "After Jamie and Jessica went to the station, Jamie gave a necklace to",
+      "corrupt": "After Peter and Anthony went to the station, Jack gave a necklace to",
+      "answers": [
+        " Jessica"
+      ],
+      "wrong_answers": [
+        " Jamie"
+      ]
+    },
+    {
+      "clean": "Then, Aaron and Joshua were thinking about going to the restaurant. Joshua wanted to give a ring to",
+      "corrupt": "Then, Georgia and Rose were thinking about going to the restaurant. Charlie wanted to give a ring to",
+      "answers": [
+        " Aaron"
+      ],
+      "wrong_answers": [
+        " Joshua"
+      ]
+    },
+    {
+      "clean": "Then, Jordan and Patrick had a long argument, and afterwards Jordan said to",
+      "corrupt": "Then, Graham and Rachel had a long argument, and afterwards Ryan said to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Jordan"
+      ]
+    },
+    {
+      "clean": "After Robert and Charlie went to the hospital, Robert gave a drink to",
+      "corrupt": "After Austin and Jonathan went to the hospital, Daniel gave a drink to",
+      "answers": [
+        " Charlie"
+      ],
+      "wrong_answers": [
+        " Robert"
+      ]
+    },
+    {
+      "clean": "Then, Anna and Graham were working at the school. Graham decided to give a necklace to",
+      "corrupt": "Then, Alex and Joseph were working at the school. Jacob decided to give a necklace to",
+      "answers": [
+        " Anna"
+      ],
+      "wrong_answers": [
+        " Graham"
+      ]
+    },
+    {
+      "clean": "Then, Jason and Lisa were working at the store. Lisa decided to give a computer to",
+      "corrupt": "Then, Taylor and Grant were working at the store. Alex decided to give a computer to",
+      "answers": [
+        " Jason"
+      ],
+      "wrong_answers": [
+        " Lisa"
+      ]
+    },
+    {
+      "clean": "Then, Crew and Amy had a lot of fun at the store. Crew gave a snack to",
+      "corrupt": "Then, Andy and Patrick had a lot of fun at the store. Rachel gave a snack to",
+      "answers": [
+        " Amy"
+      ],
+      "wrong_answers": [
+        " Crew"
+      ]
+    },
+    {
+      "clean": "Then, Maria and David were working at the station. Maria decided to give a ring to",
+      "corrupt": "Then, Graham and Elizabeth were working at the station. Patrick decided to give a ring to",
+      "answers": [
+        " David"
+      ],
+      "wrong_answers": [
+        " Maria"
+      ]
+    },
+    {
+      "clean": "When Lewis and Connor went to the restaurant, Lewis gave a necklace to",
+      "corrupt": "When Kevin and Arthur went to the restaurant, Crystal gave a necklace to",
+      "answers": [
+        " Connor"
+      ],
+      "wrong_answers": [
+        " Lewis"
+      ]
+    },
+    {
+      "clean": "When Peter and Jake got a kiss at the station, Jake decided to give it to",
+      "corrupt": "When Anthony and Jamie got a kiss at the station, Max decided to give it to",
+      "answers": [
+        " Peter"
+      ],
+      "wrong_answers": [
+        " Jake"
+      ]
+    },
+    {
+      "clean": "After Carter and Russell went to the office, Carter gave a drink to",
+      "corrupt": "After Justin and Ford went to the office, Blake gave a drink to",
+      "answers": [
+        " Russell"
+      ],
+      "wrong_answers": [
+        " Carter"
+      ]
+    },
+    {
+      "clean": "Then, Aaron and Jay went to the hospital. Aaron gave a drink to",
+      "corrupt": "Then, Graham and Max went to the hospital. Andrew gave a drink to",
+      "answers": [
+        " Jay"
+      ],
+      "wrong_answers": [
+        " Aaron"
+      ]
+    },
+    {
+      "clean": "Then, Connor and Marcus were thinking about going to the house. Connor wanted to give a drink to",
+      "corrupt": "Then, George and Michael were thinking about going to the house. Joshua wanted to give a drink to",
+      "answers": [
+        " Marcus"
+      ],
+      "wrong_answers": [
+        " Connor"
+      ]
+    },
+    {
+      "clean": "Then, Alice and Blake had a long argument, and afterwards Blake said to",
+      "corrupt": "Then, Peter and Christopher had a long argument, and afterwards Jake said to",
+      "answers": [
+        " Alice"
+      ],
+      "wrong_answers": [
+        " Blake"
+      ]
+    },
+    {
+      "clean": "When Andre and Matthew got a necklace at the hospital, Matthew decided to give it to",
+      "corrupt": "When Frank and Charlie got a necklace at the hospital, Jack decided to give it to",
+      "answers": [
+        " Andre"
+      ],
+      "wrong_answers": [
+        " Matthew"
+      ]
+    },
+    {
+      "clean": "Then, Edward and Daniel were thinking about going to the school. Daniel wanted to give a basketball to",
+      "corrupt": "Then, Alice and Jordan were thinking about going to the school. Morgan wanted to give a basketball to",
+      "answers": [
+        " Edward"
+      ],
+      "wrong_answers": [
+        " Daniel"
+      ]
+    },
+    {
+      "clean": "Then, Blake and Stephen had a long argument, and afterwards Stephen said to",
+      "corrupt": "Then, Jack and Ruby had a long argument, and afterwards Jessica said to",
+      "answers": [
+        " Blake"
+      ],
+      "wrong_answers": [
+        " Stephen"
+      ]
+    },
+    {
+      "clean": "When Frank and Brian went to the house, Frank gave a snack to",
+      "corrupt": "When Jonathan and Grant went to the house, Jane gave a snack to",
+      "answers": [
+        " Brian"
+      ],
+      "wrong_answers": [
+        " Frank"
+      ]
+    },
+    {
+      "clean": "Then, Patrick and Luke went to the station. Luke gave a ring to",
+      "corrupt": "Then, Crystal and Ryan went to the station. Warren gave a ring to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Luke"
+      ]
+    },
+    {
+      "clean": "When Jay and Jake went to the hospital, Jake gave a necklace to",
+      "corrupt": "When Amy and Austin went to the hospital, Ruby gave a necklace to",
+      "answers": [
+        " Jay"
+      ],
+      "wrong_answers": [
+        " Jake"
+      ]
+    },
+    {
+      "clean": "When Collins and James got a snack at the hospital, Collins decided to give it to",
+      "corrupt": "When Madison and Jake got a snack at the hospital, Max decided to give it to",
+      "answers": [
+        " James"
+      ],
+      "wrong_answers": [
+        " Collins"
+      ]
+    },
+    {
+      "clean": "Then, John and Charles went to the house. Charles gave a ring to",
+      "corrupt": "Then, Jessica and Marco went to the house. Jane gave a ring to",
+      "answers": [
+        " John"
+      ],
+      "wrong_answers": [
+        " Charles"
+      ]
+    },
+    {
+      "clean": "After Russell and Sullivan went to the garden, Sullivan gave a bone to",
+      "corrupt": "After Eric and Michael went to the garden, Madison gave a bone to",
+      "answers": [
+        " Russell"
+      ],
+      "wrong_answers": [
+        " Sullivan"
+      ]
+    },
+    {
+      "clean": "Then, Russell and Sullivan had a long argument, and afterwards Russell said to",
+      "corrupt": "Then, Thomas and Daniel had a long argument, and afterwards George said to",
+      "answers": [
+        " Sullivan"
+      ],
+      "wrong_answers": [
+        " Russell"
+      ]
+    },
+    {
+      "clean": "Then, Ian and John had a long argument, and afterwards John said to",
+      "corrupt": "Then, Marco and Grant had a long argument, and afterwards Robert said to",
+      "answers": [
+        " Ian"
+      ],
+      "wrong_answers": [
+        " John"
+      ]
+    },
+    {
+      "clean": "Then, Stephen and Crystal had a long argument, and afterwards Crystal said to",
+      "corrupt": "Then, Kevin and Eva had a long argument, and afterwards Mark said to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Crystal"
+      ]
+    },
+    {
+      "clean": "When Louis and Georgia went to the store, Georgia gave a bone to",
+      "corrupt": "When Kevin and Justin went to the store, Paul gave a bone to",
+      "answers": [
+        " Louis"
+      ],
+      "wrong_answers": [
+        " Georgia"
+      ]
+    },
+    {
+      "clean": "When Crew and Mary got a kiss at the hospital, Mary decided to give it to",
+      "corrupt": "When Martin and John got a kiss at the hospital, Jordan decided to give it to",
+      "answers": [
+        " Crew"
+      ],
+      "wrong_answers": [
+        " Mary"
+      ]
+    },
+    {
+      "clean": "After Adam and Mark went to the station, Adam gave a bone to",
+      "corrupt": "After Jack and Peter went to the station, Charlie gave a bone to",
+      "answers": [
+        " Mark"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "When Roman and David got a drink at the school, David decided to give it to",
+      "corrupt": "When Jordan and Sean got a drink at the school, Tyler decided to give it to",
+      "answers": [
+        " Roman"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "When Peter and Jennifer got a kiss at the office, Jennifer decided to give it to",
+      "corrupt": "When Lewis and Emily got a kiss at the office, Christopher decided to give it to",
+      "answers": [
+        " Peter"
+      ],
+      "wrong_answers": [
+        " Jennifer"
+      ]
+    },
+    {
+      "clean": "Then, Daniel and Frank had a long argument, and afterwards Frank said to",
+      "corrupt": "Then, Luke and Brian had a long argument, and afterwards Henry said to",
+      "answers": [
+        " Daniel"
+      ],
+      "wrong_answers": [
+        " Frank"
+      ]
+    },
+    {
+      "clean": "After River and Andrew went to the store, Andrew gave a ring to",
+      "corrupt": "After Robert and Kevin went to the store, Taylor gave a ring to",
+      "answers": [
+        " River"
+      ],
+      "wrong_answers": [
+        " Andrew"
+      ]
+    },
+    {
+      "clean": "After Carter and Warren went to the garden, Warren gave a basketball to",
+      "corrupt": "After Aaron and Scott went to the garden, Christian gave a basketball to",
+      "answers": [
+        " Carter"
+      ],
+      "wrong_answers": [
+        " Warren"
+      ]
+    },
+    {
+      "clean": "When Henry and Lewis got a computer at the store, Lewis decided to give it to",
+      "corrupt": "When Jordan and Cole got a computer at the store, Anna decided to give it to",
+      "answers": [
+        " Henry"
+      ],
+      "wrong_answers": [
+        " Lewis"
+      ]
+    },
+    {
+      "clean": "When Justin and Paul got a bone at the hospital, Justin decided to give it to",
+      "corrupt": "When Clark and Jane got a bone at the hospital, Sullivan decided to give it to",
+      "answers": [
+        " Paul"
+      ],
+      "wrong_answers": [
+        " Justin"
+      ]
+    },
+    {
+      "clean": "After Steven and Jane went to the office, Steven gave a basketball to",
+      "corrupt": "After Kelly and Martin went to the office, Cole gave a basketball to",
+      "answers": [
+        " Jane"
+      ],
+      "wrong_answers": [
+        " Steven"
+      ]
+    },
+    {
+      "clean": "Then, Andrew and Warren were thinking about going to the office. Warren wanted to give a snack to",
+      "corrupt": "Then, Kevin and Sarah were thinking about going to the office. Connor wanted to give a snack to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Warren"
+      ]
+    },
+    {
+      "clean": "Then, Robert and Kevin were thinking about going to the station. Robert wanted to give a necklace to",
+      "corrupt": "Then, Thomas and Andrew were thinking about going to the station. Taylor wanted to give a necklace to",
+      "answers": [
+        " Kevin"
+      ],
+      "wrong_answers": [
+        " Robert"
+      ]
+    },
+    {
+      "clean": "Then, Tyler and Prince were working at the garden. Prince decided to give a kiss to",
+      "corrupt": "Then, Arthur and Kate were working at the garden. John decided to give a kiss to",
+      "answers": [
+        " Tyler"
+      ],
+      "wrong_answers": [
+        " Prince"
+      ]
+    },
+    {
+      "clean": "Then, Victoria and Kevin went to the school. Kevin gave a computer to",
+      "corrupt": "Then, Joseph and Scott went to the school. Joshua gave a computer to",
+      "answers": [
+        " Victoria"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "Then, Ford and Prince were thinking about going to the garden. Prince wanted to give a computer to",
+      "corrupt": "Then, Roman and George were thinking about going to the garden. Jonathan wanted to give a computer to",
+      "answers": [
+        " Ford"
+      ],
+      "wrong_answers": [
+        " Prince"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Laura went to the store. Eric gave a kiss to",
+      "corrupt": "Then, Arthur and Jonathan went to the store. Henry gave a kiss to",
+      "answers": [
+        " Laura"
+      ],
+      "wrong_answers": [
+        " Eric"
+      ]
+    },
+    {
+      "clean": "When Sean and Jake went to the restaurant, Jake gave a snack to",
+      "corrupt": "When Prince and Charlie went to the restaurant, Paul gave a snack to",
+      "answers": [
+        " Sean"
+      ],
+      "wrong_answers": [
+        " Jake"
+      ]
+    },
+    {
+      "clean": "Then, Andrew and Brian went to the house. Brian gave a necklace to",
+      "corrupt": "Then, Henry and Ford went to the house. Aaron gave a necklace to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Brian"
+      ]
+    },
+    {
+      "clean": "Then, Aaron and Jordan had a lot of fun at the store. Aaron gave a drink to",
+      "corrupt": "Then, Sarah and Jamie had a lot of fun at the store. Robert gave a drink to",
+      "answers": [
+        " Jordan"
+      ],
+      "wrong_answers": [
+        " Aaron"
+      ]
+    },
+    {
+      "clean": "Then, Arthur and Jason had a long argument, and afterwards Jason said to",
+      "corrupt": "Then, Richard and Andrew had a long argument, and afterwards Jennifer said to",
+      "answers": [
+        " Arthur"
+      ],
+      "wrong_answers": [
+        " Jason"
+      ]
+    },
+    {
+      "clean": "Then, Austin and Matthew had a lot of fun at the school. Austin gave a bone to",
+      "corrupt": "Then, Ian and Laura had a lot of fun at the school. David gave a bone to",
+      "answers": [
+        " Matthew"
+      ],
+      "wrong_answers": [
+        " Austin"
+      ]
+    },
+    {
+      "clean": "Then, Matthew and Charlie had a lot of fun at the garden. Charlie gave a bone to",
+      "corrupt": "Then, Aaron and Lewis had a lot of fun at the garden. Jay gave a bone to",
+      "answers": [
+        " Matthew"
+      ],
+      "wrong_answers": [
+        " Charlie"
+      ]
+    },
+    {
+      "clean": "When Kevin and Andy went to the school, Kevin gave a kiss to",
+      "corrupt": "When Tyler and Simon went to the school, Matthew gave a kiss to",
+      "answers": [
+        " Andy"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "Then, Anna and Maria were working at the station. Anna decided to give a ring to",
+      "corrupt": "Then, Michelle and Andy were working at the station. Collins decided to give a ring to",
+      "answers": [
+        " Maria"
+      ],
+      "wrong_answers": [
+        " Anna"
+      ]
+    },
+    {
+      "clean": "When Emily and Rachel got a drink at the store, Rachel decided to give it to",
+      "corrupt": "When Ruby and Jacob got a drink at the store, Paul decided to give it to",
+      "answers": [
+        " Emily"
+      ],
+      "wrong_answers": [
+        " Rachel"
+      ]
+    },
+    {
+      "clean": "When Jane and Edward went to the office, Jane gave a drink to",
+      "corrupt": "When Leon and Jack went to the office, Roman gave a drink to",
+      "answers": [
+        " Edward"
+      ],
+      "wrong_answers": [
+        " Jane"
+      ]
+    },
+    {
+      "clean": "Then, Roman and Andy were thinking about going to the house. Andy wanted to give a basketball to",
+      "corrupt": "Then, Anthony and Rose were thinking about going to the house. Charlie wanted to give a basketball to",
+      "answers": [
+        " Roman"
+      ],
+      "wrong_answers": [
+        " Andy"
+      ]
+    },
+    {
+      "clean": "When Simon and Luke went to the office, Luke gave a ring to",
+      "corrupt": "When Ian and Michael went to the office, Jacob gave a ring to",
+      "answers": [
+        " Simon"
+      ],
+      "wrong_answers": [
+        " Luke"
+      ]
+    },
+    {
+      "clean": "When Christian and Alex got a snack at the hospital, Christian decided to give it to",
+      "corrupt": "When Jennifer and Jason got a snack at the hospital, Jay decided to give it to",
+      "answers": [
+        " Alex"
+      ],
+      "wrong_answers": [
+        " Christian"
+      ]
+    },
+    {
+      "clean": "When Jason and Jordan got a drink at the office, Jordan decided to give it to",
+      "corrupt": "When William and Jacob got a drink at the office, Alice decided to give it to",
+      "answers": [
+        " Jason"
+      ],
+      "wrong_answers": [
+        " Jordan"
+      ]
+    },
+    {
+      "clean": "Then, Richard and Frank went to the house. Frank gave a snack to",
+      "corrupt": "Then, William and Marcus went to the house. Andre gave a snack to",
+      "answers": [
+        " Richard"
+      ],
+      "wrong_answers": [
+        " Frank"
+      ]
+    },
+    {
+      "clean": "Then, Frank and Simon had a long argument, and afterwards Frank said to",
+      "corrupt": "Then, Jane and James had a long argument, and afterwards Matthew said to",
+      "answers": [
+        " Simon"
+      ],
+      "wrong_answers": [
+        " Frank"
+      ]
+    },
+    {
+      "clean": "Then, Ford and Andrew had a lot of fun at the hospital. Ford gave a basketball to",
+      "corrupt": "Then, Joshua and Leon had a lot of fun at the hospital. Christopher gave a basketball to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Ford"
+      ]
+    },
+    {
+      "clean": "Then, Louis and Richard went to the garden. Louis gave a basketball to",
+      "corrupt": "Then, Eric and Anna went to the garden. Sean gave a basketball to",
+      "answers": [
+        " Richard"
+      ],
+      "wrong_answers": [
+        " Louis"
+      ]
+    },
+    {
+      "clean": "When Thomas and Brandon got a drink at the restaurant, Thomas decided to give it to",
+      "corrupt": "When Marco and Jessica got a drink at the restaurant, Emily decided to give it to",
+      "answers": [
+        " Brandon"
+      ],
+      "wrong_answers": [
+        " Thomas"
+      ]
+    },
+    {
+      "clean": "When Grant and Matthew got a kiss at the restaurant, Grant decided to give it to",
+      "corrupt": "When William and Arthur got a kiss at the restaurant, Ian decided to give it to",
+      "answers": [
+        " Matthew"
+      ],
+      "wrong_answers": [
+        " Grant"
+      ]
+    },
+    {
+      "clean": "When Collins and Adam got a computer at the restaurant, Collins decided to give it to",
+      "corrupt": "When Connor and Aaron got a computer at the restaurant, George decided to give it to",
+      "answers": [
+        " Adam"
+      ],
+      "wrong_answers": [
+        " Collins"
+      ]
+    },
+    {
+      "clean": "Then, David and Lewis went to the house. David gave a necklace to",
+      "corrupt": "Then, Grant and Leon went to the house. Kevin gave a necklace to",
+      "answers": [
+        " Lewis"
+      ],
+      "wrong_answers": [
+        " David"
+      ]
+    },
+    {
+      "clean": "Then, Brian and Peter were working at the hospital. Brian decided to give a necklace to",
+      "corrupt": "Then, Charlie and Emily were working at the hospital. Richard decided to give a necklace to",
+      "answers": [
+        " Peter"
+      ],
+      "wrong_answers": [
+        " Brian"
+      ]
+    },
+    {
+      "clean": "When Alice and Grant got a bone at the station, Grant decided to give it to",
+      "corrupt": "When Andrew and Andre got a bone at the station, Jason decided to give it to",
+      "answers": [
+        " Alice"
+      ],
+      "wrong_answers": [
+        " Grant"
+      ]
+    },
+    {
+      "clean": "Then, Edward and Andy were working at the garden. Edward decided to give a kiss to",
+      "corrupt": "Then, Jay and Sean were working at the garden. Kevin decided to give a kiss to",
+      "answers": [
+        " Andy"
+      ],
+      "wrong_answers": [
+        " Edward"
+      ]
+    },
+    {
+      "clean": "Then, Jacob and Henry were working at the restaurant. Jacob decided to give a bone to",
+      "corrupt": "Then, Justin and Amy were working at the restaurant. Ruby decided to give a bone to",
+      "answers": [
+        " Henry"
+      ],
+      "wrong_answers": [
+        " Jacob"
+      ]
+    },
+    {
+      "clean": "Then, Peter and Daniel went to the house. Daniel gave a snack to",
+      "corrupt": "Then, Jennifer and Eric went to the house. Simon gave a snack to",
+      "answers": [
+        " Peter"
+      ],
+      "wrong_answers": [
+        " Daniel"
+      ]
+    },
+    {
+      "clean": "When Peter and Jay got a bone at the station, Jay decided to give it to",
+      "corrupt": "When Robert and Frank got a bone at the station, Jonathan decided to give it to",
+      "answers": [
+        " Peter"
+      ],
+      "wrong_answers": [
+        " Jay"
+      ]
+    },
+    {
+      "clean": "After Mary and Roman went to the school, Roman gave a necklace to",
+      "corrupt": "After Grant and William went to the school, Warren gave a necklace to",
+      "answers": [
+        " Mary"
+      ],
+      "wrong_answers": [
+        " Roman"
+      ]
+    },
+    {
+      "clean": "After Rachel and Charlie went to the hospital, Rachel gave a basketball to",
+      "corrupt": "After Adam and Michael went to the hospital, Joshua gave a basketball to",
+      "answers": [
+        " Charlie"
+      ],
+      "wrong_answers": [
+        " Rachel"
+      ]
+    },
+    {
+      "clean": "After Louis and Stephen went to the house, Louis gave a drink to",
+      "corrupt": "After Simon and Patrick went to the house, Jennifer gave a drink to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Louis"
+      ]
+    },
+    {
+      "clean": "Then, Adam and Morgan had a lot of fun at the hospital. Adam gave a ring to",
+      "corrupt": "Then, David and Rachel had a lot of fun at the hospital. Cole gave a ring to",
+      "answers": [
+        " Morgan"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "When Marcus and Jack got a snack at the restaurant, Marcus decided to give it to",
+      "corrupt": "When Taylor and Steven got a snack at the restaurant, Marco decided to give it to",
+      "answers": [
+        " Jack"
+      ],
+      "wrong_answers": [
+        " Marcus"
+      ]
+    },
+    {
+      "clean": "Then, Rachel and Jane were thinking about going to the station. Jane wanted to give a snack to",
+      "corrupt": "Then, Paul and David were thinking about going to the station. Anna wanted to give a snack to",
+      "answers": [
+        " Rachel"
+      ],
+      "wrong_answers": [
+        " Jane"
+      ]
+    },
+    {
+      "clean": "Then, Brandon and Matthew had a long argument, and afterwards Brandon said to",
+      "corrupt": "Then, Ruby and Marco had a long argument, and afterwards Sean said to",
+      "answers": [
+        " Matthew"
+      ],
+      "wrong_answers": [
+        " Brandon"
+      ]
+    },
+    {
+      "clean": "Then, Simon and Joseph were working at the hospital. Joseph decided to give a bone to",
+      "corrupt": "Then, Brandon and Anthony were working at the hospital. Aaron decided to give a bone to",
+      "answers": [
+        " Simon"
+      ],
+      "wrong_answers": [
+        " Joseph"
+      ]
+    },
+    {
+      "clean": "When Jordan and Christopher got a ring at the restaurant, Christopher decided to give it to",
+      "corrupt": "When Kevin and Rachel got a ring at the restaurant, Kyle decided to give it to",
+      "answers": [
+        " Jordan"
+      ],
+      "wrong_answers": [
+        " Christopher"
+      ]
+    },
+    {
+      "clean": "When Victoria and Taylor got a snack at the hospital, Victoria decided to give it to",
+      "corrupt": "When Jacob and Jack got a snack at the hospital, Graham decided to give it to",
+      "answers": [
+        " Taylor"
+      ],
+      "wrong_answers": [
+        " Victoria"
+      ]
+    },
+    {
+      "clean": "Then, Marcus and Justin had a long argument, and afterwards Marcus said to",
+      "corrupt": "Then, Jamie and Thomas had a long argument, and afterwards Rose said to",
+      "answers": [
+        " Justin"
+      ],
+      "wrong_answers": [
+        " Marcus"
+      ]
+    },
+    {
+      "clean": "When Georgia and Brandon got a kiss at the office, Georgia decided to give it to",
+      "corrupt": "When Peter and Russell got a kiss at the office, Crystal decided to give it to",
+      "answers": [
+        " Brandon"
+      ],
+      "wrong_answers": [
+        " Georgia"
+      ]
+    },
+    {
+      "clean": "Then, Eva and William were thinking about going to the store. William wanted to give a computer to",
+      "corrupt": "Then, Elizabeth and Patrick were thinking about going to the store. Warren wanted to give a computer to",
+      "answers": [
+        " Eva"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "When Joseph and Kyle went to the restaurant, Kyle gave a necklace to",
+      "corrupt": "When George and Madison went to the restaurant, Luke gave a necklace to",
+      "answers": [
+        " Joseph"
+      ],
+      "wrong_answers": [
+        " Kyle"
+      ]
+    },
+    {
+      "clean": "After Rachel and Graham went to the house, Rachel gave a basketball to",
+      "corrupt": "After Russell and Richard went to the house, Brandon gave a basketball to",
+      "answers": [
+        " Graham"
+      ],
+      "wrong_answers": [
+        " Rachel"
+      ]
+    },
+    {
+      "clean": "When William and Anna got a kiss at the restaurant, William decided to give it to",
+      "corrupt": "When Luke and George got a kiss at the restaurant, Eric decided to give it to",
+      "answers": [
+        " Anna"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "When Leon and Brian went to the restaurant, Leon gave a necklace to",
+      "corrupt": "When Russell and William went to the restaurant, Jennifer gave a necklace to",
+      "answers": [
+        " Brian"
+      ],
+      "wrong_answers": [
+        " Leon"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Connor had a lot of fun at the house. Eric gave a basketball to",
+      "corrupt": "Then, Lisa and George had a lot of fun at the house. Leon gave a basketball to",
+      "answers": [
+        " Connor"
+      ],
+      "wrong_answers": [
+        " Eric"
+      ]
+    },
+    {
+      "clean": "Then, Simon and Leon had a lot of fun at the hospital. Leon gave a computer to",
+      "corrupt": "Then, Henry and David had a lot of fun at the hospital. Elizabeth gave a computer to",
+      "answers": [
+        " Simon"
+      ],
+      "wrong_answers": [
+        " Leon"
+      ]
+    },
+    {
+      "clean": "Then, Alice and Henry went to the garden. Alice gave a snack to",
+      "corrupt": "Then, Crystal and Andrew went to the garden. Warren gave a snack to",
+      "answers": [
+        " Henry"
+      ],
+      "wrong_answers": [
+        " Alice"
+      ]
+    },
+    {
+      "clean": "When Alex and Jane got a kiss at the hospital, Alex decided to give it to",
+      "corrupt": "When Laura and Joshua got a kiss at the hospital, Andrew decided to give it to",
+      "answers": [
+        " Jane"
+      ],
+      "wrong_answers": [
+        " Alex"
+      ]
+    },
+    {
+      "clean": "After Alice and Carter went to the house, Alice gave a necklace to",
+      "corrupt": "After Robert and Crystal went to the house, River gave a necklace to",
+      "answers": [
+        " Carter"
+      ],
+      "wrong_answers": [
+        " Alice"
+      ]
+    },
+    {
+      "clean": "Then, Matthew and Adam had a long argument, and afterwards Adam said to",
+      "corrupt": "Then, Paul and Jane had a long argument, and afterwards Madison said to",
+      "answers": [
+        " Matthew"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "When Leon and William went to the office, Leon gave a basketball to",
+      "corrupt": "When Thomas and Daniel went to the office, Frank gave a basketball to",
+      "answers": [
+        " William"
+      ],
+      "wrong_answers": [
+        " Leon"
+      ]
+    },
+    {
+      "clean": "Then, Michael and Victoria were working at the house. Victoria decided to give a ring to",
+      "corrupt": "Then, William and David were working at the house. Patrick decided to give a ring to",
+      "answers": [
+        " Michael"
+      ],
+      "wrong_answers": [
+        " Victoria"
+      ]
+    },
+    {
+      "clean": "Then, Aaron and Connor had a lot of fun at the restaurant. Connor gave a basketball to",
+      "corrupt": "Then, Marco and Graham had a lot of fun at the restaurant. Andrew gave a basketball to",
+      "answers": [
+        " Aaron"
+      ],
+      "wrong_answers": [
+        " Connor"
+      ]
+    },
+    {
+      "clean": "Then, Louis and Crew went to the house. Crew gave a necklace to",
+      "corrupt": "Then, Mary and Morgan went to the house. Matthew gave a necklace to",
+      "answers": [
+        " Louis"
+      ],
+      "wrong_answers": [
+        " Crew"
+      ]
+    },
+    {
+      "clean": "When Brandon and Andy went to the hospital, Andy gave a snack to",
+      "corrupt": "When Mark and Martin went to the hospital, Cole gave a snack to",
+      "answers": [
+        " Brandon"
+      ],
+      "wrong_answers": [
+        " Andy"
+      ]
+    },
+    {
+      "clean": "When Mark and Andre went to the house, Mark gave a drink to",
+      "corrupt": "When Michael and Taylor went to the house, David gave a drink to",
+      "answers": [
+        " Andre"
+      ],
+      "wrong_answers": [
+        " Mark"
+      ]
+    },
+    {
+      "clean": "After Jamie and Brian went to the store, Brian gave a snack to",
+      "corrupt": "After Adam and Blake went to the store, Daniel gave a snack to",
+      "answers": [
+        " Jamie"
+      ],
+      "wrong_answers": [
+        " Brian"
+      ]
+    },
+    {
+      "clean": "Then, Brandon and William had a long argument, and afterwards William said to",
+      "corrupt": "Then, Simon and Aaron had a long argument, and afterwards Emily said to",
+      "answers": [
+        " Brandon"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "Then, Christian and Blake went to the restaurant. Blake gave a drink to",
+      "corrupt": "Then, Sean and Alex went to the restaurant. Jason gave a drink to",
+      "answers": [
+        " Christian"
+      ],
+      "wrong_answers": [
+        " Blake"
+      ]
+    },
+    {
+      "clean": "Then, Crystal and Prince had a lot of fun at the store. Prince gave a kiss to",
+      "corrupt": "Then, Simon and Austin had a lot of fun at the store. Marco gave a kiss to",
+      "answers": [
+        " Crystal"
+      ],
+      "wrong_answers": [
+        " Prince"
+      ]
+    },
+    {
+      "clean": "When Roman and Jane went to the station, Roman gave a bone to",
+      "corrupt": "When Luke and Joseph went to the station, Richard gave a bone to",
+      "answers": [
+        " Jane"
+      ],
+      "wrong_answers": [
+        " Roman"
+      ]
+    },
+    {
+      "clean": "When Connor and Taylor got a kiss at the school, Connor decided to give it to",
+      "corrupt": "When Roman and Kevin got a kiss at the school, Jay decided to give it to",
+      "answers": [
+        " Taylor"
+      ],
+      "wrong_answers": [
+        " Connor"
+      ]
+    },
+    {
+      "clean": "Then, Dean and William went to the school. William gave a bone to",
+      "corrupt": "Then, Morgan and Christian went to the school. Jack gave a bone to",
+      "answers": [
+        " Dean"
+      ],
+      "wrong_answers": [
+        " William"
+      ]
+    },
+    {
+      "clean": "Then, Collins and Anderson were thinking about going to the restaurant. Anderson wanted to give a necklace to",
+      "corrupt": "Then, Maria and Lewis were thinking about going to the restaurant. Frank wanted to give a necklace to",
+      "answers": [
+        " Collins"
+      ],
+      "wrong_answers": [
+        " Anderson"
+      ]
+    },
+    {
+      "clean": "Then, Jane and Aaron were working at the store. Aaron decided to give a snack to",
+      "corrupt": "Then, Jonathan and Lewis were working at the store. Cole decided to give a snack to",
+      "answers": [
+        " Jane"
+      ],
+      "wrong_answers": [
+        " Aaron"
+      ]
+    },
+    {
+      "clean": "When Austin and Martin went to the hospital, Martin gave a bone to",
+      "corrupt": "When Stephen and Richard went to the hospital, Adam gave a bone to",
+      "answers": [
+        " Austin"
+      ],
+      "wrong_answers": [
+        " Martin"
+      ]
+    },
+    {
+      "clean": "Then, Max and Laura were working at the hospital. Laura decided to give a necklace to",
+      "corrupt": "Then, Cole and Alex were working at the hospital. Ford decided to give a necklace to",
+      "answers": [
+        " Max"
+      ],
+      "wrong_answers": [
+        " Laura"
+      ]
+    },
+    {
+      "clean": "Then, Emily and Brandon were working at the restaurant. Emily decided to give a ring to",
+      "corrupt": "Then, Mark and Patrick were working at the restaurant. Collins decided to give a ring to",
+      "answers": [
+        " Brandon"
+      ],
+      "wrong_answers": [
+        " Emily"
+      ]
+    },
+    {
+      "clean": "Then, Ian and Warren had a long argument, and afterwards Warren said to",
+      "corrupt": "Then, Richard and Roman had a long argument, and afterwards Victoria said to",
+      "answers": [
+        " Ian"
+      ],
+      "wrong_answers": [
+        " Warren"
+      ]
+    },
+    {
+      "clean": "Then, Georgia and Thomas were working at the school. Thomas decided to give a kiss to",
+      "corrupt": "Then, Joseph and David were working at the school. David decided to give a kiss to",
+      "answers": [
+        " Georgia"
+      ],
+      "wrong_answers": [
+        " Thomas"
+      ]
+    },
+    {
+      "clean": "After Sullivan and Paul went to the station, Paul gave a snack to",
+      "corrupt": "After Marco and Jane went to the station, Dean gave a snack to",
+      "answers": [
+        " Sullivan"
+      ],
+      "wrong_answers": [
+        " Paul"
+      ]
+    },
+    {
+      "clean": "When Jonathan and Jane went to the school, Jonathan gave a kiss to",
+      "corrupt": "When Grant and Frank went to the school, Jamie gave a kiss to",
+      "answers": [
+        " Jane"
+      ],
+      "wrong_answers": [
+        " Jonathan"
+      ]
+    },
+    {
+      "clean": "Then, David and Charlie went to the restaurant. Charlie gave a drink to",
+      "corrupt": "Then, Scott and Luke went to the restaurant. Georgia gave a drink to",
+      "answers": [
+        " David"
+      ],
+      "wrong_answers": [
+        " Charlie"
+      ]
+    },
+    {
+      "clean": "When Patrick and Christian got a computer at the school, Christian decided to give it to",
+      "corrupt": "When Grant and Stephen got a computer at the school, Mary decided to give it to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Christian"
+      ]
+    },
+    {
+      "clean": "Then, Eric and Daniel were thinking about going to the station. Daniel wanted to give a ring to",
+      "corrupt": "Then, Paul and Connor were thinking about going to the station. Crew wanted to give a ring to",
+      "answers": [
+        " Eric"
+      ],
+      "wrong_answers": [
+        " Daniel"
+      ]
+    },
+    {
+      "clean": "Then, Andrew and Ford were working at the station. Ford decided to give a kiss to",
+      "corrupt": "Then, Max and Prince were working at the station. Jay decided to give a kiss to",
+      "answers": [
+        " Andrew"
+      ],
+      "wrong_answers": [
+        " Ford"
+      ]
+    },
+    {
+      "clean": "Then, Thomas and Kelly had a long argument, and afterwards Kelly said to",
+      "corrupt": "Then, Roman and Grant had a long argument, and afterwards Jeremy said to",
+      "answers": [
+        " Thomas"
+      ],
+      "wrong_answers": [
+        " Kelly"
+      ]
+    },
+    {
+      "clean": "After Elizabeth and Mark went to the store, Elizabeth gave a snack to",
+      "corrupt": "After James and Georgia went to the store, Alice gave a snack to",
+      "answers": [
+        " Mark"
+      ],
+      "wrong_answers": [
+        " Elizabeth"
+      ]
+    },
+    {
+      "clean": "Then, Jamie and Adam had a long argument, and afterwards Adam said to",
+      "corrupt": "Then, Christian and Mark had a long argument, and afterwards Crew said to",
+      "answers": [
+        " Jamie"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "Then, Patrick and Christian had a lot of fun at the school. Christian gave a necklace to",
+      "corrupt": "Then, Andy and Andy had a lot of fun at the school. George gave a necklace to",
+      "answers": [
+        " Patrick"
+      ],
+      "wrong_answers": [
+        " Christian"
+      ]
+    },
+    {
+      "clean": "When Jonathan and Sarah got a basketball at the hospital, Jonathan decided to give it to",
+      "corrupt": "When Eva and Mary got a basketball at the hospital, Alan decided to give it to",
+      "answers": [
+        " Sarah"
+      ],
+      "wrong_answers": [
+        " Jonathan"
+      ]
+    },
+    {
+      "clean": "Then, Elizabeth and Russell had a long argument, and afterwards Elizabeth said to",
+      "corrupt": "Then, Dean and Jacob had a long argument, and afterwards Louis said to",
+      "answers": [
+        " Russell"
+      ],
+      "wrong_answers": [
+        " Elizabeth"
+      ]
+    },
+    {
+      "clean": "When Adam and Henry got a ring at the station, Adam decided to give it to",
+      "corrupt": "When Victoria and Andy got a ring at the station, Carter decided to give it to",
+      "answers": [
+        " Henry"
+      ],
+      "wrong_answers": [
+        " Adam"
+      ]
+    },
+    {
+      "clean": "Then, Kevin and Kyle went to the school. Kyle gave a computer to",
+      "corrupt": "Then, Taylor and Max went to the school. Rachel gave a computer to",
+      "answers": [
+        " Kevin"
+      ],
+      "wrong_answers": [
+        " Kyle"
+      ]
+    },
+    {
+      "clean": "Then, Alice and Charlie had a lot of fun at the school. Charlie gave a drink to",
+      "corrupt": "Then, Daniel and Kyle had a lot of fun at the school. Andre gave a drink to",
+      "answers": [
+        " Alice"
+      ],
+      "wrong_answers": [
+        " Charlie"
+      ]
+    },
+    {
+      "clean": "When Lewis and Andre got a snack at the hospital, Lewis decided to give it to",
+      "corrupt": "When Charlie and Christopher got a snack at the hospital, Ian decided to give it to",
+      "answers": [
+        " Andre"
+      ],
+      "wrong_answers": [
+        " Lewis"
+      ]
+    },
+    {
+      "clean": "Then, Ryan and Lisa were thinking about going to the station. Lisa wanted to give a kiss to",
+      "corrupt": "Then, Taylor and Jake were thinking about going to the station. George wanted to give a kiss to",
+      "answers": [
+        " Ryan"
+      ],
+      "wrong_answers": [
+        " Lisa"
+      ]
+    },
+    {
+      "clean": "When Daniel and Michael got a drink at the garden, Daniel decided to give it to",
+      "corrupt": "When Prince and Ruby got a drink at the garden, Ford decided to give it to",
+      "answers": [
+        " Michael"
+      ],
+      "wrong_answers": [
+        " Daniel"
+      ]
+    },
+    {
+      "clean": "Then, Kyle and Alex were working at the store. Alex decided to give a ring to",
+      "corrupt": "Then, Prince and Steven were working at the store. Laura decided to give a ring to",
+      "answers": [
+        " Kyle"
+      ],
+      "wrong_answers": [
+        " Alex"
+      ]
+    },
+    {
+      "clean": "Then, Lisa and Sean were thinking about going to the garden. Lisa wanted to give a bone to",
+      "corrupt": "Then, Jennifer and Ruby were thinking about going to the garden. Alice wanted to give a bone to",
+      "answers": [
+        " Sean"
+      ],
+      "wrong_answers": [
+        " Lisa"
+      ]
+    },
+    {
+      "clean": "Then, Jason and Carter went to the house. Jason gave a snack to",
+      "corrupt": "Then, Russell and Aaron went to the house. Victoria gave a snack to",
+      "answers": [
+        " Carter"
+      ],
+      "wrong_answers": [
+        " Jason"
+      ]
+    },
+    {
+      "clean": "When Eva and Daniel got a drink at the hospital, Daniel decided to give it to",
+      "corrupt": "When Alex and Elizabeth got a drink at the hospital, Matthew decided to give it to",
+      "answers": [
+        " Eva"
+      ],
+      "wrong_answers": [
+        " Daniel"
+      ]
+    },
+    {
+      "clean": "Then, Jason and John were thinking about going to the store. Jason wanted to give a basketball to",
+      "corrupt": "Then, Austin and Anthony were thinking about going to the store. Paul wanted to give a basketball to",
+      "answers": [
+        " John"
+      ],
+      "wrong_answers": [
+        " Jason"
+      ]
+    },
+    {
+      "clean": "Then, Tyler and Jordan had a long argument, and afterwards Tyler said to",
+      "corrupt": "Then, Adam and Prince had a long argument, and afterwards Russell said to",
+      "answers": [
+        " Jordan"
+      ],
+      "wrong_answers": [
+        " Tyler"
+      ]
+    },
+    {
+      "clean": "Then, Jack and Anderson went to the school. Jack gave a ring to",
+      "corrupt": "Then, Steven and Eric went to the school. Michael gave a ring to",
+      "answers": [
+        " Anderson"
+      ],
+      "wrong_answers": [
+        " Jack"
+      ]
+    },
+    {
+      "clean": "Then, Ruby and Graham had a lot of fun at the station. Graham gave a necklace to",
+      "corrupt": "Then, Stephen and Thomas had a lot of fun at the station. Scott gave a necklace to",
+      "answers": [
+        " Ruby"
+      ],
+      "wrong_answers": [
+        " Graham"
+      ]
+    },
+    {
+      "clean": "Then, Jacob and Connor were working at the garden. Jacob decided to give a drink to",
+      "corrupt": "Then, Henry and Andrew were working at the garden. Adam decided to give a drink to",
+      "answers": [
+        " Connor"
+      ],
+      "wrong_answers": [
+        " Jacob"
+      ]
+    },
+    {
+      "clean": "Then, Stephen and Cole were working at the school. Cole decided to give a necklace to",
+      "corrupt": "Then, Martin and Blake were working at the school. Charles decided to give a necklace to",
+      "answers": [
+        " Stephen"
+      ],
+      "wrong_answers": [
+        " Cole"
+      ]
+    },
+    {
+      "clean": "When Patrick and Jay got a drink at the restaurant, Patrick decided to give it to",
+      "corrupt": "When Justin and Joseph got a drink at the restaurant, Peter decided to give it to",
+      "answers": [
+        " Jay"
+      ],
+      "wrong_answers": [
+        " Patrick"
+      ]
+    },
+    {
+      "clean": "Then, Kevin and Eric were working at the office. Kevin decided to give a necklace to",
+      "corrupt": "Then, Russell and Daniel were working at the office. Daniel decided to give a necklace to",
+      "answers": [
+        " Eric"
+      ],
+      "wrong_answers": [
+        " Kevin"
+      ]
+    },
+    {
+      "clean": "When Joshua and Jordan went to the office, Jordan gave a necklace to",
+      "corrupt": "When Georgia and Russell went to the office, Jay gave a necklace to",
+      "answers": [
+        " Joshua"
+      ],
+      "wrong_answers": [
+        " Jordan"
+      ]
+    },
+    {
+      "clean": "Then, Collins and Warren had a long argument, and afterwards Warren said to",
+      "corrupt": "Then, Arthur and Ian had a long argument, and afterwards Richard said to",
+      "answers": [
+        " Collins"
+      ],
+      "wrong_answers": [
+        " Warren"
+      ]
+    },
+    {
+      "clean": "When Mark and Jay went to the school, Mark gave a bone to",
+      "corrupt": "When Louis and Kelly went to the school, David gave a bone to",
+      "answers": [
+        " Jay"
+      ],
+      "wrong_answers": [
+        " Mark"
+      ]
+    },
+    {
+      "clean": "Then, Carter and Charles were thinking about going to the station. Carter wanted to give a kiss to",
+      "corrupt": "Then, Frank and Alice were thinking about going to the station. Marcus wanted to give a kiss to",
+      "answers": [
+        " Charles"
+      ],
+      "wrong_answers": [
+        " Carter"
+      ]
+    },
+    {
+      "clean": "Then, Anthony and Arthur had a long argument, and afterwards Anthony said to",
+      "corrupt": "Then, Edward and Jay had a long argument, and afterwards Edward said to",
+      "answers": [
+        " Arthur"
+      ],
+      "wrong_answers": [
+        " Anthony"
+      ]
+    },
+    {
+      "clean": "Then, Jacob and David were thinking about going to the store. Jacob wanted to give a drink to",
+      "corrupt": "Then, Anthony and Dean were thinking about going to the store. Michael wanted to give a drink to",
+      "answers": [
+        " David"
+      ],
+      "wrong_answers": [
+        " Jacob"
+      ]
+    },
+    {
+      "clean": "After Jack and Scott went to the school, Scott gave a necklace to",
+      "corrupt": "After Amy and Jordan went to the school, Charles gave a necklace to",
+      "answers": [
+        " Jack"
+      ],
+      "wrong_answers": [
+        " Scott"
+      ]
+    }
+  ]
+}

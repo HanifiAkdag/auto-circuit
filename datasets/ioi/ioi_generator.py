@@ -773,57 +773,58 @@ class IOIDataset:
         return self
 
 
-N = 1000
-for order in ["ABBA", "BABA"]:
-# for order in ["ABBA"]:
-    for template_idx in range(15):
-    # for template_idx in range(1):
-        ioi_dataset = IOIDataset(
-            prompt_type=order,
-            N=N,
-            tokenizer=None,
-            prepend_bos=False,
-            template_idx=template_idx,
-            seed=0,
-            device="cpu",
-        )
-        print([prompt["text"] for prompt in ioi_dataset.ioi_prompts])
+if __name__ == "__main__":
+    N = 1000
+    for order in ["ABBA", "BABA"]:
+    # for order in ["ABBA"]:
+        for template_idx in range(15):
+        # for template_idx in range(1):
+            ioi_dataset = IOIDataset(
+                prompt_type=order,
+                N=N,
+                tokenizer=None,
+                prepend_bos=False,
+                template_idx=template_idx,
+                seed=0,
+                device="cpu",
+            )
+            print([prompt["text"] for prompt in ioi_dataset.ioi_prompts])
 
-        # For justification of this particular prompt format see:
-        # https://colab.research.google.com/drive/1M4F9SU_vHUUCQkhmtWnmY2eomOJu5B5s#scrollTo=Srst_LcHl6mS
+            # For justification of this particular prompt format see:
+            # https://colab.research.google.com/drive/1M4F9SU_vHUUCQkhmtWnmY2eomOJu5B5s#scrollTo=Srst_LcHl6mS
 
-        abc_dataset = ioi_dataset.gen_flipped_prompts("ABB->XYZ, BAB->XYZ")
-        print(ioi_dataset.s_tokenIDs)
-        # abc_dataset = ioi_dataset.gen_flipped_prompts("ABB->XYZ")
-        # print([prompt["text"] for prompt in abc_dataset.ioi_prompts])
+            abc_dataset = ioi_dataset.gen_flipped_prompts("ABB->XYZ, BAB->XYZ")
+            print(ioi_dataset.s_tokenIDs)
+            # abc_dataset = ioi_dataset.gen_flipped_prompts("ABB->XYZ")
+            # print([prompt["text"] for prompt in abc_dataset.ioi_prompts])
 
-        prompt_dicts = []
-        for i, (clean_prompt, corrupt_prompt) in enumerate(
-            zip(ioi_dataset.ioi_prompts, abc_dataset.ioi_prompts)
-        ):
-            prompt_dict = {
-                "clean": " ".join(clean_prompt["text"].split()[:-1]),
-                "corrupt": " ".join(corrupt_prompt["text"].split()[:-1]),
-                # We don't need the space but these are more common tokens (lower indices)
-                "answers": [" " + clean_prompt["text"].split()[-1]],
-                "wrong_answers": [ioi_dataset.s_token_strs[i]],
-            }
-            prompt_dicts.append(prompt_dict)
+            prompt_dicts = []
+            for i, (clean_prompt, corrupt_prompt) in enumerate(
+                zip(ioi_dataset.ioi_prompts, abc_dataset.ioi_prompts)
+            ):
+                prompt_dict = {
+                    "clean": " ".join(clean_prompt["text"].split()[:-1]),
+                    "corrupt": " ".join(corrupt_prompt["text"].split()[:-1]),
+                    # We don't need the space but these are more common tokens (lower indices)
+                    "answers": [" " + clean_prompt["text"].split()[-1]],
+                    "wrong_answers": [ioi_dataset.s_token_strs[i]],
+                }
+                prompt_dicts.append(prompt_dict)
 
-        # Add 1 because we will prepend a bos token
-        word_idxs = dict([(word, idx[0].item() + (0 if word == "starts" else 0)) for word, idx in ioi_dataset.word_idx.items()])
-        print("word_idxs:", word_idxs)
+            # Add 1 because we will prepend a bos token
+            word_idxs = dict([(word, idx[0].item() + (0 if word == "starts" else 0)) for word, idx in ioi_dataset.word_idx.items()])
+            print("word_idxs:", word_idxs)
 
-        for i in range(3):
-            print()
-            print("Clean:", prompt_dicts[i]["clean"])
-            print("Corrupt:", prompt_dicts[i]["corrupt"])
-            print("Answers:", prompt_dicts[i]["answers"])
-            print("Wrong answers:", prompt_dicts[i]["wrong_answers"])
-        data_json = {"word_idxs": word_idxs, "prompts": prompt_dicts}
+            for i in range(3):
+                print()
+                print("Clean:", prompt_dicts[i]["clean"])
+                print("Corrupt:", prompt_dicts[i]["corrupt"])
+                print("Answers:", prompt_dicts[i]["answers"])
+                print("Wrong answers:", prompt_dicts[i]["wrong_answers"])
+            data_json = {"word_idxs": word_idxs, "prompts": prompt_dicts}
 
-        path = repo_path_to_abs_path(f"datasets/ioi/ioi_{order}_template_{template_idx}_prompts.json")
-        with open(path, "w") as f:
-            json.dump(data_json, f)
+            path = repo_path_to_abs_path(f"datasets/ioi/ioi_{order}_template_{template_idx}_prompts.json")
+            with open(path, "w") as f:
+                json.dump(data_json, f)
 
-# %%
+    # %%

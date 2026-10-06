@@ -23,10 +23,21 @@ import torch as t
 
 from auto_circuit.utils.misc import load_cache, repo_path_to_abs_path
 from .experiment_utils import git_state
+from .run_cell import _cache_stem
 
 
 def _serialize(obj: Any) -> Any:
     return str(obj)
+
+
+def validate_partial_protocols(manifests: list[dict]) -> dict | None:
+    first = manifests[0]
+    for other in manifests[1:]:
+        if (other['cell'].get('split_seed'), other.get('data_split')) != (first['cell'].get('split_seed'), first.get('data_split')):
+            raise ValueError('ACDC partial split identities disagree')
+        if other.get('data_budget') != first.get('data_budget'):
+            raise ValueError('ACDC partial data budgets disagree')
+    return first.get('data_split')
 
 
 def main():
@@ -34,17 +45,23 @@ def main():
     p.add_argument("--task", required=True)
     p.add_argument("--ablation", required=True)
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--split-seed", type=int, default=42)
+    p.add_argument("--legacy-split", action="store_true")
     p.add_argument("--partials-dir", default=".prune_scores/final/benchmark/partials")
     p.add_argument("--output-dir", default=".prune_scores/final/benchmark")
     p.add_argument("--expect", type=int, default=5, help="Required partial count (one per tao base)")
     args = p.parse_args()
 
-    stem = f"cell_{args.task}_acdc_{args.ablation}_seed{args.seed}__"
+    split_seed = None if args.legacy_split else args.split_seed
+    base_stem = _cache_stem(args.task, 'acdc', args.ablation, args.seed, None, split_seed=split_seed)
+    stem = base_stem + '__'
     pdir = repo_path_to_abs_path(args.partials_dir)
     # One partial per tao base; a requeued job leaves several timestamps for the same
     # base, so keep only the newest of each before merging.
     newest: dict = {}
     for f in pdir.glob(f"{stem}*.pkl"):
+        if not f.with_name(f.stem + '_manifest.json').exists():
+            continue
         tag = f.name[len(stem):].split("-")[0]
         if tag not in newest or f.stat().st_mtime > newest[tag].stat().st_mtime:
             newest[tag] = f
@@ -57,6 +74,10 @@ def main():
     print(f"Merging {len(partials)} partials for {args.task}/{args.ablation}:")
     for f in partials:
         print(f"  {f.name}")
+    partial_manifests = [json.loads(f.with_name(f.stem + '_manifest.json').read_text()) for f in partials]
+    data_split = validate_partial_protocols(partial_manifests)
+    if partial_manifests[0]['cell'].get('split_seed') != split_seed:
+        raise ValueError('Requested split does not match ACDC partials')
 
     # Element-wise min across partials (init +inf identity is already baked into each).
     merged: dict = t.load(partials[0], map_location="cpu")
@@ -79,7 +100,7 @@ def main():
     out = repo_path_to_abs_path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
     dt = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-    stem_out = f"cell_{args.task}_acdc_{args.ablation}_seed{args.seed}-{dt}"
+    stem_out = f"{base_stem}-{dt}"
     cache_path = out / f"{stem_out}.pkl"
     # Write-then-rename, as in run_cell.py: a direct write truncated by preemption would
     # leave a torn .pkl under the final name.
@@ -101,11 +122,13 @@ def main():
             "task": args.task, "algo": "acdc",
             "algo_key": list(list(merged.values())[0].keys())[0],
             "ablation": args.ablation, "seed": args.seed, "null_test": False,
+            "split_seed": split_seed,
         },
         "cache_file": cache_path.name,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
         "git": git_state(),
         "data_budget": budget,
+        "data_split": data_split,
         "merged_from": [f.name for f in partials],
         "note": "tao-split ACDC partials merged by element-wise min (identical to single-process 20-tau sweep).",
     }

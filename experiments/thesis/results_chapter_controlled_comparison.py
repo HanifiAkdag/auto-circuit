@@ -55,7 +55,13 @@ def selected_row(rows: list[dict[str, str]], task: str, ablation: str,
     return min(candidates, key=lambda row: abs(float(row["realised_mean"]) - target))
 
 
-def main() -> None:
+def main(output_root=None) -> None:
+    global SOURCE, SOURCE_MANIFEST, OUT
+    if output_root is not None:
+        root = (ROOT / output_root).resolve()
+        SOURCE = root / 'size_curves/size_curves.csv'
+        SOURCE_MANIFEST = root / 'size_curves/size_curves_manifest.json'
+        OUT = root / 'controlled_comparison'
     OUT.mkdir(parents=True, exist_ok=True)
     rows = read_csv(SOURCE)
     selected: list[dict[str, object]] = []
@@ -111,6 +117,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(selected)
     manifest = {
+        "evaluation_protocol_id": json.loads(SOURCE_MANIFEST.read_text()).get('evaluation_protocol_id'),
         "source": str(SOURCE.relative_to(ROOT)),
         "source_sha256": hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
         "source_manifest": str(SOURCE_MANIFEST.relative_to(ROOT)),
@@ -134,4 +141,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-root', type=Path)
+    args = parser.parse_args()
+    main(args.output_root)

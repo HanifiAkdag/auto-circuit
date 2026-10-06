@@ -100,7 +100,7 @@ def paired_rows(first, second):
 def table_source(rows):
     lookup = {(r['task'], r['algo'], r['ablation_a'], r['ablation_b']): r for r in rows}
     lines = [r'\begin{table}[!ht]', r'\centering', r'\small',
-             r'\caption{Edge-set agreement across discovery ablations at the requested comparison sizes of 739 edges (IOI) and 235 edges (Greater-Than). Entries summarise five comparisons pairing identical dataset and PyTorch seeds (42--46). Ranges are descriptive. ACDC is approximately size matched using its selected threshold for each ablation; attained sizes are reported in \Cref{tab:within-ablation-stability}.}',
+             r'\caption{Edge-set agreement across discovery ablations at the requested comparison sizes of 739 edges for the IOI task and 235 edges for the Greater-Than task. Entries summarise five comparisons pairing identical dataset and PyTorch seeds (42--46). Ranges are descriptive. ACDC is approximately size matched using its selected threshold for each ablation; attained sizes are reported in \Cref{tab:within-ablation-stability}.}',
              r'\label{tab:cross-discovery-stability}', r'\setlength{\tabcolsep}{5pt}',
              r'\renewcommand{\arraystretch}{1.10}', r'\begin{tabular}{@{}lccc@{}}', r'\toprule',
              r'& \multicolumn{3}{c}{Jaccard: average [minimum, maximum]} \\',

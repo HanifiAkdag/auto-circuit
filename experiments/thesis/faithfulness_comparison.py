@@ -196,7 +196,7 @@ def _experiment_folder(name: Optional[str], seed: int) -> Path:
     return folder
 
 
-def _group_cells_by_discovery_ablation(loaded, seed: int):
+def _group_cells_by_discovery_ablation(loaded, seed: int, split_seed: Optional[int] = None):
     """Assemble {discovery-ablation D: {task_key: {base_algo_key: PruneScores}}}.
 
     Swept cells land in their own ablation's group; ablation-independent anchors
@@ -213,6 +213,8 @@ def _group_cells_by_discovery_ablation(loaded, seed: int):
     consumed: list = []
     for manifest, tps in loaded:
         cell = (manifest or {}).get("cell", {})
+        if cell.get("split_seed") != split_seed:
+            continue
         task_short, algo_short, abl = cell.get("task"), cell.get("algo"), cell.get("ablation")
         if cell.get("seed") != seed or cell.get("init_seed", cell.get("seed")) != seed or cell.get("null_test"):
             continue
@@ -243,6 +245,9 @@ def main():
     parser = argparse.ArgumentParser(description="Faithfulness spine analysis pass (sub-RQ3).")
     parser.add_argument("--cache-dir", default=FAITHFULNESS_CACHE_DIR, help="Discovery cell cache folder")
     parser.add_argument("--seed", type=int, default=42, help="Seed of the cells to analyse")
+    parser.add_argument("--eval-manifest", type=Path, help="Temporary historical repair evaluation manifest")
+    parser.add_argument("--split-seed", type=int, default=42, help="Common holdout seed for new discoveries")
+    parser.add_argument("--legacy-eval", action="store_true", help="Historical template evaluation for audit only")
     parser.add_argument("--name", default=None, help="Experiment folder name (default: faithfulness_seed<seed>_<date>)")
     parser.add_argument("--no-circuit-graphs", action="store_true", help="Skip circuit-graph HTML")
     parser.add_argument(
@@ -252,8 +257,33 @@ def main():
     )
     args = parser.parse_args()
 
+    if args.eval_manifest and args.legacy_eval:
+        parser.error('--eval-manifest and --legacy-eval are mutually exclusive')
+
+    from .evaluation_protocol import build_evaluation_tasks, load_protocol, verify_evaluation_task, verify_holdout_identity, fixed_evaluation_id
+    from .run_cell import _TASK_TEMPLATES, _data_budget
+    protocol = load_protocol(args.eval_manifest) if args.eval_manifest else None
+    split_seed = None if protocol or args.legacy_eval else args.split_seed
+    task_shorts = list(protocol['tasks']) if protocol else list(_TASK_TEMPLATES)
+    evaluation_tasks = None if args.legacy_eval else build_evaluation_tasks(protocol, task_shorts, args.split_seed)
     loaded = latest_per_cell(load_many_caches(args.cache_dir, "cell_"))
-    groups, consumed = _group_cells_by_discovery_ablation(loaded, args.seed)
+    groups, consumed = _group_cells_by_discovery_ablation(loaded, args.seed, split_seed)
+    if evaluation_tasks is not None:
+        groups = {d: {key: scores for key, scores in value.items() if key in evaluation_tasks} for d, value in groups.items()}
+        if protocol:
+            for short in task_shorts:
+                verify_evaluation_task(evaluation_tasks[_TASK_TEMPLATES[short].key], protocol, short)
+        else:
+            for short in task_shorts:
+                task = evaluation_tasks[_TASK_TEMPLATES[short].key]
+                sources = [m for m, _ in loaded if m.get('cell', {}).get('task') == short
+                           and m.get('cell', {}).get('split_seed') == split_seed
+                           and m.get('cell', {}).get('seed') == args.seed
+                           and m.get('cell', {}).get('init_seed', args.seed) == args.seed
+                           and not m.get('cell', {}).get('null_test')]
+                verify_holdout_identity(sources, task.test_loader.split_metadata, _data_budget(task))
+    if not any(groups.values()):
+        raise ValueError('No discovery cells match the requested evaluation split')
     print(f"Loaded {len(consumed)} cells from {args.cache_dir} (seed {args.seed}).")
 
     experiment_folder = _experiment_folder(args.name, args.seed)
@@ -277,6 +307,8 @@ def main():
         "metrics_per_task": {k: [m.key for m in ms] for k, ms in TASK_METRICS.items()},
         "similarity_edge_counts": args.similarity_edge_counts,
         "consumed_cells": consumed,
+        "evaluation_protocol_id": protocol['protocol_id'] if protocol else (fixed_evaluation_id(evaluation_tasks) if not args.legacy_eval else "legacy_template"),
+        "temporary_historical_repair": bool(protocol),
     }
     write_manifest(experiment_folder / "manifest.json", manifest)
 
@@ -295,14 +327,15 @@ def main():
 
         # Move loaded scores onto each task's model device + float32.
         for task_key, algo_ps in tps_d.items():
-            dev = next(TASK_DICT[task_key].model.parameters()).device
+            task = TASK_DICT[task_key] if evaluation_tasks is None else evaluation_tasks[task_key]
+            dev = next(task.model.parameters()).device
             for ak in list(algo_ps):
                 algo_ps[ak] = {m: s.float().to(dev) for m, s in algo_ps[ak].items()}
 
         # ── Circuit graphs (per discovery-ablation × task × algo) ──
         if not args.no_circuit_graphs:
             for task_key, algo_ps in tps_d.items():
-                task = TASK_DICT[task_key]
+                task = TASK_DICT[task_key] if evaluation_tasks is None else evaluation_tasks[task_key]
                 for algo_key, ps in algo_ps.items():
                     try:
                         save_circuit_sankey_slider(
@@ -325,13 +358,14 @@ def main():
         # ── Eval matrix: per patch direction × task × eval-ablation × metric ──
         for patch_type, measure in _PATCH_SEMANTICS.items():
             for task_key, algo_ps in tps_d.items():
-                task = TASK_DICT[task_key]
+                task = TASK_DICT[task_key] if evaluation_tasks is None else evaluation_tasks[task_key]
                 metrics = TASK_METRICS.get(task_key, _COMMON_METRICS)
                 try:
                     measurements = measure_prune_metrics(
                         ablation_types=EVAL_ABLATION_TYPES, metrics=metrics,
                         task_prune_scores={task_key: algo_ps}, patch_type=patch_type,
                         reverse_clean_corrupt=_reverse_clean_corrupt(patch_type),
+                        evaluation_tasks=evaluation_tasks,
                     )
                 except Exception as e:
                     print(f"WARNING: measure failed {d}/{measure}/{task.name}: {e}")

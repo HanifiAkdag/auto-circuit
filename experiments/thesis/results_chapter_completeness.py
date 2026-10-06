@@ -53,7 +53,18 @@ def select_manual(rows: list[dict[str, str]], task: str, ablation: str,
     return selected[0]
 
 
-def main() -> None:
+def main(source_dir=None, output_root=None) -> None:
+    global FUNCTIONAL, FUNCTIONAL_MANIFEST, MANUAL, OUT
+    if source_dir is not None:
+        if output_root is None:
+            raise ValueError('Alternate sources require separate output artifacts')
+        FUNCTIONAL = (ROOT / source_dir).resolve() / 'functional.csv'
+        FUNCTIONAL_MANIFEST = FUNCTIONAL.with_name('manifest.json')
+        root = (ROOT / output_root).resolve()
+        MANUAL = root / 'size_curves/manual_completeness.csv'
+        OUT = root / 'completeness'
+        from .evaluation_protocol import require_same_protocol
+        require_same_protocol(json.loads(FUNCTIONAL_MANIFEST.read_text()), json.loads((root / 'size_curves/manual_baselines_manifest.json').read_text()))
     functional = read_csv(FUNCTIONAL)
     manual = read_csv(MANUAL)
     rows: list[dict[str, object]] = []
@@ -86,6 +97,7 @@ def main() -> None:
         writer.writeheader()
         writer.writerows(rows)
     manifest = {
+        "evaluation_protocol_id": json.loads(FUNCTIONAL_MANIFEST.read_text()).get('evaluation_protocol_id'),
         "sources": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                     for path in (FUNCTIONAL, FUNCTIONAL_MANIFEST, MANUAL)},
         "selection": "Matched discovery/evaluation ablations at task-specific target; nearest realised ACDC boundary; Random anchor reused per evaluation ablation; deterministic manual circuit under native ablation.",
@@ -97,4 +109,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    args = parser.parse_args()
+    main(args.source_dir, args.output_root)

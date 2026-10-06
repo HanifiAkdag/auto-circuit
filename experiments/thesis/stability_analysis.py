@@ -25,6 +25,7 @@ Writes `structural.csv`, `functional.csv`, `summary.csv`, `summary.md` and the f
 """
 import argparse
 import csv
+import json
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -60,6 +61,7 @@ from auto_circuit.types import AblationType, PatchType, PruneScores
 from auto_circuit.utils.misc import repo_path_to_abs_path
 
 from .experiment_utils import algo_hyperparams, git_state, write_manifest
+from .evaluation_protocol import build_evaluation_tasks, load_protocol, verify_evaluation_task, load_frozen_inputs, sha256, fixed_evaluation_id, verify_holdout_identity
 from .faithfulness_comparison import (
     TASK_METRICS,
     _ABL_SHORT,
@@ -68,7 +70,7 @@ from .faithfulness_comparison import (
     _ablation_slug,
     _reverse_clean_corrupt,
 )
-from .run_cell import _ALGO_MAP, _TASK_TEMPLATES
+from .run_cell import _ALGO_MAP, _TASK_TEMPLATES, _data_budget
 from .stability_cells import (
     ANCHOR_ABLATION,
     ANCHOR_ALGOS,
@@ -127,6 +129,7 @@ class Cell:
     condition: str = "joint"
     seeds: List[int] = field(default_factory=list)
     scores: List[PruneScores] = field(default_factory=list)
+    manifests: List[dict] = field(default_factory=list)
 
     @property
     def task_key(self) -> str:
@@ -211,7 +214,7 @@ def _cell_specs(
     return specs
 
 
-def _load_cell(cache_dir: str, spec: Tuple[str, str, str, str], seeds: List[int]) -> Cell:
+def _load_cell(cache_dir: str, spec: Tuple[str, str, str, str], seeds: List[int], split_seed: Optional[int] = None, frozen_inputs: Optional[list] = None) -> Cell:
     """Load one group's seeds.
 
     Globs narrowly per group rather than loading all caches at once, and re-keys the
@@ -228,11 +231,24 @@ def _load_cell(cache_dir: str, spec: Tuple[str, str, str, str], seeds: List[int]
     task, algo, ablation, condition = spec
     wanted = _effective_condition(algo, condition)
     pattern = f"cell_{task}_{algo.replace('-', '_')}_{ablation}_seed"
-    loaded = latest_per_cell(load_many_caches(cache_dir, pattern))
+    if frozen_inputs is None:
+        loaded = latest_per_cell(load_many_caches(cache_dir, pattern))
+    else:
+        import torch
+        from .evaluation_protocol import ROOT
+        loaded = []
+        for item in frozen_inputs:
+            meta = item['cell']
+            if (meta.get('task'), meta.get('algo'), meta.get('ablation')) == (task, algo, ablation):
+                manifest = json.loads((ROOT / item['manifest']).read_text())
+                loaded.append((manifest, torch.load(ROOT / item['scores'], map_location='cpu', weights_only=True)))
     cell = Cell(task=task, algo=algo, ablation=ablation, condition=condition)
     by_seed: Dict[int, PruneScores] = {}
+    manifests = {}
     for manifest, tps in loaded:
         meta = (manifest or {}).get("cell", {})
+        if meta.get("split_seed") != split_seed:
+            continue
         if meta.get("null_test"):
             continue
         data_seed = int(meta.get("seed", -1))
@@ -244,9 +260,11 @@ def _load_cell(cache_dir: str, spec: Tuple[str, str, str, str], seeds: List[int]
         if varying not in seeds:
             continue
         by_seed[varying] = next(iter(next(iter(tps.values())).values()))
+        manifests[varying] = manifest
     for seed in sorted(by_seed):
         cell.seeds.append(seed)
         cell.scores.append(by_seed[seed])
+        cell.manifests.append(manifests[seed])
     return cell
 
 
@@ -333,6 +351,7 @@ def _functional_rows(
     budgets: List[Budget],
     device_scores: List[PruneScores],
     patch_types: List[PatchType],
+    evaluation_tasks: Optional[dict] = None,
 ) -> List[dict]:
     """Re-score each seed's circuit, one `measure_prune_metrics` call per (seed, measure).
 
@@ -340,7 +359,7 @@ def _functional_rows(
     seed, and `test_edge_counts` is shared across the algos in a single call. The patch
     type is a scalar argument, so the two measures are separate calls as well.
     """
-    task = TASK_DICT[cell.task_key]
+    task = TASK_DICT[cell.task_key] if evaluation_tasks is None else evaluation_tasks[cell.task_key]
     metrics = TASK_METRICS.get(cell.task_key, _COMMON_METRICS)
     eval_ablations = _eval_ablations(cell)
     n_edges = len(index)
@@ -370,6 +389,7 @@ def _functional_rows(
                 patch_type=patch_type,
                 reverse_clean_corrupt=_reverse_clean_corrupt(patch_type),
                 test_edge_counts=counts,
+                evaluation_tasks=evaluation_tasks,
             )
             for ablation in eval_ablations:
                 for metric in metrics:
@@ -585,7 +605,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--cache-dir", default=STABILITY_CACHE_DIR)
     parser.add_argument("--name", default=None, help="Experiment folder name")
-    parser.add_argument("--tasks", nargs="+", default=TASKS)
+    parser.add_argument("--eval-manifest", type=Path, help="Temporary historical repair artifact; never used for new discovery")
+    parser.add_argument("--selected-inputs", type=Path, help="Frozen score/manifest inventory for the temporary historical repair")
+    parser.add_argument("--split-seed", type=int, default=42, help="Fixed holdout seed of new discovery caches")
+    parser.add_argument("--legacy-eval", action="store_true", help="Reproduce historical evaluation, including overlap; audit only")
+    parser.add_argument("--tasks", nargs="+", default=None)
     parser.add_argument("--algos", nargs="+", default=SWEPT_ALGOS + ANCHOR_ALGOS)
     parser.add_argument("--ablations", nargs="+", default=DISCOVERY_ABLATIONS)
     parser.add_argument("--conditions", nargs="+", choices=CONDITIONS, default=CONDITIONS)
@@ -609,13 +633,22 @@ def main() -> None:
         "--name, without touching the caches. Needs no GPU.",
     )
     args = parser.parse_args()
+    if args.eval_manifest and args.legacy_eval:
+        parser.error('--eval-manifest and --legacy-eval are mutually exclusive')
+    if args.eval_manifest and not args.selected_inputs:
+        parser.error('Temporary repair requires --selected-inputs to freeze historical circuits')
 
     if args.summary_only:
         _rebuild_summary(_experiment_folder(args.name), skip_figures=args.skip_figures)
         return
 
+    protocol = load_protocol(args.eval_manifest) if args.eval_manifest else None
+    frozen_inputs = load_frozen_inputs(args.selected_inputs) if args.selected_inputs else None
+    args.tasks = args.tasks or (list(protocol['tasks']) if protocol else TASKS)
+    split_seed = None if protocol or args.legacy_eval else args.split_seed
+    evaluation_tasks = None if args.legacy_eval else build_evaluation_tasks(protocol, args.tasks, args.split_seed)
     specs = _cell_specs(args.tasks, args.algos, args.ablations, args.conditions)
-    cells = [_load_cell(args.cache_dir, spec, args.seeds) for spec in specs]
+    cells = [_load_cell(args.cache_dir, spec, args.seeds, split_seed=split_seed, frozen_inputs=frozen_inputs) for spec in specs]
 
     if args.dry_run:
         print(f"{'cell':<48} {'seeds':<20} n")
@@ -628,6 +661,8 @@ def main() -> None:
               f"{_acdc_tau_grid()[-1]:.1e}")
         return
 
+    if any(len(c.seeds) != len(args.seeds) for c in cells):
+        raise ValueError('Incomplete discovery inputs for the requested split protocol; use --legacy-eval only for historical audit')
     folder = _experiment_folder(args.name)
     print(f"Writing results to: {folder}")
     manifest = {
@@ -640,7 +675,13 @@ def main() -> None:
         "anchor_seed": ANCHOR_SEED,
         "eval_protocol": f"measures {sorted(args.measures)} x all three eval ablations, "
         "every cell",
-        "eval_data": "TASK_DICT template test_loader, identical for every seed",
+        "eval_data": "historical template (overlap possible)" if args.legacy_eval else "explicit common held-out evaluation Tasks",
+        "evaluation_protocol_id": protocol['protocol_id'] if protocol else (fixed_evaluation_id(evaluation_tasks) if not args.legacy_eval else "legacy_template"),
+        "evaluation_manifest": str(args.eval_manifest) if args.eval_manifest else None,
+        "temporary_historical_repair": bool(protocol),
+        "selected_inputs": str(args.selected_inputs) if args.selected_inputs else None,
+        "selected_inputs_sha256": sha256(args.selected_inputs) if args.selected_inputs else None,
+        "complete": False,
         "stability_metric": STABILITY_METRIC,
         "stable_bar": STABLE_BAR,
         "cells": [
@@ -660,7 +701,11 @@ def main() -> None:
         if len(cell.seeds) < 2:
             print(f"WARNING: {cell} has {len(cell.seeds)} seed(s), skipping")
             continue
-        task = TASK_DICT[cell.task_key]
+        task = TASK_DICT[cell.task_key] if evaluation_tasks is None else evaluation_tasks[cell.task_key]
+        if protocol:
+            verify_evaluation_task(task, protocol, cell.task)
+        elif not args.legacy_eval:
+            verify_holdout_identity(cell.manifests, task.test_loader.split_metadata, _data_budget(task))
         edges = task.model.edges
         index = edge_index(edges, cell.scores[0])
         budgets = _budgets(cell, edges, task.true_edge_count)
@@ -677,7 +722,7 @@ def main() -> None:
             wanted = sorted(set(args.functional_budgets + ([task.true_edge_count] if task.true_edge_count else [])))
             fbudgets = [Budget("top_k", k) for k in wanted if 0 < k < len(edges)]
             fbudgets.append(Budget("top_k", len(edges)))
-        functional += _functional_rows(cell, index, fbudgets, on_device, patch_types)
+        functional += _functional_rows(cell, index, fbudgets, on_device, patch_types, evaluation_tasks=evaluation_tasks)
 
     _write_csv(folder / "structural.csv", structural, STRUCTURAL_FIELDS)
     if functional:
@@ -692,6 +737,7 @@ def main() -> None:
     manifest["completed_at"] = datetime.now().isoformat(timespec="seconds")
     manifest["structural_rows"] = len(structural)
     manifest["functional_rows"] = len(functional)
+    manifest["complete"] = True
     write_manifest(folder / "manifest.json", manifest)
 
     if not args.skip_figures:

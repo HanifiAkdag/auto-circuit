@@ -314,6 +314,7 @@ def latest_per_cell(
             cell.get("seed"),
             cell.get("init_seed", cell.get("seed")),
             cell.get("null_test"),
+            cell.get("split_seed"),
         )
         saved = (manifest or {}).get("saved_at", "")
         if key not in best or saved > best[key][0]:

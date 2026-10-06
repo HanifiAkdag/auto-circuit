@@ -14,6 +14,7 @@ See docs/superpowers/specs/2026-06-02-circuit-discovery-comparison-design.md §3
 (Operating model) for the full design rationale.
 """
 import argparse
+import hashlib
 import json
 import os
 import random
@@ -144,6 +145,7 @@ def _cache_stem(
     init_seed: Optional[int],
     null_test: bool = False,
     partial_tag: Optional[str] = None,
+    split_seed: Optional[int] = None,
 ) -> str:
     """Cache identity. The init tag appears only when the init seed differs from the data
     seed, so joint cells keep the names the existing cells already use and --skip-if-exists
@@ -151,8 +153,9 @@ def _cache_stem(
     init_tag = "" if init_seed is None or init_seed == seed else f"_init{init_seed}"
     null_tag = "_null" if null_test else ""
     ptag = f"__{partial_tag}" if partial_tag else ""
+    split_tag = "" if split_seed is None else f"_holdout{split_seed}"
     algo_slug = algo.replace("-", "_")
-    return f"cell_{task}_{algo_slug}_{ablation}_seed{seed}{init_tag}{null_tag}{ptag}"
+    return f"cell_{task}_{algo_slug}_{ablation}_seed{seed}{init_tag}{null_tag}{split_tag}{ptag}"
 
 
 def _hardware() -> dict[str, Any]:
@@ -173,14 +176,26 @@ def _data_budget(task: Task) -> dict[str, Any]:
     pair = lambda v: v if isinstance(v, tuple) else (v, v)  # noqa: E731
     bs, bc = pair(task.batch_size), pair(task.batch_count)
     return {
-        "batch_size": task.batch_size,
-        "batch_count": task.batch_count,
+        "batch_size": list(task.batch_size) if isinstance(task.batch_size, tuple) else task.batch_size,
+        "batch_count": list(task.batch_count) if isinstance(task.batch_count, tuple) else task.batch_count,
         "train_examples": bs[0] * bc[0],
         "test_examples": bs[1] * bc[1],
     }
 
 
-def _build_task(task_short: str, seed: int, null_test: bool) -> Task:
+def _can_reuse_cache(manifest: dict, task_short: str, split_seed: Optional[int]) -> bool:
+    template = _TASK_TEMPLATES[task_short]
+    if manifest.get('cell', {}).get('split_seed') != split_seed or manifest.get('data_budget') != _data_budget(template):
+        return False
+    if split_seed is None:
+        return True
+    path = repo_path_to_abs_path(f'datasets/{template._dataset_name}.json')
+    records = json.loads(path.read_text())['prompts']
+    pool_hash = hashlib.sha256(json.dumps(records, sort_keys=True).encode()).hexdigest()
+    return (manifest.get('data_split') or {}).get('pool_sha256') == pool_hash
+
+
+def _build_task(task_short: str, seed: int, null_test: bool, split_seed: Optional[int] = 42) -> Task:
     """Construct a Task from the template, overriding seed (and model for null test)."""
     tmpl = _TASK_TEMPLATES[task_short]
     kwargs = {
@@ -196,6 +211,7 @@ def _build_task(task_short: str, seed: int, null_test: bool) -> Task:
         "slice_output": tmpl.slice_output,
         "dtype": tmpl.dtype,
         "seed": seed,
+        "split_seed": split_seed,
     }
     if null_test:
         device = t.device("cuda" if t.cuda.is_available() else "cpu")
@@ -212,6 +228,8 @@ def main():
     parser.add_argument("--ablation", required=True, choices=list(_ABLATION_MAP), help="Discovery ablation type")
     parser.add_argument("--seed", type=int, default=42, help="Random seed (data shuffle + mask init)")
     parser.add_argument("--init-seed", type=int, default=None, help="Mask-init seed, decoupled from --seed (data draw). Omit for the legacy coupled path.")
+    parser.add_argument("--split-seed", type=int, default=42, help="Fixed holdout seed shared by all discovery runs (default: 42)")
+    parser.add_argument("--legacy-split", action="store_true", help="Reproduce historical per-run train/test membership; unsuitable for common held-out evaluation")
     parser.add_argument("--output-dir", default=".prune_scores_cache", help="Cache folder (relative to repo root)")
     parser.add_argument("--null-test", action="store_true", help="Use randomly-initialized model weights (dead-salmon null)")
     parser.add_argument("--skip-if-exists", action="store_true", help="Skip if this cell is already cached (requeue-safe)")
@@ -224,11 +242,13 @@ def main():
     parser.add_argument("--tao-exps", default=None, help="ACDC only: comma-separated tao exps override (e.g. '-5,-4,-3,-2')")
     parser.add_argument("--partial-tag", default=None, help="Suffix appended to the cache stem (for tao-split partials)")
     args = parser.parse_args()
+    split_seed = None if args.legacy_split else args.split_seed
 
     # ── Cache identity (computed up front so we can skip/resume) ──
     base_filename = _cache_stem(
         args.task, args.algo, args.ablation, args.seed, args.init_seed,
         args.null_test, args.partial_tag,
+        split_seed=split_seed,
     )
     folder = repo_path_to_abs_path(args.output_dir)
     folder.mkdir(parents=True, exist_ok=True)
@@ -242,6 +262,7 @@ def main():
         existing = [
             p for p in sorted(folder.glob(f"{base_filename}-*.pkl"))
             if (folder / f"{p.stem}_manifest.json").exists()
+            and _can_reuse_cache(json.loads((folder / f"{p.stem}_manifest.json").read_text()), args.task, split_seed)
         ]
         if existing:
             print(f"Cell already cached ({existing[-1].name}); skipping. Use --force to recompute.")
@@ -274,7 +295,7 @@ def main():
     else:
         algo = base_algo  # GT / Random: ablation is irrelevant
 
-    task = _build_task(args.task, args.seed, args.null_test)
+    task = _build_task(args.task, args.seed, args.null_test, split_seed=split_seed)
 
     # --init-seed decouples mask initialisation from the prompt draw. load_datasets_from_json
     # re-seeds torch itself, so the seed has to land after the loaders are built; init_task is
@@ -309,6 +330,7 @@ def main():
             "seed": args.seed,
             "init_seed": args.seed if args.init_seed is None else args.init_seed,
             "null_test": args.null_test,
+            "split_seed": split_seed,
         },
         "cache_file": cache_path.name,
         "saved_at": datetime.now().isoformat(timespec="seconds"),
@@ -316,6 +338,7 @@ def main():
         "hardware": _hardware(),
         "data_budget": _data_budget(task),
         "algo_hyperparams": algo_hyperparams(algo),
+        "data_split": getattr(task.train_loader, "split_metadata", None),
     }
     manifest_path = folder / f"{full_stem}_manifest.json"
     tmp_manifest = manifest_path.with_name(manifest_path.name + ".tmp")

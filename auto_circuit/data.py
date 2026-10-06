@@ -1,4 +1,5 @@
 import json
+import hashlib
 import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -228,6 +229,7 @@ def load_datasets_from_json(
     shuffle: bool = True,
     random_seed: int = 42,
     pad: bool = True,
+    split_seed: Optional[int] = None,
 ) -> Tuple[PromptDataLoader, PromptDataLoader]:
     """
     Load a dataset from a json file. The file should specify a list of
@@ -281,6 +283,8 @@ def load_datasets_from_json(
         random_seed: Seed for the random number generator.
         pad: If `True`, pad the prompts to the maximum length in the batch. Do not use
             in conjunction with `return_seq_length`.
+        split_seed: Reserve one content-disjoint test set independently of the training
+            seed. None retains the historical shuffled split. Requires shuffle=True.
 
     Note:
         `shuffle` only shuffles the order of the prompts once at the beginning. The
@@ -289,6 +293,8 @@ def load_datasets_from_json(
         constructor). This makes it easier to ensure experiments are deterministic.
     """
     assert not (prepend_bos and (model is None)), "Need model tokenizer to prepend bos"
+    if split_seed is not None and not shuffle:
+        raise ValueError("A fixed split seed requires shuffle=True")
 
     # Load a dataset. If path is a list, only the first dataset is fully loaded.
     first_path = path if isinstance(path, Path) else path[0]
@@ -306,12 +312,15 @@ def load_datasets_from_json(
     # Shuffle data and split into train and test
     random.seed(random_seed)
     t.random.manual_seed(random_seed)
-    random.shuffle(data["prompts"]) if shuffle else None
+    random.shuffle(data["prompts"]) if shuffle and split_seed is None else None
     n_train_and_test = sum(train_test_size)
-    clean_prompts = [d["clean"] for d in data["prompts"]][:n_train_and_test]
-    corrupt_prompts = [d["corrupt"] for d in data["prompts"]][:n_train_and_test]
-    answer_strs = [d["answers"] for d in data["prompts"]][:n_train_and_test]
-    wrong_answer_strs = [d["wrong_answers"] for d in data["prompts"]][:n_train_and_test]
+    n_load = n_train_and_test if split_seed is None else len(data["prompts"])
+    if n_load < n_train_and_test or len(data["prompts"]) < n_train_and_test:
+        raise ValueError("Insufficient prompt records for the requested train/test sizes")
+    clean_prompts = [d["clean"] for d in data["prompts"]][:n_load]
+    corrupt_prompts = [d["corrupt"] for d in data["prompts"]][:n_load]
+    answer_strs = [d["answers"] for d in data["prompts"]][:n_load]
+    wrong_answer_strs = [d["wrong_answers"] for d in data["prompts"]][:n_load]
     seq_labels = data.get("seq_labels", None)
     word_idxs = data.get("word_idxs", {})
 
@@ -322,6 +331,30 @@ def load_datasets_from_json(
 
     kvs = []
     diverge_idx: int = 0
+    split_metadata = None
+    if split_seed is not None:
+        if model is None:
+            clean_ids = [tuple(p) for p in clean_prompts]
+            corrupt_ids = [tuple(p) for p in corrupt_prompts]
+        else:
+            bos = model.tokenizer.bos_token if prepend_bos else ""
+            clean_ids = [tuple(model.tokenizer.encode(bos + p)) for p in clean_prompts]
+            corrupt_ids = [tuple(model.tokenizer.encode(bos + p)) for p in corrupt_prompts]
+        train_idxs, test_idxs = fixed_holdout_indices(
+            clean_ids, corrupt_ids, train_test_size, random_seed, split_seed
+        )
+        chosen = train_idxs + test_idxs
+        clean_prompts = [clean_prompts[i] for i in chosen]
+        corrupt_prompts = [corrupt_prompts[i] for i in chosen]
+        answer_strs = [answer_strs[i] for i in chosen]
+        wrong_answer_strs = [wrong_answer_strs[i] for i in chosen]
+        split_metadata = {
+            "protocol": "fixed_holdout_v1", "split_seed": split_seed,
+            "pool_sha256": hashlib.sha256(json.dumps(data["prompts"], sort_keys=True).encode()).hexdigest(),
+            "train_row_ids": train_idxs, "test_row_ids": test_idxs,
+            "test_clean_sha256": hashlib.sha256(json.dumps([clean_ids[i] for i in test_idxs]).encode()).hexdigest(),
+            "clean_input_overlap": 0,
+        }
     if model is None:
         clean_prompts = [t.tensor(p).to(device) for p in clean_prompts]
         corrupt_prompts = [t.tensor(p).to(device) for p in corrupt_prompts]
@@ -417,4 +450,33 @@ def load_datasets_from_json(
         batch_size=batch_size[1] if isinstance(batch_size, tuple) else batch_size,
         shuffle=False,
     )
+    train_loader.split_metadata = test_loader.split_metadata = split_metadata
     return train_loader, test_loader
+
+
+def fixed_holdout_indices(
+    clean_ids: List[Tuple[int, ...]],
+    corrupt_ids: List[Tuple[int, ...]],
+    sizes: Tuple[int, int],
+    random_seed: int,
+    split_seed: int,
+) -> Tuple[List[int], List[int]]:
+    """Reserve unique clean inputs; vary training membership without exposing them."""
+    order = list(range(len(clean_ids)))
+    random.Random(split_seed).shuffle(order)
+    test_idxs, test_clean = [], set()
+    for idx in order:
+        if len(test_idxs) == sizes[1]:
+            break
+        if clean_ids[idx] not in test_clean:
+            test_idxs.append(idx)
+            test_clean.add(clean_ids[idx])
+    if len(test_idxs) != sizes[1]:
+        raise ValueError("Insufficient unique clean prompts for the fixed holdout")
+    test_rows = set(test_idxs)
+    eligible = [i for i in range(len(clean_ids)) if i not in test_rows
+                and clean_ids[i] not in test_clean and corrupt_ids[i] not in test_clean]
+    if len(eligible) < sizes[0]:
+        raise ValueError("Insufficient training prompts after held-out input exclusion")
+    random.Random(random_seed).shuffle(eligible)
+    return eligible[:sizes[0]], test_idxs

@@ -12,7 +12,7 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
 from auto_circuit.metrics.prune_metrics.prune_metrics_plot import edge_patching_plot
 from auto_circuit.prune import run_circuits
 from auto_circuit.prune_algos.prune_algos import PRUNE_ALGO_DICT
-from auto_circuit.tasks import TASK_DICT
+from auto_circuit.tasks import TASK_DICT, Task
 from auto_circuit.types import (
     AblationMeasurements,
     AblationType,
@@ -39,6 +39,7 @@ def measure_prune_metrics(
     patch_type: PatchType,
     reverse_clean_corrupt: bool = False,
     test_edge_counts: Optional[List[int]] = None,
+    evaluation_tasks: Optional[Dict[str, Task]] = None,
 ) -> AblationMeasurements:
     """
     Measure a set of circuit metrics for each
@@ -54,6 +55,8 @@ def measure_prune_metrics(
         reverse_clean_corrupt: Reverse clean and corrupt (for input and patches).
         test_edge_counts: The set of [number of edges to prune] for each task and
             algorithm.
+        evaluation_tasks: Explicit evaluation Tasks. Missing keys raise an error;
+            None retains the registry-based evaluation path.
 
     Returns:
         A nested dictionary of measurements for each ablation type, metric, task, and
@@ -61,7 +64,9 @@ def measure_prune_metrics(
     """
     measurements: AblationMeasurements = defaultdict(double_default_factory)
     for task_key, algo_prune_scores in (task_pbar := tqdm(task_prune_scores.items())):
-        task = TASK_DICT[task_key]
+        task = TASK_DICT[task_key] if evaluation_tasks is None else evaluation_tasks[task_key]
+        if task.key != task_key:
+            raise ValueError("Evaluation Task key does not match score Task key")
         task_pbar.set_description_str(f"Task: {task.name}")
         test_loader = task.test_loader
         for algo_key, prune_scores in (algo_pbar := tqdm(algo_prune_scores.items())):
@@ -87,7 +92,7 @@ def measure_prune_metrics(
                 for metric in (metric_pbar := tqdm(metrics)):
                     metric_pbar.set_description_str(f"Measuring {metric.name}")
                     measurement = metric.metric_func(
-                        task.model, task.test_loader, circuit_outs
+                        task.model, test_loader, circuit_outs
                     )
                     measurements[ablation_type][metric.key][task.key][
                         algo.key

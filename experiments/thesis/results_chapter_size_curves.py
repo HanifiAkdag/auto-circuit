@@ -5,6 +5,7 @@ Run on a CPU compute node: srun --mem=8G python -m experiments.thesis.results_ch
 from __future__ import annotations
 
 import csv
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -18,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "results/stability/stability_v5_2026-09-19"
 OUT = ROOT / "results/results_chapter"
 SIZE_OUT = OUT / "size_curves"
-INSPECTION = Path("/tmp/auto-circuit-results-inspection/size_curves")
+INSPECTION = SIZE_OUT
 ABLATIONS = ("zero", "resample", "mean")
 TASKS = {
     "ioi": ("Indirect Object Identification", "IOI"),
@@ -33,10 +34,10 @@ STYLE = {
     "EP": ("#0072B2", "Edge Pruning"),
     "DiscoGP": ("#D55E00", "DiscoGP"),
     "Random": ("#777777", "Random circuit"),
-    "Manual circuit": ("#222222", "Ground truth"),
+    "Manual circuit": ("#222222", "Manually identified circuit"),
 }
 METRICS = (("Clean KL Div", "Clean KL divergence"),
-           ("Logit Diff Percent", "Recovered logit difference (%)"),
+           ("Logit Diff Percent", "Logit difference (%)"),
            ("Correct Answer Greater Than Incorrect Percent",
             "Correct-over-incorrect accuracy (%)"))
 TASK_METRICS = {
@@ -50,6 +51,12 @@ MANUAL_BUDGETS = {"ioi": 739, "gt": 235, "docstring": 24}
 def read_csv(path):
     with path.open(newline="") as f:
         return list(csv.DictReader(f))
+
+
+def validate_source_protocol(source_meta, manual_meta):
+    from .evaluation_protocol import require_same_protocol
+    require_same_protocol({'evaluation_protocol_id': source_meta.get('evaluation_protocol_id', 'legacy_template')},
+                          {'evaluation_protocol_id': manual_meta.get('evaluation_protocol_id', 'legacy_template')})
 
 
 def metric_ylim(task_rows, metric):
@@ -71,14 +78,29 @@ def metric_ylim(task_rows, metric):
     return [lower if lower == 0 else lower - padding, upper + padding]
 
 
-def main():
+def main(source_dir=None, output_dir=None, task_keys=None):
+    global SOURCE, OUT, SIZE_OUT, INSPECTION, TASKS, TASK_METRICS
+    if source_dir is not None:
+        if output_dir is None:
+            raise ValueError('An alternate source requires a separate output directory')
+        SOURCE = (ROOT / source_dir).resolve()
+        OUT = (ROOT / output_dir).resolve()
+        SIZE_OUT = INSPECTION = OUT / 'size_curves'
+    if task_keys is not None:
+        TASKS = {k: v for k, v in TASKS.items() if k in task_keys}
+        TASK_METRICS = {k: v for k, v in TASK_METRICS.items() if k in task_keys}
     SIZE_OUT.mkdir(parents=True, exist_ok=True)
     INSPECTION.mkdir(parents=True, exist_ok=True)
     functional = SOURCE / "functional.csv"
     stability_manifest = SOURCE / "manifest.json"
     source_meta = json.loads(stability_manifest.read_text())
+    manual_meta = json.loads((SIZE_OUT / 'manual_baselines_manifest.json').read_text())
+    validate_source_protocol(source_meta, manual_meta)
     assert source_meta["seeds"] == [42, 43, 44, 45, 46]
-    assert len(source_meta["cells"]) == 96
+    if source_dir is None:
+        assert len(source_meta["cells"]) == 96
+    else:
+        assert source_meta['complete']
     all_rows = read_csv(functional)
     manual_file = SIZE_OUT / "manual_baselines.csv"
     assert manual_file.exists(), "Run results_chapter_manual_baseline.py first"
@@ -155,7 +177,7 @@ def main():
         n_cols = len(task_metrics) if horizontal_layout else len(plot_ablations)
         subplot_titles = ([ylabel for _, ylabel in task_metrics]
                           if horizontal_layout else
-                          [a.capitalize() for a in plot_ablations]
+                          [f"{a.capitalize()} ablation" for a in plot_ablations]
                           + [""] * ((len(task_metrics) - 1) * len(plot_ablations)))
         fig = make_subplots(rows=n_rows, cols=n_cols,
                             horizontal_spacing=.075,
@@ -221,10 +243,10 @@ def main():
         figure_width = 1060 if len(plot_ablations) == 3 else 560
         if horizontal_layout:
             figure_width = 1060
-            figure_height = 430
+            figure_height = 460
             left_margin = 65
-            bottom_margin = 116
-            legend_y = -.23
+            bottom_margin = 160
+            legend_y = -.32
         else:
             figure_height = 900 if len(task_metrics) == 3 else 700
             left_margin = 83
@@ -258,6 +280,7 @@ def main():
             native_ablation = "mean" if task_key == "ioi" else "resample"
             render_task_figure(task_key, task_name, task_label, (native_ablation,), "_native")
     manifest = {
+        "evaluation_protocol_id": source_meta.get('evaluation_protocol_id'),
         "figures": [f"{TASK_SLUGS[k]}_size_curves.pdf" for k in TASKS],
         "main_figures": {
             "ioi": "ioi_native_size_curves.pdf",
@@ -281,10 +304,17 @@ def main():
         "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its task's native evaluation ablation (mean for IOI, resample for Greater-Than and Docstring)",
         "acdc": "Only recorded threshold boundaries and full-circuit point are plotted; lines connect observations without adding intermediate values",
         "rows": len(rows), "manual_budgets": MANUAL_BUDGETS,
+        "output_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                          for p in SIZE_OUT.glob("*_size_curves.pdf")},
     }
     (SIZE_OUT / "size_curves_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"Wrote {len(rows)} plotted rows")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-dir', type=Path)
+    parser.add_argument('--tasks', nargs='+')
+    args = parser.parse_args()
+    main(args.source_dir, args.output_dir, args.tasks)

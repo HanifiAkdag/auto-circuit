@@ -34,7 +34,7 @@ TASKS = {
 }
 METRIC_LABELS = {
     "Clean KL Div": "Clean KL divergence",
-    "Logit Diff Percent": "Logit-difference recovery (%)",
+    "Logit Diff Percent": "Logit difference (% of full model)",
     "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect accuracy (%)",
 }
 AXIS_LABELS = METRIC_LABELS
@@ -65,8 +65,12 @@ def select() -> list[dict[str, object]]:
     assert sha(ROOT / selection_meta["source"]) == selection_meta["source_sha256"]
     assert sha(ROOT / selection_meta["source_manifest"]) == selection_meta["source_manifest_sha256"]
     source_meta = json.loads(SOURCE_MANIFEST.read_text())
+    if source_meta.get('evaluation_protocol_id'):
+        from .evaluation_protocol import require_same_protocol
+        require_same_protocol(source_meta, selection_meta)
     assert source_meta["seeds"] == [42, 43, 44, 45, 46]
-    assert source_meta["discovery_cache_dir"] == ".prune_scores/final/benchmark"
+    if not source_meta.get('evaluation_protocol_id'):
+        assert source_meta["discovery_cache_dir"] == ".prune_scores/final/benchmark"
     all_rows = read_csv(SOURCE)
     selection = read_csv(SELECTION)
     selected = []
@@ -124,7 +128,7 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     legend_size = 17
     headings = {
         "Clean KL Div": "Clean KL divergence",
-        "Logit Diff Percent": "Logit difference (%)",
+        "Logit Diff Percent": "Logit difference<br>(% of full model)",
         "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
     }
     fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True,
@@ -194,12 +198,16 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     for i, discovery in enumerate(ABLATIONS):
         y = 10.5 - group_spacing * i
         fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=y, yref="y",
-                           text=f"<b>{discovery.capitalize()} discovery</b>", textangle=-90,
+                           text=f"<b>{discovery.capitalize()}</b>", textangle=-90,
                            showarrow=False, xanchor="center", yanchor="middle",
                            font=dict(size=discovery_label_size, color="#303030"))
 
     for annotation in fig.layout.annotations[:len(metrics)]:
         annotation.update(font=dict(size=title_size, color="#222222"), y=1.04)
+    fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=1.04, yref="paper",
+                       text="<b>Discovery<br>ablation</b>", showarrow=False,
+                       xanchor="center", yanchor="bottom",
+                       font=dict(size=discovery_label_size, color="#303030"))
     fig.update_layout(template="simple_white", width=width,
                       height=740, margin=dict(l=left_margin, r=right_margin, t=115, b=115),
                       font=dict(family="Arial", color="#222222", size=legend_size),
@@ -238,11 +246,11 @@ def render_table(rows: list[dict[str, object]], task: str, metric: str) -> str:
     slug, title, _, _ = TASKS[task]
     caption_metric = METRIC_LABELS[metric].replace("%", r"\%")
     lines = [r"\begin{table}[ht]", r"\centering", r"\footnotesize",
-             "\\caption{" + title + " " + caption_metric[0].lower() + caption_metric[1:]
-             + " under each evaluation ablation. Values are five-run average $\\pm$ population SD.}",
+             "\\caption{" + caption_metric + " for the " + title
+             + " task under each evaluation ablation. Values are five-run average $\\pm$ population SD. Numeric columns identify the evaluation ablation.}",
              "\\label{tab:" + slug.replace("_", "-") + "-evaluation-" + METRIC_SLUGS[metric].replace("_", "-") + "}",
              r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccc@{}}", r"\toprule",
-             "Discovery & Method & Zero & Resample & Mean \\\\", r"\midrule"]
+             "Discovery ablation & Method & Zero & Resample & Mean \\\\", r"\midrule"]
     for discovery in ABLATIONS:
         for i, method in enumerate(METHODS):
             values = []
@@ -273,7 +281,17 @@ def update_appendix(tables: list[str]) -> None:
     APPENDIX.write_text(appendix)
 
 
-def main() -> None:
+def main(source_dir=None, output_root=None) -> None:
+    global SOURCE, SOURCE_MANIFEST, SELECTION, SELECTION_MANIFEST, OUT, IMAGES
+    if source_dir is not None:
+        if output_root is None:
+            raise ValueError('Alternate evaluation sources require separate preview artifacts')
+        SOURCE = (ROOT / source_dir).resolve() / 'functional.csv'
+        SOURCE_MANIFEST = SOURCE.with_name('manifest.json')
+        root = (ROOT / output_root).resolve()
+        SELECTION = root / 'controlled_comparison/matched_quality.csv'
+        SELECTION_MANIFEST = SELECTION.with_name('matched_quality_manifest.json')
+        OUT = IMAGES = root / 'evaluation_ablation'
     for directory in (OUT, IMAGES):
         directory.mkdir(parents=True, exist_ok=True)
     rows = select()
@@ -287,9 +305,15 @@ def main() -> None:
     for task, (_, _, _, metrics) in TASKS.items():
         outputs.extend(render_figure(rows, task))
         tables.extend(render_table(rows, task, metric) for metric in metrics)
-    update_appendix(tables)
-    outputs.append(APPENDIX)
+    if source_dir is None:
+        update_appendix(tables)
+        outputs.append(APPENDIX)
+    else:
+        table_path = OUT / 'appendix_tables.tex'
+        table_path.write_text('\n\n'.join(tables) + '\n')
+        outputs.append(table_path)
     manifest = {
+        "evaluation_protocol_id": json.loads(SOURCE_MANIFEST.read_text()).get('evaluation_protocol_id'),
         "source": str(SOURCE.relative_to(ROOT)), "source_sha256": sha(SOURCE),
         "source_manifest": str(SOURCE_MANIFEST.relative_to(ROOT)),
         "source_manifest_sha256": sha(SOURCE_MANIFEST),
@@ -306,4 +330,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    args = parser.parse_args()
+    main(args.source_dir, args.output_root)
