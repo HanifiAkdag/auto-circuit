@@ -214,3 +214,12 @@ def test_join_rejects_incomplete_functional_bundle():
     from experiments.thesis.evaluation_protocol import require_same_protocol
     with pytest.raises(ValueError, match='Incomplete'):
         require_same_protocol({'evaluation_protocol_id': 'p', 'complete': False}, {'evaluation_protocol_id': 'p'})
+
+
+def test_smoke_prefix_comes_from_the_frozen_task_prompt(tmp_path):
+    from experiments.thesis.temporary_evaluation_repair import evaluation_prefix
+    (tmp_path / 'docstring.json').write_text(json.dumps({'prompts': [{'clean': '\ndef function'}]}))
+    tokenizer = SimpleNamespace(bos_token='<BOS>', encode=lambda text: [7, 8, 9, 10] if text == '<BOS>\ndef function' else pytest.fail('Wrong task prefix'))
+    task = SimpleNamespace(model=SimpleNamespace(tokenizer=tokenizer), test_loader=SimpleNamespace(diverge_idx=3))
+    protocol = {'_manifest_path': str(tmp_path / 'manifest.json'), 'tasks': {'docstring': {'dataset': 'docstring.json'}}}
+    assert evaluation_prefix(task, protocol, 'docstring') == [7, 8, 9]

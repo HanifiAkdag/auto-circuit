@@ -1,5 +1,7 @@
 import importlib
 import json
+import random
+import sys
 from pathlib import Path
 
 import pytest
@@ -14,6 +16,36 @@ def test_generator_imports_are_safe(monkeypatch):
         spec = importlib.util.spec_from_file_location('generator_under_test', root / relative)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+
+
+def test_docstring_generator_is_import_safe_and_reproducible(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    before = random.getstate()
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location('docstring_generator_under_test', root / 'datasets/docstring_generator.py')
+    module = importlib.util.module_from_spec(spec)
+    monkeypatch.setitem(sys.modules, spec.name, module)
+    spec.loader.exec_module(module)
+    assert list(tmp_path.iterdir()) == [], 'Import must not generate an output dataset'
+    assert random.getstate() == before
+    first = module.get_docstring_data(8, seed=20261006)
+    assert first == module.get_docstring_data(8, seed=20261006)
+    assert first != module.get_docstring_data(8, seed=20261007)
+    assert random.getstate() == before
+    assert all(set(row) == {'clean', 'corrupt', 'answers', 'wrong_answers'} for row in first)
+    assert all(len(row['answers']) == 1 and row['wrong_answers'] for row in first)
+
+
+def test_docstring_builder_selects_the_model_tokenizer(tmp_path, monkeypatch):
+    from experiments.thesis import build_evaluation_set as module
+    class SelectedTokenizer(Exception):
+        pass
+    def select(name, **kwargs):
+        assert name == 'NeelNanda/gpt-neox-tokenizer-digits'
+        raise SelectedTokenizer
+    monkeypatch.setattr(module.AutoTokenizer, 'from_pretrained', select)
+    with pytest.raises(SelectedTokenizer):
+        module.build(tmp_path, tasks=('docstring',))
 
 
 def test_clean_identity_rejects_shared_clean_with_different_corruption():

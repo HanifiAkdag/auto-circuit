@@ -8,6 +8,7 @@ import csv
 import argparse
 import hashlib
 import json
+from math import log10
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -55,8 +56,8 @@ def read_csv(path):
 
 def validate_source_protocol(source_meta, manual_meta):
     from .evaluation_protocol import require_same_protocol
-    require_same_protocol({'evaluation_protocol_id': source_meta.get('evaluation_protocol_id', 'legacy_template')},
-                          {'evaluation_protocol_id': manual_meta.get('evaluation_protocol_id', 'legacy_template')})
+    require_same_protocol({**source_meta, 'evaluation_protocol_id': source_meta.get('evaluation_protocol_id', 'legacy_template')},
+                          {**manual_meta, 'evaluation_protocol_id': manual_meta.get('evaluation_protocol_id', 'legacy_template')})
 
 
 def metric_ylim(task_rows, metric):
@@ -207,7 +208,7 @@ def main(source_dir=None, output_dir=None, task_keys=None):
                     lower = [r["metric_mean"] - r["metric_sd"] for r in rr]
                     rgb = tuple(int(color[k:k+2], 16) for k in (1, 3, 5))
                     fig.add_trace(go.Scatter(
-                    x=x + x[::-1], y=upper + lower[::-1], fill="toself",
+                    x=x + x[::-1], y=upper + lower[::-1], mode="lines", fill="toself",
                     fillcolor=f"rgba({rgb[0]},{rgb[1]},{rgb[2]},0.14)",
                     line=dict(width=0), hoverinfo="skip", showlegend=False),
                         row=plot_row, col=plot_col)
@@ -223,10 +224,13 @@ def main(source_dir=None, output_dir=None, task_keys=None):
                 if metric == "Logit Diff Percent":
                     fig.add_hline(y=100, row=plot_row, col=plot_col, line_color="#999999",
                               line_width=.8, line_dash="dot", layer="below")
-                fig.update_xaxes(type="log", range=[.9, 4.65], row=plot_row, col=plot_col,
+                x_range = [.9, log10(max(r['realised_mean'] for r in task_rows)) + .08] if task_key == 'docstring' else [.9, 4.65]
+                tick_values = [10, 100, 1000] if task_key == 'docstring' else [10, 100, 1000, 10000]
+                tick_labels = ["10", "100", "1,000"] if task_key == 'docstring' else ["10", "100", "1,000", "10,000"]
+                fig.update_xaxes(type="log", range=x_range, row=plot_row, col=plot_col,
                              showline=True, linecolor="#666666", linewidth=.7,
-                             ticks="outside", tickvals=[10, 100, 1000, 10000],
-                             ticktext=["10", "100", "1,000", "10,000"],
+                             ticks="outside", tickvals=tick_values,
+                             ticktext=tick_labels,
                              showticklabels=(plot_row == n_rows),
                              showgrid=False, tickfont=dict(size=15),
                              title_font=dict(size=15),

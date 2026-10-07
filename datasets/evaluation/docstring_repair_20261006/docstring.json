@@ -1,0 +1,5688 @@
+{
+  "seq_labels": [
+    "\n",
+    "def",
+    " model",
+    "(",
+    "self",
+    ",",
+    " fields",
+    ",",
+    " page",
+    ",",
+    "A_def",
+    ",_A",
+    "B_def",
+    ",_B",
+    "C_def",
+    ",_C",
+    " number",
+    "):",
+    "\n   ",
+    " \"\"\"",
+    "unit",
+    " bone",
+    " paper",
+    "\n\n   ",
+    " :",
+    "param_1",
+    "A_doc",
+    ":",
+    " selection",
+    " sky",
+    "\n   ",
+    " :",
+    "param_2",
+    "B_doc",
+    ":",
+    " host",
+    " action",
+    "\n   ",
+    " :",
+    "param_3"
+  ],
+  "word_idxs": {
+    "A_def": 10,
+    "B_def": 12,
+    ",_B": 13,
+    "C_def": 14,
+    "A_doc": 26,
+    "param_2": 32,
+    "B_doc": 33,
+    "param_3": 39
+  },
+  "prompts": [
+    {
+      "clean": "\ndef options(self, content, root, status, settings, token, expected):\n    \"\"\"section application research\n\n    :param status: surface test\n    :param settings: light collection\n    :param",
+      "corrupt": "\ndef options(self, content, root, title, json, update, expected):\n    \"\"\"section application research\n\n    :param start: surface test\n    :param page: light collection\n    :param",
+      "answers": [
+        " token"
+      ],
+      "wrong_answers": [
+        " default",
+        " title",
+        " json",
+        " update",
+        " start",
+        " page",
+        " filename",
+        " index",
+        " status",
+        " settings",
+        " content",
+        " root",
+        " expected"
+      ]
+    },
+    {
+      "clean": "\ndef query(self, line, value, date, found, source, tag):\n    \"\"\"wall cat stage\n\n    :param date: floor network\n    :param found: loss writing\n    :param",
+      "corrupt": "\ndef query(self, line, value, data, default, version, tag):\n    \"\"\"wall cat stage\n\n    :param options: floor network\n    :param model: loss writing\n    :param",
+      "answers": [
+        " source"
+      ],
+      "wrong_answers": [
+        " values",
+        " data",
+        " default",
+        " version",
+        " options",
+        " model",
+        " url",
+        " function",
+        " date",
+        " found",
+        " line",
+        " value",
+        " tag"
+      ]
+    },
+    {
+      "clean": "\ndef version(self, old, path, current, count, number, item):\n    \"\"\"language module warning\n\n    :param current: technology language\n    :param count: map clock\n    :param",
+      "corrupt": "\ndef version(self, old, path, index, test, update, item):\n    \"\"\"language module warning\n\n    :param options: technology language\n    :param data: map clock\n    :param",
+      "answers": [
+        " number"
+      ],
+      "wrong_answers": [
+        " files",
+        " index",
+        " test",
+        " update",
+        " options",
+        " data",
+        " settings",
+        " parent",
+        " current",
+        " count",
+        " old",
+        " path",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef status(self, text, client, string, results, options, new):\n    \"\"\"page operation billion\n\n    :param string: table command\n    :param results: leader height\n    :param",
+      "corrupt": "\ndef status(self, text, client, shape, obj, read, new):\n    \"\"\"page operation billion\n\n    :param test: table command\n    :param event: leader height\n    :param",
+      "answers": [
+        " options"
+      ],
+      "wrong_answers": [
+        " session",
+        " shape",
+        " obj",
+        " read",
+        " test",
+        " event",
+        " create",
+        " first",
+        " string",
+        " results",
+        " text",
+        " client",
+        " new"
+      ]
+    },
+    {
+      "clean": "\ndef size(self, log, task, option, node, msg, old):\n    \"\"\"oil count object\n\n    :param option: director dimension\n    :param node: shadow reply\n    :param",
+      "corrupt": "\ndef size(self, log, task, resource, content, key, old):\n    \"\"\"oil count object\n\n    :param user: director dimension\n    :param mode: shadow reply\n    :param",
+      "answers": [
+        " msg"
+      ],
+      "wrong_answers": [
+        " response",
+        " resource",
+        " content",
+        " key",
+        " user",
+        " mode",
+        " num",
+        " command",
+        " option",
+        " node",
+        " log",
+        " task",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, user, call, node, config, color, code):\n    \"\"\"technology play fuel\n\n    :param node: item travel\n    :param config: project wave\n    :param",
+      "corrupt": "\ndef token(self, user, call, file, page, run, code):\n    \"\"\"technology play fuel\n\n    :param name: item travel\n    :param source: project wave\n    :param",
+      "answers": [
+        " color"
+      ],
+      "wrong_answers": [
+        " string",
+        " file",
+        " page",
+        " run",
+        " name",
+        " source",
+        " output",
+        " query",
+        " node",
+        " config",
+        " user",
+        " call",
+        " code"
+      ]
+    },
+    {
+      "clean": "\ndef settings(self, command, client, number, num, request, ret):\n    \"\"\"professional rule cap\n\n    :param number: run scale\n    :param num: scope creation\n    :param",
+      "corrupt": "\ndef settings(self, command, client, files, result, info, ret):\n    \"\"\"professional rule cap\n\n    :param create: run scale\n    :param project: scope creation\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " found",
+        " files",
+        " result",
+        " info",
+        " create",
+        " project",
+        " target",
+        " user",
+        " number",
+        " num",
+        " command",
+        " client",
+        " ret"
+      ]
+    },
+    {
+      "clean": "\ndef num(self, settings, path, array, files, server, call):\n    \"\"\"demand train subject\n\n    :param array: cut team\n    :param files: green search\n    :param",
+      "corrupt": "\ndef num(self, settings, path, first, name, options, call):\n    \"\"\"demand train subject\n\n    :param data: cut team\n    :param source: green search\n    :param",
+      "answers": [
+        " server"
+      ],
+      "wrong_answers": [
+        " model",
+        " first",
+        " name",
+        " options",
+        " data",
+        " source",
+        " text",
+        " filename",
+        " array",
+        " files",
+        " settings",
+        " path",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef json(self, node, response, session, port, results, run):\n    \"\"\"field sound search\n\n    :param session: bus class\n    :param port: stream aid\n    :param",
+      "corrupt": "\ndef json(self, node, response, description, filename, source, run):\n    \"\"\"field sound search\n\n    :param ret: bus class\n    :param status: stream aid\n    :param",
+      "answers": [
+        " results"
+      ],
+      "wrong_answers": [
+        " group",
+        " description",
+        " filename",
+        " source",
+        " ret",
+        " status",
+        " current",
+        " order",
+        " session",
+        " port",
+        " node",
+        " response",
+        " run"
+      ]
+    },
+    {
+      "clean": "\ndef action(self, group, last, version, array, values, description):\n    \"\"\"tone love item\n\n    :param version: message bone\n    :param array: date document\n    :param",
+      "corrupt": "\ndef action(self, group, last, page, count, settings, description):\n    \"\"\"tone love item\n\n    :param shape: message bone\n    :param user: date document\n    :param",
+      "answers": [
+        " values"
+      ],
+      "wrong_answers": [
+        " root",
+        " page",
+        " count",
+        " settings",
+        " shape",
+        " user",
+        " filename",
+        " end",
+        " version",
+        " array",
+        " group",
+        " last",
+        " description"
+      ]
+    },
+    {
+      "clean": "\ndef root(self, index, last, message, ret, response, old):\n    \"\"\"cup lake call\n\n    :param message: return tone\n    :param ret: cause relative\n    :param",
+      "corrupt": "\ndef root(self, index, last, target, image, label, old):\n    \"\"\"cup lake call\n\n    :param value: return tone\n    :param module: cause relative\n    :param",
+      "answers": [
+        " response"
+      ],
+      "wrong_answers": [
+        " key",
+        " target",
+        " image",
+        " label",
+        " value",
+        " module",
+        " session",
+        " version",
+        " message",
+        " ret",
+        " index",
+        " last",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef fields(self, state, host, token, info, default, label):\n    \"\"\"framework price management\n\n    :param token: daughter press\n    :param info: rent record\n    :param",
+      "corrupt": "\ndef fields(self, state, host, data, msg, node, label):\n    \"\"\"framework price management\n\n    :param count: daughter press\n    :param table: rent record\n    :param",
+      "answers": [
+        " default"
+      ],
+      "wrong_answers": [
+        " item",
+        " data",
+        " msg",
+        " node",
+        " count",
+        " table",
+        " resource",
+        " text",
+        " token",
+        " info",
+        " state",
+        " host",
+        " label"
+      ]
+    },
+    {
+      "clean": "\ndef tag(self, current, test, name, last, start, node):\n    \"\"\"existence land mission\n\n    :param name: guide mouth\n    :param last: goal depth\n    :param",
+      "corrupt": "\ndef tag(self, current, test, num, description, resource, node):\n    \"\"\"existence land mission\n\n    :param model: guide mouth\n    :param string: goal depth\n    :param",
+      "answers": [
+        " start"
+      ],
+      "wrong_answers": [
+        " form",
+        " num",
+        " description",
+        " resource",
+        " model",
+        " string",
+        " run",
+        " data",
+        " name",
+        " last",
+        " current",
+        " test",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef url(self, response, status, field, description, code, option):\n    \"\"\"context link pool\n\n    :param field: press help\n    :param description: condition string\n    :param",
+      "corrupt": "\ndef url(self, response, status, update, count, client, option):\n    \"\"\"context link pool\n\n    :param run: press help\n    :param form: condition string\n    :param",
+      "answers": [
+        " code"
+      ],
+      "wrong_answers": [
+        " create",
+        " update",
+        " count",
+        " client",
+        " run",
+        " form",
+        " settings",
+        " query",
+        " field",
+        " description",
+        " response",
+        " status",
+        " option"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, session, user, description, sub, create, item):\n    \"\"\"music century path\n\n    :param description: command south\n    :param sub: album tone\n    :param",
+      "corrupt": "\ndef number(self, session, user, valid, command, name, item):\n    \"\"\"music century path\n\n    :param server: command south\n    :param index: album tone\n    :param",
+      "answers": [
+        " create"
+      ],
+      "wrong_answers": [
+        " base",
+        " valid",
+        " command",
+        " name",
+        " server",
+        " index",
+        " tag",
+        " action",
+        " description",
+        " sub",
+        " session",
+        " user",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef user(self, update, message, expected, json, log, node):\n    \"\"\"background actor history\n\n    :param expected: purpose action\n    :param json: priority position\n    :param",
+      "corrupt": "\ndef user(self, update, message, resource, options, token, node):\n    \"\"\"background actor history\n\n    :param load: purpose action\n    :param title: priority position\n    :param",
+      "answers": [
+        " log"
+      ],
+      "wrong_answers": [
+        " port",
+        " resource",
+        " options",
+        " token",
+        " load",
+        " title",
+        " request",
+        " names",
+        " expected",
+        " json",
+        " update",
+        " message",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef info(self, image, parent, read, default, root, current):\n    \"\"\"respect record dad\n\n    :param read: setting conduct\n    :param default: class statement\n    :param",
+      "corrupt": "\ndef info(self, image, parent, output, event, text, current):\n    \"\"\"respect record dad\n\n    :param ret: setting conduct\n    :param key: class statement\n    :param",
+      "answers": [
+        " root"
+      ],
+      "wrong_answers": [
+        " format",
+        " output",
+        " event",
+        " text",
+        " ret",
+        " key",
+        " options",
+        " call",
+        " read",
+        " default",
+        " image",
+        " parent",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef title(self, shape, format, content, base, item, row):\n    \"\"\"girl response date\n\n    :param content: stress drug\n    :param base: light margin\n    :param",
+      "corrupt": "\ndef title(self, shape, format, create, parser, valid, row):\n    \"\"\"girl response date\n\n    :param model: stress drug\n    :param user: light margin\n    :param",
+      "answers": [
+        " item"
+      ],
+      "wrong_answers": [
+        " call",
+        " create",
+        " parser",
+        " valid",
+        " model",
+        " user",
+        " json",
+        " date",
+        " content",
+        " base",
+        " shape",
+        " format",
+        " row"
+      ]
+    },
+    {
+      "clean": "\ndef test(self, base, root, parser, run, load, server):\n    \"\"\"start list export\n\n    :param parser: standing girl\n    :param run: hat hole\n    :param",
+      "corrupt": "\ndef test(self, base, root, key, current, array, server):\n    \"\"\"start list export\n\n    :param obj: standing girl\n    :param files: hat hole\n    :param",
+      "answers": [
+        " load"
+      ],
+      "wrong_answers": [
+        " row",
+        " key",
+        " current",
+        " array",
+        " obj",
+        " files",
+        " tag",
+        " sub",
+        " parser",
+        " run",
+        " base",
+        " root",
+        " server"
+      ]
+    },
+    {
+      "clean": "\ndef format(self, config, last, task, names, command, response):\n    \"\"\"future strength motion\n\n    :param task: radio piece\n    :param names: motion working\n    :param",
+      "corrupt": "\ndef format(self, config, last, file, valid, source, response):\n    \"\"\"future strength motion\n\n    :param target: radio piece\n    :param table: motion working\n    :param",
+      "answers": [
+        " command"
+      ],
+      "wrong_answers": [
+        " item",
+        " file",
+        " valid",
+        " source",
+        " target",
+        " table",
+        " function",
+        " settings",
+        " task",
+        " names",
+        " config",
+        " last",
+        " response"
+      ]
+    },
+    {
+      "clean": "\ndef old(self, instance, value, obj, test, create, row):\n    \"\"\"population activity watch\n\n    :param obj: subject break\n    :param test: course tube\n    :param",
+      "corrupt": "\ndef old(self, instance, value, url, module, start, row):\n    \"\"\"population activity watch\n\n    :param message: subject break\n    :param match: course tube\n    :param",
+      "answers": [
+        " create"
+      ],
+      "wrong_answers": [
+        " key",
+        " url",
+        " module",
+        " start",
+        " message",
+        " match",
+        " valid",
+        " result",
+        " obj",
+        " test",
+        " instance",
+        " value",
+        " row"
+      ]
+    },
+    {
+      "clean": "\ndef start(self, function, old, response, fields, url, version):\n    \"\"\"test aim image\n\n    :param response: election rain\n    :param fields: tone glass\n    :param",
+      "corrupt": "\ndef start(self, function, old, content, number, context, version):\n    \"\"\"test aim image\n\n    :param item: election rain\n    :param key: tone glass\n    :param",
+      "answers": [
+        " url"
+      ],
+      "wrong_answers": [
+        " last",
+        " content",
+        " number",
+        " context",
+        " item",
+        " key",
+        " line",
+        " command",
+        " response",
+        " fields",
+        " function",
+        " old",
+        " version"
+      ]
+    },
+    {
+      "clean": "\ndef result(self, image, files, update, user, item, parser):\n    \"\"\"bus move button\n\n    :param update: selection heat\n    :param user: type medium\n    :param",
+      "corrupt": "\ndef result(self, image, files, instance, data, count, parser):\n    \"\"\"bus move button\n\n    :param output: selection heat\n    :param val: type medium\n    :param",
+      "answers": [
+        " item"
+      ],
+      "wrong_answers": [
+        " project",
+        " instance",
+        " data",
+        " count",
+        " output",
+        " val",
+        " settings",
+        " color",
+        " update",
+        " user",
+        " image",
+        " files",
+        " parser"
+      ]
+    },
+    {
+      "clean": "\ndef count(self, command, client, shape, required, update, fields):\n    \"\"\"father offer register\n\n    :param shape: demand gate\n    :param required: production chair\n    :param",
+      "corrupt": "\ndef count(self, command, client, context, message, sub, fields):\n    \"\"\"father offer register\n\n    :param path: demand gate\n    :param user: production chair\n    :param",
+      "answers": [
+        " update"
+      ],
+      "wrong_answers": [
+        " version",
+        " context",
+        " message",
+        " sub",
+        " path",
+        " user",
+        " json",
+        " run",
+        " shape",
+        " required",
+        " command",
+        " client",
+        " fields"
+      ]
+    },
+    {
+      "clean": "\ndef name(self, string, settings, module, mode, group, sub):\n    \"\"\"gap church priority\n\n    :param module: protein piece\n    :param mode: examination sex\n    :param",
+      "corrupt": "\ndef name(self, string, settings, ret, file, test, sub):\n    \"\"\"gap church priority\n\n    :param text: protein piece\n    :param val: examination sex\n    :param",
+      "answers": [
+        " group"
+      ],
+      "wrong_answers": [
+        " options",
+        " ret",
+        " file",
+        " test",
+        " text",
+        " val",
+        " line",
+        " status",
+        " module",
+        " mode",
+        " string",
+        " settings",
+        " sub"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, info, page, code, start, files, string):\n    \"\"\"human address black\n\n    :param code: hold aid\n    :param start: height dark\n    :param",
+      "corrupt": "\ndef label(self, info, page, table, load, result, string):\n    \"\"\"human address black\n\n    :param end: hold aid\n    :param instance: height dark\n    :param",
+      "answers": [
+        " files"
+      ],
+      "wrong_answers": [
+        " last",
+        " table",
+        " load",
+        " result",
+        " end",
+        " instance",
+        " date",
+        " state",
+        " code",
+        " start",
+        " info",
+        " page",
+        " string"
+      ]
+    },
+    {
+      "clean": "\ndef client(self, index, files, default, path, request, text):\n    \"\"\"prison purpose screen\n\n    :param default: regulation plant\n    :param path: request address\n    :param",
+      "corrupt": "\ndef client(self, index, files, port, function, run, text):\n    \"\"\"prison purpose screen\n\n    :param command: regulation plant\n    :param target: request address\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " field",
+        " port",
+        " function",
+        " run",
+        " command",
+        " target",
+        " response",
+        " model",
+        " default",
+        " path",
+        " index",
+        " files",
+        " text"
+      ]
+    },
+    {
+      "clean": "\ndef load(self, code, match, start, query, num, found):\n    \"\"\"fight balance account\n\n    :param start: knowledge shop\n    :param query: action pace\n    :param",
+      "corrupt": "\ndef load(self, code, match, ret, count, header, found):\n    \"\"\"fight balance account\n\n    :param log: knowledge shop\n    :param text: action pace\n    :param",
+      "answers": [
+        " num"
+      ],
+      "wrong_answers": [
+        " shape",
+        " ret",
+        " count",
+        " header",
+        " log",
+        " text",
+        " path",
+        " run",
+        " start",
+        " query",
+        " code",
+        " match",
+        " found"
+      ]
+    },
+    {
+      "clean": "\ndef old(self, error, options, info, response, request, session):\n    \"\"\"iron mill king\n\n    :param info: income demand\n    :param response: tree code\n    :param",
+      "corrupt": "\ndef old(self, error, options, shape, value, settings, session):\n    \"\"\"iron mill king\n\n    :param files: income demand\n    :param valid: tree code\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " version",
+        " shape",
+        " value",
+        " settings",
+        " files",
+        " valid",
+        " server",
+        " log",
+        " info",
+        " response",
+        " error",
+        " options",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef instance(self, target, base, field, run, resource, path):\n    \"\"\"release dimension tube\n\n    :param field: mine pound\n    :param run: anger bill\n    :param",
+      "corrupt": "\ndef instance(self, target, base, action, function, source, path):\n    \"\"\"release dimension tube\n\n    :param msg: mine pound\n    :param test: anger bill\n    :param",
+      "answers": [
+        " resource"
+      ],
+      "wrong_answers": [
+        " text",
+        " action",
+        " function",
+        " source",
+        " msg",
+        " test",
+        " array",
+        " error",
+        " field",
+        " run",
+        " target",
+        " base",
+        " path"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, count, create, path, expected, content, names):\n    \"\"\"rule topic profile\n\n    :param path: impact shop\n    :param expected: student load\n    :param",
+      "corrupt": "\ndef number(self, count, create, query, read, files, names):\n    \"\"\"rule topic profile\n\n    :param fields: impact shop\n    :param name: student load\n    :param",
+      "answers": [
+        " content"
+      ],
+      "wrong_answers": [
+        " function",
+        " query",
+        " read",
+        " files",
+        " fields",
+        " name",
+        " token",
+        " action",
+        " path",
+        " expected",
+        " count",
+        " create",
+        " names"
+      ]
+    },
+    {
+      "clean": "\ndef value(self, option, group, format, default, code, node):\n    \"\"\"bell average scope\n\n    :param format: thinking square\n    :param default: performance stuff\n    :param",
+      "corrupt": "\ndef value(self, option, group, path, image, date, node):\n    \"\"\"bell average scope\n\n    :param current: thinking square\n    :param val: performance stuff\n    :param",
+      "answers": [
+        " code"
+      ],
+      "wrong_answers": [
+        " session",
+        " path",
+        " image",
+        " date",
+        " current",
+        " val",
+        " parser",
+        " response",
+        " format",
+        " default",
+        " option",
+        " group",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef update(self, values, command, content, info, string, tag):\n    \"\"\"track source shock\n\n    :param content: consumer committee\n    :param info: type pub\n    :param",
+      "corrupt": "\ndef update(self, values, command, array, request, page, tag):\n    \"\"\"track source shock\n\n    :param result: consumer committee\n    :param output: type pub\n    :param",
+      "answers": [
+        " string"
+      ],
+      "wrong_answers": [
+        " action",
+        " array",
+        " request",
+        " page",
+        " result",
+        " output",
+        " root",
+        " model",
+        " content",
+        " info",
+        " values",
+        " command",
+        " tag"
+      ]
+    },
+    {
+      "clean": "\ndef options(self, check, output, format, project, base, old):\n    \"\"\"medium response club\n\n    :param format: wheel event\n    :param project: tax hero\n    :param",
+      "corrupt": "\ndef options(self, check, output, config, values, row, old):\n    \"\"\"medium response club\n\n    :param token: wheel event\n    :param tag: tax hero\n    :param",
+      "answers": [
+        " base"
+      ],
+      "wrong_answers": [
+        " update",
+        " config",
+        " values",
+        " row",
+        " token",
+        " tag",
+        " content",
+        " response",
+        " format",
+        " project",
+        " check",
+        " output",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef text(self, test, first, date, read, update, filename):\n    \"\"\"danger direction touch\n\n    :param date: opening layer\n    :param read: cloud setting\n    :param",
+      "corrupt": "\ndef text(self, test, first, name, row, port, filename):\n    \"\"\"danger direction touch\n\n    :param message: opening layer\n    :param option: cloud setting\n    :param",
+      "answers": [
+        " update"
+      ],
+      "wrong_answers": [
+        " query",
+        " name",
+        " row",
+        " port",
+        " message",
+        " option",
+        " size",
+        " form",
+        " date",
+        " read",
+        " test",
+        " first",
+        " filename"
+      ]
+    },
+    {
+      "clean": "\ndef version(self, number, results, names, server, date, read):\n    \"\"\"mail entry peak\n\n    :param names: bag gain\n    :param server: performance hair\n    :param",
+      "corrupt": "\ndef version(self, number, results, result, update, title, read):\n    \"\"\"mail entry peak\n\n    :param parser: bag gain\n    :param load: performance hair\n    :param",
+      "answers": [
+        " date"
+      ],
+      "wrong_answers": [
+        " color",
+        " result",
+        " update",
+        " title",
+        " parser",
+        " load",
+        " found",
+        " header",
+        " names",
+        " server",
+        " number",
+        " results",
+        " read"
+      ]
+    },
+    {
+      "clean": "\ndef check(self, log, current, base, target, read, number):\n    \"\"\"capital stage bottom\n\n    :param base: trade request\n    :param target: fan plane\n    :param",
+      "corrupt": "\ndef check(self, log, current, match, test, values, number):\n    \"\"\"capital stage bottom\n\n    :param ret: trade request\n    :param order: fan plane\n    :param",
+      "answers": [
+        " read"
+      ],
+      "wrong_answers": [
+        " command",
+        " match",
+        " test",
+        " values",
+        " ret",
+        " order",
+        " content",
+        " parser",
+        " base",
+        " target",
+        " log",
+        " current",
+        " number"
+      ]
+    },
+    {
+      "clean": "\ndef server(self, item, info, target, index, line, value):\n    \"\"\"professional secret argument\n\n    :param target: letter purpose\n    :param index: science formation\n    :param",
+      "corrupt": "\ndef server(self, item, info, action, tag, form, value):\n    \"\"\"professional secret argument\n\n    :param response: letter purpose\n    :param version: science formation\n    :param",
+      "answers": [
+        " line"
+      ],
+      "wrong_answers": [
+        " read",
+        " action",
+        " tag",
+        " form",
+        " response",
+        " version",
+        " test",
+        " file",
+        " target",
+        " index",
+        " item",
+        " info",
+        " value"
+      ]
+    },
+    {
+      "clean": "\ndef row(self, token, config, action, function, array, url):\n    \"\"\"dad top aim\n\n    :param action: total margin\n    :param function: spring error\n    :param",
+      "corrupt": "\ndef row(self, token, config, content, field, current, url):\n    \"\"\"dad top aim\n\n    :param project: total margin\n    :param instance: spring error\n    :param",
+      "answers": [
+        " array"
+      ],
+      "wrong_answers": [
+        " result",
+        " content",
+        " field",
+        " current",
+        " project",
+        " instance",
+        " json",
+        " create",
+        " action",
+        " function",
+        " token",
+        " config",
+        " url"
+      ]
+    },
+    {
+      "clean": "\ndef mode(self, index, status, client, version, run, field):\n    \"\"\"edge impact task\n\n    :param client: determination margin\n    :param version: pool square\n    :param",
+      "corrupt": "\ndef mode(self, index, status, expected, item, num, field):\n    \"\"\"edge impact task\n\n    :param format: determination margin\n    :param end: pool square\n    :param",
+      "answers": [
+        " run"
+      ],
+      "wrong_answers": [
+        " value",
+        " expected",
+        " item",
+        " num",
+        " format",
+        " end",
+        " name",
+        " instance",
+        " client",
+        " version",
+        " index",
+        " status",
+        " field"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, old, project, test, parser, node, log):\n    \"\"\"billion gold bank\n\n    :param test: talk action\n    :param parser: mark sum\n    :param",
+      "corrupt": "\ndef token(self, old, project, path, first, function, log):\n    \"\"\"billion gold bank\n\n    :param load: talk action\n    :param tag: mark sum\n    :param",
+      "answers": [
+        " node"
+      ],
+      "wrong_answers": [
+        " results",
+        " path",
+        " first",
+        " function",
+        " load",
+        " tag",
+        " required",
+        " format",
+        " test",
+        " parser",
+        " old",
+        " project",
+        " log"
+      ]
+    },
+    {
+      "clean": "\ndef command(self, instance, format, action, obj, field, output):\n    \"\"\"creation mode chapter\n\n    :param action: break entry\n    :param obj: border store\n    :param",
+      "corrupt": "\ndef command(self, instance, format, table, name, read, output):\n    \"\"\"creation mode chapter\n\n    :param last: break entry\n    :param host: border store\n    :param",
+      "answers": [
+        " field"
+      ],
+      "wrong_answers": [
+        " status",
+        " table",
+        " name",
+        " read",
+        " last",
+        " host",
+        " files",
+        " title",
+        " action",
+        " obj",
+        " instance",
+        " format",
+        " output"
+      ]
+    },
+    {
+      "clean": "\ndef version(self, index, status, match, item, color, server):\n    \"\"\"glass core weight\n\n    :param match: gain session\n    :param item: export wall\n    :param",
+      "corrupt": "\ndef version(self, index, status, create, string, base, server):\n    \"\"\"glass core weight\n\n    :param host: gain session\n    :param new: export wall\n    :param",
+      "answers": [
+        " color"
+      ],
+      "wrong_answers": [
+        " root",
+        " create",
+        " string",
+        " base",
+        " host",
+        " new",
+        " filename",
+        " content",
+        " match",
+        " item",
+        " index",
+        " status",
+        " server"
+      ]
+    },
+    {
+      "clean": "\ndef port(self, count, array, match, output, text, end):\n    \"\"\"tube record mind\n\n    :param match: parent picture\n    :param output: resident balance\n    :param",
+      "corrupt": "\ndef port(self, count, array, new, key, number, end):\n    \"\"\"tube record mind\n\n    :param required: parent picture\n    :param values: resident balance\n    :param",
+      "answers": [
+        " text"
+      ],
+      "wrong_answers": [
+        " task",
+        " new",
+        " key",
+        " number",
+        " required",
+        " values",
+        " command",
+        " last",
+        " match",
+        " output",
+        " count",
+        " array",
+        " end"
+      ]
+    },
+    {
+      "clean": "\ndef response(self, number, token, table, load, state, check):\n    \"\"\"team inch cap\n\n    :param table: bottom examination\n    :param load: bus limit\n    :param",
+      "corrupt": "\ndef response(self, number, token, fields, command, resource, check):\n    \"\"\"team inch cap\n\n    :param update: bottom examination\n    :param color: bus limit\n    :param",
+      "answers": [
+        " state"
+      ],
+      "wrong_answers": [
+        " create",
+        " fields",
+        " command",
+        " resource",
+        " update",
+        " color",
+        " tag",
+        " values",
+        " table",
+        " load",
+        " number",
+        " token",
+        " check"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, action, source, state, url, info, label):\n    \"\"\"grade module anger\n\n    :param state: mine theme\n    :param url: master guy\n    :param",
+      "corrupt": "\ndef token(self, action, source, results, resource, create, label):\n    \"\"\"grade module anger\n\n    :param text: mine theme\n    :param test: master guy\n    :param",
+      "answers": [
+        " info"
+      ],
+      "wrong_answers": [
+        " command",
+        " results",
+        " resource",
+        " create",
+        " text",
+        " test",
+        " error",
+        " default",
+        " state",
+        " url",
+        " action",
+        " source",
+        " label"
+      ]
+    },
+    {
+      "clean": "\ndef request(self, url, info, number, task, ret, base):\n    \"\"\"pain weather touch\n\n    :param number: hill height\n    :param task: course love\n    :param",
+      "corrupt": "\ndef request(self, url, info, query, function, order, base):\n    \"\"\"pain weather touch\n\n    :param first: hill height\n    :param context: course love\n    :param",
+      "answers": [
+        " ret"
+      ],
+      "wrong_answers": [
+        " result",
+        " query",
+        " function",
+        " order",
+        " first",
+        " context",
+        " content",
+        " start",
+        " number",
+        " task",
+        " url",
+        " info",
+        " base"
+      ]
+    },
+    {
+      "clean": "\ndef values(self, index, header, response, array, version, parser):\n    \"\"\"living document score\n\n    :param response: writer language\n    :param array: register holder\n    :param",
+      "corrupt": "\ndef values(self, index, header, call, user, request, parser):\n    \"\"\"living document score\n\n    :param val: writer language\n    :param last: register holder\n    :param",
+      "answers": [
+        " version"
+      ],
+      "wrong_answers": [
+        " info",
+        " call",
+        " user",
+        " request",
+        " val",
+        " last",
+        " default",
+        " base",
+        " response",
+        " array",
+        " index",
+        " header",
+        " parser"
+      ]
+    },
+    {
+      "clean": "\ndef json(self, path, current, model, resource, results, color):\n    \"\"\"field coat definition\n\n    :param model: motion lane\n    :param resource: ground column\n    :param",
+      "corrupt": "\ndef json(self, path, current, log, function, info, color):\n    \"\"\"field coat definition\n\n    :param number: motion lane\n    :param shape: ground column\n    :param",
+      "answers": [
+        " results"
+      ],
+      "wrong_answers": [
+        " file",
+        " log",
+        " function",
+        " info",
+        " number",
+        " shape",
+        " error",
+        " old",
+        " model",
+        " resource",
+        " path",
+        " current",
+        " color"
+      ]
+    },
+    {
+      "clean": "\ndef size(self, options, form, query, values, node, num):\n    \"\"\"pack origin oil\n\n    :param query: item goal\n    :param values: reply device\n    :param",
+      "corrupt": "\ndef size(self, options, form, json, data, table, num):\n    \"\"\"pack origin oil\n\n    :param row: item goal\n    :param ret: reply device\n    :param",
+      "answers": [
+        " node"
+      ],
+      "wrong_answers": [
+        " text",
+        " json",
+        " data",
+        " table",
+        " row",
+        " ret",
+        " event",
+        " config",
+        " query",
+        " values",
+        " options",
+        " form",
+        " num"
+      ]
+    },
+    {
+      "clean": "\ndef end(self, data, table, run, file, user, value):\n    \"\"\"account input living\n\n    :param run: respect phone\n    :param file: block agency\n    :param",
+      "corrupt": "\ndef end(self, data, table, fields, instance, config, value):\n    \"\"\"account input living\n\n    :param obj: respect phone\n    :param request: block agency\n    :param",
+      "answers": [
+        " user"
+      ],
+      "wrong_answers": [
+        " context",
+        " fields",
+        " instance",
+        " config",
+        " obj",
+        " request",
+        " base",
+        " info",
+        " run",
+        " file",
+        " data",
+        " table",
+        " value"
+      ]
+    },
+    {
+      "clean": "\ndef context(self, log, code, count, table, new, ret):\n    \"\"\"charge chair wind\n\n    :param count: margin actor\n    :param table: care iron\n    :param",
+      "corrupt": "\ndef context(self, log, code, mode, test, resource, ret):\n    \"\"\"charge chair wind\n\n    :param names: margin actor\n    :param event: care iron\n    :param",
+      "answers": [
+        " new"
+      ],
+      "wrong_answers": [
+        " response",
+        " mode",
+        " test",
+        " resource",
+        " names",
+        " event",
+        " content",
+        " num",
+        " count",
+        " table",
+        " log",
+        " code",
+        " ret"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, file, token, parent, valid, read, page):\n    \"\"\"selection second start\n\n    :param parent: proof cloud\n    :param valid: sense author\n    :param",
+      "corrupt": "\ndef line(self, file, token, option, size, function, page):\n    \"\"\"selection second start\n\n    :param match: proof cloud\n    :param data: sense author\n    :param",
+      "answers": [
+        " read"
+      ],
+      "wrong_answers": [
+        " required",
+        " option",
+        " size",
+        " function",
+        " match",
+        " data",
+        " start",
+        " last",
+        " parent",
+        " valid",
+        " file",
+        " token",
+        " page"
+      ]
+    },
+    {
+      "clean": "\ndef data(self, target, action, string, context, files, required):\n    \"\"\"port course speed\n\n    :param string: gap reference\n    :param context: print card\n    :param",
+      "corrupt": "\ndef data(self, target, action, names, log, key, required):\n    \"\"\"port course speed\n\n    :param header: gap reference\n    :param group: print card\n    :param",
+      "answers": [
+        " files"
+      ],
+      "wrong_answers": [
+        " title",
+        " names",
+        " log",
+        " key",
+        " header",
+        " group",
+        " value",
+        " field",
+        " string",
+        " context",
+        " target",
+        " action",
+        " required"
+      ]
+    },
+    {
+      "clean": "\ndef response(self, array, module, model, task, text, item):\n    \"\"\"answer account leader\n\n    :param model: round text\n    :param task: letter unity\n    :param",
+      "corrupt": "\ndef response(self, array, module, function, query, group, item):\n    \"\"\"answer account leader\n\n    :param options: round text\n    :param files: letter unity\n    :param",
+      "answers": [
+        " text"
+      ],
+      "wrong_answers": [
+        " log",
+        " function",
+        " query",
+        " group",
+        " options",
+        " files",
+        " val",
+        " event",
+        " model",
+        " task",
+        " array",
+        " module",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, command, update, module, base, image, version):\n    \"\"\"phone respect heat\n\n    :param module: relative review\n    :param base: ice key\n    :param",
+      "corrupt": "\ndef line(self, command, update, field, default, node, version):\n    \"\"\"phone respect heat\n\n    :param obj: relative review\n    :param order: ice key\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " header",
+        " field",
+        " default",
+        " node",
+        " obj",
+        " order",
+        " code",
+        " sub",
+        " module",
+        " base",
+        " command",
+        " update",
+        " version"
+      ]
+    },
+    {
+      "clean": "\ndef item(self, error, module, start, command, version, value):\n    \"\"\"second route project\n\n    :param start: chart operation\n    :param command: fruit risk\n    :param",
+      "corrupt": "\ndef item(self, error, module, run, result, field, value):\n    \"\"\"second route project\n\n    :param port: chart operation\n    :param info: fruit risk\n    :param",
+      "answers": [
+        " version"
+      ],
+      "wrong_answers": [
+        " resource",
+        " run",
+        " result",
+        " field",
+        " port",
+        " info",
+        " request",
+        " filename",
+        " start",
+        " command",
+        " error",
+        " module",
+        " value"
+      ]
+    },
+    {
+      "clean": "\ndef message(self, image, field, model, required, token, read):\n    \"\"\"trial aim gallery\n\n    :param model: mill chief\n    :param required: black shadow\n    :param",
+      "corrupt": "\ndef message(self, image, field, version, session, result, read):\n    \"\"\"trial aim gallery\n\n    :param check: mill chief\n    :param name: black shadow\n    :param",
+      "answers": [
+        " token"
+      ],
+      "wrong_answers": [
+        " base",
+        " version",
+        " session",
+        " result",
+        " check",
+        " name",
+        " found",
+        " function",
+        " model",
+        " required",
+        " image",
+        " field",
+        " read"
+      ]
+    },
+    {
+      "clean": "\ndef order(self, version, form, count, field, message, action):\n    \"\"\"author role percent\n\n    :param count: ticket pit\n    :param field: stream fruit\n    :param",
+      "corrupt": "\ndef order(self, version, form, project, page, number, action):\n    \"\"\"author role percent\n\n    :param current: ticket pit\n    :param content: stream fruit\n    :param",
+      "answers": [
+        " message"
+      ],
+      "wrong_answers": [
+        " found",
+        " project",
+        " page",
+        " number",
+        " current",
+        " content",
+        " old",
+        " base",
+        " count",
+        " field",
+        " version",
+        " form",
+        " action"
+      ]
+    },
+    {
+      "clean": "\ndef config(self, values, mode, title, order, update, action):\n    \"\"\"top comfort index\n\n    :param title: education mind\n    :param order: link support\n    :param",
+      "corrupt": "\ndef config(self, values, mode, line, filename, ret, action):\n    \"\"\"top comfort index\n\n    :param options: education mind\n    :param check: link support\n    :param",
+      "answers": [
+        " update"
+      ],
+      "wrong_answers": [
+        " option",
+        " line",
+        " filename",
+        " ret",
+        " options",
+        " check",
+        " first",
+        " root",
+        " title",
+        " order",
+        " values",
+        " mode",
+        " action"
+      ]
+    },
+    {
+      "clean": "\ndef index(self, page, required, status, header, match, ret):\n    \"\"\"cross weather region\n\n    :param status: fig present\n    :param header: present string\n    :param",
+      "corrupt": "\ndef index(self, page, required, expected, val, call, ret):\n    \"\"\"cross weather region\n\n    :param read: fig present\n    :param state: present string\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " new",
+        " expected",
+        " val",
+        " call",
+        " read",
+        " state",
+        " query",
+        " content",
+        " status",
+        " header",
+        " page",
+        " required",
+        " ret"
+      ]
+    },
+    {
+      "clean": "\ndef results(self, create, target, files, mode, values, log):\n    \"\"\"reader table dark\n\n    :param files: rail pocket\n    :param mode: memory rain\n    :param",
+      "corrupt": "\ndef results(self, create, target, host, settings, image, log):\n    \"\"\"reader table dark\n\n    :param function: rail pocket\n    :param info: memory rain\n    :param",
+      "answers": [
+        " values"
+      ],
+      "wrong_answers": [
+        " current",
+        " host",
+        " settings",
+        " image",
+        " function",
+        " info",
+        " response",
+        " field",
+        " files",
+        " mode",
+        " create",
+        " target",
+        " log"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, run, instance, error, path, val, description):\n    \"\"\"currency length committee\n\n    :param error: sort plate\n    :param path: culture egg\n    :param",
+      "corrupt": "\ndef token(self, run, instance, state, values, item, description):\n    \"\"\"currency length committee\n\n    :param msg: sort plate\n    :param array: culture egg\n    :param",
+      "answers": [
+        " val"
+      ],
+      "wrong_answers": [
+        " node",
+        " state",
+        " values",
+        " item",
+        " msg",
+        " array",
+        " file",
+        " filename",
+        " error",
+        " path",
+        " run",
+        " instance",
+        " description"
+      ]
+    },
+    {
+      "clean": "\ndef model(self, source, status, load, size, image, values):\n    \"\"\"belt path anger\n\n    :param load: medium bid\n    :param size: existence minute\n    :param",
+      "corrupt": "\ndef model(self, source, status, code, module, option, values):\n    \"\"\"belt path anger\n\n    :param version: medium bid\n    :param token: existence minute\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " line",
+        " code",
+        " module",
+        " option",
+        " version",
+        " token",
+        " date",
+        " fields",
+        " load",
+        " size",
+        " source",
+        " status",
+        " values"
+      ]
+    },
+    {
+      "clean": "\ndef title(self, last, event, names, instance, ret, source):\n    \"\"\"joy analysis standing\n\n    :param names: input character\n    :param instance: column page\n    :param",
+      "corrupt": "\ndef title(self, last, event, message, files, data, source):\n    \"\"\"joy analysis standing\n\n    :param settings: input character\n    :param root: column page\n    :param",
+      "answers": [
+        " ret"
+      ],
+      "wrong_answers": [
+        " array",
+        " message",
+        " files",
+        " data",
+        " settings",
+        " root",
+        " token",
+        " host",
+        " names",
+        " instance",
+        " last",
+        " event",
+        " source"
+      ]
+    },
+    {
+      "clean": "\ndef project(self, required, image, shape, version, table, current):\n    \"\"\"section mail purpose\n\n    :param shape: margin male\n    :param version: payment resident\n    :param",
+      "corrupt": "\ndef project(self, required, image, check, instance, node, current):\n    \"\"\"section mail purpose\n\n    :param mode: margin male\n    :param host: payment resident\n    :param",
+      "answers": [
+        " table"
+      ],
+      "wrong_answers": [
+        " error",
+        " check",
+        " instance",
+        " node",
+        " mode",
+        " host",
+        " first",
+        " load",
+        " shape",
+        " version",
+        " required",
+        " image",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef option(self, mode, page, user, last, order, label):\n    \"\"\"shock male fight\n\n    :param user: route count\n    :param last: lane shirt\n    :param",
+      "corrupt": "\ndef option(self, mode, page, item, array, function, label):\n    \"\"\"shock male fight\n\n    :param found: route count\n    :param project: lane shirt\n    :param",
+      "answers": [
+        " order"
+      ],
+      "wrong_answers": [
+        " context",
+        " item",
+        " array",
+        " function",
+        " found",
+        " project",
+        " text",
+        " count",
+        " user",
+        " last",
+        " mode",
+        " page",
+        " label"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, response, form, header, first, options, state):\n    \"\"\"station game faith\n\n    :param header: pain writer\n    :param first: nature guy\n    :param",
+      "corrupt": "\ndef number(self, response, form, key, status, user, state):\n    \"\"\"station game faith\n\n    :param file: pain writer\n    :param names: nature guy\n    :param",
+      "answers": [
+        " options"
+      ],
+      "wrong_answers": [
+        " output",
+        " key",
+        " status",
+        " user",
+        " file",
+        " names",
+        " port",
+        " action",
+        " header",
+        " first",
+        " response",
+        " form",
+        " state"
+      ]
+    },
+    {
+      "clean": "\ndef config(self, function, read, option, status, parser, current):\n    \"\"\"pit property fund\n\n    :param option: unity forest\n    :param status: fight grade\n    :param",
+      "corrupt": "\ndef config(self, function, read, array, source, sub, current):\n    \"\"\"pit property fund\n\n    :param request: unity forest\n    :param result: fight grade\n    :param",
+      "answers": [
+        " parser"
+      ],
+      "wrong_answers": [
+        " version",
+        " array",
+        " source",
+        " sub",
+        " request",
+        " result",
+        " size",
+        " match",
+        " option",
+        " status",
+        " function",
+        " read",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef value(self, settings, size, read, old, create, title):\n    \"\"\"module spring trust\n\n    :param read: crime heart\n    :param old: resource final\n    :param",
+      "corrupt": "\ndef value(self, settings, size, filename, default, found, title):\n    \"\"\"module spring trust\n\n    :param values: crime heart\n    :param request: resource final\n    :param",
+      "answers": [
+        " create"
+      ],
+      "wrong_answers": [
+        " sub",
+        " filename",
+        " default",
+        " found",
+        " values",
+        " request",
+        " index",
+        " file",
+        " read",
+        " old",
+        " settings",
+        " size",
+        " title"
+      ]
+    },
+    {
+      "clean": "\ndef names(self, index, instance, description, valid, option, user):\n    \"\"\"charge camera story\n\n    :param description: paper stuff\n    :param valid: culture print\n    :param",
+      "corrupt": "\ndef names(self, index, instance, host, state, run, user):\n    \"\"\"charge camera story\n\n    :param parser: paper stuff\n    :param new: culture print\n    :param",
+      "answers": [
+        " option"
+      ],
+      "wrong_answers": [
+        " item",
+        " host",
+        " state",
+        " run",
+        " parser",
+        " new",
+        " label",
+        " load",
+        " description",
+        " valid",
+        " index",
+        " instance",
+        " user"
+      ]
+    },
+    {
+      "clean": "\ndef call(self, match, create, message, string, project, token):\n    \"\"\"ice hair inch\n\n    :param message: movie chemical\n    :param string: error delay\n    :param",
+      "corrupt": "\ndef call(self, match, create, output, mode, settings, token):\n    \"\"\"ice hair inch\n\n    :param names: movie chemical\n    :param text: error delay\n    :param",
+      "answers": [
+        " project"
+      ],
+      "wrong_answers": [
+        " key",
+        " output",
+        " mode",
+        " settings",
+        " names",
+        " text",
+        " function",
+        " results",
+        " message",
+        " string",
+        " match",
+        " create",
+        " token"
+      ]
+    },
+    {
+      "clean": "\ndef expected(self, data, image, start, found, count, names):\n    \"\"\"class connection setting\n\n    :param start: picture option\n    :param found: green minute\n    :param",
+      "corrupt": "\ndef expected(self, data, image, mode, item, settings, names):\n    \"\"\"class connection setting\n\n    :param new: picture option\n    :param run: green minute\n    :param",
+      "answers": [
+        " count"
+      ],
+      "wrong_answers": [
+        " url",
+        " mode",
+        " item",
+        " settings",
+        " new",
+        " run",
+        " config",
+        " context",
+        " start",
+        " found",
+        " data",
+        " image",
+        " names"
+      ]
+    },
+    {
+      "clean": "\ndef group(self, description, response, test, client, expected, start):\n    \"\"\"speed track tube\n\n    :param test: label region\n    :param client: row fee\n    :param",
+      "corrupt": "\ndef group(self, description, response, request, ret, output, start):\n    \"\"\"speed track tube\n\n    :param size: label region\n    :param found: row fee\n    :param",
+      "answers": [
+        " expected"
+      ],
+      "wrong_answers": [
+        " check",
+        " request",
+        " ret",
+        " output",
+        " size",
+        " found",
+        " value",
+        " event",
+        " test",
+        " client",
+        " description",
+        " response",
+        " start"
+      ]
+    },
+    {
+      "clean": "\ndef settings(self, context, check, update, msg, index, group):\n    \"\"\"package surface platform\n\n    :param update: unit block\n    :param msg: kid trial\n    :param",
+      "corrupt": "\ndef settings(self, context, check, name, token, user, group):\n    \"\"\"package surface platform\n\n    :param page: unit block\n    :param session: kid trial\n    :param",
+      "answers": [
+        " index"
+      ],
+      "wrong_answers": [
+        " header",
+        " name",
+        " token",
+        " user",
+        " page",
+        " session",
+        " port",
+        " color",
+        " update",
+        " msg",
+        " context",
+        " check",
+        " group"
+      ]
+    },
+    {
+      "clean": "\ndef obj(self, call, resource, date, base, test, sub):\n    \"\"\"draft choice match\n\n    :param date: cancer contact\n    :param base: voice set\n    :param",
+      "corrupt": "\ndef obj(self, call, resource, file, title, current, sub):\n    \"\"\"draft choice match\n\n    :param query: cancer contact\n    :param port: voice set\n    :param",
+      "answers": [
+        " test"
+      ],
+      "wrong_answers": [
+        " mode",
+        " file",
+        " title",
+        " current",
+        " query",
+        " port",
+        " start",
+        " line",
+        " date",
+        " base",
+        " call",
+        " resource",
+        " sub"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, last, description, check, format, message, values):\n    \"\"\"map heart scale\n\n    :param check: custom miss\n    :param format: consumer surface\n    :param",
+      "corrupt": "\ndef label(self, last, description, size, info, config, values):\n    \"\"\"map heart scale\n\n    :param num: custom miss\n    :param names: consumer surface\n    :param",
+      "answers": [
+        " message"
+      ],
+      "wrong_answers": [
+        " form",
+        " size",
+        " info",
+        " config",
+        " num",
+        " names",
+        " count",
+        " function",
+        " check",
+        " format",
+        " last",
+        " description",
+        " values"
+      ]
+    },
+    {
+      "clean": "\ndef header(self, check, task, project, match, info, item):\n    \"\"\"vote seat tone\n\n    :param project: half gap\n    :param match: screen frame\n    :param",
+      "corrupt": "\ndef header(self, check, task, output, function, host, item):\n    \"\"\"vote seat tone\n\n    :param node: half gap\n    :param settings: screen frame\n    :param",
+      "answers": [
+        " info"
+      ],
+      "wrong_answers": [
+        " parser",
+        " output",
+        " function",
+        " host",
+        " node",
+        " settings",
+        " format",
+        " event",
+        " project",
+        " match",
+        " check",
+        " task",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef header(self, shape, description, info, end, names, item):\n    \"\"\"camp tip column\n\n    :param info: print cloud\n    :param end: joy start\n    :param",
+      "corrupt": "\ndef header(self, shape, description, response, key, log, item):\n    \"\"\"camp tip column\n\n    :param msg: print cloud\n    :param index: joy start\n    :param",
+      "answers": [
+        " names"
+      ],
+      "wrong_answers": [
+        " count",
+        " response",
+        " key",
+        " log",
+        " msg",
+        " index",
+        " number",
+        " state",
+        " info",
+        " end",
+        " shape",
+        " description",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef path(self, mode, fields, msg, parent, session, array):\n    \"\"\"layer mass union\n\n    :param msg: left flower\n    :param parent: communication respect\n    :param",
+      "corrupt": "\ndef path(self, mode, fields, names, default, index, array):\n    \"\"\"layer mass union\n\n    :param function: left flower\n    :param tag: communication respect\n    :param",
+      "answers": [
+        " session"
+      ],
+      "wrong_answers": [
+        " description",
+        " names",
+        " default",
+        " index",
+        " function",
+        " tag",
+        " format",
+        " parser",
+        " msg",
+        " parent",
+        " mode",
+        " fields",
+        " array"
+      ]
+    },
+    {
+      "clean": "\ndef json(self, result, log, valid, last, settings, server):\n    \"\"\"story tax walk\n\n    :param valid: hero object\n    :param last: past list\n    :param",
+      "corrupt": "\ndef json(self, result, log, test, new, source, server):\n    \"\"\"story tax walk\n\n    :param parser: hero object\n    :param read: past list\n    :param",
+      "answers": [
+        " settings"
+      ],
+      "wrong_answers": [
+        " user",
+        " test",
+        " new",
+        " source",
+        " parser",
+        " read",
+        " format",
+        " files",
+        " valid",
+        " last",
+        " result",
+        " log",
+        " server"
+      ]
+    },
+    {
+      "clean": "\ndef filename(self, server, user, host, match, page, action):\n    \"\"\"adult intelligence start\n\n    :param host: hero protein\n    :param match: fan screen\n    :param",
+      "corrupt": "\ndef filename(self, server, user, path, load, response, action):\n    \"\"\"adult intelligence start\n\n    :param number: hero protein\n    :param required: fan screen\n    :param",
+      "answers": [
+        " page"
+      ],
+      "wrong_answers": [
+        " root",
+        " path",
+        " load",
+        " response",
+        " number",
+        " required",
+        " json",
+        " array",
+        " host",
+        " match",
+        " server",
+        " user",
+        " action"
+      ]
+    },
+    {
+      "clean": "\ndef form(self, required, data, result, value, image, field):\n    \"\"\"success duty poll\n\n    :param result: shape rock\n    :param value: dust draft\n    :param",
+      "corrupt": "\ndef form(self, required, data, instance, text, color, field):\n    \"\"\"success duty poll\n\n    :param url: shape rock\n    :param shape: dust draft\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " project",
+        " instance",
+        " text",
+        " color",
+        " url",
+        " shape",
+        " table",
+        " client",
+        " result",
+        " value",
+        " required",
+        " data",
+        " field"
+      ]
+    },
+    {
+      "clean": "\ndef output(self, count, current, server, form, result, port):\n    \"\"\"assembly tie flat\n\n    :param server: memory label\n    :param form: subject bed\n    :param",
+      "corrupt": "\ndef output(self, count, current, color, path, row, port):\n    \"\"\"assembly tie flat\n\n    :param parent: memory label\n    :param target: subject bed\n    :param",
+      "answers": [
+        " result"
+      ],
+      "wrong_answers": [
+        " page",
+        " color",
+        " path",
+        " row",
+        " parent",
+        " target",
+        " request",
+        " fields",
+        " server",
+        " form",
+        " count",
+        " current",
+        " port"
+      ]
+    },
+    {
+      "clean": "\ndef session(self, item, group, create, form, msg, node):\n    \"\"\"trust protection human\n\n    :param create: game dimension\n    :param form: control protein\n    :param",
+      "corrupt": "\ndef session(self, item, group, last, count, version, node):\n    \"\"\"trust protection human\n\n    :param date: game dimension\n    :param content: control protein\n    :param",
+      "answers": [
+        " msg"
+      ],
+      "wrong_answers": [
+        " path",
+        " last",
+        " count",
+        " version",
+        " date",
+        " content",
+        " files",
+        " image",
+        " create",
+        " form",
+        " item",
+        " group",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, size, old, valid, description, module, file):\n    \"\"\"king chemical back\n\n    :param valid: aid cancer\n    :param description: shell sky\n    :param",
+      "corrupt": "\ndef token(self, size, old, last, array, option, file):\n    \"\"\"king chemical back\n\n    :param host: aid cancer\n    :param count: shell sky\n    :param",
+      "answers": [
+        " module"
+      ],
+      "wrong_answers": [
+        " results",
+        " last",
+        " array",
+        " option",
+        " host",
+        " count",
+        " session",
+        " code",
+        " valid",
+        " description",
+        " size",
+        " old",
+        " file"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, info, instance, function, event, start, num):\n    \"\"\"general president billion\n\n    :param function: response mouse\n    :param event: relation lane\n    :param",
+      "corrupt": "\ndef label(self, info, instance, action, page, load, num):\n    \"\"\"general president billion\n\n    :param json: response mouse\n    :param last: relation lane\n    :param",
+      "answers": [
+        " start"
+      ],
+      "wrong_answers": [
+        " config",
+        " action",
+        " page",
+        " load",
+        " json",
+        " last",
+        " command",
+        " target",
+        " function",
+        " event",
+        " info",
+        " instance",
+        " num"
+      ]
+    },
+    {
+      "clean": "\ndef server(self, results, code, tag, url, file, data):\n    \"\"\"song examination minute\n\n    :param tag: project release\n    :param url: peace green\n    :param",
+      "corrupt": "\ndef server(self, results, code, row, command, context, data):\n    \"\"\"song examination minute\n\n    :param info: project release\n    :param response: peace green\n    :param",
+      "answers": [
+        " file"
+      ],
+      "wrong_answers": [
+        " event",
+        " row",
+        " command",
+        " context",
+        " info",
+        " response",
+        " message",
+        " host",
+        " tag",
+        " url",
+        " results",
+        " code",
+        " data"
+      ]
+    },
+    {
+      "clean": "\ndef results(self, end, parser, config, form, string, num):\n    \"\"\"bench treatment engine\n\n    :param config: committee material\n    :param form: video pain\n    :param",
+      "corrupt": "\ndef results(self, end, parser, action, key, obj, num):\n    \"\"\"bench treatment engine\n\n    :param session: committee material\n    :param label: video pain\n    :param",
+      "answers": [
+        " string"
+      ],
+      "wrong_answers": [
+        " names",
+        " action",
+        " key",
+        " obj",
+        " session",
+        " label",
+        " found",
+        " val",
+        " config",
+        " form",
+        " end",
+        " parser",
+        " num"
+      ]
+    },
+    {
+      "clean": "\ndef page(self, match, command, model, source, query, version):\n    \"\"\"computer frequency assembly\n\n    :param model: dad tip\n    :param source: source son\n    :param",
+      "corrupt": "\ndef page(self, match, command, info, name, log, version):\n    \"\"\"computer frequency assembly\n\n    :param settings: dad tip\n    :param shape: source son\n    :param",
+      "answers": [
+        " query"
+      ],
+      "wrong_answers": [
+        " config",
+        " info",
+        " name",
+        " log",
+        " settings",
+        " shape",
+        " response",
+        " run",
+        " model",
+        " source",
+        " match",
+        " command",
+        " version"
+      ]
+    },
+    {
+      "clean": "\ndef parser(self, run, error, project, server, state, current):\n    \"\"\"scope cycle context\n\n    :param project: article energy\n    :param server: glass picture\n    :param",
+      "corrupt": "\ndef parser(self, run, error, data, expected, create, current):\n    \"\"\"scope cycle context\n\n    :param array: article energy\n    :param load: glass picture\n    :param",
+      "answers": [
+        " state"
+      ],
+      "wrong_answers": [
+        " read",
+        " data",
+        " expected",
+        " create",
+        " array",
+        " load",
+        " json",
+        " start",
+        " project",
+        " server",
+        " run",
+        " error",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef files(self, title, resource, option, target, info, count):\n    \"\"\"return stairs bag\n\n    :param option: rose limit\n    :param target: grass pound\n    :param",
+      "corrupt": "\ndef files(self, title, resource, node, shape, field, count):\n    \"\"\"return stairs bag\n\n    :param color: rose limit\n    :param action: grass pound\n    :param",
+      "answers": [
+        " info"
+      ],
+      "wrong_answers": [
+        " names",
+        " node",
+        " shape",
+        " field",
+        " color",
+        " action",
+        " format",
+        " index",
+        " option",
+        " target",
+        " title",
+        " resource",
+        " count"
+      ]
+    },
+    {
+      "clean": "\ndef parser(self, load, status, val, log, start, key):\n    \"\"\"border pair lip\n\n    :param val: sign run\n    :param log: rose standing\n    :param",
+      "corrupt": "\ndef parser(self, load, status, field, create, read, key):\n    \"\"\"border pair lip\n\n    :param ret: sign run\n    :param host: rose standing\n    :param",
+      "answers": [
+        " start"
+      ],
+      "wrong_answers": [
+        " call",
+        " field",
+        " create",
+        " read",
+        " ret",
+        " host",
+        " size",
+        " end",
+        " val",
+        " log",
+        " load",
+        " status",
+        " key"
+      ]
+    },
+    {
+      "clean": "\ndef action(self, image, required, shape, output, module, call):\n    \"\"\"hill human custom\n\n    :param shape: draft century\n    :param output: inch position\n    :param",
+      "corrupt": "\ndef action(self, image, required, version, value, field, call):\n    \"\"\"hill human custom\n\n    :param page: draft century\n    :param table: inch position\n    :param",
+      "answers": [
+        " module"
+      ],
+      "wrong_answers": [
+        " file",
+        " version",
+        " value",
+        " field",
+        " page",
+        " table",
+        " new",
+        " names",
+        " shape",
+        " output",
+        " image",
+        " required",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef target(self, match, number, status, form, default, run):\n    \"\"\"print hospital lord\n\n    :param status: station wheel\n    :param form: position dream\n    :param",
+      "corrupt": "\ndef target(self, match, number, mode, sub, new, run):\n    \"\"\"print hospital lord\n\n    :param group: station wheel\n    :param user: position dream\n    :param",
+      "answers": [
+        " default"
+      ],
+      "wrong_answers": [
+        " node",
+        " mode",
+        " sub",
+        " new",
+        " group",
+        " user",
+        " server",
+        " project",
+        " status",
+        " form",
+        " match",
+        " number",
+        " run"
+      ]
+    },
+    {
+      "clean": "\ndef image(self, action, info, event, settings, target, options):\n    \"\"\"mill circle speech\n\n    :param event: rise subject\n    :param settings: miss spring\n    :param",
+      "corrupt": "\ndef image(self, action, info, model, order, found, options):\n    \"\"\"mill circle speech\n\n    :param file: rise subject\n    :param valid: miss spring\n    :param",
+      "answers": [
+        " target"
+      ],
+      "wrong_answers": [
+        " client",
+        " model",
+        " order",
+        " found",
+        " file",
+        " valid",
+        " mode",
+        " field",
+        " event",
+        " settings",
+        " action",
+        " info",
+        " options"
+      ]
+    },
+    {
+      "clean": "\ndef module(self, table, config, user, token, request, title):\n    \"\"\"green capacity comfort\n\n    :param user: fuel method\n    :param token: hall resident\n    :param",
+      "corrupt": "\ndef module(self, table, config, result, files, description, title):\n    \"\"\"green capacity comfort\n\n    :param version: fuel method\n    :param run: hall resident\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " test",
+        " result",
+        " files",
+        " description",
+        " version",
+        " run",
+        " base",
+        " query",
+        " user",
+        " token",
+        " table",
+        " config",
+        " title"
+      ]
+    },
+    {
+      "clean": "\ndef results(self, client, path, load, server, required, file):\n    \"\"\"poll saving miss\n\n    :param load: store camera\n    :param server: capital demand\n    :param",
+      "corrupt": "\ndef results(self, client, path, count, msg, parent, file):\n    \"\"\"poll saving miss\n\n    :param session: store camera\n    :param command: capital demand\n    :param",
+      "answers": [
+        " required"
+      ],
+      "wrong_answers": [
+        " number",
+        " count",
+        " msg",
+        " parent",
+        " session",
+        " command",
+        " create",
+        " value",
+        " load",
+        " server",
+        " client",
+        " path",
+        " file"
+      ]
+    },
+    {
+      "clean": "\ndef end(self, match, description, result, update, date, load):\n    \"\"\"payment guard module\n\n    :param result: move speech\n    :param update: input front\n    :param",
+      "corrupt": "\ndef end(self, match, description, msg, action, old, load):\n    \"\"\"payment guard module\n\n    :param line: move speech\n    :param node: input front\n    :param",
+      "answers": [
+        " date"
+      ],
+      "wrong_answers": [
+        " create",
+        " msg",
+        " action",
+        " old",
+        " line",
+        " node",
+        " num",
+        " count",
+        " result",
+        " update",
+        " match",
+        " description",
+        " load"
+      ]
+    },
+    {
+      "clean": "\ndef val(self, default, date, row, values, client, index):\n    \"\"\"play impact patient\n\n    :param row: pound skin\n    :param values: variable pair\n    :param",
+      "corrupt": "\ndef val(self, default, date, settings, description, function, index):\n    \"\"\"play impact patient\n\n    :param valid: pound skin\n    :param file: variable pair\n    :param",
+      "answers": [
+        " client"
+      ],
+      "wrong_answers": [
+        " url",
+        " settings",
+        " description",
+        " function",
+        " valid",
+        " file",
+        " project",
+        " current",
+        " row",
+        " values",
+        " default",
+        " date",
+        " index"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, name, info, option, context, match, image):\n    \"\"\"communication age screen\n\n    :param option: purpose concept\n    :param context: capital load\n    :param",
+      "corrupt": "\ndef line(self, name, info, session, files, function, image):\n    \"\"\"communication age screen\n\n    :param fields: purpose concept\n    :param state: capital load\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " output",
+        " session",
+        " files",
+        " function",
+        " fields",
+        " state",
+        " number",
+        " sub",
+        " option",
+        " context",
+        " name",
+        " info",
+        " image"
+      ]
+    },
+    {
+      "clean": "\ndef required(self, check, match, results, expected, label, source):\n    \"\"\"storage limit cross\n\n    :param results: bill stream\n    :param expected: trust search\n    :param",
+      "corrupt": "\ndef required(self, check, match, project, values, data, source):\n    \"\"\"storage limit cross\n\n    :param result: bill stream\n    :param output: trust search\n    :param",
+      "answers": [
+        " label"
+      ],
+      "wrong_answers": [
+        " num",
+        " project",
+        " values",
+        " data",
+        " result",
+        " output",
+        " msg",
+        " options",
+        " results",
+        " expected",
+        " check",
+        " match",
+        " source"
+      ]
+    },
+    {
+      "clean": "\ndef order(self, version, string, port, group, names, old):\n    \"\"\"bench touch union\n\n    :param port: album channel\n    :param group: joy sun\n    :param",
+      "corrupt": "\ndef order(self, version, string, ret, target, model, old):\n    \"\"\"bench touch union\n\n    :param user: album channel\n    :param image: joy sun\n    :param",
+      "answers": [
+        " names"
+      ],
+      "wrong_answers": [
+        " create",
+        " ret",
+        " target",
+        " model",
+        " user",
+        " image",
+        " path",
+        " last",
+        " port",
+        " group",
+        " version",
+        " string",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef name(self, user, event, form, start, parser, old):\n    \"\"\"science shop god\n\n    :param form: ship response\n    :param start: custom bay\n    :param",
+      "corrupt": "\ndef name(self, user, event, count, result, current, old):\n    \"\"\"science shop god\n\n    :param last: ship response\n    :param table: custom bay\n    :param",
+      "answers": [
+        " parser"
+      ],
+      "wrong_answers": [
+        " token",
+        " count",
+        " result",
+        " current",
+        " last",
+        " table",
+        " message",
+        " default",
+        " form",
+        " start",
+        " user",
+        " event",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef new(self, start, load, response, value, request, context):\n    \"\"\"capacity source president\n\n    :param response: bay cloud\n    :param value: sample demand\n    :param",
+      "corrupt": "\ndef new(self, start, load, port, filename, size, context):\n    \"\"\"capacity source president\n\n    :param old: bay cloud\n    :param header: sample demand\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " files",
+        " port",
+        " filename",
+        " size",
+        " old",
+        " header",
+        " function",
+        " create",
+        " response",
+        " value",
+        " start",
+        " load",
+        " context"
+      ]
+    },
+    {
+      "clean": "\ndef host(self, root, found, num, val, item, call):\n    \"\"\"learning concept river\n\n    :param num: hole town\n    :param val: ball channel\n    :param",
+      "corrupt": "\ndef host(self, root, found, results, event, function, call):\n    \"\"\"learning concept river\n\n    :param format: hole town\n    :param row: ball channel\n    :param",
+      "answers": [
+        " item"
+      ],
+      "wrong_answers": [
+        " tag",
+        " results",
+        " event",
+        " function",
+        " format",
+        " row",
+        " size",
+        " create",
+        " num",
+        " val",
+        " root",
+        " found",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef function(self, end, title, date, tag, match, session):\n    \"\"\"reading forest culture\n\n    :param date: grass director\n    :param tag: oil engineering\n    :param",
+      "corrupt": "\ndef function(self, end, title, info, msg, log, session):\n    \"\"\"reading forest culture\n\n    :param path: grass director\n    :param old: oil engineering\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " number",
+        " info",
+        " msg",
+        " log",
+        " path",
+        " old",
+        " json",
+        " call",
+        " date",
+        " tag",
+        " end",
+        " title",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef task(self, end, header, call, mode, json, update):\n    \"\"\"reference region document\n\n    :param call: card press\n    :param mode: leg price\n    :param",
+      "corrupt": "\ndef task(self, end, header, table, order, run, update):\n    \"\"\"reference region document\n\n    :param target: card press\n    :param first: leg price\n    :param",
+      "answers": [
+        " json"
+      ],
+      "wrong_answers": [
+        " test",
+        " table",
+        " order",
+        " run",
+        " target",
+        " first",
+        " server",
+        " page",
+        " call",
+        " mode",
+        " end",
+        " header",
+        " update"
+      ]
+    },
+    {
+      "clean": "\ndef row(self, log, expected, query, state, date, message):\n    \"\"\"ship unity content\n\n    :param query: block communication\n    :param state: brother flight\n    :param",
+      "corrupt": "\ndef row(self, log, expected, files, host, start, message):\n    \"\"\"ship unity content\n\n    :param function: block communication\n    :param values: brother flight\n    :param",
+      "answers": [
+        " date"
+      ],
+      "wrong_answers": [
+        " line",
+        " files",
+        " host",
+        " start",
+        " function",
+        " values",
+        " ret",
+        " group",
+        " query",
+        " state",
+        " log",
+        " expected",
+        " message"
+      ]
+    },
+    {
+      "clean": "\ndef date(self, target, new, call, token, settings, load):\n    \"\"\"scene mouth duty\n\n    :param call: hole fight\n    :param token: voice title\n    :param",
+      "corrupt": "\ndef date(self, target, new, event, request, code, load):\n    \"\"\"scene mouth duty\n\n    :param options: hole fight\n    :param url: voice title\n    :param",
+      "answers": [
+        " settings"
+      ],
+      "wrong_answers": [
+        " function",
+        " event",
+        " request",
+        " code",
+        " options",
+        " url",
+        " default",
+        " content",
+        " call",
+        " token",
+        " target",
+        " new",
+        " load"
+      ]
+    },
+    {
+      "clean": "\ndef match(self, required, sub, options, info, item, count):\n    \"\"\"president bank pace\n\n    :param options: frame product\n    :param info: delay horse\n    :param",
+      "corrupt": "\ndef match(self, required, sub, settings, first, status, count):\n    \"\"\"president bank pace\n\n    :param text: frame product\n    :param user: delay horse\n    :param",
+      "answers": [
+        " item"
+      ],
+      "wrong_answers": [
+        " check",
+        " settings",
+        " first",
+        " status",
+        " text",
+        " user",
+        " server",
+        " target",
+        " options",
+        " info",
+        " required",
+        " sub",
+        " count"
+      ]
+    },
+    {
+      "clean": "\ndef module(self, message, create, server, key, count, num):\n    \"\"\"bit master rent\n\n    :param server: employment edge\n    :param key: individual space\n    :param",
+      "corrupt": "\ndef module(self, message, create, resource, source, page, num):\n    \"\"\"bit master rent\n\n    :param current: employment edge\n    :param row: individual space\n    :param",
+      "answers": [
+        " count"
+      ],
+      "wrong_answers": [
+        " settings",
+        " resource",
+        " source",
+        " page",
+        " current",
+        " row",
+        " first",
+        " option",
+        " server",
+        " key",
+        " message",
+        " create",
+        " num"
+      ]
+    },
+    {
+      "clean": "\ndef user(self, load, command, event, host, option, filename):\n    \"\"\"claim link gas\n\n    :param event: final female\n    :param host: shock adult\n    :param",
+      "corrupt": "\ndef user(self, load, command, line, obj, expected, filename):\n    \"\"\"claim link gas\n\n    :param file: final female\n    :param config: shock adult\n    :param",
+      "answers": [
+        " option"
+      ],
+      "wrong_answers": [
+        " instance",
+        " line",
+        " obj",
+        " expected",
+        " file",
+        " config",
+        " node",
+        " mode",
+        " event",
+        " host",
+        " load",
+        " command",
+        " filename"
+      ]
+    },
+    {
+      "clean": "\ndef required(self, task, message, status, read, form, page):\n    \"\"\"peace zone resolution\n\n    :param status: version look\n    :param read: god watch\n    :param",
+      "corrupt": "\ndef required(self, task, message, node, request, array, page):\n    \"\"\"peace zone resolution\n\n    :param context: version look\n    :param parent: god watch\n    :param",
+      "answers": [
+        " form"
+      ],
+      "wrong_answers": [
+        " test",
+        " node",
+        " request",
+        " array",
+        " context",
+        " parent",
+        " output",
+        " old",
+        " status",
+        " read",
+        " task",
+        " message",
+        " page"
+      ]
+    },
+    {
+      "clean": "\ndef key(self, state, row, results, filename, date, data):\n    \"\"\"paragraph block module\n\n    :param results: ice top\n    :param filename: pipe list\n    :param",
+      "corrupt": "\ndef key(self, state, row, result, resource, array, data):\n    \"\"\"paragraph block module\n\n    :param number: ice top\n    :param session: pipe list\n    :param",
+      "answers": [
+        " date"
+      ],
+      "wrong_answers": [
+        " group",
+        " result",
+        " resource",
+        " array",
+        " number",
+        " session",
+        " end",
+        " host",
+        " results",
+        " filename",
+        " state",
+        " row",
+        " data"
+      ]
+    },
+    {
+      "clean": "\ndef status(self, item, server, instance, source, label, string):\n    \"\"\"gap belt league\n\n    :param instance: camp flower\n    :param source: sun pub\n    :param",
+      "corrupt": "\ndef status(self, item, server, state, check, log, string):\n    \"\"\"gap belt league\n\n    :param query: camp flower\n    :param value: sun pub\n    :param",
+      "answers": [
+        " label"
+      ],
+      "wrong_answers": [
+        " token",
+        " state",
+        " check",
+        " log",
+        " query",
+        " value",
+        " root",
+        " host",
+        " instance",
+        " source",
+        " item",
+        " server",
+        " string"
+      ]
+    },
+    {
+      "clean": "\ndef ret(self, field, names, module, task, num, session):\n    \"\"\"proof core cross\n\n    :param module: height club\n    :param task: song cost\n    :param",
+      "corrupt": "\ndef ret(self, field, names, create, form, run, session):\n    \"\"\"proof core cross\n\n    :param title: height club\n    :param version: song cost\n    :param",
+      "answers": [
+        " num"
+      ],
+      "wrong_answers": [
+        " state",
+        " create",
+        " form",
+        " run",
+        " title",
+        " version",
+        " test",
+        " tag",
+        " module",
+        " task",
+        " field",
+        " names",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef json(self, array, label, first, name, run, server):\n    \"\"\"set production management\n\n    :param first: doctor card\n    :param name: ship talk\n    :param",
+      "corrupt": "\ndef json(self, array, label, parser, source, settings, server):\n    \"\"\"set production management\n\n    :param description: doctor card\n    :param line: ship talk\n    :param",
+      "answers": [
+        " run"
+      ],
+      "wrong_answers": [
+        " new",
+        " parser",
+        " source",
+        " settings",
+        " description",
+        " line",
+        " option",
+        " key",
+        " first",
+        " name",
+        " array",
+        " label",
+        " server"
+      ]
+    },
+    {
+      "clean": "\ndef files(self, user, default, order, filename, status, color):\n    \"\"\"example hill circle\n\n    :param order: tone standard\n    :param filename: screen fee\n    :param",
+      "corrupt": "\ndef files(self, user, default, expected, result, event, color):\n    \"\"\"example hill circle\n\n    :param token: tone standard\n    :param root: screen fee\n    :param",
+      "answers": [
+        " status"
+      ],
+      "wrong_answers": [
+        " context",
+        " expected",
+        " result",
+        " event",
+        " token",
+        " root",
+        " item",
+        " image",
+        " order",
+        " filename",
+        " user",
+        " default",
+        " color"
+      ]
+    },
+    {
+      "clean": "\ndef resource(self, base, number, msg, header, description, files):\n    \"\"\"duty ear reply\n\n    :param msg: rain hair\n    :param header: resource selection\n    :param",
+      "corrupt": "\ndef resource(self, base, number, output, row, last, files):\n    \"\"\"duty ear reply\n\n    :param response: rain hair\n    :param token: resource selection\n    :param",
+      "answers": [
+        " description"
+      ],
+      "wrong_answers": [
+        " size",
+        " output",
+        " row",
+        " last",
+        " response",
+        " token",
+        " config",
+        " path",
+        " msg",
+        " header",
+        " base",
+        " number",
+        " files"
+      ]
+    },
+    {
+      "clean": "\ndef filename(self, old, response, action, obj, test, count):\n    \"\"\"working start percent\n\n    :param action: rose brain\n    :param obj: tone platform\n    :param",
+      "corrupt": "\ndef filename(self, old, response, image, info, field, count):\n    \"\"\"working start percent\n\n    :param title: rose brain\n    :param value: tone platform\n    :param",
+      "answers": [
+        " test"
+      ],
+      "wrong_answers": [
+        " request",
+        " image",
+        " info",
+        " field",
+        " title",
+        " value",
+        " current",
+        " target",
+        " action",
+        " obj",
+        " old",
+        " response",
+        " count"
+      ]
+    },
+    {
+      "clean": "\ndef array(self, names, end, num, instance, query, values):\n    \"\"\"fall import shop\n\n    :param num: sea location\n    :param instance: action credit\n    :param",
+      "corrupt": "\ndef array(self, names, end, run, root, tag, values):\n    \"\"\"fall import shop\n\n    :param test: sea location\n    :param page: action credit\n    :param",
+      "answers": [
+        " query"
+      ],
+      "wrong_answers": [
+        " image",
+        " run",
+        " root",
+        " tag",
+        " test",
+        " page",
+        " table",
+        " error",
+        " num",
+        " instance",
+        " names",
+        " end",
+        " values"
+      ]
+    },
+    {
+      "clean": "\ndef current(self, old, option, msg, result, filename, url):\n    \"\"\"bell space working\n\n    :param msg: earth register\n    :param result: education index\n    :param",
+      "corrupt": "\ndef current(self, old, option, info, val, target, url):\n    \"\"\"bell space working\n\n    :param index: earth register\n    :param update: education index\n    :param",
+      "answers": [
+        " filename"
+      ],
+      "wrong_answers": [
+        " page",
+        " info",
+        " val",
+        " target",
+        " index",
+        " update",
+        " shape",
+        " config",
+        " msg",
+        " result",
+        " old",
+        " option",
+        " url"
+      ]
+    },
+    {
+      "clean": "\ndef val(self, page, key, start, load, node, code):\n    \"\"\"register guide section\n\n    :param start: option god\n    :param load: environment chemical\n    :param",
+      "corrupt": "\ndef val(self, page, key, instance, model, array, code):\n    \"\"\"register guide section\n\n    :param description: option god\n    :param size: environment chemical\n    :param",
+      "answers": [
+        " node"
+      ],
+      "wrong_answers": [
+        " values",
+        " instance",
+        " model",
+        " array",
+        " description",
+        " size",
+        " settings",
+        " new",
+        " start",
+        " load",
+        " page",
+        " key",
+        " code"
+      ]
+    },
+    {
+      "clean": "\ndef tag(self, query, json, start, options, string, content):\n    \"\"\"seat client generation\n\n    :param start: saving finger\n    :param options: protein dollar\n    :param",
+      "corrupt": "\ndef tag(self, query, json, row, key, port, content):\n    \"\"\"seat client generation\n\n    :param sub: saving finger\n    :param array: protein dollar\n    :param",
+      "answers": [
+        " string"
+      ],
+      "wrong_answers": [
+        " log",
+        " row",
+        " key",
+        " port",
+        " sub",
+        " array",
+        " new",
+        " resource",
+        " start",
+        " options",
+        " query",
+        " json",
+        " content"
+      ]
+    },
+    {
+      "clean": "\ndef content(self, port, context, mode, first, model, error):\n    \"\"\"public call capacity\n\n    :param mode: metal generation\n    :param first: play circle\n    :param",
+      "corrupt": "\ndef content(self, port, context, expected, new, values, error):\n    \"\"\"public call capacity\n\n    :param command: metal generation\n    :param source: play circle\n    :param",
+      "answers": [
+        " model"
+      ],
+      "wrong_answers": [
+        " msg",
+        " expected",
+        " new",
+        " values",
+        " command",
+        " source",
+        " page",
+        " base",
+        " mode",
+        " first",
+        " port",
+        " context",
+        " error"
+      ]
+    },
+    {
+      "clean": "\ndef message(self, sub, form, table, match, base, server):\n    \"\"\"finding coin stone\n\n    :param table: editor content\n    :param match: expression selection\n    :param",
+      "corrupt": "\ndef message(self, sub, form, function, item, current, server):\n    \"\"\"finding coin stone\n\n    :param size: editor content\n    :param update: expression selection\n    :param",
+      "answers": [
+        " base"
+      ],
+      "wrong_answers": [
+        " msg",
+        " function",
+        " item",
+        " current",
+        " size",
+        " update",
+        " valid",
+        " run",
+        " table",
+        " match",
+        " sub",
+        " form",
+        " server"
+      ]
+    },
+    {
+      "clean": "\ndef token(self, model, obj, json, name, fields, session):\n    \"\"\"control picture phrase\n\n    :param json: unity custom\n    :param name: subject heart\n    :param",
+      "corrupt": "\ndef token(self, model, obj, action, results, result, session):\n    \"\"\"control picture phrase\n\n    :param current: unity custom\n    :param expected: subject heart\n    :param",
+      "answers": [
+        " fields"
+      ],
+      "wrong_answers": [
+        " item",
+        " action",
+        " results",
+        " result",
+        " current",
+        " expected",
+        " values",
+        " root",
+        " json",
+        " name",
+        " model",
+        " obj",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef expected(self, string, default, form, old, header, request):\n    \"\"\"fish component plane\n\n    :param form: sea culture\n    :param old: element human\n    :param",
+      "corrupt": "\ndef expected(self, string, default, first, module, line, request):\n    \"\"\"fish component plane\n\n    :param create: sea culture\n    :param image: element human\n    :param",
+      "answers": [
+        " header"
+      ],
+      "wrong_answers": [
+        " text",
+        " first",
+        " module",
+        " line",
+        " create",
+        " image",
+        " description",
+        " user",
+        " form",
+        " old",
+        " string",
+        " default",
+        " request"
+      ]
+    },
+    {
+      "clean": "\ndef user(self, group, command, order, option, path, load):\n    \"\"\"patient tax thinking\n\n    :param order: storage scale\n    :param option: income sample\n    :param",
+      "corrupt": "\ndef user(self, group, command, log, names, default, load):\n    \"\"\"patient tax thinking\n\n    :param num: storage scale\n    :param sub: income sample\n    :param",
+      "answers": [
+        " path"
+      ],
+      "wrong_answers": [
+        " module",
+        " log",
+        " names",
+        " default",
+        " num",
+        " sub",
+        " check",
+        " config",
+        " order",
+        " option",
+        " group",
+        " command",
+        " load"
+      ]
+    },
+    {
+      "clean": "\ndef user(self, project, data, count, text, shape, expected):\n    \"\"\"ship management count\n\n    :param count: threat sex\n    :param text: complex birth\n    :param",
+      "corrupt": "\ndef user(self, project, data, msg, port, obj, expected):\n    \"\"\"ship management count\n\n    :param update: threat sex\n    :param field: complex birth\n    :param",
+      "answers": [
+        " shape"
+      ],
+      "wrong_answers": [
+        " client",
+        " msg",
+        " port",
+        " obj",
+        " update",
+        " field",
+        " files",
+        " response",
+        " count",
+        " text",
+        " project",
+        " data",
+        " expected"
+      ]
+    },
+    {
+      "clean": "\ndef msg(self, number, code, event, target, order, session):\n    \"\"\"half content culture\n\n    :param event: mode being\n    :param target: lift border\n    :param",
+      "corrupt": "\ndef msg(self, number, code, form, count, node, session):\n    \"\"\"half content culture\n\n    :param label: mode being\n    :param sub: lift border\n    :param",
+      "answers": [
+        " order"
+      ],
+      "wrong_answers": [
+        " status",
+        " form",
+        " count",
+        " node",
+        " label",
+        " sub",
+        " array",
+        " config",
+        " event",
+        " target",
+        " number",
+        " code",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef function(self, values, form, action, order, description, tag):\n    \"\"\"bridge hero protection\n\n    :param action: environment border\n    :param order: neck text\n    :param",
+      "corrupt": "\ndef function(self, values, form, string, text, row, tag):\n    \"\"\"bridge hero protection\n\n    :param version: environment border\n    :param instance: neck text\n    :param",
+      "answers": [
+        " description"
+      ],
+      "wrong_answers": [
+        " format",
+        " string",
+        " text",
+        " row",
+        " version",
+        " instance",
+        " output",
+        " item",
+        " action",
+        " order",
+        " values",
+        " form",
+        " tag"
+      ]
+    },
+    {
+      "clean": "\ndef form(self, size, value, old, response, string, json):\n    \"\"\"test phase display\n\n    :param old: secret material\n    :param response: ear panel\n    :param",
+      "corrupt": "\ndef form(self, size, value, end, event, settings, json):\n    \"\"\"test phase display\n\n    :param sub: secret material\n    :param group: ear panel\n    :param",
+      "answers": [
+        " string"
+      ],
+      "wrong_answers": [
+        " mode",
+        " end",
+        " event",
+        " settings",
+        " sub",
+        " group",
+        " token",
+        " required",
+        " old",
+        " response",
+        " size",
+        " value",
+        " json"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, page, request, error, function, count, fields):\n    \"\"\"pole stage standard\n\n    :param error: spring map\n    :param function: ticket pool\n    :param",
+      "corrupt": "\ndef line(self, page, request, session, current, target, fields):\n    \"\"\"pole stage standard\n\n    :param project: spring map\n    :param tag: ticket pool\n    :param",
+      "answers": [
+        " count"
+      ],
+      "wrong_answers": [
+        " expected",
+        " session",
+        " current",
+        " target",
+        " project",
+        " tag",
+        " number",
+        " command",
+        " error",
+        " function",
+        " page",
+        " request",
+        " fields"
+      ]
+    },
+    {
+      "clean": "\ndef start(self, valid, msg, end, name, task, code):\n    \"\"\"device theme saving\n\n    :param end: vote contract\n    :param name: production watch\n    :param",
+      "corrupt": "\ndef start(self, valid, msg, source, table, last, code):\n    \"\"\"device theme saving\n\n    :param url: vote contract\n    :param obj: production watch\n    :param",
+      "answers": [
+        " task"
+      ],
+      "wrong_answers": [
+        " names",
+        " source",
+        " table",
+        " last",
+        " url",
+        " obj",
+        " parser",
+        " test",
+        " end",
+        " name",
+        " valid",
+        " msg",
+        " code"
+      ]
+    },
+    {
+      "clean": "\ndef ret(self, end, json, parent, order, string, msg):\n    \"\"\"division writer pipe\n\n    :param parent: content frame\n    :param order: worker host\n    :param",
+      "corrupt": "\ndef ret(self, end, json, event, group, config, msg):\n    \"\"\"division writer pipe\n\n    :param status: content frame\n    :param user: worker host\n    :param",
+      "answers": [
+        " string"
+      ],
+      "wrong_answers": [
+        " action",
+        " event",
+        " group",
+        " config",
+        " status",
+        " user",
+        " base",
+        " target",
+        " parent",
+        " order",
+        " end",
+        " json",
+        " msg"
+      ]
+    },
+    {
+      "clean": "\ndef key(self, source, data, create, run, file, fields):\n    \"\"\"background speed bar\n\n    :param create: import background\n    :param run: library model\n    :param",
+      "corrupt": "\ndef key(self, source, data, new, resource, root, fields):\n    \"\"\"background speed bar\n\n    :param instance: import background\n    :param config: library model\n    :param",
+      "answers": [
+        " file"
+      ],
+      "wrong_answers": [
+        " array",
+        " new",
+        " resource",
+        " root",
+        " instance",
+        " config",
+        " ret",
+        " path",
+        " create",
+        " run",
+        " source",
+        " data",
+        " fields"
+      ]
+    },
+    {
+      "clean": "\ndef title(self, call, value, action, array, settings, names):\n    \"\"\"pound mail item\n\n    :param action: pocket direction\n    :param array: memory committee\n    :param",
+      "corrupt": "\ndef title(self, call, value, file, obj, msg, names):\n    \"\"\"pound mail item\n\n    :param sub: pocket direction\n    :param values: memory committee\n    :param",
+      "answers": [
+        " settings"
+      ],
+      "wrong_answers": [
+        " required",
+        " file",
+        " obj",
+        " msg",
+        " sub",
+        " values",
+        " string",
+        " parent",
+        " action",
+        " array",
+        " call",
+        " value",
+        " names"
+      ]
+    },
+    {
+      "clean": "\ndef context(self, user, root, source, val, default, sub):\n    \"\"\"event cause design\n\n    :param source: scale female\n    :param val: stand editor\n    :param",
+      "corrupt": "\ndef context(self, user, root, options, line, info, sub):\n    \"\"\"event cause design\n\n    :param load: scale female\n    :param state: stand editor\n    :param",
+      "answers": [
+        " default"
+      ],
+      "wrong_answers": [
+        " new",
+        " options",
+        " line",
+        " info",
+        " load",
+        " state",
+        " parser",
+        " item",
+        " source",
+        " val",
+        " user",
+        " root",
+        " sub"
+      ]
+    },
+    {
+      "clean": "\ndef state(self, token, info, code, json, text, url):\n    \"\"\"return clock mouse\n\n    :param code: forest frame\n    :param json: address brother\n    :param",
+      "corrupt": "\ndef state(self, token, info, last, request, count, url):\n    \"\"\"return clock mouse\n\n    :param default: forest frame\n    :param tag: address brother\n    :param",
+      "answers": [
+        " text"
+      ],
+      "wrong_answers": [
+        " array",
+        " last",
+        " request",
+        " count",
+        " default",
+        " tag",
+        " index",
+        " log",
+        " code",
+        " json",
+        " token",
+        " info",
+        " url"
+      ]
+    },
+    {
+      "clean": "\ndef last(self, table, num, error, size, form, version):\n    \"\"\"left relative boot\n\n    :param error: thinking impact\n    :param size: ice cash\n    :param",
+      "corrupt": "\ndef last(self, table, num, response, image, read, version):\n    \"\"\"left relative boot\n\n    :param description: thinking impact\n    :param options: ice cash\n    :param",
+      "answers": [
+        " form"
+      ],
+      "wrong_answers": [
+        " key",
+        " response",
+        " image",
+        " read",
+        " description",
+        " options",
+        " model",
+        " project",
+        " error",
+        " size",
+        " table",
+        " num",
+        " version"
+      ]
+    },
+    {
+      "clean": "\ndef call(self, log, client, obj, file, instance, tag):\n    \"\"\"note turn song\n\n    :param obj: danger sex\n    :param file: lead release\n    :param",
+      "corrupt": "\ndef call(self, log, client, description, sub, row, tag):\n    \"\"\"note turn song\n\n    :param required: danger sex\n    :param function: lead release\n    :param",
+      "answers": [
+        " instance"
+      ],
+      "wrong_answers": [
+        " label",
+        " description",
+        " sub",
+        " row",
+        " required",
+        " function",
+        " old",
+        " update",
+        " obj",
+        " file",
+        " log",
+        " client",
+        " tag"
+      ]
+    },
+    {
+      "clean": "\ndef string(self, options, instance, table, count, root, event):\n    \"\"\"ear bit left\n\n    :param table: shift aim\n    :param count: win mind\n    :param",
+      "corrupt": "\ndef string(self, options, instance, check, port, ret, event):\n    \"\"\"ear bit left\n\n    :param names: shift aim\n    :param config: win mind\n    :param",
+      "answers": [
+        " root"
+      ],
+      "wrong_answers": [
+        " function",
+        " check",
+        " port",
+        " ret",
+        " names",
+        " config",
+        " code",
+        " message",
+        " table",
+        " count",
+        " options",
+        " instance",
+        " event"
+      ]
+    },
+    {
+      "clean": "\ndef model(self, node, current, error, response, shape, call):\n    \"\"\"tie fish theme\n\n    :param error: club hat\n    :param response: export editor\n    :param",
+      "corrupt": "\ndef model(self, node, current, valid, array, filename, call):\n    \"\"\"tie fish theme\n\n    :param expected: club hat\n    :param form: export editor\n    :param",
+      "answers": [
+        " shape"
+      ],
+      "wrong_answers": [
+        " load",
+        " valid",
+        " array",
+        " filename",
+        " expected",
+        " form",
+        " old",
+        " tag",
+        " error",
+        " response",
+        " node",
+        " current",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef host(self, path, size, output, value, match, source):\n    \"\"\"doctor bottom dollar\n\n    :param output: process trip\n    :param value: section treatment\n    :param",
+      "corrupt": "\ndef host(self, path, size, command, last, files, source):\n    \"\"\"doctor bottom dollar\n\n    :param update: process trip\n    :param tag: section treatment\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " task",
+        " command",
+        " last",
+        " files",
+        " update",
+        " tag",
+        " project",
+        " array",
+        " output",
+        " value",
+        " path",
+        " size",
+        " source"
+      ]
+    },
+    {
+      "clean": "\ndef option(self, index, page, url, format, error, target):\n    \"\"\"metal mark argument\n\n    :param url: rest choice\n    :param format: motion opening\n    :param",
+      "corrupt": "\ndef option(self, index, page, line, label, date, target):\n    \"\"\"metal mark argument\n\n    :param table: rest choice\n    :param fields: motion opening\n    :param",
+      "answers": [
+        " error"
+      ],
+      "wrong_answers": [
+        " instance",
+        " line",
+        " label",
+        " date",
+        " table",
+        " fields",
+        " valid",
+        " description",
+        " url",
+        " format",
+        " index",
+        " page",
+        " target"
+      ]
+    },
+    {
+      "clean": "\ndef page(self, options, item, token, client, group, call):\n    \"\"\"document release flight\n\n    :param token: reader front\n    :param client: creation sequence\n    :param",
+      "corrupt": "\ndef page(self, options, item, results, user, host, call):\n    \"\"\"document release flight\n\n    :param tag: reader front\n    :param query: creation sequence\n    :param",
+      "answers": [
+        " group"
+      ],
+      "wrong_answers": [
+        " string",
+        " results",
+        " user",
+        " host",
+        " tag",
+        " query",
+        " code",
+        " match",
+        " token",
+        " client",
+        " options",
+        " item",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef load(self, val, test, old, status, required, state):\n    \"\"\"unity note date\n\n    :param old: print block\n    :param status: grade surface\n    :param",
+      "corrupt": "\ndef load(self, val, test, info, json, options, state):\n    \"\"\"unity note date\n\n    :param current: print block\n    :param read: grade surface\n    :param",
+      "answers": [
+        " required"
+      ],
+      "wrong_answers": [
+        " array",
+        " info",
+        " json",
+        " options",
+        " current",
+        " read",
+        " msg",
+        " context",
+        " old",
+        " status",
+        " val",
+        " test",
+        " state"
+      ]
+    },
+    {
+      "clean": "\ndef size(self, array, client, end, count, query, key):\n    \"\"\"director lad treatment\n\n    :param end: poll mouth\n    :param count: import existence\n    :param",
+      "corrupt": "\ndef size(self, array, client, current, values, test, key):\n    \"\"\"director lad treatment\n\n    :param sub: poll mouth\n    :param session: import existence\n    :param",
+      "answers": [
+        " query"
+      ],
+      "wrong_answers": [
+        " label",
+        " current",
+        " values",
+        " test",
+        " sub",
+        " session",
+        " module",
+        " result",
+        " end",
+        " count",
+        " array",
+        " client",
+        " key"
+      ]
+    },
+    {
+      "clean": "\ndef mode(self, user, date, image, name, result, host):\n    \"\"\"driver knowledge will\n\n    :param image: spirit bed\n    :param name: screen generation\n    :param",
+      "corrupt": "\ndef mode(self, user, date, call, json, code, host):\n    \"\"\"driver knowledge will\n\n    :param last: spirit bed\n    :param content: screen generation\n    :param",
+      "answers": [
+        " result"
+      ],
+      "wrong_answers": [
+        " shape",
+        " call",
+        " json",
+        " code",
+        " last",
+        " content",
+        " log",
+        " fields",
+        " image",
+        " name",
+        " user",
+        " date",
+        " host"
+      ]
+    },
+    {
+      "clean": "\ndef config(self, default, format, header, resource, mode, label):\n    \"\"\"client horse grass\n\n    :param header: language pack\n    :param resource: design protein\n    :param",
+      "corrupt": "\ndef config(self, default, format, path, query, item, label):\n    \"\"\"client horse grass\n\n    :param value: language pack\n    :param last: design protein\n    :param",
+      "answers": [
+        " mode"
+      ],
+      "wrong_answers": [
+        " size",
+        " path",
+        " query",
+        " item",
+        " value",
+        " last",
+        " values",
+        " ret",
+        " header",
+        " resource",
+        " default",
+        " format",
+        " label"
+      ]
+    },
+    {
+      "clean": "\ndef config(self, title, string, field, format, size, run):\n    \"\"\"image disk security\n\n    :param field: standing bus\n    :param format: panel spot\n    :param",
+      "corrupt": "\ndef config(self, title, string, filename, value, state, run):\n    \"\"\"image disk security\n\n    :param load: standing bus\n    :param name: panel spot\n    :param",
+      "answers": [
+        " size"
+      ],
+      "wrong_answers": [
+        " number",
+        " filename",
+        " value",
+        " state",
+        " load",
+        " name",
+        " context",
+        " port",
+        " field",
+        " format",
+        " title",
+        " string",
+        " run"
+      ]
+    },
+    {
+      "clean": "\ndef item(self, code, field, required, project, query, url):\n    \"\"\"entry finger love\n\n    :param required: assembly general\n    :param project: framework station\n    :param",
+      "corrupt": "\ndef item(self, code, field, log, load, default, url):\n    \"\"\"entry finger love\n\n    :param color: assembly general\n    :param config: framework station\n    :param",
+      "answers": [
+        " query"
+      ],
+      "wrong_answers": [
+        " files",
+        " log",
+        " load",
+        " default",
+        " color",
+        " config",
+        " match",
+        " json",
+        " required",
+        " project",
+        " code",
+        " field",
+        " url"
+      ]
+    },
+    {
+      "clean": "\ndef current(self, action, sub, node, num, result, source):\n    \"\"\"bread session efficiency\n\n    :param node: morning bone\n    :param num: communication register\n    :param",
+      "corrupt": "\ndef current(self, action, sub, version, end, form, source):\n    \"\"\"bread session efficiency\n\n    :param server: morning bone\n    :param ret: communication register\n    :param",
+      "answers": [
+        " result"
+      ],
+      "wrong_answers": [
+        " default",
+        " version",
+        " end",
+        " form",
+        " server",
+        " ret",
+        " file",
+        " request",
+        " node",
+        " num",
+        " action",
+        " sub",
+        " source"
+      ]
+    },
+    {
+      "clean": "\ndef tag(self, found, file, json, form, end, session):\n    \"\"\"image record hat\n\n    :param json: currency run\n    :param form: language foot\n    :param",
+      "corrupt": "\ndef tag(self, found, file, option, url, config, session):\n    \"\"\"image record hat\n\n    :param string: currency run\n    :param page: language foot\n    :param",
+      "answers": [
+        " end"
+      ],
+      "wrong_answers": [
+        " log",
+        " option",
+        " url",
+        " config",
+        " string",
+        " page",
+        " base",
+        " result",
+        " json",
+        " form",
+        " found",
+        " file",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef event(self, start, test, model, valid, ret, state):\n    \"\"\"assembly application factor\n\n    :param model: duty building\n    :param valid: trip link\n    :param",
+      "corrupt": "\ndef event(self, start, test, load, config, group, state):\n    \"\"\"assembly application factor\n\n    :param required: duty building\n    :param parent: trip link\n    :param",
+      "answers": [
+        " ret"
+      ],
+      "wrong_answers": [
+        " filename",
+        " load",
+        " config",
+        " group",
+        " required",
+        " parent",
+        " sub",
+        " settings",
+        " model",
+        " valid",
+        " start",
+        " test",
+        " state"
+      ]
+    },
+    {
+      "clean": "\ndef target(self, action, create, order, host, token, request):\n    \"\"\"description race document\n\n    :param order: sector panel\n    :param host: bus payment\n    :param",
+      "corrupt": "\ndef target(self, action, create, field, file, load, request):\n    \"\"\"description race document\n\n    :param ret: sector panel\n    :param update: bus payment\n    :param",
+      "answers": [
+        " token"
+      ],
+      "wrong_answers": [
+        " json",
+        " field",
+        " file",
+        " load",
+        " ret",
+        " update",
+        " filename",
+        " found",
+        " order",
+        " host",
+        " action",
+        " create",
+        " request"
+      ]
+    },
+    {
+      "clean": "\ndef filename(self, end, parser, old, log, last, json):\n    \"\"\"application thinking wing\n\n    :param old: unity list\n    :param log: sleep brain\n    :param",
+      "corrupt": "\ndef filename(self, end, parser, host, required, number, json):\n    \"\"\"application thinking wing\n\n    :param load: unity list\n    :param description: sleep brain\n    :param",
+      "answers": [
+        " last"
+      ],
+      "wrong_answers": [
+        " task",
+        " host",
+        " required",
+        " number",
+        " load",
+        " description",
+        " form",
+        " image",
+        " old",
+        " log",
+        " end",
+        " parser",
+        " json"
+      ]
+    },
+    {
+      "clean": "\ndef valid(self, options, mode, array, parent, node, instance):\n    \"\"\"bishop writer cloud\n\n    :param array: rose quality\n    :param parent: standing travel\n    :param",
+      "corrupt": "\ndef valid(self, options, mode, filename, code, url, instance):\n    \"\"\"bishop writer cloud\n\n    :param table: rose quality\n    :param title: standing travel\n    :param",
+      "answers": [
+        " node"
+      ],
+      "wrong_answers": [
+        " found",
+        " filename",
+        " code",
+        " url",
+        " table",
+        " title",
+        " num",
+        " line",
+        " array",
+        " parent",
+        " options",
+        " mode",
+        " instance"
+      ]
+    },
+    {
+      "clean": "\ndef num(self, names, source, val, module, file, first):\n    \"\"\"edge cost grass\n\n    :param val: background action\n    :param module: drive iron\n    :param",
+      "corrupt": "\ndef num(self, names, source, option, status, action, first):\n    \"\"\"edge cost grass\n\n    :param settings: background action\n    :param version: drive iron\n    :param",
+      "answers": [
+        " file"
+      ],
+      "wrong_answers": [
+        " old",
+        " option",
+        " status",
+        " action",
+        " settings",
+        " version",
+        " expected",
+        " page",
+        " val",
+        " module",
+        " names",
+        " source",
+        " first"
+      ]
+    },
+    {
+      "clean": "\ndef old(self, item, first, model, state, option, shape):\n    \"\"\"hero return transfer\n\n    :param model: error stone\n    :param state: title wood\n    :param",
+      "corrupt": "\ndef old(self, item, first, results, value, node, shape):\n    \"\"\"hero return transfer\n\n    :param filename: error stone\n    :param text: title wood\n    :param",
+      "answers": [
+        " option"
+      ],
+      "wrong_answers": [
+        " host",
+        " results",
+        " value",
+        " node",
+        " filename",
+        " text",
+        " values",
+        " obj",
+        " model",
+        " state",
+        " item",
+        " first",
+        " shape"
+      ]
+    },
+    {
+      "clean": "\ndef error(self, required, found, page, index, resource, old):\n    \"\"\"light album port\n\n    :param page: thought tie\n    :param index: pool hair\n    :param",
+      "corrupt": "\ndef error(self, required, found, request, valid, text, old):\n    \"\"\"light album port\n\n    :param action: thought tie\n    :param server: pool hair\n    :param",
+      "answers": [
+        " resource"
+      ],
+      "wrong_answers": [
+        " json",
+        " request",
+        " valid",
+        " text",
+        " action",
+        " server",
+        " row",
+        " msg",
+        " page",
+        " index",
+        " required",
+        " found",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef values(self, command, response, file, msg, match, obj):\n    \"\"\"rose engineering host\n\n    :param file: guide while\n    :param msg: match acid\n    :param",
+      "corrupt": "\ndef values(self, command, response, data, info, result, obj):\n    \"\"\"rose engineering host\n\n    :param update: guide while\n    :param header: match acid\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " results",
+        " data",
+        " info",
+        " result",
+        " update",
+        " header",
+        " string",
+        " val",
+        " file",
+        " msg",
+        " command",
+        " response",
+        " obj"
+      ]
+    },
+    {
+      "clean": "\ndef target(self, description, token, user, image, end, found):\n    \"\"\"expression warning reading\n\n    :param user: intelligence size\n    :param image: angle quarter\n    :param",
+      "corrupt": "\ndef target(self, description, token, message, model, values, found):\n    \"\"\"expression warning reading\n\n    :param match: intelligence size\n    :param session: angle quarter\n    :param",
+      "answers": [
+        " end"
+      ],
+      "wrong_answers": [
+        " value",
+        " message",
+        " model",
+        " values",
+        " match",
+        " session",
+        " form",
+        " content",
+        " user",
+        " image",
+        " description",
+        " token",
+        " found"
+      ]
+    },
+    {
+      "clean": "\ndef context(self, title, line, format, test, create, old):\n    \"\"\"lot communication property\n\n    :param format: mill star\n    :param test: flight chip\n    :param",
+      "corrupt": "\ndef context(self, title, line, msg, event, source, old):\n    \"\"\"lot communication property\n\n    :param options: mill star\n    :param ret: flight chip\n    :param",
+      "answers": [
+        " create"
+      ],
+      "wrong_answers": [
+        " data",
+        " msg",
+        " event",
+        " source",
+        " options",
+        " ret",
+        " model",
+        " order",
+        " format",
+        " test",
+        " title",
+        " line",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef state(self, field, header, event, new, ret, client):\n    \"\"\"bridge daughter danger\n\n    :param event: male database\n    :param new: coal female\n    :param",
+      "corrupt": "\ndef state(self, field, header, task, error, instance, client):\n    \"\"\"bridge daughter danger\n\n    :param message: male database\n    :param context: coal female\n    :param",
+      "answers": [
+        " ret"
+      ],
+      "wrong_answers": [
+        " key",
+        " task",
+        " error",
+        " instance",
+        " message",
+        " context",
+        " order",
+        " node",
+        " event",
+        " new",
+        " field",
+        " header",
+        " client"
+      ]
+    },
+    {
+      "clean": "\ndef settings(self, names, json, response, target, model, options):\n    \"\"\"device bar ref\n\n    :param response: team bank\n    :param target: class culture\n    :param",
+      "corrupt": "\ndef settings(self, names, json, content, query, module, options):\n    \"\"\"device bar ref\n\n    :param call: team bank\n    :param filename: class culture\n    :param",
+      "answers": [
+        " model"
+      ],
+      "wrong_answers": [
+        " required",
+        " content",
+        " query",
+        " module",
+        " call",
+        " filename",
+        " sub",
+        " request",
+        " response",
+        " target",
+        " names",
+        " json",
+        " options"
+      ]
+    },
+    {
+      "clean": "\ndef test(self, date, sub, text, config, field, content):\n    \"\"\"article frame root\n\n    :param text: option living\n    :param config: act sky\n    :param",
+      "corrupt": "\ndef test(self, date, sub, instance, run, port, content):\n    \"\"\"article frame root\n\n    :param model: option living\n    :param end: act sky\n    :param",
+      "answers": [
+        " field"
+      ],
+      "wrong_answers": [
+        " error",
+        " instance",
+        " run",
+        " port",
+        " model",
+        " end",
+        " files",
+        " settings",
+        " text",
+        " config",
+        " date",
+        " sub",
+        " content"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, query, url, parent, current, request, session):\n    \"\"\"feature nature sleep\n\n    :param parent: while stream\n    :param current: second limit\n    :param",
+      "corrupt": "\ndef label(self, query, url, last, results, array, session):\n    \"\"\"feature nature sleep\n\n    :param new: while stream\n    :param server: second limit\n    :param",
+      "answers": [
+        " request"
+      ],
+      "wrong_answers": [
+        " name",
+        " last",
+        " results",
+        " array",
+        " new",
+        " server",
+        " host",
+        " row",
+        " parent",
+        " current",
+        " query",
+        " url",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, test, results, session, path, info, field):\n    \"\"\"lot general spirit\n\n    :param session: guy matter\n    :param path: professional fund\n    :param",
+      "corrupt": "\ndef number(self, test, results, option, table, first, field):\n    \"\"\"lot general spirit\n\n    :param title: guy matter\n    :param start: professional fund\n    :param",
+      "answers": [
+        " info"
+      ],
+      "wrong_answers": [
+        " description",
+        " option",
+        " table",
+        " first",
+        " title",
+        " start",
+        " host",
+        " end",
+        " session",
+        " path",
+        " test",
+        " results",
+        " field"
+      ]
+    },
+    {
+      "clean": "\ndef table(self, text, key, group, new, base, create):\n    \"\"\"research gate sleep\n\n    :param group: shop radio\n    :param new: holder gas\n    :param",
+      "corrupt": "\ndef table(self, text, key, user, default, port, create):\n    \"\"\"research gate sleep\n\n    :param token: shop radio\n    :param host: holder gas\n    :param",
+      "answers": [
+        " base"
+      ],
+      "wrong_answers": [
+        " required",
+        " user",
+        " default",
+        " port",
+        " token",
+        " host",
+        " resource",
+        " module",
+        " group",
+        " new",
+        " text",
+        " key",
+        " create"
+      ]
+    },
+    {
+      "clean": "\ndef output(self, code, format, default, date, expected, mode):\n    \"\"\"function engineering assembly\n\n    :param default: practice ground\n    :param date: sleep chapter\n    :param",
+      "corrupt": "\ndef output(self, code, format, ret, color, response, mode):\n    \"\"\"function engineering assembly\n\n    :param info: practice ground\n    :param parser: sleep chapter\n    :param",
+      "answers": [
+        " expected"
+      ],
+      "wrong_answers": [
+        " end",
+        " ret",
+        " color",
+        " response",
+        " info",
+        " parser",
+        " header",
+        " module",
+        " default",
+        " date",
+        " code",
+        " format",
+        " mode"
+      ]
+    },
+    {
+      "clean": "\ndef user(self, value, config, path, string, array, color):\n    \"\"\"management search present\n\n    :param path: yard driver\n    :param string: league design\n    :param",
+      "corrupt": "\ndef user(self, value, config, found, state, output, color):\n    \"\"\"management search present\n\n    :param test: yard driver\n    :param json: league design\n    :param",
+      "answers": [
+        " array"
+      ],
+      "wrong_answers": [
+        " first",
+        " found",
+        " state",
+        " output",
+        " test",
+        " json",
+        " context",
+        " table",
+        " path",
+        " string",
+        " value",
+        " config",
+        " color"
+      ]
+    },
+    {
+      "clean": "\ndef group(self, command, project, resource, target, title, client):\n    \"\"\"working post message\n\n    :param resource: speed test\n    :param target: lot average\n    :param",
+      "corrupt": "\ndef group(self, command, project, description, action, instance, client):\n    \"\"\"working post message\n\n    :param content: speed test\n    :param server: lot average\n    :param",
+      "answers": [
+        " title"
+      ],
+      "wrong_answers": [
+        " order",
+        " description",
+        " action",
+        " instance",
+        " content",
+        " server",
+        " color",
+        " read",
+        " resource",
+        " target",
+        " command",
+        " project",
+        " client"
+      ]
+    },
+    {
+      "clean": "\ndef found(self, host, end, status, order, new, sub):\n    \"\"\"editor fruit average\n\n    :param status: bill thinking\n    :param order: reference leaf\n    :param",
+      "corrupt": "\ndef found(self, host, end, project, val, action, sub):\n    \"\"\"editor fruit average\n\n    :param size: bill thinking\n    :param expected: reference leaf\n    :param",
+      "answers": [
+        " new"
+      ],
+      "wrong_answers": [
+        " root",
+        " project",
+        " val",
+        " action",
+        " size",
+        " expected",
+        " ret",
+        " update",
+        " status",
+        " order",
+        " host",
+        " end",
+        " sub"
+      ]
+    },
+    {
+      "clean": "\ndef task(self, event, key, size, port, end, msg):\n    \"\"\"bus education ref\n\n    :param size: angle concept\n    :param port: operation intelligence\n    :param",
+      "corrupt": "\ndef task(self, event, key, value, item, test, msg):\n    \"\"\"bus education ref\n\n    :param found: angle concept\n    :param valid: operation intelligence\n    :param",
+      "answers": [
+        " end"
+      ],
+      "wrong_answers": [
+        " command",
+        " value",
+        " item",
+        " test",
+        " found",
+        " valid",
+        " order",
+        " table",
+        " size",
+        " port",
+        " event",
+        " key",
+        " msg"
+      ]
+    },
+    {
+      "clean": "\ndef order(self, array, node, url, test, msg, names):\n    \"\"\"female wine client\n\n    :param url: role image\n    :param test: grade computer\n    :param",
+      "corrupt": "\ndef order(self, array, node, match, host, new, names):\n    \"\"\"female wine client\n\n    :param create: role image\n    :param title: grade computer\n    :param",
+      "answers": [
+        " msg"
+      ],
+      "wrong_answers": [
+        " instance",
+        " match",
+        " host",
+        " new",
+        " create",
+        " title",
+        " line",
+        " tag",
+        " url",
+        " test",
+        " array",
+        " node",
+        " names"
+      ]
+    },
+    {
+      "clean": "\ndef default(self, description, image, resource, function, current, call):\n    \"\"\"tube plane shift\n\n    :param resource: complex mind\n    :param function: event map\n    :param",
+      "corrupt": "\ndef default(self, description, image, file, shape, match, call):\n    \"\"\"tube plane shift\n\n    :param count: complex mind\n    :param header: event map\n    :param",
+      "answers": [
+        " current"
+      ],
+      "wrong_answers": [
+        " page",
+        " file",
+        " shape",
+        " match",
+        " count",
+        " header",
+        " order",
+        " ret",
+        " resource",
+        " function",
+        " description",
+        " image",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef item(self, load, url, server, new, base, end):\n    \"\"\"election father top\n\n    :param server: origin notice\n    :param new: stick device\n    :param",
+      "corrupt": "\ndef item(self, load, url, request, row, action, end):\n    \"\"\"election father top\n\n    :param num: origin notice\n    :param first: stick device\n    :param",
+      "answers": [
+        " base"
+      ],
+      "wrong_answers": [
+        " last",
+        " request",
+        " row",
+        " action",
+        " num",
+        " first",
+        " sub",
+        " match",
+        " server",
+        " new",
+        " load",
+        " url",
+        " end"
+      ]
+    },
+    {
+      "clean": "\ndef context(self, table, command, error, match, names, header):\n    \"\"\"engine shot street\n\n    :param error: suit yard\n    :param match: spot layer\n    :param",
+      "corrupt": "\ndef context(self, table, command, host, msg, num, header):\n    \"\"\"engine shot street\n\n    :param title: suit yard\n    :param query: spot layer\n    :param",
+      "answers": [
+        " names"
+      ],
+      "wrong_answers": [
+        " field",
+        " host",
+        " msg",
+        " num",
+        " title",
+        " query",
+        " read",
+        " key",
+        " error",
+        " match",
+        " table",
+        " command",
+        " header"
+      ]
+    },
+    {
+      "clean": "\ndef current(self, request, run, item, old, results, content):\n    \"\"\"return production oil\n\n    :param item: pound claim\n    :param old: pit degree\n    :param",
+      "corrupt": "\ndef current(self, request, run, found, valid, log, content):\n    \"\"\"return production oil\n\n    :param order: pound claim\n    :param start: pit degree\n    :param",
+      "answers": [
+        " results"
+      ],
+      "wrong_answers": [
+        " host",
+        " found",
+        " valid",
+        " log",
+        " order",
+        " start",
+        " ret",
+        " session",
+        " item",
+        " old",
+        " request",
+        " run",
+        " content"
+      ]
+    },
+    {
+      "clean": "\ndef text(self, state, form, mode, sub, root, url):\n    \"\"\"production spring rise\n\n    :param mode: fig ice\n    :param sub: mind load\n    :param",
+      "corrupt": "\ndef text(self, state, form, end, match, required, url):\n    \"\"\"production spring rise\n\n    :param host: fig ice\n    :param number: mind load\n    :param",
+      "answers": [
+        " root"
+      ],
+      "wrong_answers": [
+        " index",
+        " end",
+        " match",
+        " required",
+        " host",
+        " number",
+        " read",
+        " output",
+        " mode",
+        " sub",
+        " state",
+        " form",
+        " url"
+      ]
+    },
+    {
+      "clean": "\ndef server(self, old, error, user, filename, options, node):\n    \"\"\"play research circle\n\n    :param user: unit ticket\n    :param filename: piece tree\n    :param",
+      "corrupt": "\ndef server(self, old, error, config, code, fields, node):\n    \"\"\"play research circle\n\n    :param field: unit ticket\n    :param val: piece tree\n    :param",
+      "answers": [
+        " options"
+      ],
+      "wrong_answers": [
+        " default",
+        " config",
+        " code",
+        " fields",
+        " field",
+        " val",
+        " module",
+        " order",
+        " user",
+        " filename",
+        " old",
+        " error",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef test(self, last, node, new, check, image, ret):\n    \"\"\"ban stand south\n\n    :param new: offer lot\n    :param check: agent move\n    :param",
+      "corrupt": "\ndef test(self, last, node, number, request, description, ret):\n    \"\"\"ban stand south\n\n    :param query: offer lot\n    :param log: agent move\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " tag",
+        " number",
+        " request",
+        " description",
+        " query",
+        " log",
+        " session",
+        " result",
+        " new",
+        " check",
+        " last",
+        " node",
+        " ret"
+      ]
+    },
+    {
+      "clean": "\ndef valid(self, info, current, session, page, header, read):\n    \"\"\"claim peak gallery\n\n    :param session: rose analysis\n    :param page: age sign\n    :param",
+      "corrupt": "\ndef valid(self, info, current, action, sub, resource, read):\n    \"\"\"claim peak gallery\n\n    :param value: rose analysis\n    :param first: age sign\n    :param",
+      "answers": [
+        " header"
+      ],
+      "wrong_answers": [
+        " instance",
+        " action",
+        " sub",
+        " resource",
+        " value",
+        " first",
+        " num",
+        " match",
+        " session",
+        " page",
+        " info",
+        " current",
+        " read"
+      ]
+    },
+    {
+      "clean": "\ndef model(self, parser, tag, last, options, action, project):\n    \"\"\"second mission final\n\n    :param last: record leg\n    :param options: girl ball\n    :param",
+      "corrupt": "\ndef model(self, parser, tag, found, row, log, project):\n    \"\"\"second mission final\n\n    :param group: record leg\n    :param files: girl ball\n    :param",
+      "answers": [
+        " action"
+      ],
+      "wrong_answers": [
+        " shape",
+        " found",
+        " row",
+        " log",
+        " group",
+        " files",
+        " info",
+        " value",
+        " last",
+        " options",
+        " parser",
+        " tag",
+        " project"
+      ]
+    },
+    {
+      "clean": "\ndef row(self, module, source, token, server, read, log):\n    \"\"\"energy storage record\n\n    :param token: colour step\n    :param server: faith profit\n    :param",
+      "corrupt": "\ndef row(self, module, source, date, status, task, log):\n    \"\"\"energy storage record\n\n    :param index: colour step\n    :param first: faith profit\n    :param",
+      "answers": [
+        " read"
+      ],
+      "wrong_answers": [
+        " test",
+        " date",
+        " status",
+        " task",
+        " index",
+        " first",
+        " response",
+        " file",
+        " token",
+        " server",
+        " module",
+        " source",
+        " log"
+      ]
+    },
+    {
+      "clean": "\ndef image(self, fields, command, expected, valid, file, token):\n    \"\"\"ball client boy\n\n    :param expected: wave female\n    :param valid: file hat\n    :param",
+      "corrupt": "\ndef image(self, fields, command, data, obj, start, token):\n    \"\"\"ball client boy\n\n    :param session: wave female\n    :param values: file hat\n    :param",
+      "answers": [
+        " file"
+      ],
+      "wrong_answers": [
+        " settings",
+        " data",
+        " obj",
+        " start",
+        " session",
+        " values",
+        " name",
+        " host",
+        " expected",
+        " valid",
+        " fields",
+        " command",
+        " token"
+      ]
+    },
+    {
+      "clean": "\ndef page(self, info, client, source, port, key, session):\n    \"\"\"bottom ref price\n\n    :param source: weather frequency\n    :param port: consumer guide\n    :param",
+      "corrupt": "\ndef page(self, info, client, response, image, name, session):\n    \"\"\"bottom ref price\n\n    :param test: weather frequency\n    :param options: consumer guide\n    :param",
+      "answers": [
+        " key"
+      ],
+      "wrong_answers": [
+        " found",
+        " response",
+        " image",
+        " name",
+        " test",
+        " options",
+        " code",
+        " obj",
+        " source",
+        " port",
+        " info",
+        " client",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef count(self, result, version, names, format, required, expected):\n    \"\"\"agency limit site\n\n    :param names: character rail\n    :param format: lead dog\n    :param",
+      "corrupt": "\ndef count(self, result, version, config, line, file, expected):\n    \"\"\"agency limit site\n\n    :param content: character rail\n    :param create: lead dog\n    :param",
+      "answers": [
+        " required"
+      ],
+      "wrong_answers": [
+        " valid",
+        " config",
+        " line",
+        " file",
+        " content",
+        " create",
+        " val",
+        " first",
+        " names",
+        " format",
+        " result",
+        " version",
+        " expected"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, names, version, resource, table, context, field):\n    \"\"\"load history move\n\n    :param resource: move research\n    :param table: dollar stuff\n    :param",
+      "corrupt": "\ndef line(self, names, version, status, file, node, field):\n    \"\"\"load history move\n\n    :param key: move research\n    :param code: dollar stuff\n    :param",
+      "answers": [
+        " context"
+      ],
+      "wrong_answers": [
+        " default",
+        " status",
+        " file",
+        " node",
+        " key",
+        " code",
+        " msg",
+        " form",
+        " resource",
+        " table",
+        " names",
+        " version",
+        " field"
+      ]
+    },
+    {
+      "clean": "\ndef expected(self, field, base, call, root, title, request):\n    \"\"\"fan wing resource\n\n    :param call: match stone\n    :param root: rock project\n    :param",
+      "corrupt": "\ndef expected(self, field, base, page, group, results, request):\n    \"\"\"fan wing resource\n\n    :param output: match stone\n    :param result: rock project\n    :param",
+      "answers": [
+        " title"
+      ],
+      "wrong_answers": [
+        " size",
+        " page",
+        " group",
+        " results",
+        " output",
+        " result",
+        " line",
+        " check",
+        " call",
+        " root",
+        " field",
+        " base",
+        " request"
+      ]
+    },
+    {
+      "clean": "\ndef val(self, port, model, order, array, host, results):\n    \"\"\"attack agent review\n\n    :param order: vote wire\n    :param array: chapter environment\n    :param",
+      "corrupt": "\ndef val(self, port, model, create, value, command, results):\n    \"\"\"attack agent review\n\n    :param index: vote wire\n    :param required: chapter environment\n    :param",
+      "answers": [
+        " host"
+      ],
+      "wrong_answers": [
+        " read",
+        " create",
+        " value",
+        " command",
+        " index",
+        " required",
+        " default",
+        " label",
+        " order",
+        " array",
+        " port",
+        " model",
+        " results"
+      ]
+    },
+    {
+      "clean": "\ndef session(self, color, size, content, key, result, num):\n    \"\"\"bag gallery mind\n\n    :param content: seat joy\n    :param key: property owner\n    :param",
+      "corrupt": "\ndef session(self, color, size, function, server, call, num):\n    \"\"\"bag gallery mind\n\n    :param names: seat joy\n    :param settings: property owner\n    :param",
+      "answers": [
+        " result"
+      ],
+      "wrong_answers": [
+        " new",
+        " function",
+        " server",
+        " call",
+        " names",
+        " settings",
+        " row",
+        " msg",
+        " content",
+        " key",
+        " color",
+        " size",
+        " num"
+      ]
+    },
+    {
+      "clean": "\ndef string(self, count, file, host, array, name, status):\n    \"\"\"hair background play\n\n    :param host: button layer\n    :param array: peace miss\n    :param",
+      "corrupt": "\ndef string(self, count, file, names, size, label, status):\n    \"\"\"hair background play\n\n    :param token: button layer\n    :param update: peace miss\n    :param",
+      "answers": [
+        " name"
+      ],
+      "wrong_answers": [
+        " target",
+        " names",
+        " size",
+        " label",
+        " token",
+        " update",
+        " required",
+        " parent",
+        " host",
+        " array",
+        " count",
+        " file",
+        " status"
+      ]
+    },
+    {
+      "clean": "\ndef form(self, order, mode, val, start, output, current):\n    \"\"\"adult expression campaign\n\n    :param val: user glass\n    :param start: rose force\n    :param",
+      "corrupt": "\ndef form(self, order, mode, version, log, client, current):\n    \"\"\"adult expression campaign\n\n    :param error: user glass\n    :param user: rose force\n    :param",
+      "answers": [
+        " output"
+      ],
+      "wrong_answers": [
+        " url",
+        " version",
+        " log",
+        " client",
+        " error",
+        " user",
+        " create",
+        " value",
+        " val",
+        " start",
+        " order",
+        " mode",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef update(self, read, url, default, status, value, action):\n    \"\"\"variable sample male\n\n    :param default: stone aim\n    :param status: pit border\n    :param",
+      "corrupt": "\ndef update(self, read, url, create, port, msg, action):\n    \"\"\"variable sample male\n\n    :param first: stone aim\n    :param root: pit border\n    :param",
+      "answers": [
+        " value"
+      ],
+      "wrong_answers": [
+        " ret",
+        " create",
+        " port",
+        " msg",
+        " first",
+        " root",
+        " context",
+        " node",
+        " default",
+        " status",
+        " read",
+        " url",
+        " action"
+      ]
+    },
+    {
+      "clean": "\ndef options(self, field, msg, model, call, size, test):\n    \"\"\"credit condition peace\n\n    :param model: library union\n    :param call: pair chain\n    :param",
+      "corrupt": "\ndef options(self, field, msg, client, json, page, test):\n    \"\"\"credit condition peace\n\n    :param state: library union\n    :param session: pair chain\n    :param",
+      "answers": [
+        " size"
+      ],
+      "wrong_answers": [
+        " context",
+        " client",
+        " json",
+        " page",
+        " state",
+        " session",
+        " option",
+        " status",
+        " model",
+        " call",
+        " field",
+        " msg",
+        " test"
+      ]
+    },
+    {
+      "clean": "\ndef port(self, description, read, options, context, resource, results):\n    \"\"\"network owner offer\n\n    :param options: confidence user\n    :param context: event average\n    :param",
+      "corrupt": "\ndef port(self, description, read, sub, parent, module, results):\n    \"\"\"network owner offer\n\n    :param call: confidence user\n    :param create: event average\n    :param",
+      "answers": [
+        " resource"
+      ],
+      "wrong_answers": [
+        " name",
+        " sub",
+        " parent",
+        " module",
+        " call",
+        " create",
+        " state",
+        " table",
+        " options",
+        " context",
+        " description",
+        " read",
+        " results"
+      ]
+    },
+    {
+      "clean": "\ndef expected(self, ret, names, module, token, num, client):\n    \"\"\"poll radio bag\n\n    :param module: wife ref\n    :param token: height journal\n    :param",
+      "corrupt": "\ndef expected(self, ret, names, path, parser, read, client):\n    \"\"\"poll radio bag\n\n    :param header: wife ref\n    :param options: height journal\n    :param",
+      "answers": [
+        " num"
+      ],
+      "wrong_answers": [
+        " values",
+        " path",
+        " parser",
+        " read",
+        " header",
+        " options",
+        " valid",
+        " mode",
+        " module",
+        " token",
+        " ret",
+        " names",
+        " client"
+      ]
+    },
+    {
+      "clean": "\ndef current(self, error, root, output, server, module, item):\n    \"\"\"foot management fee\n\n    :param output: sun pain\n    :param server: demand spirit\n    :param",
+      "corrupt": "\ndef current(self, error, root, url, array, check, item):\n    \"\"\"foot management fee\n\n    :param value: sun pain\n    :param color: demand spirit\n    :param",
+      "answers": [
+        " module"
+      ],
+      "wrong_answers": [
+        " order",
+        " url",
+        " array",
+        " check",
+        " value",
+        " color",
+        " load",
+        " option",
+        " output",
+        " server",
+        " error",
+        " root",
+        " item"
+      ]
+    },
+    {
+      "clean": "\ndef last(self, options, name, task, action, count, fields):\n    \"\"\"drug mouse strength\n\n    :param task: framework chip\n    :param action: table content\n    :param",
+      "corrupt": "\ndef last(self, options, name, url, description, first, fields):\n    \"\"\"drug mouse strength\n\n    :param call: framework chip\n    :param label: table content\n    :param",
+      "answers": [
+        " count"
+      ],
+      "wrong_answers": [
+        " root",
+        " url",
+        " description",
+        " first",
+        " call",
+        " label",
+        " response",
+        " names",
+        " task",
+        " action",
+        " options",
+        " name",
+        " fields"
+      ]
+    },
+    {
+      "clean": "\ndef value(self, filename, description, parser, check, new, call):\n    \"\"\"method concept thought\n\n    :param parser: football client\n    :param check: wine music\n    :param",
+      "corrupt": "\ndef value(self, filename, description, format, node, sub, call):\n    \"\"\"method concept thought\n\n    :param session: football client\n    :param settings: wine music\n    :param",
+      "answers": [
+        " new"
+      ],
+      "wrong_answers": [
+        " last",
+        " format",
+        " node",
+        " sub",
+        " session",
+        " settings",
+        " create",
+        " title",
+        " parser",
+        " check",
+        " filename",
+        " description",
+        " call"
+      ]
+    },
+    {
+      "clean": "\ndef line(self, field, log, valid, instance, settings, command):\n    \"\"\"memory file topic\n\n    :param valid: team register\n    :param instance: dark ring\n    :param",
+      "corrupt": "\ndef line(self, field, log, create, number, match, command):\n    \"\"\"memory file topic\n\n    :param start: team register\n    :param context: dark ring\n    :param",
+      "answers": [
+        " settings"
+      ],
+      "wrong_answers": [
+        " url",
+        " create",
+        " number",
+        " match",
+        " start",
+        " context",
+        " index",
+        " expected",
+        " valid",
+        " instance",
+        " field",
+        " log",
+        " command"
+      ]
+    },
+    {
+      "clean": "\ndef code(self, settings, response, resource, field, node, found):\n    \"\"\"post folk aim\n\n    :param resource: price layer\n    :param field: lake card\n    :param",
+      "corrupt": "\ndef code(self, settings, response, fields, session, state, found):\n    \"\"\"post folk aim\n\n    :param files: price layer\n    :param order: lake card\n    :param",
+      "answers": [
+        " node"
+      ],
+      "wrong_answers": [
+        " context",
+        " fields",
+        " session",
+        " state",
+        " files",
+        " order",
+        " function",
+        " num",
+        " resource",
+        " field",
+        " settings",
+        " response",
+        " found"
+      ]
+    },
+    {
+      "clean": "\ndef target(self, current, create, test, expected, match, fields):\n    \"\"\"resident dollar danger\n\n    :param test: page park\n    :param expected: minute plane\n    :param",
+      "corrupt": "\ndef target(self, current, create, info, state, resource, fields):\n    \"\"\"resident dollar danger\n\n    :param option: page park\n    :param data: minute plane\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " command",
+        " info",
+        " state",
+        " resource",
+        " option",
+        " data",
+        " obj",
+        " old",
+        " test",
+        " expected",
+        " current",
+        " create",
+        " fields"
+      ]
+    },
+    {
+      "clean": "\ndef settings(self, info, shape, resource, query, instance, node):\n    \"\"\"route examination stand\n\n    :param resource: peak music\n    :param query: title committee\n    :param",
+      "corrupt": "\ndef settings(self, info, shape, image, key, title, node):\n    \"\"\"route examination stand\n\n    :param message: peak music\n    :param sub: title committee\n    :param",
+      "answers": [
+        " instance"
+      ],
+      "wrong_answers": [
+        " text",
+        " image",
+        " key",
+        " title",
+        " message",
+        " sub",
+        " obj",
+        " output",
+        " resource",
+        " query",
+        " info",
+        " shape",
+        " node"
+      ]
+    },
+    {
+      "clean": "\ndef filename(self, name, item, status, string, client, results):\n    \"\"\"range action respect\n\n    :param status: date spot\n    :param string: setting platform\n    :param",
+      "corrupt": "\ndef filename(self, name, item, call, key, end, results):\n    \"\"\"range action respect\n\n    :param last: date spot\n    :param code: setting platform\n    :param",
+      "answers": [
+        " client"
+      ],
+      "wrong_answers": [
+        " row",
+        " call",
+        " key",
+        " end",
+        " last",
+        " code",
+        " current",
+        " error",
+        " status",
+        " string",
+        " name",
+        " item",
+        " results"
+      ]
+    },
+    {
+      "clean": "\ndef test(self, load, read, form, header, path, settings):\n    \"\"\"bar wine shift\n\n    :param form: floor comfort\n    :param header: goal copy\n    :param",
+      "corrupt": "\ndef test(self, load, read, request, required, token, settings):\n    \"\"\"bar wine shift\n\n    :param parent: floor comfort\n    :param name: goal copy\n    :param",
+      "answers": [
+        " path"
+      ],
+      "wrong_answers": [
+        " item",
+        " request",
+        " required",
+        " token",
+        " parent",
+        " name",
+        " array",
+        " row",
+        " form",
+        " header",
+        " load",
+        " read",
+        " settings"
+      ]
+    },
+    {
+      "clean": "\ndef info(self, token, action, query, port, fields, old):\n    \"\"\"owner thinking card\n\n    :param query: capital contract\n    :param port: father setting\n    :param",
+      "corrupt": "\ndef info(self, token, action, value, num, item, old):\n    \"\"\"owner thinking card\n\n    :param version: capital contract\n    :param header: father setting\n    :param",
+      "answers": [
+        " fields"
+      ],
+      "wrong_answers": [
+        " description",
+        " value",
+        " num",
+        " item",
+        " version",
+        " header",
+        " instance",
+        " current",
+        " query",
+        " port",
+        " token",
+        " action",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, item, header, valid, json, results, test):\n    \"\"\"storm contract living\n\n    :param valid: leader complex\n    :param json: stand margin\n    :param",
+      "corrupt": "\ndef label(self, item, header, status, run, module, test):\n    \"\"\"storm contract living\n\n    :param name: leader complex\n    :param info: stand margin\n    :param",
+      "answers": [
+        " results"
+      ],
+      "wrong_answers": [
+        " response",
+        " status",
+        " run",
+        " module",
+        " name",
+        " info",
+        " shape",
+        " request",
+        " valid",
+        " json",
+        " item",
+        " header",
+        " test"
+      ]
+    },
+    {
+      "clean": "\ndef task(self, log, sub, ret, obj, new, parent):\n    \"\"\"employment ice fish\n\n    :param ret: god dimension\n    :param obj: living project\n    :param",
+      "corrupt": "\ndef task(self, log, sub, num, start, filename, parent):\n    \"\"\"employment ice fish\n\n    :param form: god dimension\n    :param name: living project\n    :param",
+      "answers": [
+        " new"
+      ],
+      "wrong_answers": [
+        " config",
+        " num",
+        " start",
+        " filename",
+        " form",
+        " name",
+        " event",
+        " default",
+        " ret",
+        " obj",
+        " log",
+        " sub",
+        " parent"
+      ]
+    },
+    {
+      "clean": "\ndef client(self, base, query, event, test, read, form):\n    \"\"\"act regulation percent\n\n    :param event: opening gain\n    :param test: ref collection\n    :param",
+      "corrupt": "\ndef client(self, base, query, count, response, order, form):\n    \"\"\"act regulation percent\n\n    :param title: opening gain\n    :param source: ref collection\n    :param",
+      "answers": [
+        " read"
+      ],
+      "wrong_answers": [
+        " default",
+        " count",
+        " response",
+        " order",
+        " title",
+        " source",
+        " format",
+        " action",
+        " event",
+        " test",
+        " base",
+        " query",
+        " form"
+      ]
+    },
+    {
+      "clean": "\ndef options(self, format, module, order, value, current, settings):\n    \"\"\"doctor camera gate\n\n    :param order: opening black\n    :param value: style contract\n    :param",
+      "corrupt": "\ndef options(self, format, module, found, start, run, settings):\n    \"\"\"doctor camera gate\n\n    :param table: opening black\n    :param line: style contract\n    :param",
+      "answers": [
+        " current"
+      ],
+      "wrong_answers": [
+        " version",
+        " found",
+        " start",
+        " run",
+        " table",
+        " line",
+        " label",
+        " server",
+        " order",
+        " value",
+        " format",
+        " module",
+        " settings"
+      ]
+    },
+    {
+      "clean": "\ndef event(self, project, table, function, current, fields, log):\n    \"\"\"general sample turn\n\n    :param function: sector currency\n    :param current: port drive\n    :param",
+      "corrupt": "\ndef event(self, project, table, root, date, page, log):\n    \"\"\"general sample turn\n\n    :param val: sector currency\n    :param files: port drive\n    :param",
+      "answers": [
+        " fields"
+      ],
+      "wrong_answers": [
+        " title",
+        " root",
+        " date",
+        " page",
+        " val",
+        " files",
+        " module",
+        " command",
+        " function",
+        " current",
+        " project",
+        " table",
+        " log"
+      ]
+    },
+    {
+      "clean": "\ndef filename(self, files, function, instance, call, options, request):\n    \"\"\"row unity unit\n\n    :param instance: gold element\n    :param call: union register\n    :param",
+      "corrupt": "\ndef filename(self, files, function, query, port, order, request):\n    \"\"\"row unity unit\n\n    :param sub: gold element\n    :param count: union register\n    :param",
+      "answers": [
+        " options"
+      ],
+      "wrong_answers": [
+        " token",
+        " query",
+        " port",
+        " order",
+        " sub",
+        " count",
+        " new",
+        " json",
+        " instance",
+        " call",
+        " files",
+        " function",
+        " request"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, parser, page, old, files, mode, tag):\n    \"\"\"activity chapter boat\n\n    :param old: component performance\n    :param files: percent neck\n    :param",
+      "corrupt": "\ndef number(self, parser, page, key, image, msg, tag):\n    \"\"\"activity chapter boat\n\n    :param status: component performance\n    :param end: percent neck\n    :param",
+      "answers": [
+        " mode"
+      ],
+      "wrong_answers": [
+        " function",
+        " key",
+        " image",
+        " msg",
+        " status",
+        " end",
+        " array",
+        " task",
+        " old",
+        " files",
+        " parser",
+        " page",
+        " tag"
+      ]
+    },
+    {
+      "clean": "\ndef name(self, key, date, parser, filename, tag, path):\n    \"\"\"rule string music\n\n    :param parser: fruit selection\n    :param filename: rule thought\n    :param",
+      "corrupt": "\ndef name(self, key, date, found, error, run, path):\n    \"\"\"rule string music\n\n    :param size: fruit selection\n    :param val: rule thought\n    :param",
+      "answers": [
+        " tag"
+      ],
+      "wrong_answers": [
+        " first",
+        " found",
+        " error",
+        " run",
+        " size",
+        " val",
+        " message",
+        " ret",
+        " parser",
+        " filename",
+        " key",
+        " date",
+        " path"
+      ]
+    },
+    {
+      "clean": "\ndef action(self, task, run, options, check, group, default):\n    \"\"\"tin connection motion\n\n    :param options: contract resource\n    :param check: character spirit\n    :param",
+      "corrupt": "\ndef action(self, task, run, root, host, values, default):\n    \"\"\"tin connection motion\n\n    :param number: contract resource\n    :param new: character spirit\n    :param",
+      "answers": [
+        " group"
+      ],
+      "wrong_answers": [
+        " context",
+        " root",
+        " host",
+        " values",
+        " number",
+        " new",
+        " command",
+        " array",
+        " options",
+        " check",
+        " task",
+        " run",
+        " default"
+      ]
+    },
+    {
+      "clean": "\ndef path(self, expected, port, option, sub, count, obj):\n    \"\"\"match quality mouse\n\n    :param option: crime colour\n    :param sub: management ticket\n    :param",
+      "corrupt": "\ndef path(self, expected, port, end, module, first, obj):\n    \"\"\"match quality mouse\n\n    :param tag: crime colour\n    :param info: management ticket\n    :param",
+      "answers": [
+        " count"
+      ],
+      "wrong_answers": [
+        " request",
+        " end",
+        " module",
+        " first",
+        " tag",
+        " info",
+        " array",
+        " format",
+        " option",
+        " sub",
+        " expected",
+        " port",
+        " obj"
+      ]
+    },
+    {
+      "clean": "\ndef parser(self, valid, string, event, val, config, json):\n    \"\"\"drive bread category\n\n    :param event: age subject\n    :param val: lord start\n    :param",
+      "corrupt": "\ndef parser(self, valid, string, date, file, info, json):\n    \"\"\"drive bread category\n\n    :param target: age subject\n    :param title: lord start\n    :param",
+      "answers": [
+        " config"
+      ],
+      "wrong_answers": [
+        " client",
+        " date",
+        " file",
+        " info",
+        " target",
+        " title",
+        " name",
+        " token",
+        " event",
+        " val",
+        " valid",
+        " string",
+        " json"
+      ]
+    },
+    {
+      "clean": "\ndef tag(self, end, token, result, create, state, msg):\n    \"\"\"win peace percent\n\n    :param result: spot stage\n    :param create: sort ear\n    :param",
+      "corrupt": "\ndef tag(self, end, token, color, parser, file, msg):\n    \"\"\"win peace percent\n\n    :param filename: spot stage\n    :param shape: sort ear\n    :param",
+      "answers": [
+        " state"
+      ],
+      "wrong_answers": [
+        " read",
+        " color",
+        " parser",
+        " file",
+        " filename",
+        " shape",
+        " code",
+        " new",
+        " result",
+        " create",
+        " end",
+        " token",
+        " msg"
+      ]
+    },
+    {
+      "clean": "\ndef target(self, results, table, file, create, error, project):\n    \"\"\"ball dad pace\n\n    :param file: site rank\n    :param create: memory argument\n    :param",
+      "corrupt": "\ndef target(self, results, table, update, expected, number, project):\n    \"\"\"ball dad pace\n\n    :param description: site rank\n    :param current: memory argument\n    :param",
+      "answers": [
+        " error"
+      ],
+      "wrong_answers": [
+        " code",
+        " update",
+        " expected",
+        " number",
+        " description",
+        " current",
+        " format",
+        " data",
+        " file",
+        " create",
+        " results",
+        " table",
+        " project"
+      ]
+    },
+    {
+      "clean": "\ndef mode(self, node, old, user, found, page, create):\n    \"\"\"female master leaf\n\n    :param user: doctor folk\n    :param found: neck memory\n    :param",
+      "corrupt": "\ndef mode(self, node, old, log, current, query, create):\n    \"\"\"female master leaf\n\n    :param field: doctor folk\n    :param session: neck memory\n    :param",
+      "answers": [
+        " page"
+      ],
+      "wrong_answers": [
+        " results",
+        " log",
+        " current",
+        " query",
+        " field",
+        " session",
+        " client",
+        " group",
+        " user",
+        " found",
+        " node",
+        " old",
+        " create"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, action, instance, file, settings, json, order):\n    \"\"\"gallery reference yard\n\n    :param file: collection neck\n    :param settings: regulation input\n    :param",
+      "corrupt": "\ndef number(self, action, instance, sub, root, model, order):\n    \"\"\"gallery reference yard\n\n    :param source: collection neck\n    :param run: regulation input\n    :param",
+      "answers": [
+        " json"
+      ],
+      "wrong_answers": [
+        " msg",
+        " sub",
+        " root",
+        " model",
+        " source",
+        " run",
+        " call",
+        " shape",
+        " file",
+        " settings",
+        " action",
+        " instance",
+        " order"
+      ]
+    },
+    {
+      "clean": "\ndef request(self, last, options, data, code, name, message):\n    \"\"\"boat control prison\n\n    :param data: while arm\n    :param code: frame art\n    :param",
+      "corrupt": "\ndef request(self, last, options, found, value, instance, message):\n    \"\"\"boat control prison\n\n    :param path: while arm\n    :param title: frame art\n    :param",
+      "answers": [
+        " name"
+      ],
+      "wrong_answers": [
+        " group",
+        " found",
+        " value",
+        " instance",
+        " path",
+        " title",
+        " files",
+        " token",
+        " data",
+        " code",
+        " last",
+        " options",
+        " message"
+      ]
+    },
+    {
+      "clean": "\ndef message(self, expected, last, form, response, names, host):\n    \"\"\"phone generation transfer\n\n    :param form: boat computer\n    :param response: date task\n    :param",
+      "corrupt": "\ndef message(self, expected, last, target, field, valid, host):\n    \"\"\"phone generation transfer\n\n    :param port: boat computer\n    :param resource: date task\n    :param",
+      "answers": [
+        " names"
+      ],
+      "wrong_answers": [
+        " update",
+        " target",
+        " field",
+        " valid",
+        " port",
+        " resource",
+        " source",
+        " option",
+        " form",
+        " response",
+        " expected",
+        " last",
+        " host"
+      ]
+    },
+    {
+      "clean": "\ndef command(self, obj, msg, old, end, title, filename):\n    \"\"\"hell pattern type\n\n    :param old: thought phrase\n    :param end: distance son\n    :param",
+      "corrupt": "\ndef command(self, obj, msg, start, response, status, filename):\n    \"\"\"hell pattern type\n\n    :param settings: thought phrase\n    :param load: distance son\n    :param",
+      "answers": [
+        " title"
+      ],
+      "wrong_answers": [
+        " array",
+        " start",
+        " response",
+        " status",
+        " settings",
+        " load",
+        " results",
+        " label",
+        " old",
+        " end",
+        " obj",
+        " msg",
+        " filename"
+      ]
+    },
+    {
+      "clean": "\ndef names(self, event, array, status, run, description, string):\n    \"\"\"peace return rent\n\n    :param status: framework cut\n    :param run: gas sign\n    :param",
+      "corrupt": "\ndef names(self, event, array, project, url, fields, string):\n    \"\"\"peace return rent\n\n    :param read: framework cut\n    :param format: gas sign\n    :param",
+      "answers": [
+        " description"
+      ],
+      "wrong_answers": [
+        " port",
+        " project",
+        " url",
+        " fields",
+        " read",
+        " format",
+        " settings",
+        " found",
+        " status",
+        " run",
+        " event",
+        " array",
+        " string"
+      ]
+    },
+    {
+      "clean": "\ndef num(self, context, form, format, text, client, resource):\n    \"\"\"item seed release\n\n    :param format: wine instance\n    :param text: offer category\n    :param",
+      "corrupt": "\ndef num(self, context, form, model, status, item, resource):\n    \"\"\"item seed release\n\n    :param response: wine instance\n    :param path: offer category\n    :param",
+      "answers": [
+        " client"
+      ],
+      "wrong_answers": [
+        " error",
+        " model",
+        " status",
+        " item",
+        " response",
+        " path",
+        " test",
+        " source",
+        " format",
+        " text",
+        " context",
+        " form",
+        " resource"
+      ]
+    },
+    {
+      "clean": "\ndef session(self, check, state, page, filename, files, msg):\n    \"\"\"management notice bill\n\n    :param page: gold chip\n    :param filename: origin connection\n    :param",
+      "corrupt": "\ndef session(self, check, state, color, log, form, msg):\n    \"\"\"management notice bill\n\n    :param host: gold chip\n    :param settings: origin connection\n    :param",
+      "answers": [
+        " files"
+      ],
+      "wrong_answers": [
+        " old",
+        " color",
+        " log",
+        " form",
+        " host",
+        " settings",
+        " end",
+        " format",
+        " page",
+        " filename",
+        " check",
+        " state",
+        " msg"
+      ]
+    },
+    {
+      "clean": "\ndef url(self, context, array, table, last, json, model):\n    \"\"\"intelligence official trust\n\n    :param table: assembly payment\n    :param last: error cross\n    :param",
+      "corrupt": "\ndef url(self, context, array, call, results, test, model):\n    \"\"\"intelligence official trust\n\n    :param filename: assembly payment\n    :param run: error cross\n    :param",
+      "answers": [
+        " json"
+      ],
+      "wrong_answers": [
+        " title",
+        " call",
+        " results",
+        " test",
+        " filename",
+        " run",
+        " instance",
+        " msg",
+        " table",
+        " last",
+        " context",
+        " array",
+        " model"
+      ]
+    },
+    {
+      "clean": "\ndef end(self, node, match, ret, project, form, load):\n    \"\"\"unit king chief\n\n    :param ret: region hat\n    :param project: club brother\n    :param",
+      "corrupt": "\ndef end(self, node, match, url, default, resource, load):\n    \"\"\"unit king chief\n\n    :param log: region hat\n    :param target: club brother\n    :param",
+      "answers": [
+        " form"
+      ],
+      "wrong_answers": [
+        " query",
+        " url",
+        " default",
+        " resource",
+        " log",
+        " target",
+        " format",
+        " key",
+        " ret",
+        " project",
+        " node",
+        " match",
+        " load"
+      ]
+    },
+    {
+      "clean": "\ndef array(self, file, description, size, first, field, port):\n    \"\"\"ring quality wing\n\n    :param size: mine package\n    :param first: standing duty\n    :param",
+      "corrupt": "\ndef array(self, file, description, text, parser, filename, port):\n    \"\"\"ring quality wing\n\n    :param files: mine package\n    :param source: standing duty\n    :param",
+      "answers": [
+        " field"
+      ],
+      "wrong_answers": [
+        " json",
+        " text",
+        " parser",
+        " filename",
+        " files",
+        " source",
+        " request",
+        " host",
+        " size",
+        " first",
+        " file",
+        " description",
+        " port"
+      ]
+    },
+    {
+      "clean": "\ndef model(self, first, action, old, content, json, options):\n    \"\"\"building hole bay\n\n    :param old: load language\n    :param content: mile environment\n    :param",
+      "corrupt": "\ndef model(self, first, action, parser, config, table, options):\n    \"\"\"building hole bay\n\n    :param size: load language\n    :param valid: mile environment\n    :param",
+      "answers": [
+        " json"
+      ],
+      "wrong_answers": [
+        " line",
+        " parser",
+        " config",
+        " table",
+        " size",
+        " valid",
+        " token",
+        " module",
+        " old",
+        " content",
+        " first",
+        " action",
+        " options"
+      ]
+    },
+    {
+      "clean": "\ndef string(self, ret, read, settings, field, number, order):\n    \"\"\"determination rent release\n\n    :param settings: food ticket\n    :param field: doctor track\n    :param",
+      "corrupt": "\ndef string(self, ret, read, files, port, host, order):\n    \"\"\"determination rent release\n\n    :param size: food ticket\n    :param result: doctor track\n    :param",
+      "answers": [
+        " number"
+      ],
+      "wrong_answers": [
+        " text",
+        " files",
+        " port",
+        " host",
+        " size",
+        " result",
+        " msg",
+        " status",
+        " settings",
+        " field",
+        " ret",
+        " read",
+        " order"
+      ]
+    },
+    {
+      "clean": "\ndef first(self, json, event, config, number, response, action):\n    \"\"\"stress red chart\n\n    :param config: credit bell\n    :param number: credit arm\n    :param",
+      "corrupt": "\ndef first(self, json, event, result, user, resource, action):\n    \"\"\"stress red chart\n\n    :param file: credit bell\n    :param server: credit arm\n    :param",
+      "answers": [
+        " response"
+      ],
+      "wrong_answers": [
+        " msg",
+        " result",
+        " user",
+        " resource",
+        " file",
+        " server",
+        " found",
+        " node",
+        " config",
+        " number",
+        " json",
+        " event",
+        " action"
+      ]
+    },
+    {
+      "clean": "\ndef read(self, command, files, format, file, output, task):\n    \"\"\"art process box\n\n    :param format: wing official\n    :param file: fall heart\n    :param",
+      "corrupt": "\ndef read(self, command, files, base, function, event, task):\n    \"\"\"art process box\n\n    :param parser: wing official\n    :param num: fall heart\n    :param",
+      "answers": [
+        " output"
+      ],
+      "wrong_answers": [
+        " user",
+        " base",
+        " function",
+        " event",
+        " parser",
+        " num",
+        " log",
+        " key",
+        " format",
+        " file",
+        " command",
+        " files",
+        " task"
+      ]
+    },
+    {
+      "clean": "\ndef result(self, function, title, path, count, image, state):\n    \"\"\"sun century history\n\n    :param path: look wind\n    :param count: human town\n    :param",
+      "corrupt": "\ndef result(self, function, title, message, source, config, state):\n    \"\"\"sun century history\n\n    :param valid: look wind\n    :param form: human town\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " string",
+        " message",
+        " source",
+        " config",
+        " valid",
+        " form",
+        " token",
+        " model",
+        " path",
+        " count",
+        " function",
+        " title",
+        " state"
+      ]
+    },
+    {
+      "clean": "\ndef match(self, first, command, read, options, action, project):\n    \"\"\"screen session doctor\n\n    :param read: count floor\n    :param options: fruit table\n    :param",
+      "corrupt": "\ndef match(self, first, command, config, sub, output, project):\n    \"\"\"screen session doctor\n\n    :param results: count floor\n    :param names: fruit table\n    :param",
+      "answers": [
+        " action"
+      ],
+      "wrong_answers": [
+        " description",
+        " config",
+        " sub",
+        " output",
+        " results",
+        " names",
+        " value",
+        " color",
+        " read",
+        " options",
+        " first",
+        " command",
+        " project"
+      ]
+    },
+    {
+      "clean": "\ndef version(self, values, results, action, color, label, end):\n    \"\"\"wing wine hair\n\n    :param action: date bread\n    :param color: selection rose\n    :param",
+      "corrupt": "\ndef version(self, values, results, array, string, parent, end):\n    \"\"\"wing wine hair\n\n    :param config: date bread\n    :param url: selection rose\n    :param",
+      "answers": [
+        " label"
+      ],
+      "wrong_answers": [
+        " required",
+        " array",
+        " string",
+        " parent",
+        " config",
+        " url",
+        " root",
+        " value",
+        " action",
+        " color",
+        " values",
+        " results",
+        " end"
+      ]
+    },
+    {
+      "clean": "\ndef number(self, title, default, context, files, name, new):\n    \"\"\"bottom location respect\n\n    :param context: mine date\n    :param files: cut note\n    :param",
+      "corrupt": "\ndef number(self, title, default, message, info, value, new):\n    \"\"\"bottom location respect\n\n    :param mode: mine date\n    :param port: cut note\n    :param",
+      "answers": [
+        " name"
+      ],
+      "wrong_answers": [
+        " response",
+        " message",
+        " info",
+        " value",
+        " mode",
+        " port",
+        " page",
+        " val",
+        " context",
+        " files",
+        " title",
+        " default",
+        " new"
+      ]
+    },
+    {
+      "clean": "\ndef field(self, required, function, date, size, create, query):\n    \"\"\"fan lane bar\n\n    :param date: present chart\n    :param size: shell pub\n    :param",
+      "corrupt": "\ndef field(self, required, function, info, check, options, query):\n    \"\"\"fan lane bar\n\n    :param row: present chart\n    :param color: shell pub\n    :param",
+      "answers": [
+        " create"
+      ],
+      "wrong_answers": [
+        " array",
+        " info",
+        " check",
+        " options",
+        " row",
+        " color",
+        " event",
+        " page",
+        " date",
+        " size",
+        " required",
+        " function",
+        " query"
+      ]
+    },
+    {
+      "clean": "\ndef size(self, run, expected, ret, item, match, current):\n    \"\"\"language disk plan\n\n    :param ret: rose drive\n    :param item: rail art\n    :param",
+      "corrupt": "\ndef size(self, run, expected, resource, count, end, current):\n    \"\"\"language disk plan\n\n    :param parent: rose drive\n    :param line: rail art\n    :param",
+      "answers": [
+        " match"
+      ],
+      "wrong_answers": [
+        " config",
+        " resource",
+        " count",
+        " end",
+        " parent",
+        " line",
+        " module",
+        " filename",
+        " ret",
+        " item",
+        " run",
+        " expected",
+        " current"
+      ]
+    },
+    {
+      "clean": "\ndef state(self, string, last, obj, count, image, port):\n    \"\"\"hill student patient\n\n    :param obj: election method\n    :param count: tool director\n    :param",
+      "corrupt": "\ndef state(self, string, last, root, check, description, port):\n    \"\"\"hill student patient\n\n    :param status: election method\n    :param request: tool director\n    :param",
+      "answers": [
+        " image"
+      ],
+      "wrong_answers": [
+        " format",
+        " root",
+        " check",
+        " description",
+        " status",
+        " request",
+        " user",
+        " sub",
+        " obj",
+        " count",
+        " string",
+        " last",
+        " port"
+      ]
+    },
+    {
+      "clean": "\ndef request(self, parser, fields, model, check, port, filename):\n    \"\"\"index return mill\n\n    :param model: seat communication\n    :param check: subject care\n    :param",
+      "corrupt": "\ndef request(self, parser, fields, required, error, count, filename):\n    \"\"\"index return mill\n\n    :param load: seat communication\n    :param log: subject care\n    :param",
+      "answers": [
+        " port"
+      ],
+      "wrong_answers": [
+        " read",
+        " required",
+        " error",
+        " count",
+        " load",
+        " log",
+        " found",
+        " test",
+        " model",
+        " check",
+        " parser",
+        " fields",
+        " filename"
+      ]
+    },
+    {
+      "clean": "\ndef values(self, instance, log, root, data, error, update):\n    \"\"\"category balance shadow\n\n    :param root: step black\n    :param data: factor sea\n    :param",
+      "corrupt": "\ndef values(self, instance, log, output, base, model, update):\n    \"\"\"category balance shadow\n\n    :param valid: step black\n    :param action: factor sea\n    :param",
+      "answers": [
+        " error"
+      ],
+      "wrong_answers": [
+        " mode",
+        " output",
+        " base",
+        " model",
+        " valid",
+        " action",
+        " first",
+        " options",
+        " root",
+        " data",
+        " instance",
+        " log",
+        " update"
+      ]
+    },
+    {
+      "clean": "\ndef first(self, string, state, content, values, shape, session):\n    \"\"\"layer thought chief\n\n    :param content: learning analysis\n    :param values: seed past\n    :param",
+      "corrupt": "\ndef first(self, string, state, action, names, module, session):\n    \"\"\"layer thought chief\n\n    :param settings: learning analysis\n    :param fields: seed past\n    :param",
+      "answers": [
+        " shape"
+      ],
+      "wrong_answers": [
+        " create",
+        " action",
+        " names",
+        " module",
+        " settings",
+        " fields",
+        " path",
+        " request",
+        " content",
+        " values",
+        " string",
+        " state",
+        " session"
+      ]
+    },
+    {
+      "clean": "\ndef read(self, value, settings, val, session, required, found):\n    \"\"\"gain building site\n\n    :param val: consumer left\n    :param session: event engine\n    :param",
+      "corrupt": "\ndef read(self, value, settings, order, values, run, found):\n    \"\"\"gain building site\n\n    :param current: consumer left\n    :param root: event engine\n    :param",
+      "answers": [
+        " required"
+      ],
+      "wrong_answers": [
+        " old",
+        " order",
+        " values",
+        " run",
+        " current",
+        " root",
+        " group",
+        " state",
+        " val",
+        " session",
+        " value",
+        " settings",
+        " found"
+      ]
+    },
+    {
+      "clean": "\ndef label(self, create, title, content, current, command, key):\n    \"\"\"existence impact target\n\n    :param content: boot season\n    :param current: rock age\n    :param",
+      "corrupt": "\ndef label(self, create, title, required, mode, old, key):\n    \"\"\"existence impact target\n\n    :param field: boot season\n    :param context: rock age\n    :param",
+      "answers": [
+        " command"
+      ],
+      "wrong_answers": [
+        " names",
+        " required",
+        " mode",
+        " old",
+        " field",
+        " context",
+        " index",
+        " output",
+        " content",
+        " current",
+        " create",
+        " title",
+        " key"
+      ]
+    },
+    {
+      "clean": "\ndef session(self, state, instance, query, resource, call, key):\n    \"\"\"mark move position\n\n    :param query: local future\n    :param resource: comfort play\n    :param",
+      "corrupt": "\ndef session(self, state, instance, path, number, json, key):\n    \"\"\"mark move position\n\n    :param action: local future\n    :param mode: comfort play\n    :param",
+      "answers": [
+        " call"
+      ],
+      "wrong_answers": [
+        " value",
+        " path",
+        " number",
+        " json",
+        " action",
+        " mode",
+        " url",
+        " info",
+        " query",
+        " resource",
+        " state",
+        " instance",
+        " key"
+      ]
+    },
+    {
+      "clean": "\ndef names(self, version, info, output, node, resource, config):\n    \"\"\"action truth love\n\n    :param output: hold age\n    :param node: position balance\n    :param",
+      "corrupt": "\ndef names(self, version, info, data, string, query, config):\n    \"\"\"action truth love\n\n    :param event: hold age\n    :param expected: position balance\n    :param",
+      "answers": [
+        " resource"
+      ],
+      "wrong_answers": [
+        " parser",
+        " data",
+        " string",
+        " query",
+        " event",
+        " expected",
+        " option",
+        " number",
+        " output",
+        " node",
+        " version",
+        " info",
+        " config"
+      ]
+    },
+    {
+      "clean": "\ndef call(self, start, field, error, resource, settings, model):\n    \"\"\"guide attack label\n\n    :param error: summary position\n    :param resource: left host\n    :param",
+      "corrupt": "\ndef call(self, start, field, string, status, info, model):\n    \"\"\"guide attack label\n\n    :param obj: summary position\n    :param form: left host\n    :param",
+      "answers": [
+        " settings"
+      ],
+      "wrong_answers": [
+        " image",
+        " string",
+        " status",
+        " info",
+        " obj",
+        " form",
+        " query",
+        " first",
+        " error",
+        " resource",
+        " start",
+        " field",
+        " model"
+      ]
+    },
+    {
+      "clean": "\ndef request(self, sub, current, value, version, port, old):\n    \"\"\"church board tone\n\n    :param value: chip bill\n    :param version: boot ground\n    :param",
+      "corrupt": "\ndef request(self, sub, current, array, path, row, old):\n    \"\"\"church board tone\n\n    :param response: chip bill\n    :param match: boot ground\n    :param",
+      "answers": [
+        " port"
+      ],
+      "wrong_answers": [
+        " function",
+        " array",
+        " path",
+        " row",
+        " response",
+        " match",
+        " valid",
+        " filename",
+        " value",
+        " version",
+        " sub",
+        " current",
+        " old"
+      ]
+    },
+    {
+      "clean": "\ndef content(self, fields, count, client, error, end, index):\n    \"\"\"station impact trial\n\n    :param client: operator bill\n    :param error: complex degree\n    :param",
+      "corrupt": "\ndef content(self, fields, count, value, num, file, index):\n    \"\"\"station impact trial\n\n    :param text: operator bill\n    :param parser: complex degree\n    :param",
+      "answers": [
+        " end"
+      ],
+      "wrong_answers": [
+        " source",
+        " value",
+        " num",
+        " file",
+        " text",
+        " parser",
+        " instance",
+        " info",
+        " client",
+        " error",
+        " fields",
+        " count",
+        " index"
+      ]
+    }
+  ]
+}

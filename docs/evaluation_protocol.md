@@ -31,4 +31,37 @@ The builder refuses to overwrite a frozen artifact. The existing artifact has it
 
 After all groups and the temporary manual baseline complete, run `python -m experiments.thesis.finalize_evaluation_repair` on a CPU compute node. It merges outputs, regenerates the IOI/Greater-Than exhibits, verifies unchanged structural rows and frozen caches, and writes `report.md` and `evaluation_changes.csv`. `finalization.json` records completion of each step. A failed step stops the pipeline. The no-argument manual-baseline exporter retains the historical protocol; use an explicit temporary manifest, frozen inventory and separate output directory for this repair.
 
-Historical result CSVs and thesis figures remain intact. Preview outputs are written below `results/results_chapter/temporary_repair_20261006/`; exporters require matching evaluation protocol IDs so new measurements cannot be combined with historical baselines. Docstring and port-validation results are outside this temporary correction.
+Historical result CSVs remain intact. Corrected IOI/Greater-Than outputs are written below `results/results_chapter/temporary_repair_20261006/`; exporters require matching evaluation protocol IDs so new measurements cannot be combined with historical baselines. The manuscript integration is tracked separately in `results/results_chapter/complete_repair_integration_20261006/`. Port-validation results retain their separate original protocol.
+
+## Docstring repair and manuscript integration
+
+The separate frozen artifact at `datasets/evaluation/docstring_repair_20261006/` extends the historical repair to Docstring. It preserves the original rest-style generation geometry and metadata, uses generation seed 20261006, and contains 256 fresh clean prompts excluded from both original input roles. No corrupt contexts overlap either original role. Docstring uses **NeelNanda/gpt-neox-tokenizer-digits**, not GPT-2's tokenizer; identity and single-token-answer checks must use the actual model tokenizer. The builder requires a separate Docstring artifact so tokenizer provenance remains explicit.
+
+```bash
+srun --mem=8G python -m experiments.thesis.build_evaluation_set --tasks docstring --output-dir datasets/evaluation/a_new_docstring_artifact
+```
+
+Frozen historical Docstring inputs are recorded in `results/results_chapter/complete_repair_integration_20261006/docstring_selected_inputs.json`; functional outputs and matching manual baselines are in `results/results_chapter/docstring_repair_20261006/`. Only circuit evaluation is repeated. Original discovery scores, selectors, budgets and structural measurements remain unchanged. The task-specific smoke check also verifies the full circuit and cached-prefix computation.
+
+The active thesis functional sources are recorded in `results/results_chapter/active_sources.json`. The main comparison uses the repaired IOI/Greater-Than bundle; the Docstring appendix uses its separate repaired bundle. Use explicit `--source-dir` and output arguments for re-exporting these sources. Historical exporter defaults remain available for audit and are not the active manuscript sources. Do not replace corrected thesis displays with historical exports. See the integration plan and report under `complete_repair_integration_20261006/` for the exact figure/table adoption and verification.
+
+## Fresh-run verification boundary
+
+The October 7 verification rebuilt all three repair datasets in empty output directories and exercised fresh EAP discovery, cache resume and stability analysis for all three tasks. This representative run does not rerun the complete method/ablation/seed matrix or test installation without downloaded model resources. Details and logs are in `results/results_chapter/fresh_run_verification_20261007/report.md`.
+
+The manual-baseline limitation identified by that audit is addressed by the fixed-holdout export path below. Historical and repaired thesis baseline sources remain separate; reproducing those sources still requires their matching evaluation protocol.
+
+## Manual baselines for new fixed-holdout runs
+
+Generate the official circuit cell in the new cache folder with the same split seed, then export its baseline against the completed analysis source. For the IOI example above:
+
+```bash
+srun --gres=gpu:1 python -m experiments.thesis.run_cell --task ioi --algo gt --ablation resample --seed 42 --split-seed 42 --output-dir .prune_scores/new_comparison
+srun --gres=gpu:1 python -m experiments.thesis.results_chapter_manual_baseline --split-seed 42 --cache-dir .prune_scores/new_comparison --source-dir results/stability/new_comparison --output-dir results/results_chapter/new_comparison/exhibits/size_curves
+```
+
+For a multi-task analysis, generate one official cell per task in that cache folder. Baseline task scope defaults to the analysis source; an explicit `--tasks` must match it. Fixed-holdout export requires a completed `--source-dir` and a separate `--output-dir`. It reconstructs the production evaluation Tasks and checks their actual content-derived protocol ID against the analysis before scoring. This identity includes ordered clean/corrupt inputs, answers, pool, tokenizer and loader construction. The selected official cache must also match the holdout identity and data budget. Missing inputs do not fall back to historical caches.
+
+Official circuits retain their native evaluation ablations: mean ablation for IOI and resample ablation for Greater-Than and Docstring. Both faithfulness and completeness use the same clean evaluation set as the comparison. Output manifests record the evaluation-clean hash per task, the analysis manifest hash and completion status; curve joins reject incomplete or mismatched sources.
+
+The no-argument exporter remains historical audit mode. `--eval-manifest` with `--selected-inputs` remains the frozen temporary-repair mode and is mutually exclusive with `--split-seed`. Repair score files are resolved from their inventory paths. The scoped implementation and verification report is `results/results_chapter/fixed_holdout_baseline_20261007/report.md`.

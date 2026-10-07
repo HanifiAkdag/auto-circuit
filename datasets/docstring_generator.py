@@ -1214,26 +1214,26 @@ data_json = {
     }
 }
 
-prompt_dicts = []
-N_PROMPTS = 1000
-random.seed(0)
-for i in range(N_PROMPTS):
-    prompt = docstring_induction_prompt_generator("rest", n_matching_args=3, n_def_prefix_args=2, n_def_suffix_args=1, n_doc_prefix_args=0, met_desc_len=3, arg_desc_len=2)
-    prompt_dict = {
-        "clean": prompt.clean_prompt,
-        "corrupt": prompt.corrupt_prompt["random_random"],
-        "answers": prompt.correct_answers,
-        "wrong_answers": prompt.wrong_answers,
-    }
-    prompt_dicts.append(prompt_dict)
-
-print("prompt_dicts[0]", prompt_dicts[0]['clean'])
-print("prompt_dicts[1]", prompt_dicts[1]['clean'])
-
-data_json["prompts"] = prompt_dicts
-
-with open("docstring_prompts2.json", "w") as f:
-    json.dump(data_json, f)
+def get_docstring_data(n_prompts: int, seed: int = 0) -> List[Dict]:
+    """Generate the historical prompt geometry without changing caller randomness."""
+    state = random.getstate()
+    try:
+        random.seed(seed)
+        records = []
+        for _ in range(n_prompts):
+            prompt = docstring_induction_prompt_generator("rest", n_matching_args=3, n_def_prefix_args=2, n_def_suffix_args=1, n_doc_prefix_args=0, met_desc_len=3, arg_desc_len=2)
+            records.append({"clean": prompt.clean_prompt,
+                            "corrupt": prompt.corrupt_prompt["random_random"],
+                            "answers": prompt.correct_answers,
+                            "wrong_answers": prompt.wrong_answers})
+        return records
+    finally:
+        random.setstate(state)
 
 
-#%%
+if __name__ == "__main__":
+    prompt_dicts = get_docstring_data(1000)
+    print("prompt_dicts[0]", prompt_dicts[0]['clean'])
+    print("prompt_dicts[1]", prompt_dicts[1]['clean'])
+    with open("docstring_prompts2.json", "w") as f:
+        json.dump({**data_json, "prompts": prompt_dicts}, f)

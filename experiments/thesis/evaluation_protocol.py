@@ -87,7 +87,7 @@ def verify_evaluation_task(task, protocol: dict, short: str) -> None:
     tokenizer = task.model.tokenizer
     stats = validate_records(records, original, lambda s: tokenizer.encode(tokenizer.bos_token + s))
     if stats != item['identity_checks'] or stats['examples'] != 256:
-        raise ValueError('Runtime evaluation token identities disagree with the frozen protocol')
+        raise ValueError(f'Runtime evaluation token identities disagree with the frozen protocol: tokenizer={tokenizer.name_or_path}, actual={stats}, expected={item["identity_checks"]}')
 
 
 def require_same_protocol(*manifests: dict) -> None:

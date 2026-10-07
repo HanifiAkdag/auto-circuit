@@ -59,13 +59,13 @@ def main(output: Path):
         if row['condition'] == 'joint' and row['measure'] == 'faithfulness' and row['discovery_ablation'] == row['eval_ablation']:
             matched[(row['task'], row['metric'])].append(row['average_change'])
     lines = ['# Temporary correction of historical evaluation', '',
-             'This re-evaluates the existing IOI and Greater-Than circuits on 256 fresh clean prompts per task. Discovery scores, seeds, circuit selectors and attained sizes are unchanged. Historical result files and thesis figures are preserved.', '',
+             'This re-evaluates the selected historical circuits on 256 fresh clean prompts per task. Discovery scores, seeds, circuit selectors and attained sizes are unchanged. Historical result files are preserved; manuscript integration is documented separately.', '',
              '| Task | Clean prompts | Clean overlap with either original input role | Rows with a reused corrupt context |',
              '|---|---:|---:|---:|']
     for short, item in protocol['tasks'].items():
         checks = item['identity_checks']
         lines.append(f"| {short} | {checks['examples']} | {checks['clean_overlap_rows']} | {checks['corrupt_overlap_rows']} |")
-    lines += ['', f"Verified {len(changes):,} corresponding functional rows and the frozen score/manifest hashes. Both faithfulness and completeness use the new clean inputs. Greater-Than corrupt-context reuse is permitted by the selected protocol; it does not establish unseen corrupt contexts.", '',
+    lines += ['', f"Verified {len(changes):,} corresponding functional rows and the frozen score/manifest hashes. Both faithfulness and completeness use the new clean inputs. Corrupt-context reuse, where reported above, is permitted by the selected protocol; it does not establish unseen corrupt contexts.", '',
               '| Task | Metric | Median change across matched joint curve points | Largest absolute change |',
               '|---|---|---:|---:|']
     for (task, metric), values in sorted(matched.items()):

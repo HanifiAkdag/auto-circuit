@@ -117,7 +117,7 @@ def merge(protocol_path, inputs_path, output, task_shorts):
                 'complete': False, 'cells': specs, 'functional_rows': len(functional),
                 'structural_rows': len(structural), 'temporary_historical_repair': True,
                 'evaluation_protocol_id': protocol['protocol_id'], 'evaluation_manifest': str(protocol_path),
-                'selected_inputs': str(inputs_path), 'selected_inputs_sha256': sha256(inputs_path), 'eval_data': 'Temporary unseen-clean evaluation, 256 prompts per main task',
+                'selected_inputs': str(inputs_path), 'selected_inputs_sha256': sha256(inputs_path), 'eval_data': 'Temporary unseen-clean evaluation, 256 prompts per task',
                 'structural_source_sha256': sha256(HISTORICAL / 'structural.csv'),
                 'historical_manifest_sha256': sha256(HISTORICAL / 'manifest.json')}
     write_json = lambda path, value: path.write_text(json.dumps(value, indent=2))
@@ -129,6 +129,14 @@ def merge(protocol_path, inputs_path, output, task_shorts):
     manifest.update(complete=True, completed_at=datetime.now().isoformat())
     _atomic_output(output / 'manifest.json', write_json, manifest)
     print('Merged', len(functional), 'functional rows and', len(structural), 'unchanged structural rows')
+
+
+def evaluation_prefix(task, protocol: dict, short: str) -> list[int]:
+    """Reconstruct the loader's cached prefix from its actual frozen input."""
+    path = Path(protocol['_manifest_path']).parent / protocol['tasks'][short]['dataset']
+    clean = json.loads(path.read_text())['prompts'][0]['clean']
+    tokenizer = task.model.tokenizer
+    return tokenizer.encode(tokenizer.bos_token + clean)[:task.test_loader.diverge_idx]
 
 
 def smoke(protocol_path: Path, inputs_path: Path, output: Path, task_shorts: list[str]) -> None:
@@ -161,7 +169,7 @@ def smoke(protocol_path: Path, inputs_path: Path, output: Path, task_shorts: lis
             with torch.inference_mode():
                 cached = model(batch.clean)[model.out_slice]
                 if task.test_loader.diverge_idx:
-                    prefix = torch.tensor(model.tokenizer.encode(model.tokenizer.bos_token + 'The'), device=batch.clean.device)
+                    prefix = torch.tensor(evaluation_prefix(task, protocol, short), device=batch.clean.device)
                     assert len(prefix) == task.test_loader.diverge_idx
                     raw = torch.cat([prefix.expand(len(batch.clean), -1), batch.clean], dim=1)
                     uncached = model.wrapped_model(raw)[model.out_slice]
