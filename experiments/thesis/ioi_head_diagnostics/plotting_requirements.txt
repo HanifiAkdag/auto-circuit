@@ -1,0 +1,7 @@
+# Isolated figure-only dependencies. Base NumPy and scientific packages are unchanged.
+matplotlib==3.8.4
+contourpy==1.2.1
+cycler==0.12.1
+fonttools==4.53.1
+kiwisolver==1.4.5
+pyparsing==3.1.2
