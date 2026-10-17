@@ -1,9 +1,18 @@
+import json
+
+import pytest
+
 from experiments.thesis.run_cell import (  # noqa: E402
     _EP_TASK_HPARAMS,
     _bind_task_hyperparams,
+    _can_reuse_cache,
     _cache_stem,
+    _data_budget,
+    _serialize,
+    _TASK_TEMPLATES,
 )
 from auto_circuit.prune_algos.prune_algos import EDGE_PRUNING_PRUNE_ALGO  # noqa: E402
+from experiments.thesis.experiment_utils import algo_hyperparams
 
 
 def test_joint_stem_matches_the_legacy_name():
@@ -40,3 +49,35 @@ def test_edge_pruning_uses_released_task_specific_targets():
     assert gt.func.keywords["target_edge_sparsity"] == 1.1
     assert gt.func.keywords["target_node_sparsity"] == 0.68
     assert gt.key == EDGE_PRUNING_PRUNE_ALGO.key
+
+
+def test_gt_edge_pruning_records_all_reference_candidate_tokens():
+    algo = _bind_task_hyperparams(EDGE_PRUNING_PRUNE_ALGO, "ep", "gt")
+    params = json.loads(json.dumps(algo_hyperparams(algo), default=_serialize))
+    assert params["kl_vocab_tokens"] == [f"{i:02d}" for i in range(100)]
+
+
+@pytest.mark.parametrize("task", ["ioi", "docstring", "new_user_task"])
+def test_other_tasks_default_to_full_vocabulary(task):
+    algo = _bind_task_hyperparams(EDGE_PRUNING_PRUNE_ALGO, "ep", task)
+    assert algo_hyperparams(algo)["kl_vocab_tokens"] is None
+    assert algo.key == EDGE_PRUNING_PRUNE_ALGO.key
+
+
+def test_gt_restricted_loss_cannot_collide_with_historical_cache():
+    stem = _cache_stem("gt", "ep", "resample", 42, None)
+    assert stem != "cell_gt_ep_resample_seed42"
+    assert "_klvocab" in stem
+
+
+def test_gt_cache_requires_matching_training_vocabulary():
+    manifest = {
+        "cell": {"task": "gt", "algo": "ep", "split_seed": None},
+        "data_budget": _data_budget(_TASK_TEMPLATES["gt"]),
+        "algo_hyperparams": {},
+    }
+    assert not _can_reuse_cache(manifest, "gt", None)
+    manifest["algo_hyperparams"]["kl_vocab_tokens"] = [f"{i:02d}" for i in range(100)]
+    assert _can_reuse_cache(manifest, "gt", None)
+    manifest["algo_hyperparams"]["kl_vocab_tokens"].pop(0)
+    assert not _can_reuse_cache(manifest, "gt", None)

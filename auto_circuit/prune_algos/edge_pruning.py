@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import math
 from itertools import cycle
-from typing import Callable, Dict, List, Optional, Set
+from typing import Callable, Dict, List, Optional, Sequence, Set
 
 import plotly.graph_objects as go
 import torch as t
@@ -111,6 +111,47 @@ def _sample_mask(log_alpha: t.Tensor, batch_size: int, shared: bool) -> t.Tensor
     return one.expand(batch_size, *one.shape[1:])
 
 
+def _resolve_kl_vocab_indices(
+    model: PatchableModel,
+    tokens: Optional[Sequence[str]],
+    device: t.device,
+) -> Optional[t.Tensor]:
+    """Resolve an optional candidate vocabulary, requiring distinct single tokens."""
+    if tokens is None:
+        return None
+    if (
+        isinstance(tokens, str)
+        or not tokens
+        or any(not isinstance(token, str) for token in tokens)
+    ):
+        raise ValueError("kl_vocab_tokens must be a nonempty sequence of token strings")
+    tokenizer = getattr(model, "tokenizer", None)
+    if tokenizer is None:
+        raise ValueError("kl_vocab_tokens requires a model tokenizer")
+    encoded = [tokenizer.encode(token, add_special_tokens=False) for token in tokens]
+    if any(len(ids) != 1 for ids in encoded):
+        raise ValueError("Each kl_vocab_tokens entry must encode to exactly one token")
+    indices = [ids[0] for ids in encoded]
+    if len(set(indices)) != len(indices) or any(index < 0 for index in indices):
+        raise ValueError("kl_vocab_tokens must resolve to distinct nonnegative token IDs")
+    return t.tensor(indices, dtype=t.long, device=device)
+
+
+def _kl_divergence(
+    circuit_logits: t.Tensor,
+    full_logits: t.Tensor,
+    vocab_indices: Optional[t.Tensor] = None,
+) -> t.Tensor:
+    """KL(full || circuit), normalizing after any vocabulary restriction."""
+    if vocab_indices is not None:
+        circuit_logits = circuit_logits.index_select(-1, vocab_indices)
+        full_logits = full_logits.index_select(-1, vocab_indices)
+    return multibatch_kl_div(
+        log_softmax(circuit_logits, dim=-1),
+        log_softmax(full_logits, dim=-1),
+    )
+
+
 def edge_pruning_prune_scores(
     model: PatchableModel,
     dataloader: PromptDataLoader,
@@ -140,6 +181,8 @@ def edge_pruning_prune_scores(
     eval_every: Optional[int] = None,
     # --- Discovery ablation ---
     ablation_type: AblationType = AblationType.RESAMPLE,
+    # --- Training objective ---
+    kl_vocab_tokens: Optional[Sequence[str]] = None,
 ) -> PruneScores:
     """Discover a circuit using L0-regularised edge pruning with Lagrangian duality.
 
@@ -193,6 +236,11 @@ def edge_pruning_prune_scores(
         disable_linear_regularization: If ``True``, freeze the λ₁ (linear) terms at 0
             and use only the quadratic λ₂ terms.  The original paper finds the
             quadratic term alone is sufficient in some settings.
+        kl_vocab_tokens: Optional candidate strings for the training KL. Each must
+            encode to one distinct token with the model's tokenizer. Both models'
+            logits are restricted before normalization. ``None`` uses the full
+            vocabulary; ``tuple(f"{i:02d}" for i in range(100))`` matches the released
+            Greater-Than trainer. This does not restrict downstream evaluation.
 
     Returns:
         :class:`PruneScores` mapping module names to edge importance tensors.
@@ -202,6 +250,7 @@ def edge_pruning_prune_scores(
     """
     assert len(dataloader) > 0, "Dataloader is empty"
     device = next(model.parameters()).device
+    kl_vocab_indices = _resolve_kl_vocab_indices(model, kl_vocab_tokens, device)
     out_slice = model.out_slice
     n_edges = model.n_edges
     n_srcs = len(model.srcs)
@@ -213,6 +262,10 @@ def edge_pruning_prune_scores(
     with t.inference_mode():
         for batch in dataloader:
             clean_logits[batch.key] = model(batch.clean)[out_slice]
+    if kl_vocab_indices is not None:
+        vocab_size = next(iter(clean_logits.values())).shape[-1]
+        if kl_vocab_indices.max().item() >= vocab_size:
+            raise ValueError("kl_vocab_tokens contains IDs outside the model's output vocabulary")
 
     # ============================================================
     # Step 2: Compute ablation source activations for the chosen ablation type
@@ -422,10 +475,7 @@ def edge_pruning_prune_scores(
                 wrapper.batch_size = orig_state[mod_name]["batch_size"]
 
         # --- KL divergence loss ---
-        kl_loss = multibatch_kl_div(
-            log_softmax(train_logits, dim=-1),
-            log_softmax(clean_logits[batch.key], dim=-1),
-        )
+        kl_loss = _kl_divergence(train_logits, clean_logits[batch.key], kl_vocab_indices)
 
         # --- Edge sparsity & regularisation ---
         # sparsity = mean sampled z (0 = keep, 1 = ablate) → equals 1 - kept_frac,

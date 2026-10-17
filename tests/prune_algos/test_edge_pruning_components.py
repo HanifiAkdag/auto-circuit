@@ -15,9 +15,11 @@ These tests close a coverage gap that exists regardless of the comparison —
 Skipped automatically when ``third_party/edge_pruning`` is absent.
 """
 
+import importlib.util
 import json
 import sys
 from pathlib import Path
+from types import ModuleType, SimpleNamespace
 
 import pytest
 import torch as t
@@ -30,6 +32,7 @@ from auto_circuit.prune_algos.edge_pruning import (
     _target_sparsity,
     edge_pruning_prune_scores,
 )
+import auto_circuit.prune_algos.edge_pruning as ep
 from auto_circuit.utils.l0_utils import (
     FACTOR,
     LIMIT_LEFT,
@@ -323,6 +326,47 @@ def test_sparsity_conventions_are_complementary(orig, tiny):
 
 
 # --- A6: the KL objective ----------------------------------------------------
+
+
+def test_gt_kl_matches_executed_reference_loss_and_gradients(orig, mini_tl_transformer, monkeypatch):
+    # The GT script imports evaluate but never uses it, including in compute_loss.
+    if importlib.util.find_spec("evaluate") is None:
+        monkeypatch.setitem(sys.modules, "evaluate", ModuleType("evaluate"))
+    from fpt2_gt import FPT2InfoTrainer
+
+    generator = t.Generator().manual_seed(17)
+    circuit = t.randn(2, 3, 50257, generator=generator, dtype=t.float64, requires_grad=True)
+    full = t.randn(2, 3, 50257, generator=generator, dtype=t.float64)
+    positions = t.tensor([0, 2])
+    tokenizer = mini_tl_transformer.tokenizer
+    trainer = SimpleNamespace(
+        digits=None, tokenizer=tokenizer, args=SimpleNamespace(device=t.device("cpu")),
+        gpt2_model=lambda **kwargs: SimpleNamespace(logits=full, writer_states=t.zeros(1, 2)),
+        skip_layer_loss_if_higher_sparsity=False,
+        state=SimpleNamespace(global_step=0),
+        get_current_edge_target_sparsity=lambda step: 0.0,
+        get_current_layer_target_sparsity=lambda step: 0.0,
+    )
+    outputs = orig["modeling"].FPT2LMHeadModelOutput(
+        logits=circuit, edge_loss=t.zeros(()), node_loss=t.zeros(()),
+    )
+    reference_loss = FPT2InfoTrainer.compute_loss(
+        trainer, lambda **kwargs: outputs,
+        {"indices": positions, "digits": t.tensor([3, 78]),
+         "input_ids": t.ones(2, 3, dtype=t.long), "corr_input_ids": t.zeros(2, 3, dtype=t.long)},
+    )
+    reference_gradient, = t.autograd.grad(reference_loss, circuit)
+
+    token_ids = ep._resolve_kl_vocab_indices(
+        SimpleNamespace(tokenizer=tokenizer), tuple(f"{i:02d}" for i in range(100)), t.device("cpu"),
+    )
+    assert t.equal(token_ids, trainer.digits)
+    ours = circuit.detach().clone().requires_grad_()
+    row = t.arange(2)
+    port_loss = ep._kl_divergence(ours[row, positions], full[row, positions], token_ids)
+    port_gradient, = t.autograd.grad(port_loss, ours)
+    t.testing.assert_close(port_loss, reference_loss, atol=1e-12, rtol=1e-12)
+    t.testing.assert_close(port_gradient, reference_gradient, atol=1e-12, rtol=1e-12)
 
 
 def test_kl_matches_reference_on_single_token_span(orig, tiny):

@@ -1,5 +1,6 @@
 import importlib
 import importlib.util
+import json
 
 import numpy as np
 import pytest
@@ -9,6 +10,20 @@ def analysis():
     name = 'experiments.thesis.results_chapter_structure_function'
     assert importlib.util.find_spec(name) is not None, 'Paired analysis module is missing'
     return importlib.import_module(name)
+
+
+@pytest.mark.parametrize('absolute', [False, True])
+def test_selected_inputs_follow_the_active_registry(tmp_path, absolute):
+    legacy = tmp_path / 'results/results_chapter/evaluation_overlap_integration_20261006/selected_inputs.json'
+    legacy.parent.mkdir(parents=True)
+    legacy.write_text(json.dumps({'inputs': [{'scores': 'superseded.pkl'}]}))
+    current = tmp_path / 'current/selected_inputs.json'
+    current.parent.mkdir()
+    current.write_text(json.dumps({'inputs': [{'scores': 'restricted_objective.pkl'}]}))
+    registry = {'selected_inputs': str(current if absolute else current.relative_to(tmp_path))}
+    path, inputs = analysis().load_selected_inputs(tmp_path, registry)
+    assert path == current
+    assert inputs == [{'scores': 'restricted_objective.pkl'}]
 
 
 def test_pair_identity_and_overlap_are_preserved():

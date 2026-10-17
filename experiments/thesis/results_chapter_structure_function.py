@@ -122,14 +122,18 @@ def validate_scores(vector, method):
         raise ValueError('Invalid scores; infinity is ACDC\'s retained-edge sentinel')
 
 
+def load_selected_inputs(root, registry):
+    path = root / registry['selected_inputs']
+    return path, json.loads(path.read_text())['inputs']
+
+
 def run(root, output):
     import torch
     from experiments.thesis.results_chapter_cross_discovery import flatten_scores, select_mask
     from experiments.thesis.stability_plots import _spearman
     registry = json.loads((root/'results/results_chapter/active_sources.json').read_text())['bundles']['main']
     source = root/registry['source_dir']
-    inputs_path = root/'results/results_chapter/evaluation_overlap_integration_20261006/selected_inputs.json'
-    frozen = json.loads(inputs_path.read_text())['inputs']
+    inputs_path, frozen = load_selected_inputs(root, registry)
     paths = [source/'functional.csv', source/'structural.csv', source/'manifest.json', inputs_path,
              source/'exhibits/stability/within_ablation_selected.csv',
              source/'exhibits/controlled_comparison/matched_quality.csv']

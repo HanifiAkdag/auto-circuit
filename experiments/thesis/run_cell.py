@@ -86,11 +86,14 @@ _TASK_MODEL_DEF: dict[str, str] = {
     "docstring": "attn-only-4l",
 }
 
-# EP's released GPT-2 scripts use a task-specific node-sparsity target. The common
-# 0.72 setting remains the fallback for tasks without a released EP configuration.
-_EP_TASK_HPARAMS: dict[str, dict[str, float]] = {
+# Released EP settings: GT normalizes its training KL over the 100 number tokens.
+# Unlisted tasks retain the registered algorithm's defaults.
+_EP_TASK_HPARAMS: dict[str, dict[str, Any]] = {
     "ioi": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.72},
-    "gt": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.68},
+    "gt": {
+        "target_edge_sparsity": 1.1, "target_node_sparsity": 0.68,
+        "kl_vocab_tokens": tuple(f"{i:02d}" for i in range(100)),
+    },
     "docstring": {"target_edge_sparsity": 1.1, "target_node_sparsity": 0.72},
 }
 
@@ -102,7 +105,7 @@ def _bind_task_hyperparams(algo: PruneAlgo, algo_short: str, task_short: str) ->
     return PruneAlgo(
         key=algo.key,
         name=algo.name,
-        func=partial(algo.func, **_EP_TASK_HPARAMS[task_short]),
+        func=partial(algo.func, **_EP_TASK_HPARAMS.get(task_short, {})),
         _short_name=algo.short_name,
     )
 
@@ -154,8 +157,13 @@ def _cache_stem(
     null_tag = "_null" if null_test else ""
     ptag = f"__{partial_tag}" if partial_tag else ""
     split_tag = "" if split_seed is None else f"_holdout{split_seed}"
+    vocab = _EP_TASK_HPARAMS.get(task, {}).get("kl_vocab_tokens") if algo == "ep" else None
+    vocab_tag = ""
+    if vocab is not None:
+        digest = hashlib.sha256(json.dumps(vocab).encode()).hexdigest()[:12]
+        vocab_tag = f"_klvocab{digest}"
     algo_slug = algo.replace("-", "_")
-    return f"cell_{task}_{algo_slug}_{ablation}_seed{seed}{init_tag}{null_tag}{split_tag}{ptag}"
+    return f"cell_{task}_{algo_slug}_{ablation}_seed{seed}{init_tag}{null_tag}{split_tag}{vocab_tag}{ptag}"
 
 
 def _hardware() -> dict[str, Any]:
@@ -187,6 +195,11 @@ def _can_reuse_cache(manifest: dict, task_short: str, split_seed: Optional[int])
     template = _TASK_TEMPLATES[task_short]
     if manifest.get('cell', {}).get('split_seed') != split_seed or manifest.get('data_budget') != _data_budget(template):
         return False
+    if manifest.get("cell", {}).get("algo") == "ep":
+        vocab = _EP_TASK_HPARAMS.get(task_short, {}).get("kl_vocab_tokens")
+        expected = None if vocab is None else list(vocab)
+        if manifest.get("algo_hyperparams", {}).get("kl_vocab_tokens") != expected:
+            return False
     if split_seed is None:
         return True
     path = repo_path_to_abs_path(f'datasets/{template._dataset_name}.json')
