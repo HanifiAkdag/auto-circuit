@@ -112,23 +112,22 @@ def select() -> list[dict[str, object]]:
 
 def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]:
     slug, title, _, metrics = TASKS[task]
-    is_ioi = task == "Indirect Object Identification"
     width = 1160 if len(metrics) == 3 else 920
-    left_margin, right_margin = 195, 35
+    left_margin, right_margin = 215, 30
     plot_width = width - left_margin - right_margin
-    table_left = -(left_margin - 75) / plot_width
-    label_center = 45
-    strip_left = -(left_margin - label_center + 19) / plot_width
-    strip_right = -(left_margin - label_center - 19) / plot_width
+    table_left = -(left_margin - 90) / plot_width
+    group_label_x = (65 - left_margin) / plot_width
+    discovery_label_x = (25 - left_margin) / plot_width
+    font_family = "DejaVu Sans"
     axis_tick_size = 17
     method_label_size = 18
     title_size = 19
-    discovery_label_size = 15
+    discovery_label_size = 17
     marker_size = 9
     legend_size = 17
     headings = {
         "Clean KL Div": "Clean KL divergence",
-        "Logit Diff Percent": "Logit difference<br>(% of full model)",
+        "Logit Diff Percent": "Logit difference (%)",
         "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
     }
     fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True,
@@ -197,23 +196,26 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
                           fillcolor="#F3F4F5", line_width=0, layer="below")
     for i, discovery in enumerate(ABLATIONS):
         y = 10.5 - group_spacing * i
-        fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=y, yref="y",
+        fig.add_annotation(x=group_label_x, xref="paper", y=y, yref="y",
                            text=f"<b>{discovery.capitalize()}</b>", textangle=-90,
                            showarrow=False, xanchor="center", yanchor="middle",
                            font=dict(size=discovery_label_size, color="#303030"))
 
     for annotation in fig.layout.annotations[:len(metrics)]:
-        annotation.update(font=dict(size=title_size, color="#222222"), y=1.04)
-    fig.add_annotation(x=(strip_left + strip_right) / 2, xref="paper", y=1.04, yref="paper",
-                       text="<b>Discovery<br>ablation</b>", showarrow=False,
-                       xanchor="center", yanchor="bottom",
-                       font=dict(size=discovery_label_size, color="#303030"))
+        heading, separator, subtitle = annotation.text.partition("<br>")
+        annotation.text = f"<b>{heading}</b>{separator}{subtitle}"
+        annotation.update(font=dict(family=font_family, size=title_size, color="#222222"),
+                          y=1.085, yanchor="middle")
+    fig.add_annotation(x=discovery_label_x, xref="paper", y=0.5, yref="paper",
+                       text="<b>Discovery ablation</b>", textangle=-90, showarrow=False,
+                       xanchor="center", yanchor="middle",
+                       font=dict(size=method_label_size, color="#303030"))
     fig.update_layout(template="simple_white", width=width,
-                      height=740, margin=dict(l=left_margin, r=right_margin, t=115, b=115),
-                      font=dict(family="Arial", color="#222222", size=legend_size),
-                      legend=dict(orientation="h", x=0.5, xanchor="center",
-                                  y=-0.14, yanchor="top",
-                                  title="Evaluation ablation: ", font=dict(size=legend_size),
+                      height=700, margin=dict(l=left_margin, r=right_margin, t=85, b=100),
+                      font=dict(family=font_family, color="#222222", size=legend_size),
+                      legend=dict(orientation="h", x=(width / 2 - left_margin) / plot_width,
+                                  xanchor="center", y=-0.13, yanchor="top",
+                                  title="<b>Evaluation ablation:</b> ", font=dict(size=legend_size),
                                   title_font=dict(size=legend_size), bgcolor="rgba(0,0,0,0)"),
                       paper_bgcolor="white", plot_bgcolor="rgba(0,0,0,0)")
     pdf = IMAGES / f"{slug}_evaluation_ablation.pdf"
