@@ -297,7 +297,7 @@ def write_structure_function(joint):
              r"\label{tab:structure-function-association}", r"\begin{tabular}{@{}lccc@{}}",
              r"\toprule", r"& \multicolumn{3}{c}{$\rho$ with across-run SD} \\",
              r"\cmidrule(lr){2-4}",
-             r"Task & Clean KL & \shortstack[c]{Logit difference\\percent} & \shortstack[c]{Correct-over-incorrect\\accuracy} \\",
+             r"Task & KL divergence & \shortstack[c]{Logit difference\\percent} & \shortstack[c]{Correct-over-incorrect\\accuracy} \\",
              r"\midrule"]
     for label in ("IOI", "Greater-Than"):
         metrics = ("Clean KL Div", "Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent")

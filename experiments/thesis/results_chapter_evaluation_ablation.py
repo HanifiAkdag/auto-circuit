@@ -33,7 +33,7 @@ TASKS = {
         ("Clean KL Div", "Logit Diff Percent")),
 }
 METRIC_LABELS = {
-    "Clean KL Div": "Clean KL divergence",
+    "Clean KL Div": "KL divergence",
     "Logit Diff Percent": "Logit difference (% of full model)",
     "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect accuracy (%)",
 }
@@ -126,7 +126,7 @@ def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]
     marker_size = 9
     legend_size = 17
     headings = {
-        "Clean KL Div": "Clean KL divergence",
+        "Clean KL Div": "KL divergence",
         "Logit Diff Percent": "Logit difference (%)",
         "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
     }

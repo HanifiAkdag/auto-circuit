@@ -279,7 +279,7 @@ def plot(output):
             ax.grid(alpha=.18)
             ax.set_axisbelow(True)
         fig.supxlabel('Average structural dissimilarity to the other four runs (1 − Jaccard)', fontsize=10)
-        fig.supylabel('Clean KL divergence (nats)' if metric==KL else 'Correct-over-incorrect accuracy (%)', fontsize=10)
+        fig.supylabel('KL divergence (nats)' if metric==KL else 'Correct-over-incorrect accuracy (%)', fontsize=10)
         fig.suptitle(task, fontsize=12, fontweight='bold')
         fig.tight_layout(rect=(.02,.02,1,1))
         for extension in ('pdf','png'):

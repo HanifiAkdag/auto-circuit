@@ -37,7 +37,7 @@ STYLE = {
     "Random": ("#777777", "Random circuit"),
     "Manual circuit": ("#222222", "Manually identified circuit"),
 }
-METRICS = (("Clean KL Div", "Clean KL divergence"),
+METRICS = (("Clean KL Div", "KL divergence"),
            ("Logit Diff Percent", "Logit difference (%)"),
            ("Correct Answer Greater Than Incorrect Percent",
             "Correct-over-incorrect accuracy (%)"))
