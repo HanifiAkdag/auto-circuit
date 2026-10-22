@@ -1,0 +1,11 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "sources": {
+    "results/results_chapter/ep_gt_kl_20261017/functional.csv": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+    "results/results_chapter/ep_gt_kl_20261017/manifest.json": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/size_curves/manual_completeness.csv": "60df48cb0e25a4b881ee8c791380e7255085a9bd7c74773115dc26381960cfc8"
+  },
+  "selection": "Matched discovery/evaluation ablations at task-specific target; nearest realised ACDC boundary; Random anchor reused per evaluation ablation; deterministic manual circuit under native ablation.",
+  "patch_direction": "EDGE_PATCH on clean prompts (circuit knockout)",
+  "rows": 80
+}

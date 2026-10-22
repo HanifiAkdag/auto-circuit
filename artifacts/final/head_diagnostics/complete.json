@@ -1,0 +1,16 @@
+{
+  "study_id": "d168afd4e9fcdc18be9ece335a5590a1df556342050e381f23c993f76d6cb6ef",
+  "complete": true,
+  "predefined_conditions": 4360,
+  "verified_conditions": 4360,
+  "source_unchanged": true,
+  "full_model_margin": 3.63635516166687,
+  "n_prompts": 256,
+  "n_discovery_runs": 5,
+  "ablation": "mean",
+  "budgets": [
+    739,
+    2000,
+    3000
+  ]
+}

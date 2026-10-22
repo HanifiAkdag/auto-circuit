@@ -1,5 +1,6 @@
 #%%
 from typing import Optional
+from urllib.error import URLError
 
 import pytest
 import torch as t
@@ -12,6 +13,7 @@ from auto_circuit.model_utils.sparse_autoencoders.autoencoder_transformer import
     sae_model,
 )
 from auto_circuit.model_utils.sparse_autoencoders.sparse_autoencoder import (
+    SparseAutoencoder,
     load_autoencoder,
 )
 from auto_circuit.prune import run_circuits
@@ -43,6 +45,25 @@ MODEL_NAMES = ["pythia-70m-deduped"]
 # MODEL_NAMES = ["gpt2", "pythia-70m-deduped"]
 
 
+@pytest.fixture(autouse=True)
+def report_external_checkpoint_failure(request, monkeypatch):
+    if "external_resource" not in request.node.keywords:
+        return
+    original = t.hub.load_state_dict_from_url
+
+    def download(url, *args, **kwargs):
+        try:
+            return original(url, *args, **kwargs)
+        except (URLError, OSError) as error:
+            pytest.fail(
+                f"Required external SAE checkpoint unavailable: {url}: {error}",
+                pytrace=False,
+            )
+
+    monkeypatch.setattr(t.hub, "load_state_dict_from_url", download)
+
+
+@pytest.mark.external_resource
 @pytest.mark.parametrize("hooked_transformer", MODEL_NAMES, indirect=True)
 def test_single_autoencoder_output_similarity(
     hooked_transformer: HookedTransformer,
@@ -77,6 +98,7 @@ def test_single_autoencoder_output_similarity(
     assert error < 0.2
 
 
+@pytest.mark.external_resource
 @pytest.mark.parametrize("hooked_transformer", MODEL_NAMES, indirect=True)
 def test_autoencoder_transformer_output_similarity(
     hooked_transformer: HookedTransformer,
@@ -107,6 +129,7 @@ def test_autoencoder_transformer_output_similarity(
     del encoder_model
 
 
+@pytest.mark.external_resource
 @pytest.mark.parametrize("hooked_transformer", MODEL_NAMES, indirect=True)
 def test_prune_latents_with_dataset(
     hooked_transformer: HookedTransformer,
@@ -150,6 +173,7 @@ def test_prune_latents_with_dataset(
     del encoder_model
 
 
+@pytest.mark.external_resource
 @pytest.mark.parametrize("model_name", MODEL_NAMES)
 def test_task_autoencoder_transformer_edges(model_name: str):
     """Load an autoencoder model, make it a PatchableModel.
@@ -186,6 +210,50 @@ def test_task_autoencoder_transformer_edges(model_name: str):
     patched_out = pruned_outs[edge_count][batch.key]
     assert patched_out.shape == clean_logits.shape
     assert t.allclose(patched_out, clean_logits, atol=1e-5)
+
+
+def _set_identity_autoencoder(autoencoder: SparseAutoencoder) -> None:
+    identity = t.eye(autoencoder.n_inputs, device=autoencoder.bias.device)
+    with t.no_grad():
+        autoencoder.bias.zero_()
+        autoencoder.latent_bias.zero_()
+        autoencoder.encode_weight.copy_(t.cat([identity, -identity]))
+        autoencoder.decode_weight.copy_(t.cat([identity, -identity], dim=1))
+
+
+def test_local_autoencoder_reconstruction_and_pruning():
+    autoencoder = SparseAutoencoder(HookPoint(), n_latents=4, n_inputs=2)
+    _set_identity_autoencoder(autoencoder)
+    inputs = t.tensor([[1.0, 2.0], [3.0, 4.0]])
+    with t.inference_mode():
+        original = autoencoder(inputs)
+    assert t.equal(original, inputs)
+    assert t.equal(autoencoder.latent_total_act, t.tensor([4.0, 6.0, 0.0, 0.0]))
+    autoencoder.prune_latents(t.tensor([0, 1]))
+    assert autoencoder.n_latents == 2
+    with t.inference_mode():
+        assert t.equal(autoencoder(inputs), original)
+
+
+def test_local_autoencoder_transformer_identity(mini_tl_transformer: HookedTransformer):
+    encoder_model = sae_model(
+        mini_tl_transformer,
+        "resid_delta_mlp",
+        load_pretrained=False,
+        n_latents=2 * mini_tl_transformer.cfg.d_model,
+        new_instance=True,
+    )
+    for autoencoder in encoder_model.sparse_autoencoders:
+        _set_identity_autoencoder(autoencoder)
+    tokens = t.tensor([[1, 2, 3], [4, 5, 6]], device=mini_tl_transformer.cfg.device)
+    with t.inference_mode():
+        expected = mini_tl_transformer(tokens)
+        actual = encoder_model(tokens)
+    assert t.equal(actual, expected)
+    assert all(
+        (sae.latent_total_act > 0).any()
+        for sae in encoder_model.sparse_autoencoders
+    )
 
 
 # model_name = "gpt2"

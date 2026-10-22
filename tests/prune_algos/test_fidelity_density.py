@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from experiments.thesis.port_comparison.fidelity_analysis import edge_density
+from experiments.port_comparison.fidelity_analysis import edge_density
 
 
 def test_common_density_excludes_first_source_for_every_destination():

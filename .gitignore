@@ -1,6 +1,7 @@
 __pycache__/
 .venv/
 .venv2/
+.venv-thesis/
 .autoencoder_cache/
 .measurement_cache/
 .prune_scores_cache*/
@@ -17,8 +18,17 @@ results/
 *.pdf
 logs/
 *.sh
+!scripts/*.sh
+!scripts/slurm/*.sh
 CLAUDE.md
 *.pkl
+# Only the selected immutable scientific bundle belongs in Git.
+!artifacts/final/**/*.pkl
+!artifacts/final/**/*.html
+!artifacts/final/**/*.pdf
+# Other artifact build/output directories remain local.
+artifacts/*
+!artifacts/final/
 hpo/results/
 docs/related_work/.scratch/
 .scratch/
@@ -27,6 +37,10 @@ docs/related_work/
 #   git clone https://github.com/frankniujc/disco_gp.git third_party/disco_gp
 #   git -C third_party/disco_gp checkout 54aef81
 third_party/
+resources/
+.thesis_resources/
+.cache/thesis/
+runs/
 .port_fidelity_ep_cache*/
 
 # Temporary git worktrees for cross-version comparisons.

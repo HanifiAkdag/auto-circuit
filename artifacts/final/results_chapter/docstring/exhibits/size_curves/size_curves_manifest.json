@@ -1,0 +1,43 @@
+{
+  "evaluation_protocol_id": "b85175abf8516ecc77e33a5bc25fca9a80a4ab77937d33b45769dd93fabac230",
+  "figures": [
+    "docstring_size_curves.pdf"
+  ],
+  "main_figures": {
+    "ioi": "ioi_native_size_curves.pdf",
+    "gt": "greater_than_native_size_curves.pdf"
+  },
+  "main_figure_ablations": {
+    "ioi": "mean",
+    "gt": "resample"
+  },
+  "tasks": {
+    "docstring": "Docstring"
+  },
+  "metrics": {
+    "docstring": [
+      "Clean KL Div",
+      "Correct Answer Greater Than Incorrect Percent"
+    ]
+  },
+  "source": "results/results_chapter/docstring_repair_20261006/functional.csv",
+  "source_sha256": "7efb36b45e9936e39e292f298505aca227892927a90aa77bbe0f545aec403f11",
+  "stability_manifest": "results/results_chapter/docstring_repair_20261006/manifest.json",
+  "stability_manifest_sha256": "b7a9b192b5de1cf1e63dcfc0b75952b5db062d2609c7b29bfd302485a7efdddb",
+  "filters": "All tasks; four methods at joint matched discovery/evaluation; ablation-independent Random at each evaluation; official circuit marker at each task's native ablation",
+  "values": "functional.csv five-run metric_mean and population metric_sd (ddof=0); colored band is mean plus/minus 1 SD; manual is one deterministic evaluation",
+  "random_source": "results/results_chapter/docstring_repair_20261006/functional.csv",
+  "manual_source": "results/results_chapter/docstring_repair_20261006/exhibits/size_curves/manual_baselines.csv",
+  "manual_source_sha256": "a210ebb0c5f614d7e6dbac8079a0a191c188fbf18bd09c37bfb3fb061008c077",
+  "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its task's native evaluation ablation (mean for IOI, resample for Greater-Than and Docstring)",
+  "acdc": "Only recorded threshold boundaries and full-circuit point are plotted; lines connect observations without adding intermediate values",
+  "rows": 296,
+  "manual_budgets": {
+    "ioi": 739,
+    "gt": 235,
+    "docstring": 24
+  },
+  "output_sha256": {
+    "docstring_size_curves.pdf": "5018bc9e1f8cb5823b93321960861795af1cc8b9e072ef14d38d3e6534b1b112"
+  }
+}

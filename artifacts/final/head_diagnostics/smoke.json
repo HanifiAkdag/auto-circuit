@@ -1,0 +1,155 @@
+{
+  "study_id": "d168afd4e9fcdc18be9ece335a5590a1df556342050e381f23c993f76d6cb6ef",
+  "complete": true,
+  "checks": [
+    {
+      "algo": "acdc",
+      "batch_hash": "a94573e7619955097ea13bd8fdebf9d0d4d9938e7cf07a89bae0b919f10739df",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "acdc",
+      "batch_hash": "f8d82bed06b6da6571bb87ba9703e30e4d80226c329e3cfb73112f64f2e41bec",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "acdc",
+      "batch_hash": "a1300833c85f4819a4adf1c40b3d417e3fd5f7e033ec482deecadf7700c943b9",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "acdc",
+      "batch_hash": "e99d1ceeb929fe3393092e065a43d511409789b839432e62504f5acd5d215c4a",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "discogp-ep",
+      "batch_hash": "a94573e7619955097ea13bd8fdebf9d0d4d9938e7cf07a89bae0b919f10739df",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "discogp-ep",
+      "batch_hash": "f8d82bed06b6da6571bb87ba9703e30e4d80226c329e3cfb73112f64f2e41bec",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "discogp-ep",
+      "batch_hash": "a1300833c85f4819a4adf1c40b3d417e3fd5f7e033ec482deecadf7700c943b9",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "discogp-ep",
+      "batch_hash": "e99d1ceeb929fe3393092e065a43d511409789b839432e62504f5acd5d215c4a",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "eap",
+      "batch_hash": "a94573e7619955097ea13bd8fdebf9d0d4d9938e7cf07a89bae0b919f10739df",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "eap",
+      "batch_hash": "f8d82bed06b6da6571bb87ba9703e30e4d80226c329e3cfb73112f64f2e41bec",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "eap",
+      "batch_hash": "a1300833c85f4819a4adf1c40b3d417e3fd5f7e033ec482deecadf7700c943b9",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "eap",
+      "batch_hash": "e99d1ceeb929fe3393092e065a43d511409789b839432e62504f5acd5d215c4a",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "ep",
+      "batch_hash": "a94573e7619955097ea13bd8fdebf9d0d4d9938e7cf07a89bae0b919f10739df",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "ep",
+      "batch_hash": "f8d82bed06b6da6571bb87ba9703e30e4d80226c329e3cfb73112f64f2e41bec",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "ep",
+      "batch_hash": "a1300833c85f4819a4adf1c40b3d417e3fd5f7e033ec482deecadf7700c943b9",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    },
+    {
+      "algo": "ep",
+      "batch_hash": "e99d1ceeb929fe3393092e065a43d511409789b839432e62504f5acd5d215c4a",
+      "production_parity": true,
+      "observer_neutral": true,
+      "qkv_invariance": true,
+      "output_attention_invariance": true,
+      "reconstruction": true
+    }
+  ],
+  "model_weights_hash": "c370efbb8aa80812214415deb42ed6948b9b89fd0ef1b11abb2b2775f6f8efb9",
+  "node": "severus.ukp.informatik.tu-darmstadt.de",
+  "torch_version": "2.11.0+cu130",
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "peak_gpu_bytes": 5132409344
+}

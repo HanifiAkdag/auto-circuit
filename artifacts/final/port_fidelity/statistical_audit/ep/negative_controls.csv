@@ -1,0 +1,19 @@
+comparator,control,detected,difference_detected,endpoint,equivalence_established,equivalent,inconclusive,p_permutation
+port,port-neginv,True,True,density,False,False,False,0.000333000333000333
+port,port-neginv,True,True,Clean KL Div,False,False,False,0.000333000333000333
+port,port-neginv,True,True,Logit Diff Percent,False,False,False,0.000333000333000333
+port,port-neginv,True,True,Answer Pair KL Div,False,False,False,0.000333000333000333
+port,port-neginv,True,True,jaccard,False,False,False,0.000333000333000333
+port,port-neginv,True,True,spearman,False,False,False,0.000333000333000333
+port,port-negkl,False,False,density,False,False,True,0.33133533133533133
+port,port-negkl,False,False,Clean KL Div,False,False,True,0.46853146853146854
+port,port-negkl,False,False,Logit Diff Percent,True,True,False,0.994005994005994
+port,port-negkl,False,False,Answer Pair KL Div,True,True,False,0.30735930735930733
+port,port-negkl,False,False,jaccard,False,False,True,0.752913752913753
+port,port-negkl,False,False,spearman,False,False,True,0.9926739926739927
+port,port-nolambda,True,True,density,False,False,False,0.000333000333000333
+port,port-nolambda,True,True,Clean KL Div,False,False,False,0.000333000333000333
+port,port-nolambda,True,True,Logit Diff Percent,False,False,False,0.000333000333000333
+port,port-nolambda,True,True,Answer Pair KL Div,False,False,False,0.000333000333000333
+port,port-nolambda,True,True,jaccard,False,False,False,0.000333000333000333
+port,port-nolambda,True,True,spearman,False,False,False,0.000333000333000333

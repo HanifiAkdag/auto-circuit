@@ -8,7 +8,7 @@ import torch
 from transformers import AutoTokenizer
 
 from auto_circuit.data import load_datasets_from_json
-from experiments.thesis.evaluation_protocol import build_evaluation_tasks, load_protocol, validate_records, fixed_evaluation_id
+from experiments.evaluation_protocol import build_evaluation_tasks, load_protocol, validate_records, fixed_evaluation_id
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -86,7 +86,7 @@ def test_actual_temporary_repair_has_no_clean_input_exposure():
         assert validate_records(records, original, encode) == item['identity_checks']
     tasks = build_evaluation_tasks(protocol, ['ioi', 'gt'])
     assert all(task.split_seed is None and not task.dataset_shuffle and task.batch_count == (0, 4) for task in tasks.values())
-    from experiments.thesis.run_cell import _build_task
+    from experiments.run_cell import _build_task
     for short in ('ioi', 'gt'):
         future = _build_task(short, 43, False)
         assert future.split_seed == 42

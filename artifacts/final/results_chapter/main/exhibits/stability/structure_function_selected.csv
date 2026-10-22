@@ -1,0 +1,61 @@
+task,algo,discovery_ablation,condition,eval_ablation,target_edges,selector,budget_label,realised_mean,metric,n_seeds,n_pairs,jaccard_mean,metric_mean,metric_sd
+Indirect Object Identification,ACDC,zero,joint,zero,739,threshold,9.0e-03,597.6,Clean KL Div,5,10,0.5049704688655733,6.69972038269043,0.5125533335995067
+Indirect Object Identification,EAP,zero,joint,zero,739,top_k,739,739.0,Clean KL Div,5,10,0.9440833694134039,7.017942810058594,0.07045889235394455
+Indirect Object Identification,EP,zero,joint,zero,739,top_k,739,739.0,Clean KL Div,5,10,0.16369921864562356,0.5594641327857971,0.06814033678010652
+Indirect Object Identification,DiscoGP,zero,joint,zero,739,top_k,739,739.0,Clean KL Div,5,10,0.17396825412697425,11.189373970031738,1.1357100356098688
+Indirect Object Identification,ACDC,resample,joint,resample,739,threshold,7.0e-04,625.4,Clean KL Div,5,10,0.5337363005079236,0.5601558089256287,0.07007937097138496
+Indirect Object Identification,EAP,resample,joint,resample,739,top_k,739,739.0,Clean KL Div,5,10,0.933317173881053,2.7261564254760744,0.1192552010733022
+Indirect Object Identification,EP,resample,joint,resample,739,top_k,739,739.0,Clean KL Div,5,10,0.49624547506839833,0.2865831196308136,0.05272881298077861
+Indirect Object Identification,DiscoGP,resample,joint,resample,739,top_k,739,739.0,Clean KL Div,5,10,0.35916843548693905,3.4193593502044677,0.35625198355595844
+Indirect Object Identification,ACDC,mean,joint,mean,739,threshold,3.0e-03,888.4,Clean KL Div,5,10,0.5517080059765542,1.2988241195678711,0.3483515212151485
+Indirect Object Identification,EAP,mean,joint,mean,739,top_k,739,739.0,Clean KL Div,5,10,0.932045325773718,3.168124771118164,0.12749874881049328
+Indirect Object Identification,EP,mean,joint,mean,739,top_k,739,739.0,Clean KL Div,5,10,0.3969140420887604,0.5540848910808563,0.06749154998232315
+Indirect Object Identification,DiscoGP,mean,joint,mean,739,top_k,739,739.0,Clean KL Div,5,10,0.3415376418203055,5.5016814231872555,0.17261963574117362
+Indirect Object Identification,ACDC,zero,joint,zero,739,threshold,9.0e-03,597.6,Logit Diff Percent,5,10,0.5049704688655733,-3.0215639897859825,2.95292743315383
+Indirect Object Identification,EAP,zero,joint,zero,739,top_k,739,739.0,Logit Diff Percent,5,10,0.9440833694134039,-9.794002005378841,0.2037607694714497
+Indirect Object Identification,EP,zero,joint,zero,739,top_k,739,739.0,Logit Diff Percent,5,10,0.16369921864562356,107.7071645779761,18.992157392896015
+Indirect Object Identification,DiscoGP,zero,joint,zero,739,top_k,739,739.0,Logit Diff Percent,5,10,0.17396825412697425,353.399274939993,68.12090434292757
+Indirect Object Identification,ACDC,resample,joint,resample,739,threshold,7.0e-04,625.4,Logit Diff Percent,5,10,0.5337363005079236,35.165431952741095,9.209039250318838
+Indirect Object Identification,EAP,resample,joint,resample,739,top_k,739,739.0,Logit Diff Percent,5,10,0.933317173881053,1.000758770286955,3.1915688146711028
+Indirect Object Identification,EP,resample,joint,resample,739,top_k,739,739.0,Logit Diff Percent,5,10,0.49624547506839833,104.17069679941206,15.515956759227258
+Indirect Object Identification,DiscoGP,resample,joint,resample,739,top_k,739,739.0,Logit Diff Percent,5,10,0.35916843548693905,164.8195817736177,39.220939531918546
+Indirect Object Identification,ACDC,mean,joint,mean,739,threshold,3.0e-03,888.4,Logit Diff Percent,5,10,0.5517080059765542,3.119745395696467,9.151917306339852
+Indirect Object Identification,EAP,mean,joint,mean,739,top_k,739,739.0,Logit Diff Percent,5,10,0.932045325773718,2.5454457563578137,3.3966140850845914
+Indirect Object Identification,EP,mean,joint,mean,739,top_k,739,739.0,Logit Diff Percent,5,10,0.3969140420887604,66.86499896177409,8.318933168054862
+Indirect Object Identification,DiscoGP,mean,joint,mean,739,top_k,739,739.0,Logit Diff Percent,5,10,0.3415376418203055,329.2778347940507,10.640961154287792
+Indirect Object Identification,ACDC,zero,joint,zero,739,threshold,9.0e-03,597.6,Correct Answer Greater Than Incorrect Percent,5,10,0.5049704688655733,49.296875,2.999430284445698
+Indirect Object Identification,EAP,zero,joint,zero,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.9440833694134039,41.5625,1.0364452469860626
+Indirect Object Identification,EP,zero,joint,zero,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.16369921864562356,94.375,1.3441133229754105
+Indirect Object Identification,DiscoGP,zero,joint,zero,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.17396825412697425,99.84375,0.19136638615493579
+Indirect Object Identification,ACDC,resample,joint,resample,739,threshold,7.0e-04,625.4,Correct Answer Greater Than Incorrect Percent,5,10,0.5337363005079236,70.0,4.281934251888975
+Indirect Object Identification,EAP,resample,joint,resample,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.933317173881053,51.171875,1.976423537605237
+Indirect Object Identification,EP,resample,joint,resample,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.49624547506839833,96.796875,1.5896085897949848
+Indirect Object Identification,DiscoGP,resample,joint,resample,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.35916843548693905,95.546875,3.8717224041762086
+Indirect Object Identification,ACDC,mean,joint,mean,739,threshold,3.0e-03,888.4,Correct Answer Greater Than Incorrect Percent,5,10,0.5517080059765542,53.4375,4.831132760543846
+Indirect Object Identification,EAP,mean,joint,mean,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.932045325773718,51.796875,3.7434839220971687
+Indirect Object Identification,EP,mean,joint,mean,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.3969140420887604,83.4375,4.254765251309407
+Indirect Object Identification,DiscoGP,mean,joint,mean,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,10,0.3415376418203055,100.0,0.0
+Greaterthan,ACDC,zero,joint,zero,235,threshold,1.0e-02,251.4,Clean KL Div,5,10,0.5452462587864695,18.77244415283203,2.920659657660513
+Greaterthan,EAP,zero,joint,zero,235,top_k,235,235.0,Clean KL Div,5,10,0.9748387267560673,14.013101577758789,1.0416441895777897
+Greaterthan,EP,zero,joint,zero,235,top_k,235,235.0,Clean KL Div,5,10,0.1626865293830116,0.978509959578514,0.9970046441751209
+Greaterthan,DiscoGP,zero,joint,zero,235,top_k,235,235.0,Clean KL Div,5,10,0.20884180175547615,5.261235237121582,0.45619451290910745
+Greaterthan,ACDC,resample,joint,resample,235,threshold,5.0e-04,261.2,Clean KL Div,5,10,0.693090998028349,0.039538487792015076,0.005737724813811975
+Greaterthan,EAP,resample,joint,resample,235,top_k,235,235.0,Clean KL Div,5,10,0.9773106569507393,0.10454825460910797,0.001269410683721149
+Greaterthan,EP,resample,joint,resample,235,top_k,235,235.0,Clean KL Div,5,10,0.3946237180575819,0.057121022045612334,0.005366222546768098
+Greaterthan,DiscoGP,resample,joint,resample,235,top_k,235,235.0,Clean KL Div,5,10,0.3588522579319681,0.23345425128936767,0.11007833313153954
+Greaterthan,ACDC,mean,joint,mean,235,threshold,7.0e-04,190.4,Clean KL Div,5,10,0.6962979081478858,0.09286124557256699,0.00560222979244274
+Greaterthan,EAP,mean,joint,mean,235,top_k,235,235.0,Clean KL Div,5,10,0.9657352670056374,0.1871163636445999,0.01562288899919465
+Greaterthan,EP,mean,joint,mean,235,top_k,235,235.0,Clean KL Div,5,10,0.38528421847897015,0.08571902066469192,0.010168902594018937
+Greaterthan,DiscoGP,mean,joint,mean,235,top_k,235,235.0,Clean KL Div,5,10,0.35881795980087194,0.4672468900680542,0.1298131026791241
+Greaterthan,ACDC,zero,joint,zero,235,threshold,1.0e-02,251.4,Logit Diff Percent,5,10,0.5452462587864695,-37.86781641079166,7.046256510570676
+Greaterthan,EAP,zero,joint,zero,235,top_k,235,235.0,Logit Diff Percent,5,10,0.9748387267560673,-31.823021460213102,14.06277319648293
+Greaterthan,EP,zero,joint,zero,235,top_k,235,235.0,Logit Diff Percent,5,10,0.1626865293830116,90.76380911873397,4.34372951427269
+Greaterthan,DiscoGP,zero,joint,zero,235,top_k,235,235.0,Logit Diff Percent,5,10,0.20884180175547615,95.89165001796577,23.84664506770425
+Greaterthan,ACDC,resample,joint,resample,235,threshold,5.0e-04,261.2,Logit Diff Percent,5,10,0.693090998028349,84.23603804569517,1.7261395324911817
+Greaterthan,EAP,resample,joint,resample,235,top_k,235,235.0,Logit Diff Percent,5,10,0.9773106569507393,77.21570717037024,0.5229149987701049
+Greaterthan,EP,resample,joint,resample,235,top_k,235,235.0,Logit Diff Percent,5,10,0.3946237180575819,98.15926583599146,5.060105533367967
+Greaterthan,DiscoGP,resample,joint,resample,235,top_k,235,235.0,Logit Diff Percent,5,10,0.3588522579319681,72.36741301443519,20.446475738898865
+Greaterthan,ACDC,mean,joint,mean,235,threshold,7.0e-04,190.4,Logit Diff Percent,5,10,0.6962979081478858,73.8908537851945,2.8496809033322803
+Greaterthan,EAP,mean,joint,mean,235,top_k,235,235.0,Logit Diff Percent,5,10,0.9657352670056374,62.56740170385503,2.239295468456283
+Greaterthan,EP,mean,joint,mean,235,top_k,235,235.0,Logit Diff Percent,5,10,0.38528421847897015,93.65419284836041,4.216991792020195
+Greaterthan,DiscoGP,mean,joint,mean,235,top_k,235,235.0,Logit Diff Percent,5,10,0.35881795980087194,133.53351985039072,8.195396365186765

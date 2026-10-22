@@ -1,0 +1,323 @@
+"""Plot final cross-ablation circuit evaluations and write exact appendix tables.
+
+Run on a CPU compute node:
+    srun --mem=8G python -m experiments.results_chapter_evaluation_ablation
+"""
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+from math import isclose
+from pathlib import Path
+
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from pypdf import PdfReader, PdfWriter
+from .config import ROOT, load_registry, resolve_path
+from .results_chapter_sources import EXPORT_ROOT, bundle, provenance_path
+
+
+SOURCE = ROOT / "artifacts/final/results_chapter/main/functional.csv"
+SOURCE_MANIFEST = SOURCE.with_name("manifest.json")
+SELECTION = SOURCE.parent / "exhibits/controlled_comparison/matched_quality.csv"
+SELECTION_MANIFEST = SELECTION.with_name("matched_quality_manifest.json")
+OUT = EXPORT_ROOT / 'main/evaluation_ablation'
+IMAGES = OUT
+TASKS = {
+    "Indirect Object Identification": ("ioi", "IOI", 739,
+        ("Clean KL Div", "Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent")),
+    "Greaterthan": ("greater_than", "Greater-Than", 235,
+        ("Clean KL Div", "Logit Diff Percent")),
+}
+METRIC_LABELS = {
+    "Clean KL Div": "KL divergence",
+    "Logit Diff Percent": "Logit difference (% of full model)",
+    "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect accuracy (%)",
+}
+AXIS_LABELS = METRIC_LABELS
+METRIC_SLUGS = {
+    "Clean KL Div": "clean_kl",
+    "Logit Diff Percent": "logit_difference",
+    "Correct Answer Greater Than Incorrect Percent": "accuracy",
+}
+ABLATIONS = ("zero", "resample", "mean")
+METHODS = ("ACDC", "EAP", "EP", "DiscoGP")
+METHOD_LABELS = {"ACDC": "ACDC", "EAP": "EAP", "EP": "Edge Pruning", "DiscoGP": "DiscoGP"}
+EVAL_STYLE = {
+    "zero": ("#B44C46", "circle"),
+    "resample": ("#336B9E", "diamond"),
+    "mean": ("#32835F", "square"),
+}
+def read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="") as handle:
+        return list(csv.DictReader(handle))
+
+
+def sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def select() -> list[dict[str, object]]:
+    selection_meta = json.loads(SELECTION_MANIFEST.read_text())
+    registry = load_registry()
+    assert sha(resolve_path(selection_meta["source"], registry)) == selection_meta["source_sha256"]
+    assert sha(resolve_path(selection_meta["source_manifest"], registry)) == selection_meta["source_manifest_sha256"]
+    source_meta = json.loads(SOURCE_MANIFEST.read_text())
+    if source_meta.get('evaluation_protocol_id'):
+        from .evaluation_protocol import require_same_protocol
+        require_same_protocol(source_meta, selection_meta)
+    assert source_meta["seeds"] == [42, 43, 44, 45, 46]
+    if not source_meta.get('evaluation_protocol_id'):
+        assert source_meta["discovery_cache_dir"] == ".prune_scores/final/benchmark"
+    all_rows = read_csv(SOURCE)
+    selection = read_csv(SELECTION)
+    selected = []
+    for task, (_, _, target, metrics) in TASKS.items():
+        for discovery in ABLATIONS:
+            for method in METHODS:
+                for metric in metrics:
+                    chosen = [row for row in selection if row["task"] == task
+                              and row["ablation"] == discovery and row["algo"] == method
+                              and row["metric"] == metric]
+                    assert len(chosen) == 1, (task, discovery, method, metric)
+                    chosen = chosen[0]
+                    assert int(chosen["target_edges"]) == target
+                    for evaluation in ABLATIONS:
+                        matches = [row for row in all_rows if row["task"] == task
+                                   and row["algo"] == method
+                                   and row["discovery_ablation"] == discovery
+                                   and row["eval_ablation"] == evaluation
+                                   and row["condition"] == "joint"
+                                   and row["measure"] == "faithfulness"
+                                   and row["metric"] == metric
+                                   and row["selector"] == chosen["selector"]
+                                   and row["budget_label"] == chosen["budget_label"]]
+                        assert len(matches) == 1, (task, discovery, method, metric, evaluation)
+                        row = matches[0]
+                        assert int(row["n_seeds"]) == 5
+                        assert len(row["metric_values"].split(";")) == 5
+                        assert isclose(float(row["realised_mean"]), float(chosen["realised_mean"]), abs_tol=1e-9)
+                        if evaluation == discovery:
+                            assert isclose(float(row["metric_mean"]), float(chosen["metric_mean"]), abs_tol=1e-12)
+                            assert isclose(float(row["metric_sd"]), float(chosen["metric_sd"]), abs_tol=1e-12)
+                        selected.append({key: row[key] for key in (
+                            "task", "algo", "discovery_ablation", "eval_ablation", "metric",
+                            "selector", "budget_label", "realised_mean", "n_seeds", "metric_mean", "metric_sd",
+                            "metric_min", "metric_max", "metric_values")})
+    assert len(selected) == 180
+    return selected
+
+
+def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]:
+    slug, title, _, metrics = TASKS[task]
+    width = 1160 if len(metrics) == 3 else 920
+    left_margin, right_margin = 215, 30
+    plot_width = width - left_margin - right_margin
+    table_left = -(left_margin - 90) / plot_width
+    group_label_x = (65 - left_margin) / plot_width
+    discovery_label_x = (25 - left_margin) / plot_width
+    font_family = "DejaVu Sans"
+    axis_tick_size = 17
+    method_label_size = 18
+    title_size = 19
+    discovery_label_size = 17
+    marker_size = 9
+    legend_size = 17
+    headings = {
+        "Clean KL Div": "KL divergence",
+        "Logit Diff Percent": "Logit difference (%)",
+        "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
+    }
+    fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True,
+                        horizontal_spacing=0.04,
+                        subplot_titles=[headings[metric] for metric in metrics])
+    offsets = {"zero": 0.18, "resample": 0.0, "mean": -0.18}
+    group_spacing = 6.0
+    row_y = {
+        (discovery, method): 12 - group_spacing * discovery_idx - method_idx
+        for discovery_idx, discovery in enumerate(ABLATIONS)
+        for method_idx, method in enumerate(METHODS)
+    }
+    tickvals = [row_y[(discovery, method)] for discovery in ABLATIONS for method in METHODS]
+    ticktext = [METHOD_LABELS[method] for discovery in ABLATIONS for method in METHODS]
+    ranges = {}
+    for metric in metrics:
+        values = [float(r["metric_mean"]) + sign * float(r["metric_sd"])
+                  for r in rows if r["task"] == task and r["metric"] == metric
+                  for sign in (-1, 1)]
+        lower, upper = min(values), max(values)
+        pad = max((upper - lower) * 0.07, 0.02)
+        ranges[metric] = [-pad if metric == "Clean KL Div"
+                          else (0 if metric == "Correct Answer Greater Than Incorrect Percent"
+                                else lower - pad),
+                          upper + pad]
+        if metric == "Correct Answer Greater Than Incorrect Percent":
+            ranges[metric][1] = max(100.0, ranges[metric][1])
+
+    for col, metric in enumerate(metrics, 1):
+        for evaluation in ABLATIONS:
+            group = [r for r in rows if r["task"] == task and r["metric"] == metric
+                     and r["eval_ablation"] == evaluation]
+            group.sort(key=lambda r: (-ABLATIONS.index(r["discovery_ablation"]),
+                                      -METHODS.index(r["algo"])))
+            color, symbol = EVAL_STYLE[evaluation]
+            fig.add_trace(go.Scatter(
+                x=[float(r["metric_mean"]) for r in group],
+                y=[row_y[(r["discovery_ablation"], r["algo"])] + offsets[evaluation]
+                   for r in group],
+                mode="markers", name=evaluation.capitalize(), legendgroup=evaluation,
+                showlegend=col == 1,
+                marker=dict(color=color, symbol=symbol, size=marker_size,
+                            line=dict(color="white", width=0.6)),
+                error_x=dict(type="data", array=[float(r["metric_sd"]) for r in group],
+                             symmetric=True, color=color, thickness=1.0, width=2),
+                hovertemplate="%{x:.3f}<extra>%{fullData.name} evaluation</extra>",
+            ), row=1, col=col)
+
+        fig.update_xaxes(range=ranges[metric], showline=True, linecolor="#333333",
+                         linewidth=1, ticks="outside", tickfont=dict(size=axis_tick_size),
+                         showgrid=True, gridcolor="#E4E6E8", zeroline=False,
+                         row=1, col=col)
+        if task == "Indirect Object Identification" and metric == "Logit Diff Percent":
+            fig.update_xaxes(tickvals=[0, 100, 200, 300, 400], row=1, col=col)
+        fig.update_yaxes(range=[min(tickvals) - 0.65, max(tickvals) + 0.65],
+                         tickvals=tickvals, ticktext=ticktext,
+                         showticklabels=col == 1, tickfont=dict(size=method_label_size), ticks="",
+                         showgrid=False,
+                         zeroline=False, showline=False, row=1, col=col)
+
+    # Paper coordinates keep the table bands continuous across subplot gutters.
+    for band_idx, y in enumerate(tickvals):
+        if band_idx % 2 == 0:
+            fig.add_shape(type="rect", xref="paper", yref="y",
+                          x0=table_left, x1=1, y0=y - 0.48, y1=y + 0.48,
+                          fillcolor="#F3F4F5", line_width=0, layer="below")
+    for i, discovery in enumerate(ABLATIONS):
+        y = 10.5 - group_spacing * i
+        fig.add_annotation(x=group_label_x, xref="paper", y=y, yref="y",
+                           text=f"<b>{discovery.capitalize()}</b>", textangle=-90,
+                           showarrow=False, xanchor="center", yanchor="middle",
+                           font=dict(size=discovery_label_size, color="#303030"))
+
+    for annotation in fig.layout.annotations[:len(metrics)]:
+        heading, separator, subtitle = annotation.text.partition("<br>")
+        annotation.text = f"<b>{heading}</b>{separator}{subtitle}"
+        annotation.update(font=dict(family=font_family, size=title_size, color="#222222"),
+                          y=1.085, yanchor="middle")
+    fig.add_annotation(x=discovery_label_x, xref="paper", y=0.5, yref="paper",
+                       text="<b>Discovery ablation</b>", textangle=-90, showarrow=False,
+                       xanchor="center", yanchor="middle",
+                       font=dict(size=method_label_size, color="#303030"))
+    fig.update_layout(template="simple_white", width=width,
+                      height=700, margin=dict(l=left_margin, r=right_margin, t=85, b=100),
+                      font=dict(family=font_family, color="#222222", size=legend_size),
+                      legend=dict(orientation="h", x=(width / 2 - left_margin) / plot_width,
+                                  xanchor="center", y=-0.13, yanchor="top",
+                                  title="<b>Evaluation ablation:</b> ", font=dict(size=legend_size),
+                                  title_font=dict(size=legend_size), bgcolor="rgba(0,0,0,0)"),
+                      paper_bgcolor="white", plot_bgcolor="rgba(0,0,0,0)")
+    pdf = IMAGES / f"{slug}_evaluation_ablation.pdf"
+    png = OUT / f"{slug}_evaluation_ablation.png"
+    exported = OUT / f"{slug}_evaluation_ablation_export.pdf"
+    fig.write_image(str(exported))
+    pages = PdfReader(exported).pages
+    assert len(pages) in (1, 2)
+    if len(pages) == 2:
+        assert not pages[1].extract_text() and len(pages[1].get_contents().get_data()) < 500
+    writer = PdfWriter()
+    writer.add_page(pages[0])
+    with pdf.open("wb") as handle:
+        writer.write(handle)
+    exported.unlink()
+    fig.write_image(str(png), scale=1.4)
+    return pdf, png
+
+
+def fmt(metric: str, row: dict[str, object]) -> str:
+    mean, sd = float(row["metric_mean"]), float(row["metric_sd"])
+    if metric == "Clean KL Div":
+        decimals = 3 if max(abs(mean), sd) < 1 or 0 < sd < 0.005 else 2
+    else:
+        decimals = 1
+    return f"${mean:.{decimals}f}\\pm{sd:.{decimals}f}$"
+
+
+def render_table(rows: list[dict[str, object]], task: str, metric: str) -> str:
+    slug, title, _, _ = TASKS[task]
+    caption_metric = METRIC_LABELS[metric].replace("%", r"\%")
+    lines = [r"\begin{table}[ht]", r"\centering", r"\footnotesize",
+             "\\caption{" + caption_metric + " for the " + title
+             + " task under each evaluation ablation. Values are five-run average $\\pm$ population SD. Numeric columns identify the evaluation ablation.}",
+             "\\label{tab:" + slug.replace("_", "-") + "-evaluation-" + METRIC_SLUGS[metric].replace("_", "-") + "}",
+             r"\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccc@{}}", r"\toprule",
+             "Discovery ablation & Method & Zero & Resample & Mean \\\\", r"\midrule"]
+    for discovery in ABLATIONS:
+        for i, method in enumerate(METHODS):
+            values = []
+            for evaluation in ABLATIONS:
+                matches = [r for r in rows if r["task"] == task and r["metric"] == metric
+                           and r["discovery_ablation"] == discovery and r["algo"] == method
+                           and r["eval_ablation"] == evaluation]
+                assert len(matches) == 1
+                values.append(fmt(metric, matches[0]))
+            label = discovery.capitalize() if i == 0 else ""
+            lines.append(f"{label} & {METHOD_LABELS[method]} & " + " & ".join(values) + " \\\\")
+        if discovery != ABLATIONS[-1]:
+            lines.append(r"\addlinespace[4pt]")
+    lines.extend([r"\bottomrule", r"\end{tabular*}", r"\end{table}", ""])
+    return "\n".join(lines)
+
+
+def main(source_dir=None, output_root=None) -> None:
+    global SOURCE, SOURCE_MANIFEST, SELECTION, SELECTION_MANIFEST, OUT, IMAGES
+    source = (ROOT / source_dir).resolve() if source_dir is not None else Path(bundle()['source_dir'])
+    SOURCE, SOURCE_MANIFEST = source / 'functional.csv', source / 'manifest.json'
+    root = (ROOT / output_root).resolve() if output_root is not None else EXPORT_ROOT / 'main'
+    SELECTION = root / 'controlled_comparison/matched_quality.csv'
+    if not SELECTION.is_file():
+        SELECTION = source / 'exhibits/controlled_comparison/matched_quality.csv'
+    SELECTION_MANIFEST = SELECTION.with_name('matched_quality_manifest.json')
+    OUT = IMAGES = root / 'evaluation_ablation'
+    for directory in (OUT, IMAGES):
+        directory.mkdir(parents=True, exist_ok=True)
+    rows = select()
+    source_meta = json.loads(SOURCE_MANIFEST.read_text())
+    csv_path = OUT / "crossed_evaluation_values.csv"
+    with csv_path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    outputs = [csv_path]
+    tables = []
+    for task, (_, _, _, metrics) in TASKS.items():
+        outputs.extend(render_figure(rows, task))
+        tables.extend(render_table(rows, task, metric) for metric in metrics)
+    table_path = OUT / 'appendix_tables.tex'
+    table_path.write_text('\n\n'.join(tables) + '\n')
+    outputs.append(table_path)
+    manifest = {
+        "evaluation_protocol_id": source_meta.get('evaluation_protocol_id'),
+        "source": provenance_path(SOURCE), "source_sha256": sha(SOURCE),
+        "source_manifest": provenance_path(SOURCE_MANIFEST),
+        "source_manifest_sha256": sha(SOURCE_MANIFEST),
+        "selection": provenance_path(SELECTION), "selection_sha256": sha(SELECTION),
+        "selection_manifest": provenance_path(SELECTION_MANIFEST),
+        "selection_manifest_sha256": sha(SELECTION_MANIFEST),
+        "discovery_cache_dir": source_meta.get("discovery_cache_dir"),
+        "selected_inputs": source_meta.get("selected_inputs"),
+        "seeds": [42, 43, 44, 45, 46], "rows": len(rows),
+        "selection_rule": "Same selector, budget, and five circuits as the matched-quality table; only evaluation ablation varies.",
+        "outputs": {provenance_path(path): sha(path) for path in outputs},
+    }
+    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    print(f"Wrote {len(rows)} crossed-evaluation rows, two figures, and five appendix tables")
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-root', type=Path)
+    args = parser.parse_args()
+    main(args.source_dir, args.output_root)

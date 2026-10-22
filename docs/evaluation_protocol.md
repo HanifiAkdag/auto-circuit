@@ -1,67 +1,41 @@
-# Shared held-out evaluation
+# Evaluation protocols
 
-New thesis discovery runs reserve a common test set before varying training seeds. The discovery data seed changes training selection and the PyTorch seed changes optimization; neither changes the held-out test inputs. The default fixed split seed is 42.
+The launcher exposes `--protocol thesis` (default) and `--protocol fixed-holdout`. Each output directory, selected registry, baseline, and export must use one consistent identity. Port validation uses its own frozen IOI protocol.
 
-```bash
-srun --gres=gpu:1 python -m experiments.thesis.run_cell --task ioi --algo ep --ablation resample --seed 43 --split-seed 42 --output-dir .prune_scores/new_comparison
-srun --gres=gpu:1 python -m experiments.thesis.stability_analysis --cache-dir .prune_scores/new_comparison --tasks ioi --split-seed 42 --name new_comparison
-```
+## Thesis protocol
 
-Populate every requested method/ablation/seed before the analysis command. For several data seeds, use the **same `--split-seed`**, source pool, model/tokenizer and budgets in every run. The loader reserves unique clean test inputs using the split seed, removes every training record whose clean or corrupt tokens match those inputs, and samples the requested training rows using the per-run data seed. If the remaining pool is too small, it raises an error. Shared corrupt contexts are allowed: the held-out claim concerns clean inputs.
+The final thesis discoveries use the original prompt-pool splits and per-run discovery seeds. Their common evaluation sets were subsequently frozen with 256 unique clean inputs per task. Every evaluation clean token sequence is excluded from both clean and corrupt roles in the complete original discovery pool. This is a fresh evaluation set for existing discoveries, not a seed-42 pre-discovery split. The fresh pipeline reads the frozen inputs directly for both cached and new discovery outputs.
 
-New cache filenames include `_holdout42`; manifests record the pool hash, split seed, original training/test row IDs, and ordered test-clean token hash. Analysis selects that split identity and verifies its held-out identities and data budget against the evaluation loader. Evaluation protocol IDs include the actual ordered clean/corrupt inputs, answers, pool and tokenizer identities, and loader settings. Cache resume rejects changed pools or budgets. ACDC partial merges preserve and check the split identity too. Historical caches cannot satisfy a new-protocol run through `--skip-if-exists`.
+IOI and Greater-Than use GPT-2 Small and form the primary analysis. Docstring uses the four-layer attention-only model, component-level graphs, and `NeelNanda/gpt-neox-tokenizer-digits`; its results are appendix material. Greater-Than reuses 176 corrupt contexts, so the exclusion guarantee concerns clean evaluation inputs. Docstring has no corrupt-context overlap with either original input role.
 
-Library users can opt into the same protocol with `Task(..., split_seed=42)` or `load_datasets_from_json(..., random_seed=run_seed, split_seed=42)`. The library's default `split_seed=None` retains compatibility with existing callers; callers that vary data seeds and want a common held-out evaluation set must supply a fixed split seed. `shuffle=False` is incompatible with this option because frozen-file splits are a separate protocol.
+Discovery has the shared budget of 704 training prompts in 11 batches of 64. The original pool loader also selected 256 test prompts; the thesis functional evaluation instead uses the separate frozen fresh set. Frozen dataset metadata records generators, seeds, tokenizers, pool hashes, answer identities, and token-sequence exclusion checks.
 
-`--legacy-split` on discovery and `--legacy-eval` on analysis reproduce the earlier protocol for audit. They do not make common evaluation across varied data seeds held out. Keep their outputs separate. The frozen-split port-validation study remains a separate protocol.
+All four compared methods are discovered under zero, paired resample, and corrupt-tokenwise-mean ablation. Matched discovery/evaluation ablations form the primary comparison; off-diagonal evaluation is a sensitivity analysis. Manual circuits and random edge-score circuits provide task-specific baselines. The random baseline samples edges, not model weights.
 
-## Temporary repair of the 2026 historical comparison
-
-The temporary artifact at `datasets/evaluation/temporary_repair_20261006/` evaluates existing IOI and Greater-Than caches on 256 fresh clean prompts per task. It is explicitly labeled `temporary_historical_repair` and is never selected by new discovery defaults. It excludes evaluation clean token sequences against both original input roles in the entire original pool; matching corrupt contexts are reported separately.
-
-Reproduction commands, all on compute nodes:
+Greater-Than Edge Pruning trains with KL restricted to the 100 candidate tokens `00`–`99`, following the released trainer. Evaluation Clean KL is full-vocabulary for every method. Its selected final discoveries and dependent analyses replace the earlier full-vocabulary-training GT EP runs; other methods, IOI, Docstring, and port validation are unchanged.
 
 ```bash
-srun --mem=8G python -m experiments.thesis.audit_evaluation_protocol
-srun --mem=8G python -m experiments.thesis.build_evaluation_set --output-dir datasets/evaluation/a_new_temporary_artifact
-srun --gres=gpu:1 --mem=32G python -m experiments.thesis.temporary_evaluation_repair --cell-index 0
+bash scripts/thesis.sh reproduce --protocol thesis --run-dir results/reproduction
 ```
 
-The builder refuses to overwrite a frozen artifact. The existing artifact has its own generator seed, tokenizer vocabulary hash, dataset and record hashes, source pool/generator hashes and identity checks. The repair runner verifies the frozen score/manifest inventory, preserves the historical budgets and attained sizes, and writes one atomic output per independent seed group. Use `--inventory` to list groups and `--merge` after all groups finish. No discovery is repeated.
+The selected score registry is consumed directly. The public pipeline does not reconstruct historical result trees and then apply a repair. Re-exporting requires completed analyses and manual baselines with the same evaluation identity.
 
-After all groups and the temporary manual baseline complete, run `python -m experiments.thesis.finalize_evaluation_repair` on a CPU compute node. It merges outputs, regenerates the IOI/Greater-Than exhibits, verifies unchanged structural rows and frozen caches, and writes `report.md` and `evaluation_changes.csv`. `finalization.json` records completion of each step. A failed step stops the pipeline. The no-argument manual-baseline exporter retains the historical protocol; use an explicit temporary manifest, frozen inventory and separate output directory for this repair.
+## Fixed-holdout protocol
 
-Historical result CSVs remain intact. Corrected IOI/Greater-Than outputs are written below `results/results_chapter/temporary_repair_20261006/`; exporters require matching evaluation protocol IDs so new measurements cannot be combined with historical baselines. The manuscript integration is tracked separately in `results/results_chapter/complete_repair_integration_20261006/`. Port-validation results retain their separate original protocol.
-
-## Docstring repair and manuscript integration
-
-The separate frozen artifact at `datasets/evaluation/docstring_repair_20261006/` extends the historical repair to Docstring. It preserves the original rest-style generation geometry and metadata, uses generation seed 20261006, and contains 256 fresh clean prompts excluded from both original input roles. No corrupt contexts overlap either original role. Docstring uses **NeelNanda/gpt-neox-tokenizer-digits**, not GPT-2's tokenizer; identity and single-token-answer checks must use the actual model tokenizer. The builder requires a separate Docstring artifact so tokenizer provenance remains explicit.
+For new studies, `fixed-holdout` reserves a common seed-42 test split before discovery. The data seed changes training selection and the PyTorch seed changes optimization; neither changes the held-out clean test inputs. The loader removes any training row whose clean or corrupt tokens match a held-out clean input. Shared corrupt contexts remain allowed. It fails if the remaining pool cannot supply the requested training budget.
 
 ```bash
-srun --mem=8G python -m experiments.thesis.build_evaluation_set --tasks docstring --output-dir datasets/evaluation/a_new_docstring_artifact
+bash scripts/thesis.sh discover --protocol fixed-holdout --run-dir results/new-holdout
 ```
 
-Frozen historical Docstring inputs are recorded in `results/results_chapter/complete_repair_integration_20261006/docstring_selected_inputs.json`; functional outputs and matching manual baselines are in `results/results_chapter/docstring_repair_20261006/`. Only circuit evaluation is repeated. Original discovery scores, selectors, budgets and structural measurements remain unchanged. The task-specific smoke check also verifies the full circuit and cached-prefix computation.
+Use the fresh run's registry for evaluation and export under the same protocol. Cache filenames and manifests distinguish the split identity, pool, budget, and ordered evaluation-clean hash. Analysis verifies those identities against the actual loader. Existing thesis caches do not satisfy fixed-holdout resume requirements.
 
-The active thesis functional sources are recorded in `results/results_chapter/active_sources.json`. The main comparison uses the repaired IOI/Greater-Than bundle; the Docstring appendix uses its separate repaired bundle. Use explicit `--source-dir` and output arguments for re-exporting these sources. Historical exporter defaults remain available for audit and are not the active manuscript sources. Do not replace corrected thesis displays with historical exports. See the integration plan and report under `complete_repair_integration_20261006/` for the exact figure/table adoption and verification.
+Library callers retain upstream-compatible defaults: `split_seed=None` uses historical splitting. Opt in with `Task(..., split_seed=42)` or `load_datasets_from_json(..., random_seed=run_seed, split_seed=42)`. A frozen-file split uses a separate loader construction and must not also request randomized holdout selection.
 
-## Fresh-run verification boundary
+## Measures and output identity
 
-The October 7 verification rebuilt all three repair datasets in empty output directories and exercised fresh EAP discovery, cache resume and stability analysis for all three tasks. This representative run does not rerun the complete method/ablation/seed matrix or test installation without downloaded model resources. Details and logs are in `results/results_chapter/fresh_run_verification_20261007/report.md`.
+Clean KL divergence from the full model is the primary faithfulness measure. Logit difference percent is normalized by the full model, and task accuracy measures sufficiency. Completeness changes the ablated edge set and is reported separately in appendix analyses. Stability compares edge sets across five runs; the structure–function correlation uses the joint-seed condition at the manually identified circuit size and matched evaluation ablation.
 
-The manual-baseline limitation identified by that audit is addressed by the fixed-holdout export path below. Historical and repaired thesis baseline sources remain separate; reproducing those sources still requires their matching evaluation protocol.
+Evaluation manifests bind ordered clean/corrupt inputs, answers, tokenizer and model identities, loader settings, and source hashes. Baseline and curve joins reject mismatched or incomplete sources. Neither historical exporter defaults nor an unrelated local results directory may silently fill missing inputs.
 
-## Manual baselines for new fixed-holdout runs
-
-Generate the official circuit cell in the new cache folder with the same split seed, then export its baseline against the completed analysis source. For the IOI example above:
-
-```bash
-srun --gres=gpu:1 python -m experiments.thesis.run_cell --task ioi --algo gt --ablation resample --seed 42 --split-seed 42 --output-dir .prune_scores/new_comparison
-srun --gres=gpu:1 python -m experiments.thesis.results_chapter_manual_baseline --split-seed 42 --cache-dir .prune_scores/new_comparison --source-dir results/stability/new_comparison --output-dir results/results_chapter/new_comparison/exhibits/size_curves
-```
-
-For a multi-task analysis, generate one official cell per task in that cache folder. Baseline task scope defaults to the analysis source; an explicit `--tasks` must match it. Fixed-holdout export requires a completed `--source-dir` and a separate `--output-dir`. It reconstructs the production evaluation Tasks and checks their actual content-derived protocol ID against the analysis before scoring. This identity includes ordered clean/corrupt inputs, answers, pool, tokenizer and loader construction. The selected official cache must also match the holdout identity and data budget. Missing inputs do not fall back to historical caches.
-
-Official circuits retain their native evaluation ablations: mean ablation for IOI and resample ablation for Greater-Than and Docstring. Both faithfulness and completeness use the same clean evaluation set as the comparison. Output manifests record the evaluation-clean hash per task, the analysis manifest hash and completion status; curve joins reject incomplete or mismatched sources.
-
-The no-argument exporter remains historical audit mode. `--eval-manifest` with `--selected-inputs` remains the frozen temporary-repair mode and is mutually exclusive with `--split-seed`. Repair score files are resolved from their inventory paths. The scoped implementation and verification report is `results/results_chapter/fixed_holdout_baseline_20261007/report.md`.
+The head follow-up is confined to the retained mean-ablation analysis. The port-validation study preserves its independent frozen IOI protocol and must not inherit the thesis evaluation prompts. See [artifact provenance](artifacts.md).

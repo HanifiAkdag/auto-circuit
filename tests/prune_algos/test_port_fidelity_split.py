@@ -5,8 +5,8 @@ import torch as t
 
 import auto_circuit.tasks as ac_tasks
 from auto_circuit.prune_algos import disco_gp, edge_pruning
-from experiments.thesis.experiment_utils import hardware_state
-from experiments.thesis.port_comparison import ep_run_cells, fidelity_analysis, run_cells
+from experiments.experiment_utils import hardware_state
+from experiments.port_comparison import ep_run_cells, fidelity_analysis, run_cells
 
 
 RUNNERS = (

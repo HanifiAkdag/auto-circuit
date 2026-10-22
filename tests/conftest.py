@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Optional
 
 import pytest
@@ -15,24 +16,33 @@ def pytest_addoption(parser: Any) -> None:
     parser.addoption(
         "--runslow", action="store_true", default=False, help="run slow tests"
     )
+    parser.addoption(
+        "--runexternal",
+        action="store_true",
+        default=False,
+        help="run tests requiring optional external pretrained SAE checkpoints",
+    )
 
 
 def pytest_configure(config: Any) -> None:
     config.addinivalue_line("markers", "slow: mark test as slow to run")
+    config.addinivalue_line(
+        "markers", "external_resource: requires optional external pretrained checkpoints"
+    )
 
 
 def pytest_collection_modifyitems(config: Any, items: Any):
-    if config.getoption("--runslow"):
-        # --runslow given in cli: do not skip slow tests
-        return
     skip_slow = pytest.mark.skip(reason="need --runslow option to run")
+    skip_external = pytest.mark.skip(reason="need --runexternal for external checkpoints")
     for item in items:
-        if "slow" in item.keywords:
+        if "slow" in item.keywords and not config.getoption("--runslow"):
             item.add_marker(skip_slow)
+        if "external_resource" in item.keywords and not config.getoption("--runexternal"):
+            item.add_marker(skip_external)
 
 
 @pytest.fixture(scope="session")
-def mini_tl_transformer() -> tl.HookedTransformer:
+def _mini_tl_transformer_base() -> tl.HookedTransformer:
     cfg = tl.HookedTransformerConfig(
         d_vocab=50257,
         n_layers=2,
@@ -53,6 +63,13 @@ def mini_tl_transformer() -> tl.HookedTransformer:
     model.cfg.use_split_qkv_input = True
     model.cfg.use_hook_mlp_in = True
     return model
+
+
+@pytest.fixture
+def mini_tl_transformer(
+    _mini_tl_transformer_base: tl.HookedTransformer,
+) -> tl.HookedTransformer:
+    return deepcopy(_mini_tl_transformer_base)
 
 
 def get_transformer(

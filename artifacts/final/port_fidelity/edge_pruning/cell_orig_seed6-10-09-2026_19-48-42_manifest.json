@@ -1,0 +1,43 @@
+{
+  "cell": {
+    "arm": "orig",
+    "seed": 6,
+    "task": "ioi",
+    "algo": "ep",
+    "ablation": "resample"
+  },
+  "cache_file": "cell_orig_seed6-10-09-2026_19-48-42.pkl",
+  "edge_density_at_threshold": 0.022129204124212265,
+  "n_edges": 32491,
+  "dataset": "port_fidelity/ioi_frozen",
+  "dataset_shuffle": false,
+  "batch_size": 32,
+  "batch_count": [
+    22,
+    8
+  ],
+  "hparams": {
+    "learning_rate": 0.8,
+    "lambda_learning_rate": 0.8,
+    "steps": 3000,
+    "warmup_steps": 200,
+    "target_edge_sparsity": 1.1,
+    "target_node_sparsity": 0.72,
+    "start_edge_sparsity": 0.0,
+    "start_node_sparsity": 0.0,
+    "sparsity_warmup_steps": 2500,
+    "use_node_masks": true,
+    "disable_node_loss": true
+  },
+  "saved_at": "2026-09-10T19:48:42",
+  "hardware": {
+    "node": "rubeus",
+    "slurm_job_id": "436664",
+    "gpu": "NVIDIA A100-SXM4-80GB"
+  },
+  "git": {
+    "commit": "ac8382bda736987f02a598e72f1357d34efcf2f4",
+    "dirty": false,
+    "dirty_files": []
+  }
+}

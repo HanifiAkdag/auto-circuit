@@ -1,9 +1,9 @@
 #%%
-from experiments.thesis.faithfulness_cells import DISCOVERY_ABLATIONS  # noqa: E402
-from experiments.thesis.faithfulness_comparison import (  # noqa: E402
+from experiments.faithfulness_cells import DISCOVERY_ABLATIONS  # noqa: E402
+from experiments.faithfulness_comparison import (  # noqa: E402
     _group_cells_by_discovery_ablation,
 )
-from experiments.thesis.run_cell import _ALGO_MAP, _TASK_TEMPLATES  # noqa: E402
+from experiments.run_cell import _ALGO_MAP, _TASK_TEMPLATES  # noqa: E402
 
 
 def _cell(task, algo, abl, scores, seed=42, null=False):
@@ -61,7 +61,7 @@ def test_completeness_runs_the_knockout_direction():
     """
     from auto_circuit.types import PatchType  # noqa: E402
 
-    from experiments.thesis.faithfulness_comparison import _reverse_clean_corrupt  # noqa: E402
+    from experiments.faithfulness_comparison import _reverse_clean_corrupt  # noqa: E402
 
     assert _reverse_clean_corrupt(PatchType.EDGE_PATCH) is True
     assert _reverse_clean_corrupt(PatchType.TREE_PATCH) is False

@@ -1,0 +1,1435 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "generator_sha256": "1c47adafa15dd0b994bd7dd96c4d5616102f43a6fdac2e77fedd9bdf731c9836",
+  "source_hashes": {
+    "source/functional.csv": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+    "source/structural.csv": "bb167900cca264967d483cf6aac45e327e849e35075f4deff49197e28827e0ff",
+    "source/manifest.json": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+    "results/results_chapter/evaluation_overlap_integration_20261006/selected_inputs.json": "25ecf69677bc904df6b995ce1fe0d1c58f27eb6598d531b6cbd3b0302d4c75af",
+    "source/exhibits/stability/within_ablation_selected.csv": "572dc77ba4d3726a12a76f5eb453e29ae52ea81b391af0c32169d2e18df4528a",
+    "source/exhibits/controlled_comparison/matched_quality.csv": "828d0eda52df4eba2bd02188e57dca15751af38fa75a7e2a251806d8a90e039a"
+  },
+  "frozen_inputs": [
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20_manifest.json",
+      "manifest_sha256": "5b37eeee974a22bf3731d68c7e2a4dcafb85e3e17d6e2b7e52af7130d2f2561b",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20.pkl",
+      "scores_sha256": "6c9cd2489e052e5ab848413fbd448186b7aeca3065ef5da8e08e5fe8d2d95440",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50_manifest.json",
+      "manifest_sha256": "c6d571c69aa56ff26e89ea77352eb370040c14eb9ea32103cf562b77e1aa195f",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50.pkl",
+      "scores_sha256": "05a0730f5c75140a3ccaf07f8b447993e91f05de5e430f05b58b74974ece59c0",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15_manifest.json",
+      "manifest_sha256": "8e4f6e24d41d95d5f028217446e1b3b7552e560c52b297c0ad3503c5a6f920dc",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15.pkl",
+      "scores_sha256": "5e46040f43043470bbc71e9c3260ebbf009238fe9f53960fa176d85790a137b4",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49_manifest.json",
+      "manifest_sha256": "e14df1eb1970dd06b119030a5503c3822212edfc54cadddd07f03c870726d816",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49.pkl",
+      "scores_sha256": "b6e04696b2ca3fb3ca0e9c0dee46ca70d6fc37290cc9188b6e455773add2465a",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24_manifest.json",
+      "manifest_sha256": "b98aa8ca1a0178a3eea45357714e83bf5fcb451f820127a184728ff233a6da5d",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24.pkl",
+      "scores_sha256": "248bbb4a84fe6296999256860a11e601146b57a33f6a3975a652a7a0c1cb4861",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed42-14-08-2026_02-28-21_manifest.json",
+      "manifest_sha256": "97bf68b887902be5b7a1403df96dd46c179d2b529bf5c839c48bb43ca29ee702",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed42-14-08-2026_02-28-21.pkl",
+      "scores_sha256": "4e733c652f6f066785b53df727733e3fac4686af085e9fa1aebd6710ff8a88fe",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed43-14-08-2026_03-16-38_manifest.json",
+      "manifest_sha256": "d7529c4aebdc0929f21e2b4148c9eab82c15abfad1dbc697ed42ea5843853c42",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed43-14-08-2026_03-16-38.pkl",
+      "scores_sha256": "b6cd88e955a1dfcbb250eae43e9a591522823d90a66dc8f5f5aaf9bcdbf07593",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed44-14-08-2026_03-41-23_manifest.json",
+      "manifest_sha256": "650506d7be04c46603c1be0958281da7f69ba5ba9a5d2659ac29be298bd269c8",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed44-14-08-2026_03-41-23.pkl",
+      "scores_sha256": "1f77b62812cddd072a0df87cc0772f79799b410affa33a987b71ab716aefe35c",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed45-14-08-2026_03-47-53_manifest.json",
+      "manifest_sha256": "950f88dee1fc8093cf9d901b20419155fbfd3d44753f80e3ec0585fefaf25b68",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed45-14-08-2026_03-47-53.pkl",
+      "scores_sha256": "eb318e7781b7f4311e3c85e0bf55400a4f2d4deeafcb3117613801cac7b89a90",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed46-14-08-2026_04-41-01_manifest.json",
+      "manifest_sha256": "d9145e1c2ddb46d41de5c74ef2bef69e3e07ecc028789a0530ebe6c8e878a674",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_eap_mean_seed46-14-08-2026_04-41-01.pkl",
+      "scores_sha256": "48dde77be47eef63e5ebd535cce5203423a91021bf2160974a980a759c076030",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed42-14-08-2026_02-53-22_manifest.json",
+      "manifest_sha256": "b17a9cef736fca1abf0ef8022b6bc7ba9c90619bd2f47502b6ca5600e866e69e",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed42-14-08-2026_02-53-22.pkl",
+      "scores_sha256": "5f68dae57871dbcf1a2ec322e6e9cf51c14d07541824c8c4773e276454f8ae01",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed43-14-08-2026_03-17-24_manifest.json",
+      "manifest_sha256": "f42039897522dc53e767ae1937d0617726d9e62e0b6c06857522db493f7e20df",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed43-14-08-2026_03-17-24.pkl",
+      "scores_sha256": "66c4f66b432e40fcee601e1e28d061780391979c405a34eb81d8551a42c69ff8",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed44-14-08-2026_03-25-09_manifest.json",
+      "manifest_sha256": "ab09bfd4e01cbec8b3ec53aa7e1a37c02e5d766a7b327d8ad740da5deca520c9",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed44-14-08-2026_03-25-09.pkl",
+      "scores_sha256": "1379e6e313b660675a72389f660ff0c421cfbc87a659857b663d735f132ccfa5",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed45-14-08-2026_04-13-37_manifest.json",
+      "manifest_sha256": "e5090e9cfcfafd2e04e1a6e2996324b8e1faef367fb67b7f117fbfb97a358ec4",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed45-14-08-2026_04-13-37.pkl",
+      "scores_sha256": "2c702341ee4df5ac4efdc9efa63c97a4b31a037e2864b94021c0c0f6588b0db0",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed46-14-08-2026_04-38-23_manifest.json",
+      "manifest_sha256": "8d388d8bc6eb33738f05c9bd1e3b98056165dcd15787522600d00156785ede6e",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_ep_mean_seed46-14-08-2026_04-38-23.pkl",
+      "scores_sha256": "eebe77c08d2d66a7b416dd086dedd5ed7c02d878b908312b2d0df87b85c3e204",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47_manifest.json",
+      "manifest_sha256": "cf82eb1b2a0bf8e4d73ab0d9ebf92081150897f4823d796b0c8a3277a743c042",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47.pkl",
+      "scores_sha256": "b39dfbd65b35e53d013b2ae4d0ae399cef56e144f3c7119ce9cd9cba2aea0347",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52_manifest.json",
+      "manifest_sha256": "06be28b3f114b4b2a1ac0cea6e3d3e0c31b50ed1f81c53c11b24e78011d07564",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52.pkl",
+      "scores_sha256": "a1afa54002f608bd972d444f6ad77c2b72e144e2a87177418d59eda26bf1e996",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15_manifest.json",
+      "manifest_sha256": "20d12a4401539c94425706326e114b60e2776a373a4338872debb2adb34df6ac",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15.pkl",
+      "scores_sha256": "831152bb77dbbcc62d4fc92dd770c0e1c7cc4850119065cdd5c32a9eee9da6e7",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00_manifest.json",
+      "manifest_sha256": "9e084d7bdff98adc52b1718add0e7c1ceae7135039c843268268a84766b30f71",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00.pkl",
+      "scores_sha256": "da18e663022ad08c97213f92747585b9bb118726518bd8a7a82a218957ba0aaa",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30_manifest.json",
+      "manifest_sha256": "bb027548968da3890638d26e7bbc1398db882cb35a2318692e0a825ca9549205",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30.pkl",
+      "scores_sha256": "de8e8913b273773e77cde6cd09f58f593523e459be2ada3b9961ec12b5a9f6e8",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed42-15-08-2026_05-41-47_manifest.json",
+      "manifest_sha256": "bf189c035764e294483bf418786fc24cb756422803039a9ee13db2734e3ecb8d",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed42-15-08-2026_05-41-47.pkl",
+      "scores_sha256": "08696c89b4b1be1cd4c59159861bd9a9a35ca83058c8095cf894345e4e5a9bfe",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed43-15-08-2026_05-43-17_manifest.json",
+      "manifest_sha256": "865312b2e13d5d7579e6200306e419f5a3c5e97da441da5eba7e712c2d3aba82",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed43-15-08-2026_05-43-17.pkl",
+      "scores_sha256": "7343f4faca1d9c767014712d8b053efe982e9e3eb1683675a04d36408b241176",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed44-15-08-2026_05-44-46_manifest.json",
+      "manifest_sha256": "b3bf9ef2e39fc3398437c569c520bc20d085f3241cc2252818bfc461633a0c7c",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed44-15-08-2026_05-44-46.pkl",
+      "scores_sha256": "f8c0db48dd5ca863bfd83bd7909f2d16f9631c50a208b82e904073fcb2a6c87a",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed45-15-08-2026_05-46-21_manifest.json",
+      "manifest_sha256": "b006f5a178498a766d1a51b9c4525338a89c2c2048513a9e45717449bd1ffedc",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed45-15-08-2026_05-46-21.pkl",
+      "scores_sha256": "0b770e44009cfdc345372db37fba3bc87409ab3de5a9e8958ee7b5d30525fdc9",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed46-15-08-2026_05-48-00_manifest.json",
+      "manifest_sha256": "5822d8f101e8d3c83b6a534bb1bdf31c18c29c497b097f7110c4dd864132960d",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_acdc_resample_seed46-15-08-2026_05-48-00.pkl",
+      "scores_sha256": "7329756203c64b2567b28b74b92e758722c0bf185fa69e1c020135a174895ebc",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed42-14-08-2026_02-28-54_manifest.json",
+      "manifest_sha256": "36e082b1c3511cdfd47feb52e2bda61dfeee5f12e19d9382cbf749d3d932f603",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed42-14-08-2026_02-28-54.pkl",
+      "scores_sha256": "c6ed1336e5ec0a37e554e40d2d5b33baf2b73b1f25bcd824d081b953cd2c67c8",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed43-14-08-2026_03-18-59_manifest.json",
+      "manifest_sha256": "c760b20c9937416c02df745356221b200c38130a743f01d312c73a8ce5b86318",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed43-14-08-2026_03-18-59.pkl",
+      "scores_sha256": "dcdd71abf9f4a40b043d234e4d24c29beb7607286b89c0139fde7236357f2488",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed44-14-08-2026_03-42-26_manifest.json",
+      "manifest_sha256": "d873d7f902e3b833a74fde40ace79297e86b03aae1c43394607ad60385635708",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed44-14-08-2026_03-42-26.pkl",
+      "scores_sha256": "d7c63a133629c40f3b3d9fe96f370c3c8e62d7dd246ae18105ea8663c5775722",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed45-14-08-2026_03-48-44_manifest.json",
+      "manifest_sha256": "26e6ec6208016c1e6453f04cb75a197179490144155929cc1d01d5ea49327642",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed45-14-08-2026_03-48-44.pkl",
+      "scores_sha256": "d0d25e0278506ba5e096eb5cd36c150fab59d6906fd1ab4a8de4addc4555d527",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed46-14-08-2026_03-52-16_manifest.json",
+      "manifest_sha256": "6e7c1ccf9327069fc64ee6085589a5fb604000cd8883790f6189059e7653513e",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_eap_resample_seed46-14-08-2026_03-52-16.pkl",
+      "scores_sha256": "090edcc17fb27bb2663f3e7c221981a6f54523ef28959ef03fdfb13f8bf570fb",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00_manifest.json",
+      "manifest_sha256": "37d4018a16141b3ce6d683abde3840abea245b5e22a46861ca9a5585e0588b6d",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00.pkl",
+      "scores_sha256": "3f93ca0957a5f36f1ded541dba1c9e61dfd654219bc6eb6d28e42856cde36d80",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "init_seed": 42,
+        "null_test": false,
+        "split_seed": null
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29_manifest.json",
+      "manifest_sha256": "45ed57ab05e50b8ed83b9262648c9cf3919af434cec5d53dff7ce570a7f3f996",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29.pkl",
+      "scores_sha256": "ecfcd314a27b6b942ada0a649720ffc37adeed94a13da0557d48f5b6ecc078cb",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "init_seed": 43,
+        "null_test": false,
+        "split_seed": null
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19_manifest.json",
+      "manifest_sha256": "2d2f272cafd9ef25cb966f856aaf62d46baa21bcdc97ce620bc2a7cd31e7d11a",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19.pkl",
+      "scores_sha256": "c9ad8f3da7d55f11818c112217505391c2e9a97883ab4b9efea32f523beba1a3",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "init_seed": 44,
+        "null_test": false,
+        "split_seed": null
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04_manifest.json",
+      "manifest_sha256": "be347b1e16deecbfde4df82776c26a014fc9eafdddc76e113e2ac76c09e08091",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04.pkl",
+      "scores_sha256": "4abee59c189bb07666fb7d78f7474e092b7151ca07fb9d5205f69a11d7efeb76",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "init_seed": 45,
+        "null_test": false,
+        "split_seed": null
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41_manifest.json",
+      "manifest_sha256": "c7c9eece6b62aa5771dba3db2438aaf8c8a5c6cc17839838344a8f731a218f21",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41.pkl",
+      "scores_sha256": "427f2337a985c646e08fb483d93d1c79dca2d38d25b08b21cae71f2f17431b18",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "init_seed": 46,
+        "null_test": false,
+        "split_seed": null
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22_manifest.json",
+      "manifest_sha256": "a20cd215daa19d1cf7104c4469a71561ac2f9ffe5083cfed85bbd5d1001d7f28",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22.pkl",
+      "scores_sha256": "c05bf1c718ffd0efa4dc0f3f69290d4ae53eb027d287a3446d6eb5bedddfe59c",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49_manifest.json",
+      "manifest_sha256": "947b0b203d4f7951b438081df8f128c9788d7988561696d12a4e74a18e713d5d",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49.pkl",
+      "scores_sha256": "4bdb473ee67e13544a41e6726c270730a2aaaf8264527980df569ed032f69253",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50_manifest.json",
+      "manifest_sha256": "ea3d6ae5955a31ef93bac066cff3c7c086ac02b03adf3ceb47edbb82bd67f735",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50.pkl",
+      "scores_sha256": "a1bafd17f2687139a1cf983118e96fbab74c07eb39ce2e83b07c753bd06d884f",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29_manifest.json",
+      "manifest_sha256": "3e5769a98a969d8dcded91b93602d18dad253de036474bdc4143c088f9f7d0e7",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29.pkl",
+      "scores_sha256": "073601ff72584bef937a4891bb9d6c29febed92cb5e93f5b89a37cff738983d7",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    },
+    {
+      "manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56_manifest.json",
+      "manifest_sha256": "15561ebe7f6d6913a9de4075be0497dc750fe11799156858aadd188389700169",
+      "scores": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56.pkl",
+      "scores_sha256": "4cc7e055e881206bdbfffcc3dffef2bd9784f29889773cee36c12d1e1103d504",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "data_budget": {
+        "batch_size": 64,
+        "batch_count": [
+          11,
+          4
+        ],
+        "train_examples": 704,
+        "test_examples": 256
+      }
+    }
+  ],
+  "alignment": {
+    "ioi": {
+      "module_order": [
+        "blocks.0.hook_k_input",
+        "blocks.0.hook_mlp_in",
+        "blocks.0.hook_q_input",
+        "blocks.0.hook_v_input",
+        "blocks.1.hook_k_input",
+        "blocks.1.hook_mlp_in",
+        "blocks.1.hook_q_input",
+        "blocks.1.hook_v_input",
+        "blocks.10.hook_k_input",
+        "blocks.10.hook_mlp_in",
+        "blocks.10.hook_q_input",
+        "blocks.10.hook_v_input",
+        "blocks.11.hook_k_input",
+        "blocks.11.hook_mlp_in",
+        "blocks.11.hook_q_input",
+        "blocks.11.hook_resid_post",
+        "blocks.11.hook_v_input",
+        "blocks.2.hook_k_input",
+        "blocks.2.hook_mlp_in",
+        "blocks.2.hook_q_input",
+        "blocks.2.hook_v_input",
+        "blocks.3.hook_k_input",
+        "blocks.3.hook_mlp_in",
+        "blocks.3.hook_q_input",
+        "blocks.3.hook_v_input",
+        "blocks.4.hook_k_input",
+        "blocks.4.hook_mlp_in",
+        "blocks.4.hook_q_input",
+        "blocks.4.hook_v_input",
+        "blocks.5.hook_k_input",
+        "blocks.5.hook_mlp_in",
+        "blocks.5.hook_q_input",
+        "blocks.5.hook_v_input",
+        "blocks.6.hook_k_input",
+        "blocks.6.hook_mlp_in",
+        "blocks.6.hook_q_input",
+        "blocks.6.hook_v_input",
+        "blocks.7.hook_k_input",
+        "blocks.7.hook_mlp_in",
+        "blocks.7.hook_q_input",
+        "blocks.7.hook_v_input",
+        "blocks.8.hook_k_input",
+        "blocks.8.hook_mlp_in",
+        "blocks.8.hook_q_input",
+        "blocks.8.hook_v_input",
+        "blocks.9.hook_k_input",
+        "blocks.9.hook_mlp_in",
+        "blocks.9.hook_q_input",
+        "blocks.9.hook_v_input"
+      ],
+      "tensor_shapes": {
+        "blocks.0.hook_k_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_mlp_in": [
+          13
+        ],
+        "blocks.0.hook_q_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_v_input": [
+          12,
+          1
+        ],
+        "blocks.1.hook_k_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_mlp_in": [
+          26
+        ],
+        "blocks.1.hook_q_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_v_input": [
+          12,
+          14
+        ],
+        "blocks.10.hook_k_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_mlp_in": [
+          143
+        ],
+        "blocks.10.hook_q_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_v_input": [
+          12,
+          131
+        ],
+        "blocks.11.hook_k_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_mlp_in": [
+          156
+        ],
+        "blocks.11.hook_q_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_resid_post": [
+          157
+        ],
+        "blocks.11.hook_v_input": [
+          12,
+          144
+        ],
+        "blocks.2.hook_k_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_mlp_in": [
+          39
+        ],
+        "blocks.2.hook_q_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_v_input": [
+          12,
+          27
+        ],
+        "blocks.3.hook_k_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_mlp_in": [
+          52
+        ],
+        "blocks.3.hook_q_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_v_input": [
+          12,
+          40
+        ],
+        "blocks.4.hook_k_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_mlp_in": [
+          65
+        ],
+        "blocks.4.hook_q_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_v_input": [
+          12,
+          53
+        ],
+        "blocks.5.hook_k_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_mlp_in": [
+          78
+        ],
+        "blocks.5.hook_q_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_v_input": [
+          12,
+          66
+        ],
+        "blocks.6.hook_k_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_mlp_in": [
+          91
+        ],
+        "blocks.6.hook_q_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_v_input": [
+          12,
+          79
+        ],
+        "blocks.7.hook_k_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_mlp_in": [
+          104
+        ],
+        "blocks.7.hook_q_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_v_input": [
+          12,
+          92
+        ],
+        "blocks.8.hook_k_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_mlp_in": [
+          117
+        ],
+        "blocks.8.hook_q_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_v_input": [
+          12,
+          105
+        ],
+        "blocks.9.hook_k_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_mlp_in": [
+          130
+        ],
+        "blocks.9.hook_q_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_v_input": [
+          12,
+          118
+        ]
+      }
+    },
+    "gt": {
+      "module_order": [
+        "blocks.0.hook_k_input",
+        "blocks.0.hook_mlp_in",
+        "blocks.0.hook_q_input",
+        "blocks.0.hook_v_input",
+        "blocks.1.hook_k_input",
+        "blocks.1.hook_mlp_in",
+        "blocks.1.hook_q_input",
+        "blocks.1.hook_v_input",
+        "blocks.10.hook_k_input",
+        "blocks.10.hook_mlp_in",
+        "blocks.10.hook_q_input",
+        "blocks.10.hook_v_input",
+        "blocks.11.hook_k_input",
+        "blocks.11.hook_mlp_in",
+        "blocks.11.hook_q_input",
+        "blocks.11.hook_resid_post",
+        "blocks.11.hook_v_input",
+        "blocks.2.hook_k_input",
+        "blocks.2.hook_mlp_in",
+        "blocks.2.hook_q_input",
+        "blocks.2.hook_v_input",
+        "blocks.3.hook_k_input",
+        "blocks.3.hook_mlp_in",
+        "blocks.3.hook_q_input",
+        "blocks.3.hook_v_input",
+        "blocks.4.hook_k_input",
+        "blocks.4.hook_mlp_in",
+        "blocks.4.hook_q_input",
+        "blocks.4.hook_v_input",
+        "blocks.5.hook_k_input",
+        "blocks.5.hook_mlp_in",
+        "blocks.5.hook_q_input",
+        "blocks.5.hook_v_input",
+        "blocks.6.hook_k_input",
+        "blocks.6.hook_mlp_in",
+        "blocks.6.hook_q_input",
+        "blocks.6.hook_v_input",
+        "blocks.7.hook_k_input",
+        "blocks.7.hook_mlp_in",
+        "blocks.7.hook_q_input",
+        "blocks.7.hook_v_input",
+        "blocks.8.hook_k_input",
+        "blocks.8.hook_mlp_in",
+        "blocks.8.hook_q_input",
+        "blocks.8.hook_v_input",
+        "blocks.9.hook_k_input",
+        "blocks.9.hook_mlp_in",
+        "blocks.9.hook_q_input",
+        "blocks.9.hook_v_input"
+      ],
+      "tensor_shapes": {
+        "blocks.0.hook_k_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_mlp_in": [
+          13
+        ],
+        "blocks.0.hook_q_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_v_input": [
+          12,
+          1
+        ],
+        "blocks.1.hook_k_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_mlp_in": [
+          26
+        ],
+        "blocks.1.hook_q_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_v_input": [
+          12,
+          14
+        ],
+        "blocks.10.hook_k_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_mlp_in": [
+          143
+        ],
+        "blocks.10.hook_q_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_v_input": [
+          12,
+          131
+        ],
+        "blocks.11.hook_k_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_mlp_in": [
+          156
+        ],
+        "blocks.11.hook_q_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_resid_post": [
+          157
+        ],
+        "blocks.11.hook_v_input": [
+          12,
+          144
+        ],
+        "blocks.2.hook_k_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_mlp_in": [
+          39
+        ],
+        "blocks.2.hook_q_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_v_input": [
+          12,
+          27
+        ],
+        "blocks.3.hook_k_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_mlp_in": [
+          52
+        ],
+        "blocks.3.hook_q_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_v_input": [
+          12,
+          40
+        ],
+        "blocks.4.hook_k_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_mlp_in": [
+          65
+        ],
+        "blocks.4.hook_q_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_v_input": [
+          12,
+          53
+        ],
+        "blocks.5.hook_k_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_mlp_in": [
+          78
+        ],
+        "blocks.5.hook_q_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_v_input": [
+          12,
+          66
+        ],
+        "blocks.6.hook_k_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_mlp_in": [
+          91
+        ],
+        "blocks.6.hook_q_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_v_input": [
+          12,
+          79
+        ],
+        "blocks.7.hook_k_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_mlp_in": [
+          104
+        ],
+        "blocks.7.hook_q_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_v_input": [
+          12,
+          92
+        ],
+        "blocks.8.hook_k_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_mlp_in": [
+          117
+        ],
+        "blocks.8.hook_q_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_v_input": [
+          12,
+          105
+        ],
+        "blocks.9.hook_k_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_mlp_in": [
+          130
+        ],
+        "blocks.9.hook_q_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_v_input": [
+          12,
+          118
+        ]
+      }
+    }
+  },
+  "verified_structural_cells": 8,
+  "n_circuits": 40,
+  "n_metric_pairs": 120,
+  "n_summaries": 12,
+  "n_omissions": 60,
+  "accuracy_precision": "Recovered exact 256-prompt counts; native aggregate fields reproduced",
+  "kl_precision": "Six significant digits; conservative pair-gap rank interval audit",
+  "outputs": {
+    "summary.csv": "7797b5a209c11d3a2f8cb7fd236a2be655207c19eb6a948c0f1a3ae7a6e67208",
+    "runs.csv": "2708881000c5a9af00f4fb099c1a7221a35f074a4c5461b7cd0502d21889e95f",
+    "omissions.csv": "746c0b3adc963ae7f05bc22fedc0858eac4b75205ae9b4cca860a02afa41fb09",
+    "pairs.csv": "2cd89ba571f7a53c1f08d463f10a82611b674c7f0a0d8cbd1376003c0bffe190"
+  }
+}

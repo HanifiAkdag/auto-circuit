@@ -1,0 +1,50 @@
+{
+  "cell": {
+    "task": "docstring",
+    "algo": "acdc",
+    "algo_key": "ACDC [resample]",
+    "ablation": "resample",
+    "seed": 42,
+    "null_test": false
+  },
+  "cache_file": "cell_docstring_acdc_resample_seed42-14-08-2026_02-35-26.pkl",
+  "saved_at": "2026-08-14T02:35:26",
+  "git": {
+    "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+    "dirty": true,
+    "dirty_files": [
+      ".claude/",
+      ".prune_scores_cache_v3/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "tao_exps": [
+      -5,
+      -4,
+      -3,
+      -2
+    ],
+    "tao_bases": [
+      1,
+      3,
+      5,
+      7,
+      9
+    ],
+    "faithfulness_target": "kl_div",
+    "test_mode": false,
+    "run_circuits_ref": null,
+    "show_graphs": false,
+    "draw_seq_graph_ref": null,
+    "ablation_type": "Resample"
+  }
+}

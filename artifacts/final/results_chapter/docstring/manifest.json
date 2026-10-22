@@ -1,0 +1,474 @@
+{
+  "experiment": "docstring_repair_20261006",
+  "started_at": "2026-10-06T22:27:09.303343",
+  "git": {
+    "commit": "9c4a041a68ffdde9061172e698bf910fed35bd28",
+    "dirty": true,
+    "dirty_files": [
+      "datasets/docstring_generator.py",
+      "docs/evaluation_protocol.md",
+      "experiments/thesis/build_evaluation_set.py",
+      "experiments/thesis/evaluation_protocol.py",
+      "experiments/thesis/evaluation_repair_report.py",
+      "experiments/thesis/temporary_evaluation_repair.py",
+      "tests/test_evaluation_pool_fidelity.py",
+      "tests/test_evaluation_repair.py",
+      "tests/test_evaluation_set.py",
+      "datasets/evaluation/docstring_repair_20261006/",
+      "datasets/evaluation/docstring_repair_20261006_gpt2_rejected/"
+    ]
+  },
+  "discovery_cache_dir": ".prune_scores/final/benchmark",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "conditions": [
+    "joint",
+    "data",
+    "init"
+  ],
+  "anchor_seed": 42,
+  "eval_protocol": "measures ['completeness', 'faithfulness'] x all three eval ablations, every cell",
+  "eval_data": "Temporary unseen-clean evaluation, 256 prompts per task",
+  "stability_metric": {
+    "Docstring Component Circuit": "Correct Answer Percent"
+  },
+  "stable_bar": 0.8,
+  "cells": [
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    }
+  ],
+  "completed_at": "2026-10-06T22:27:13.348052",
+  "structural_rows": 672,
+  "functional_rows": 7392,
+  "historical_analysis_started_at": "2026-09-19T18:20:58",
+  "tasks": [
+    "docstring"
+  ],
+  "complete": true,
+  "temporary_historical_repair": true,
+  "evaluation_protocol_id": "b85175abf8516ecc77e33a5bc25fca9a80a4ab77937d33b45769dd93fabac230",
+  "evaluation_manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/datasets/evaluation/docstring_repair_20261006/manifest.json",
+  "selected_inputs": "/mnt/beegfs/work/akdag/thesis/auto-circuit/results/results_chapter/complete_repair_integration_20261006/docstring_selected_inputs.json",
+  "selected_inputs_sha256": "b29b60e36d4fc66466ef04fe48f1b628fb2e415aaacd85b3d1722da35b04b9d0",
+  "structural_source_sha256": "ef51c93308f91bfeb2dfa689e21bb721b1b8045f659c884ce4284f9bb0b51ff9",
+  "historical_manifest_sha256": "d2b3ebb0f3b72e06263c5b839bdb0b3cf930155e3ea2eb475e7aae6064c8e13a"
+}

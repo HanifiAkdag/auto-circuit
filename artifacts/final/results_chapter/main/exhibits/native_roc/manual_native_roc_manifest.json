@@ -1,0 +1,2805 @@
+{
+  "source_dir": ".prune_scores/final/benchmark",
+  "source_caches": [
+    {
+      "cache_file": "cell_ioi_gt_resample_seed42-27-07-2026_17-09-27.pkl",
+      "cache_manifest": "cell_ioi_gt_resample_seed42-27-07-2026_17-09-27_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "gt",
+        "algo_key": "Official Circuit",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-07-27T17:09:27"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_zero_seed42-15-08-2026_05-40-50.pkl",
+      "cache_manifest": "cell_ioi_acdc_zero_seed42-15-08-2026_05-40-50_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:40:50"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_zero_seed43-15-08-2026_05-42-21.pkl",
+      "cache_manifest": "cell_ioi_acdc_zero_seed43-15-08-2026_05-42-21_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:42:21"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_zero_seed44-15-08-2026_05-43-45.pkl",
+      "cache_manifest": "cell_ioi_acdc_zero_seed44-15-08-2026_05-43-45_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:43:45"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_zero_seed45-15-08-2026_05-45-18.pkl",
+      "cache_manifest": "cell_ioi_acdc_zero_seed45-15-08-2026_05-45-18_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:45:18"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_zero_seed46-15-08-2026_05-46-52.pkl",
+      "cache_manifest": "cell_ioi_acdc_zero_seed46-15-08-2026_05-46-52_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:46:53"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_resample_seed42-15-08-2026_05-41-06.pkl",
+      "cache_manifest": "cell_ioi_acdc_resample_seed42-15-08-2026_05-41-06_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:41:06"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_resample_seed43-15-08-2026_05-42-36.pkl",
+      "cache_manifest": "cell_ioi_acdc_resample_seed43-15-08-2026_05-42-36_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:42:36"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_resample_seed44-15-08-2026_05-44-00.pkl",
+      "cache_manifest": "cell_ioi_acdc_resample_seed44-15-08-2026_05-44-00_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:44:00"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_resample_seed45-15-08-2026_05-45-33.pkl",
+      "cache_manifest": "cell_ioi_acdc_resample_seed45-15-08-2026_05-45-33_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:45:33"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_resample_seed46-15-08-2026_05-47-08.pkl",
+      "cache_manifest": "cell_ioi_acdc_resample_seed46-15-08-2026_05-47-08_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:47:08"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20.pkl",
+      "cache_manifest": "cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:41:20"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50.pkl",
+      "cache_manifest": "cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:42:50"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15.pkl",
+      "cache_manifest": "cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:44:15"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49.pkl",
+      "cache_manifest": "cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:45:50"
+    },
+    {
+      "cache_file": "cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24.pkl",
+      "cache_manifest": "cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:47:24"
+    },
+    {
+      "cache_file": "cell_ioi_eap_zero_seed42-14-08-2026_02-28-18.pkl",
+      "cache_manifest": "cell_ioi_eap_zero_seed42-14-08-2026_02-28-18_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:28:18"
+    },
+    {
+      "cache_file": "cell_ioi_eap_zero_seed43-14-08-2026_02-30-11.pkl",
+      "cache_manifest": "cell_ioi_eap_zero_seed43-14-08-2026_02-30-11_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:30:11"
+    },
+    {
+      "cache_file": "cell_ioi_eap_zero_seed44-14-08-2026_03-18-21.pkl",
+      "cache_manifest": "cell_ioi_eap_zero_seed44-14-08-2026_03-18-21_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:18:21"
+    },
+    {
+      "cache_file": "cell_ioi_eap_zero_seed45-14-08-2026_03-42-39.pkl",
+      "cache_manifest": "cell_ioi_eap_zero_seed45-14-08-2026_03-42-39_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:42:39"
+    },
+    {
+      "cache_file": "cell_ioi_eap_zero_seed46-14-08-2026_03-50-13.pkl",
+      "cache_manifest": "cell_ioi_eap_zero_seed46-14-08-2026_03-50-13_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:50:13"
+    },
+    {
+      "cache_file": "cell_ioi_eap_resample_seed42-14-08-2026_02-28-15.pkl",
+      "cache_manifest": "cell_ioi_eap_resample_seed42-14-08-2026_02-28-15_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:28:15"
+    },
+    {
+      "cache_file": "cell_ioi_eap_resample_seed43-14-08-2026_03-18-17.pkl",
+      "cache_manifest": "cell_ioi_eap_resample_seed43-14-08-2026_03-18-17_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:18:17"
+    },
+    {
+      "cache_file": "cell_ioi_eap_resample_seed44-14-08-2026_03-41-44.pkl",
+      "cache_manifest": "cell_ioi_eap_resample_seed44-14-08-2026_03-41-44_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:41:44"
+    },
+    {
+      "cache_file": "cell_ioi_eap_resample_seed45-14-08-2026_03-48-03.pkl",
+      "cache_manifest": "cell_ioi_eap_resample_seed45-14-08-2026_03-48-03_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:03"
+    },
+    {
+      "cache_file": "cell_ioi_eap_resample_seed46-14-08-2026_03-51-34.pkl",
+      "cache_manifest": "cell_ioi_eap_resample_seed46-14-08-2026_03-51-34_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:51:34"
+    },
+    {
+      "cache_file": "cell_ioi_eap_mean_seed42-14-08-2026_02-28-21.pkl",
+      "cache_manifest": "cell_ioi_eap_mean_seed42-14-08-2026_02-28-21_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:28:21"
+    },
+    {
+      "cache_file": "cell_ioi_eap_mean_seed43-14-08-2026_03-16-38.pkl",
+      "cache_manifest": "cell_ioi_eap_mean_seed43-14-08-2026_03-16-38_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:16:38"
+    },
+    {
+      "cache_file": "cell_ioi_eap_mean_seed44-14-08-2026_03-41-23.pkl",
+      "cache_manifest": "cell_ioi_eap_mean_seed44-14-08-2026_03-41-23_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:41:23"
+    },
+    {
+      "cache_file": "cell_ioi_eap_mean_seed45-14-08-2026_03-47-53.pkl",
+      "cache_manifest": "cell_ioi_eap_mean_seed45-14-08-2026_03-47-53_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:47:53"
+    },
+    {
+      "cache_file": "cell_ioi_eap_mean_seed46-14-08-2026_04-41-01.pkl",
+      "cache_manifest": "cell_ioi_eap_mean_seed46-14-08-2026_04-41-01_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:41:01"
+    },
+    {
+      "cache_file": "cell_ioi_ep_zero_seed42-14-08-2026_02-54-27.pkl",
+      "cache_manifest": "cell_ioi_ep_zero_seed42-14-08-2026_02-54-27_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:54:27"
+    },
+    {
+      "cache_file": "cell_ioi_ep_zero_seed43-14-08-2026_03-18-12.pkl",
+      "cache_manifest": "cell_ioi_ep_zero_seed43-14-08-2026_03-18-12_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:18:12"
+    },
+    {
+      "cache_file": "cell_ioi_ep_zero_seed44-14-08-2026_03-24-55.pkl",
+      "cache_manifest": "cell_ioi_ep_zero_seed44-14-08-2026_03-24-55_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:24:55"
+    },
+    {
+      "cache_file": "cell_ioi_ep_zero_seed45-14-08-2026_03-27-54.pkl",
+      "cache_manifest": "cell_ioi_ep_zero_seed45-14-08-2026_03-27-54_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:27:54"
+    },
+    {
+      "cache_file": "cell_ioi_ep_zero_seed46-14-08-2026_04-14-43.pkl",
+      "cache_manifest": "cell_ioi_ep_zero_seed46-14-08-2026_04-14-43_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:14:43"
+    },
+    {
+      "cache_file": "cell_ioi_ep_resample_seed42-14-08-2026_02-53-22.pkl",
+      "cache_manifest": "cell_ioi_ep_resample_seed42-14-08-2026_02-53-22_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:53:22"
+    },
+    {
+      "cache_file": "cell_ioi_ep_resample_seed43-14-08-2026_03-17-41.pkl",
+      "cache_manifest": "cell_ioi_ep_resample_seed43-14-08-2026_03-17-41_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:17:41"
+    },
+    {
+      "cache_file": "cell_ioi_ep_resample_seed44-14-08-2026_03-24-53.pkl",
+      "cache_manifest": "cell_ioi_ep_resample_seed44-14-08-2026_03-24-53_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:24:53"
+    },
+    {
+      "cache_file": "cell_ioi_ep_resample_seed45-14-08-2026_04-17-02.pkl",
+      "cache_manifest": "cell_ioi_ep_resample_seed45-14-08-2026_04-17-02_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:17:02"
+    },
+    {
+      "cache_file": "cell_ioi_ep_resample_seed46-14-08-2026_04-38-52.pkl",
+      "cache_manifest": "cell_ioi_ep_resample_seed46-14-08-2026_04-38-52_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:38:52"
+    },
+    {
+      "cache_file": "cell_ioi_ep_mean_seed42-14-08-2026_02-53-22.pkl",
+      "cache_manifest": "cell_ioi_ep_mean_seed42-14-08-2026_02-53-22_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:53:22"
+    },
+    {
+      "cache_file": "cell_ioi_ep_mean_seed43-14-08-2026_03-17-24.pkl",
+      "cache_manifest": "cell_ioi_ep_mean_seed43-14-08-2026_03-17-24_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:17:24"
+    },
+    {
+      "cache_file": "cell_ioi_ep_mean_seed44-14-08-2026_03-25-09.pkl",
+      "cache_manifest": "cell_ioi_ep_mean_seed44-14-08-2026_03-25-09_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:25:09"
+    },
+    {
+      "cache_file": "cell_ioi_ep_mean_seed45-14-08-2026_04-13-37.pkl",
+      "cache_manifest": "cell_ioi_ep_mean_seed45-14-08-2026_04-13-37_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:13:37"
+    },
+    {
+      "cache_file": "cell_ioi_ep_mean_seed46-14-08-2026_04-38-23.pkl",
+      "cache_manifest": "cell_ioi_ep_mean_seed46-14-08-2026_04-38-23_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:38:23"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_zero_seed42-14-08-2026_02-40-47.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_zero_seed42-14-08-2026_02-40-47_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:40:47"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_zero_seed43-14-08-2026_02-48-39.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_zero_seed43-14-08-2026_02-48-39_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:39"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_zero_seed44-14-08-2026_02-51-08.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_zero_seed44-14-08-2026_02-51-08_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:51:08"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_zero_seed45-14-08-2026_03-38-45.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_zero_seed45-14-08-2026_03-38-45_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:38:45"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_zero_seed46-14-08-2026_04-03-12.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_zero_seed46-14-08-2026_04-03-12_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:03:12"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_resample_seed42-14-08-2026_02-40-58.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_resample_seed42-14-08-2026_02-40-58_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:40:58"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_resample_seed43-14-08-2026_02-48-40.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_resample_seed43-14-08-2026_02-48-40_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:40"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_resample_seed44-14-08-2026_03-39-22.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_resample_seed44-14-08-2026_03-39-22_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:39:22"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_resample_seed45-14-08-2026_04-02-09.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_resample_seed45-14-08-2026_04-02-09_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:02:09"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_resample_seed46-14-08-2026_04-08-44.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_resample_seed46-14-08-2026_04-08-44_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:08:44"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:40:47"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:52"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:37:15"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:02:00"
+    },
+    {
+      "cache_file": "cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30.pkl",
+      "cache_manifest": "cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30_manifest.json",
+      "cell": {
+        "task": "ioi",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:08:30"
+    },
+    {
+      "cache_file": "cell_gt_gt_resample_seed42-27-07-2026_17-24-25.pkl",
+      "cache_manifest": "cell_gt_gt_resample_seed42-27-07-2026_17-24-25_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "gt",
+        "algo_key": "Official Circuit",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-07-27T17:24:27"
+    },
+    {
+      "cache_file": "cell_gt_acdc_zero_seed42-15-08-2026_05-41-33.pkl",
+      "cache_manifest": "cell_gt_acdc_zero_seed42-15-08-2026_05-41-33_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:41:33"
+    },
+    {
+      "cache_file": "cell_gt_acdc_zero_seed43-15-08-2026_05-43-03.pkl",
+      "cache_manifest": "cell_gt_acdc_zero_seed43-15-08-2026_05-43-03_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:43:03"
+    },
+    {
+      "cache_file": "cell_gt_acdc_zero_seed44-15-08-2026_05-44-30.pkl",
+      "cache_manifest": "cell_gt_acdc_zero_seed44-15-08-2026_05-44-30_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:44:30"
+    },
+    {
+      "cache_file": "cell_gt_acdc_zero_seed45-15-08-2026_05-46-05.pkl",
+      "cache_manifest": "cell_gt_acdc_zero_seed45-15-08-2026_05-46-05_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:46:05"
+    },
+    {
+      "cache_file": "cell_gt_acdc_zero_seed46-15-08-2026_05-47-40.pkl",
+      "cache_manifest": "cell_gt_acdc_zero_seed46-15-08-2026_05-47-40_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:47:40"
+    },
+    {
+      "cache_file": "cell_gt_acdc_resample_seed42-15-08-2026_05-41-47.pkl",
+      "cache_manifest": "cell_gt_acdc_resample_seed42-15-08-2026_05-41-47_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:41:47"
+    },
+    {
+      "cache_file": "cell_gt_acdc_resample_seed43-15-08-2026_05-43-17.pkl",
+      "cache_manifest": "cell_gt_acdc_resample_seed43-15-08-2026_05-43-17_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:43:17"
+    },
+    {
+      "cache_file": "cell_gt_acdc_resample_seed44-15-08-2026_05-44-46.pkl",
+      "cache_manifest": "cell_gt_acdc_resample_seed44-15-08-2026_05-44-46_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:44:46"
+    },
+    {
+      "cache_file": "cell_gt_acdc_resample_seed45-15-08-2026_05-46-21.pkl",
+      "cache_manifest": "cell_gt_acdc_resample_seed45-15-08-2026_05-46-21_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:46:21"
+    },
+    {
+      "cache_file": "cell_gt_acdc_resample_seed46-15-08-2026_05-48-00.pkl",
+      "cache_manifest": "cell_gt_acdc_resample_seed46-15-08-2026_05-48-00_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:48:00"
+    },
+    {
+      "cache_file": "cell_gt_acdc_mean_seed42-15-08-2026_05-42-02.pkl",
+      "cache_manifest": "cell_gt_acdc_mean_seed42-15-08-2026_05-42-02_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:42:02"
+    },
+    {
+      "cache_file": "cell_gt_acdc_mean_seed43-15-08-2026_05-43-30.pkl",
+      "cache_manifest": "cell_gt_acdc_mean_seed43-15-08-2026_05-43-30_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:43:30"
+    },
+    {
+      "cache_file": "cell_gt_acdc_mean_seed44-15-08-2026_05-45-02.pkl",
+      "cache_manifest": "cell_gt_acdc_mean_seed44-15-08-2026_05-45-02_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:45:03"
+    },
+    {
+      "cache_file": "cell_gt_acdc_mean_seed45-15-08-2026_05-46-37.pkl",
+      "cache_manifest": "cell_gt_acdc_mean_seed45-15-08-2026_05-46-37_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:46:37"
+    },
+    {
+      "cache_file": "cell_gt_acdc_mean_seed46-15-08-2026_05-48-14.pkl",
+      "cache_manifest": "cell_gt_acdc_mean_seed46-15-08-2026_05-48-14_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-15T05:48:14"
+    },
+    {
+      "cache_file": "cell_gt_eap_zero_seed42-14-08-2026_02-28-57.pkl",
+      "cache_manifest": "cell_gt_eap_zero_seed42-14-08-2026_02-28-57_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:28:57"
+    },
+    {
+      "cache_file": "cell_gt_eap_zero_seed43-14-08-2026_02-30-59.pkl",
+      "cache_manifest": "cell_gt_eap_zero_seed43-14-08-2026_02-30-59_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:30:59"
+    },
+    {
+      "cache_file": "cell_gt_eap_zero_seed44-14-08-2026_03-19-03.pkl",
+      "cache_manifest": "cell_gt_eap_zero_seed44-14-08-2026_03-19-03_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:19:03"
+    },
+    {
+      "cache_file": "cell_gt_eap_zero_seed45-14-08-2026_03-43-21.pkl",
+      "cache_manifest": "cell_gt_eap_zero_seed45-14-08-2026_03-43-21_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:43:21"
+    },
+    {
+      "cache_file": "cell_gt_eap_zero_seed46-14-08-2026_03-50-52.pkl",
+      "cache_manifest": "cell_gt_eap_zero_seed46-14-08-2026_03-50-52_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:50:52"
+    },
+    {
+      "cache_file": "cell_gt_eap_resample_seed42-14-08-2026_02-28-54.pkl",
+      "cache_manifest": "cell_gt_eap_resample_seed42-14-08-2026_02-28-54_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:28:54"
+    },
+    {
+      "cache_file": "cell_gt_eap_resample_seed43-14-08-2026_03-18-59.pkl",
+      "cache_manifest": "cell_gt_eap_resample_seed43-14-08-2026_03-18-59_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:18:59"
+    },
+    {
+      "cache_file": "cell_gt_eap_resample_seed44-14-08-2026_03-42-26.pkl",
+      "cache_manifest": "cell_gt_eap_resample_seed44-14-08-2026_03-42-26_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:42:26"
+    },
+    {
+      "cache_file": "cell_gt_eap_resample_seed45-14-08-2026_03-48-44.pkl",
+      "cache_manifest": "cell_gt_eap_resample_seed45-14-08-2026_03-48-44_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:44"
+    },
+    {
+      "cache_file": "cell_gt_eap_resample_seed46-14-08-2026_03-52-16.pkl",
+      "cache_manifest": "cell_gt_eap_resample_seed46-14-08-2026_03-52-16_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:52:16"
+    },
+    {
+      "cache_file": "cell_gt_eap_mean_seed42-14-08-2026_02-29-00.pkl",
+      "cache_manifest": "cell_gt_eap_mean_seed42-14-08-2026_02-29-00_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:29:00"
+    },
+    {
+      "cache_file": "cell_gt_eap_mean_seed43-14-08-2026_03-17-19.pkl",
+      "cache_manifest": "cell_gt_eap_mean_seed43-14-08-2026_03-17-19_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:17:20"
+    },
+    {
+      "cache_file": "cell_gt_eap_mean_seed44-14-08-2026_03-42-04.pkl",
+      "cache_manifest": "cell_gt_eap_mean_seed44-14-08-2026_03-42-04_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:42:04"
+    },
+    {
+      "cache_file": "cell_gt_eap_mean_seed45-14-08-2026_03-48-33.pkl",
+      "cache_manifest": "cell_gt_eap_mean_seed45-14-08-2026_03-48-33_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:33"
+    },
+    {
+      "cache_file": "cell_gt_eap_mean_seed46-14-08-2026_04-41-46.pkl",
+      "cache_manifest": "cell_gt_eap_mean_seed46-14-08-2026_04-41-46_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:41:46"
+    },
+    {
+      "cache_file": "cell_gt_ep_zero_seed42_klvocabe30782d1f085-17-10-2026_19-04-23.pkl",
+      "cache_manifest": "cell_gt_ep_zero_seed42_klvocabe30782d1f085-17-10-2026_19-04-23_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "init_seed": 42,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T19:04:23"
+    },
+    {
+      "cache_file": "cell_gt_ep_zero_seed43_klvocabe30782d1f085-17-10-2026_19-29-45.pkl",
+      "cache_manifest": "cell_gt_ep_zero_seed43_klvocabe30782d1f085-17-10-2026_19-29-45_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "init_seed": 43,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T19:29:45"
+    },
+    {
+      "cache_file": "cell_gt_ep_zero_seed44_klvocabe30782d1f085-17-10-2026_19-31-50.pkl",
+      "cache_manifest": "cell_gt_ep_zero_seed44_klvocabe30782d1f085-17-10-2026_19-31-50_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "init_seed": 44,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T19:31:50"
+    },
+    {
+      "cache_file": "cell_gt_ep_zero_seed45_klvocabe30782d1f085-17-10-2026_19-34-44.pkl",
+      "cache_manifest": "cell_gt_ep_zero_seed45_klvocabe30782d1f085-17-10-2026_19-34-44_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "init_seed": 45,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T19:34:44"
+    },
+    {
+      "cache_file": "cell_gt_ep_zero_seed46_klvocabe30782d1f085-17-10-2026_19-40-22.pkl",
+      "cache_manifest": "cell_gt_ep_zero_seed46_klvocabe30782d1f085-17-10-2026_19-40-22_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "init_seed": 46,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T19:40:22"
+    },
+    {
+      "cache_file": "cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00.pkl",
+      "cache_manifest": "cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "init_seed": 42,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T16:12:01"
+    },
+    {
+      "cache_file": "cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29.pkl",
+      "cache_manifest": "cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "init_seed": 43,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T18:38:29"
+    },
+    {
+      "cache_file": "cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19.pkl",
+      "cache_manifest": "cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "init_seed": 44,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T18:46:19"
+    },
+    {
+      "cache_file": "cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04.pkl",
+      "cache_manifest": "cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "init_seed": 45,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T18:55:04"
+    },
+    {
+      "cache_file": "cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41.pkl",
+      "cache_manifest": "cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "init_seed": 46,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T18:58:41"
+    },
+    {
+      "cache_file": "cell_gt_ep_mean_seed42_klvocabe30782d1f085-17-10-2026_16-30-05.pkl",
+      "cache_manifest": "cell_gt_ep_mean_seed42_klvocabe30782d1f085-17-10-2026_16-30-05_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "init_seed": 42,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T16:30:05"
+    },
+    {
+      "cache_file": "cell_gt_ep_mean_seed43_klvocabe30782d1f085-17-10-2026_17-28-43.pkl",
+      "cache_manifest": "cell_gt_ep_mean_seed43_klvocabe30782d1f085-17-10-2026_17-28-43_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "init_seed": 43,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T17:28:43"
+    },
+    {
+      "cache_file": "cell_gt_ep_mean_seed44_klvocabe30782d1f085-17-10-2026_17-44-38.pkl",
+      "cache_manifest": "cell_gt_ep_mean_seed44_klvocabe30782d1f085-17-10-2026_17-44-38_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "init_seed": 44,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T17:44:38"
+    },
+    {
+      "cache_file": "cell_gt_ep_mean_seed45_klvocabe30782d1f085-17-10-2026_17-59-26.pkl",
+      "cache_manifest": "cell_gt_ep_mean_seed45_klvocabe30782d1f085-17-10-2026_17-59-26_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "init_seed": 45,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T17:59:26"
+    },
+    {
+      "cache_file": "cell_gt_ep_mean_seed46_klvocabe30782d1f085-17-10-2026_18-04-48.pkl",
+      "cache_manifest": "cell_gt_ep_mean_seed46_klvocabe30782d1f085-17-10-2026_18-04-48_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "init_seed": 46,
+        "null_test": false,
+        "split_seed": null
+      },
+      "saved_at": "2026-10-17T18:04:48"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_zero_seed42-14-08-2026_02-48-05.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_zero_seed42-14-08-2026_02-48-05_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:05"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_zero_seed43-14-08-2026_02-55-45.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_zero_seed43-14-08-2026_02-55-45_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:55:45"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_zero_seed44-14-08-2026_02-58-28.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_zero_seed44-14-08-2026_02-58-28_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:58:28"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_zero_seed45-14-08-2026_03-45-58.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_zero_seed45-14-08-2026_03-45-58_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:45:58"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_zero_seed46-14-08-2026_04-10-50.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_zero_seed46-14-08-2026_04-10-50_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:10:50"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:22"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:55:49"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:46:50"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:09:29"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:15:56"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_mean_seed42-14-08-2026_02-48-08.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_mean_seed42-14-08-2026_02-48-08_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:48:08"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_mean_seed43-14-08-2026_02-56-02.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_mean_seed43-14-08-2026_02-56-02_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:56:02"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_mean_seed44-14-08-2026_03-44-41.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_mean_seed44-14-08-2026_03-44-41_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:44:41"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_mean_seed45-14-08-2026_04-09-20.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_mean_seed45-14-08-2026_04-09-20_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:09:20"
+    },
+    {
+      "cache_file": "cell_gt_discogp_ep_mean_seed46-14-08-2026_04-15-47.pkl",
+      "cache_manifest": "cell_gt_discogp_ep_mean_seed46-14-08-2026_04-15-47_manifest.json",
+      "cell": {
+        "task": "gt",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:15:47"
+    },
+    {
+      "cache_file": "cell_docstring_gt_resample_seed42-27-07-2026_17-30-14.pkl",
+      "cache_manifest": "cell_docstring_gt_resample_seed42-27-07-2026_17-30-14_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "gt",
+        "algo_key": "Official Circuit",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-07-27T17:30:14"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_zero_seed42-14-08-2026_02-35-29.pkl",
+      "cache_manifest": "cell_docstring_acdc_zero_seed42-14-08-2026_02-35-29_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:35:29"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_zero_seed43-14-08-2026_02-37-50.pkl",
+      "cache_manifest": "cell_docstring_acdc_zero_seed43-14-08-2026_02-37-50_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:37:50"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_zero_seed44-14-08-2026_03-25-35.pkl",
+      "cache_manifest": "cell_docstring_acdc_zero_seed44-14-08-2026_03-25-35_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:25:35"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_zero_seed45-14-08-2026_03-50-00.pkl",
+      "cache_manifest": "cell_docstring_acdc_zero_seed45-14-08-2026_03-50-00_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:50:00"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_zero_seed46-14-08-2026_03-57-26.pkl",
+      "cache_manifest": "cell_docstring_acdc_zero_seed46-14-08-2026_03-57-26_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:57:26"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_resample_seed42-14-08-2026_02-35-26.pkl",
+      "cache_manifest": "cell_docstring_acdc_resample_seed42-14-08-2026_02-35-26_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:35:26"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_resample_seed43-14-08-2026_03-25-45.pkl",
+      "cache_manifest": "cell_docstring_acdc_resample_seed43-14-08-2026_03-25-45_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:25:45"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_resample_seed44-14-08-2026_03-48-59.pkl",
+      "cache_manifest": "cell_docstring_acdc_resample_seed44-14-08-2026_03-48-59_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:59"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_resample_seed45-14-08-2026_03-55-25.pkl",
+      "cache_manifest": "cell_docstring_acdc_resample_seed45-14-08-2026_03-55-25_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:55:25"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_resample_seed46-14-08-2026_03-58-52.pkl",
+      "cache_manifest": "cell_docstring_acdc_resample_seed46-14-08-2026_03-58-52_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:58:52"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_mean_seed42-14-08-2026_02-35-38.pkl",
+      "cache_manifest": "cell_docstring_acdc_mean_seed42-14-08-2026_02-35-38_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:35:38"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_mean_seed43-14-08-2026_03-23-57.pkl",
+      "cache_manifest": "cell_docstring_acdc_mean_seed43-14-08-2026_03-23-57_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:23:57"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_mean_seed44-14-08-2026_03-48-42.pkl",
+      "cache_manifest": "cell_docstring_acdc_mean_seed44-14-08-2026_03-48-42_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:42"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_mean_seed45-14-08-2026_03-55-10.pkl",
+      "cache_manifest": "cell_docstring_acdc_mean_seed45-14-08-2026_03-55-10_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:55:10"
+    },
+    {
+      "cache_file": "cell_docstring_acdc_mean_seed46-14-08-2026_04-48-36.pkl",
+      "cache_manifest": "cell_docstring_acdc_mean_seed46-14-08-2026_04-48-36_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "acdc",
+        "algo_key": "ACDC [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:48:36"
+    },
+    {
+      "cache_file": "cell_docstring_eap_zero_seed42-14-08-2026_02-29-25.pkl",
+      "cache_manifest": "cell_docstring_eap_zero_seed42-14-08-2026_02-29-25_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:29:25"
+    },
+    {
+      "cache_file": "cell_docstring_eap_zero_seed43-14-08-2026_03-17-40.pkl",
+      "cache_manifest": "cell_docstring_eap_zero_seed43-14-08-2026_03-17-40_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:17:40"
+    },
+    {
+      "cache_file": "cell_docstring_eap_zero_seed44-14-08-2026_03-41-59.pkl",
+      "cache_manifest": "cell_docstring_eap_zero_seed44-14-08-2026_03-41-59_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:41:59"
+    },
+    {
+      "cache_file": "cell_docstring_eap_zero_seed45-14-08-2026_03-49-30.pkl",
+      "cache_manifest": "cell_docstring_eap_zero_seed45-14-08-2026_03-49-30_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:49:30"
+    },
+    {
+      "cache_file": "cell_docstring_eap_zero_seed46-14-08-2026_04-37-58.pkl",
+      "cache_manifest": "cell_docstring_eap_zero_seed46-14-08-2026_04-37-58_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:37:58"
+    },
+    {
+      "cache_file": "cell_docstring_eap_resample_seed42-14-08-2026_03-17-34.pkl",
+      "cache_manifest": "cell_docstring_eap_resample_seed42-14-08-2026_03-17-34_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:17:34"
+    },
+    {
+      "cache_file": "cell_docstring_eap_resample_seed43-14-08-2026_03-40-56.pkl",
+      "cache_manifest": "cell_docstring_eap_resample_seed43-14-08-2026_03-40-56_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:40:56"
+    },
+    {
+      "cache_file": "cell_docstring_eap_resample_seed44-14-08-2026_03-47-22.pkl",
+      "cache_manifest": "cell_docstring_eap_resample_seed44-14-08-2026_03-47-22_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:47:22"
+    },
+    {
+      "cache_file": "cell_docstring_eap_resample_seed45-14-08-2026_03-50-45.pkl",
+      "cache_manifest": "cell_docstring_eap_resample_seed45-14-08-2026_03-50-45_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:50:45"
+    },
+    {
+      "cache_file": "cell_docstring_eap_resample_seed46-14-08-2026_04-36-48.pkl",
+      "cache_manifest": "cell_docstring_eap_resample_seed46-14-08-2026_04-36-48_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:36:48"
+    },
+    {
+      "cache_file": "cell_docstring_eap_mean_seed42-14-08-2026_03-15-51.pkl",
+      "cache_manifest": "cell_docstring_eap_mean_seed42-14-08-2026_03-15-51_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:15:51"
+    },
+    {
+      "cache_file": "cell_docstring_eap_mean_seed43-14-08-2026_03-40-41.pkl",
+      "cache_manifest": "cell_docstring_eap_mean_seed43-14-08-2026_03-40-41_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:40:41"
+    },
+    {
+      "cache_file": "cell_docstring_eap_mean_seed44-14-08-2026_03-47-13.pkl",
+      "cache_manifest": "cell_docstring_eap_mean_seed44-14-08-2026_03-47-13_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:47:13"
+    },
+    {
+      "cache_file": "cell_docstring_eap_mean_seed45-14-08-2026_04-40-16.pkl",
+      "cache_manifest": "cell_docstring_eap_mean_seed45-14-08-2026_04-40-16_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:40:16"
+    },
+    {
+      "cache_file": "cell_docstring_eap_mean_seed46-14-08-2026_05-02-04.pkl",
+      "cache_manifest": "cell_docstring_eap_mean_seed46-14-08-2026_05-02-04_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "eap",
+        "algo_key": "Edge Attribution Patching [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T05:02:05"
+    },
+    {
+      "cache_file": "cell_docstring_ep_zero_seed42-14-08-2026_03-16-54.pkl",
+      "cache_manifest": "cell_docstring_ep_zero_seed42-14-08-2026_03-16-54_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:16:54"
+    },
+    {
+      "cache_file": "cell_docstring_ep_zero_seed43-14-08-2026_03-40-13.pkl",
+      "cache_manifest": "cell_docstring_ep_zero_seed43-14-08-2026_03-40-13_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:40:13"
+    },
+    {
+      "cache_file": "cell_docstring_ep_zero_seed44-14-08-2026_03-46-45.pkl",
+      "cache_manifest": "cell_docstring_ep_zero_seed44-14-08-2026_03-46-45_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:46:45"
+    },
+    {
+      "cache_file": "cell_docstring_ep_zero_seed45-14-08-2026_03-50-08.pkl",
+      "cache_manifest": "cell_docstring_ep_zero_seed45-14-08-2026_03-50-08_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:50:08"
+    },
+    {
+      "cache_file": "cell_docstring_ep_zero_seed46-14-08-2026_04-36-08.pkl",
+      "cache_manifest": "cell_docstring_ep_zero_seed46-14-08-2026_04-36-08_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:36:09"
+    },
+    {
+      "cache_file": "cell_docstring_ep_resample_seed42-14-08-2026_03-15-10.pkl",
+      "cache_manifest": "cell_docstring_ep_resample_seed42-14-08-2026_03-15-10_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:15:10"
+    },
+    {
+      "cache_file": "cell_docstring_ep_resample_seed43-14-08-2026_03-40-02.pkl",
+      "cache_manifest": "cell_docstring_ep_resample_seed43-14-08-2026_03-40-02_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:40:02"
+    },
+    {
+      "cache_file": "cell_docstring_ep_resample_seed44-14-08-2026_03-46-30.pkl",
+      "cache_manifest": "cell_docstring_ep_resample_seed44-14-08-2026_03-46-30_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:46:30"
+    },
+    {
+      "cache_file": "cell_docstring_ep_resample_seed45-14-08-2026_04-39-37.pkl",
+      "cache_manifest": "cell_docstring_ep_resample_seed45-14-08-2026_04-39-37_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:39:37"
+    },
+    {
+      "cache_file": "cell_docstring_ep_resample_seed46-14-08-2026_05-01-29.pkl",
+      "cache_manifest": "cell_docstring_ep_resample_seed46-14-08-2026_05-01-29_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T05:01:29"
+    },
+    {
+      "cache_file": "cell_docstring_ep_mean_seed42-14-08-2026_03-15-03.pkl",
+      "cache_manifest": "cell_docstring_ep_mean_seed42-14-08-2026_03-15-03_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:15:03"
+    },
+    {
+      "cache_file": "cell_docstring_ep_mean_seed43-14-08-2026_03-39-16.pkl",
+      "cache_manifest": "cell_docstring_ep_mean_seed43-14-08-2026_03-39-16_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:39:16"
+    },
+    {
+      "cache_file": "cell_docstring_ep_mean_seed44-14-08-2026_03-47-04.pkl",
+      "cache_manifest": "cell_docstring_ep_mean_seed44-14-08-2026_03-47-04_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:47:04"
+    },
+    {
+      "cache_file": "cell_docstring_ep_mean_seed45-14-08-2026_04-35-18.pkl",
+      "cache_manifest": "cell_docstring_ep_mean_seed45-14-08-2026_04-35-18_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:35:18"
+    },
+    {
+      "cache_file": "cell_docstring_ep_mean_seed46-14-08-2026_05-00-25.pkl",
+      "cache_manifest": "cell_docstring_ep_mean_seed46-14-08-2026_05-00-25_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "ep",
+        "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T05:00:25"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_zero_seed42-14-08-2026_02-51-10.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_zero_seed42-14-08-2026_02-51-10_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:51:10"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_zero_seed43-14-08-2026_02-58-44.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_zero_seed43-14-08-2026_02-58-44_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:58:44"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_zero_seed44-14-08-2026_03-01-29.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_zero_seed44-14-08-2026_03-01-29_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:01:29"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_zero_seed45-14-08-2026_03-48-56.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_zero_seed45-14-08-2026_03-48-56_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:48:56"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_zero_seed46-14-08-2026_04-13-52.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_zero_seed46-14-08-2026_04-13-52_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [zero]",
+        "ablation": "zero",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:13:52"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_resample_seed42-14-08-2026_02-51-31.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_resample_seed42-14-08-2026_02-51-31_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:51:31"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_resample_seed43-14-08-2026_02-58-45.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_resample_seed43-14-08-2026_02-58-45_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:58:45"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_resample_seed44-14-08-2026_03-49-48.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_resample_seed44-14-08-2026_03-49-48_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:49:48"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_resample_seed45-14-08-2026_04-12-30.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_resample_seed45-14-08-2026_04-12-30_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:12:31"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_resample_seed46-14-08-2026_04-18-56.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_resample_seed46-14-08-2026_04-18-56_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [resample]",
+        "ablation": "resample",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:18:56"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_mean_seed42-14-08-2026_02-51-10.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_mean_seed42-14-08-2026_02-51-10_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 42,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:51:10"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_mean_seed43-14-08-2026_02-59-02.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_mean_seed43-14-08-2026_02-59-02_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 43,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T02:59:02"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_mean_seed44-14-08-2026_03-47-42.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_mean_seed44-14-08-2026_03-47-42_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 44,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T03:47:42"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_mean_seed45-14-08-2026_04-12-21.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_mean_seed45-14-08-2026_04-12-21_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 45,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:12:21"
+    },
+    {
+      "cache_file": "cell_docstring_discogp_ep_mean_seed46-14-08-2026_04-18-44.pkl",
+      "cache_manifest": "cell_docstring_discogp_ep_mean_seed46-14-08-2026_04-18-44_manifest.json",
+      "cell": {
+        "task": "docstring",
+        "algo": "discogp-ep",
+        "algo_key": "DiscoGP Edge Only Paper [tokenwise mean corrupt]",
+        "ablation": "mean",
+        "seed": 46,
+        "null_test": false
+      },
+      "saved_at": "2026-08-14T04:18:44"
+    }
+  ],
+  "manual_positives": {
+    "ioi": 739,
+    "gt": 235,
+    "docstring": 24
+  },
+  "native_discovery_ablation": {
+    "ioi": "mean",
+    "gt": "resample",
+    "docstring": "resample"
+  },
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "candidate_edges": "all entries of each PruneScores tensor, aligned by module name and tensor shape",
+  "score": "absolute edge score",
+  "labels": "positive iff deterministic official-circuit cache score is 1",
+  "auc": "Mann-Whitney probability; scipy average ranks give half credit for ties; sample SD (ddof=1)",
+  "roc": "all distinct scores, tied blocks together; linear interpolation at the highest TPR on 1001 common FPR points; average and five-run min-max",
+  "all_tied_auc": 0.5,
+  "independent_auc_check": {
+    "cell": "ioi/acdc/mean/42",
+    "rank_auc": 0.9238495967223656,
+    "scipy_mannwhitneyu_auc": 0.9238495967223656
+  },
+  "acdc_selected_boundary_check": [
+    {
+      "task": "ioi",
+      "ablation": "zero",
+      "seed": 42,
+      "tau": 0.009000000000000001,
+      "realised": 541,
+      "summary_mean": 597.6
+    },
+    {
+      "task": "ioi",
+      "ablation": "zero",
+      "seed": 43,
+      "tau": 0.009000000000000001,
+      "realised": 575,
+      "summary_mean": 597.6
+    },
+    {
+      "task": "ioi",
+      "ablation": "zero",
+      "seed": 44,
+      "tau": 0.009000000000000001,
+      "realised": 630,
+      "summary_mean": 597.6
+    },
+    {
+      "task": "ioi",
+      "ablation": "zero",
+      "seed": 45,
+      "tau": 0.009000000000000001,
+      "realised": 590,
+      "summary_mean": 597.6
+    },
+    {
+      "task": "ioi",
+      "ablation": "zero",
+      "seed": 46,
+      "tau": 0.009000000000000001,
+      "realised": 652,
+      "summary_mean": 597.6
+    },
+    {
+      "task": "ioi",
+      "ablation": "resample",
+      "seed": 42,
+      "tau": 0.0007,
+      "realised": 596,
+      "summary_mean": 625.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "resample",
+      "seed": 43,
+      "tau": 0.0007,
+      "realised": 613,
+      "summary_mean": 625.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "resample",
+      "seed": 44,
+      "tau": 0.0007,
+      "realised": 667,
+      "summary_mean": 625.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "resample",
+      "seed": 45,
+      "tau": 0.0007,
+      "realised": 589,
+      "summary_mean": 625.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "resample",
+      "seed": 46,
+      "tau": 0.0007,
+      "realised": 662,
+      "summary_mean": 625.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "mean",
+      "seed": 42,
+      "tau": 0.003,
+      "realised": 832,
+      "summary_mean": 888.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "mean",
+      "seed": 43,
+      "tau": 0.003,
+      "realised": 931,
+      "summary_mean": 888.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "mean",
+      "seed": 44,
+      "tau": 0.003,
+      "realised": 887,
+      "summary_mean": 888.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "mean",
+      "seed": 45,
+      "tau": 0.003,
+      "realised": 891,
+      "summary_mean": 888.4
+    },
+    {
+      "task": "ioi",
+      "ablation": "mean",
+      "seed": 46,
+      "tau": 0.003,
+      "realised": 901,
+      "summary_mean": 888.4
+    },
+    {
+      "task": "gt",
+      "ablation": "zero",
+      "seed": 42,
+      "tau": 0.01,
+      "realised": 258,
+      "summary_mean": 251.4
+    },
+    {
+      "task": "gt",
+      "ablation": "zero",
+      "seed": 43,
+      "tau": 0.01,
+      "realised": 226,
+      "summary_mean": 251.4
+    },
+    {
+      "task": "gt",
+      "ablation": "zero",
+      "seed": 44,
+      "tau": 0.01,
+      "realised": 259,
+      "summary_mean": 251.4
+    },
+    {
+      "task": "gt",
+      "ablation": "zero",
+      "seed": 45,
+      "tau": 0.01,
+      "realised": 261,
+      "summary_mean": 251.4
+    },
+    {
+      "task": "gt",
+      "ablation": "zero",
+      "seed": 46,
+      "tau": 0.01,
+      "realised": 253,
+      "summary_mean": 251.4
+    },
+    {
+      "task": "gt",
+      "ablation": "resample",
+      "seed": 42,
+      "tau": 0.0005,
+      "realised": 269,
+      "summary_mean": 261.2
+    },
+    {
+      "task": "gt",
+      "ablation": "resample",
+      "seed": 43,
+      "tau": 0.0005,
+      "realised": 258,
+      "summary_mean": 261.2
+    },
+    {
+      "task": "gt",
+      "ablation": "resample",
+      "seed": 44,
+      "tau": 0.0005,
+      "realised": 257,
+      "summary_mean": 261.2
+    },
+    {
+      "task": "gt",
+      "ablation": "resample",
+      "seed": 45,
+      "tau": 0.0005,
+      "realised": 266,
+      "summary_mean": 261.2
+    },
+    {
+      "task": "gt",
+      "ablation": "resample",
+      "seed": 46,
+      "tau": 0.0005,
+      "realised": 256,
+      "summary_mean": 261.2
+    },
+    {
+      "task": "gt",
+      "ablation": "mean",
+      "seed": 42,
+      "tau": 0.0007,
+      "realised": 192,
+      "summary_mean": 190.4
+    },
+    {
+      "task": "gt",
+      "ablation": "mean",
+      "seed": 43,
+      "tau": 0.0007,
+      "realised": 201,
+      "summary_mean": 190.4
+    },
+    {
+      "task": "gt",
+      "ablation": "mean",
+      "seed": 44,
+      "tau": 0.0007,
+      "realised": 190,
+      "summary_mean": 190.4
+    },
+    {
+      "task": "gt",
+      "ablation": "mean",
+      "seed": 45,
+      "tau": 0.0007,
+      "realised": 184,
+      "summary_mean": 190.4
+    },
+    {
+      "task": "gt",
+      "ablation": "mean",
+      "seed": 46,
+      "tau": 0.0007,
+      "realised": 185,
+      "summary_mean": 190.4
+    },
+    {
+      "task": "docstring",
+      "ablation": "zero",
+      "seed": 42,
+      "tau": 0.09,
+      "realised": 113,
+      "summary_mean": 99.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "zero",
+      "seed": 43,
+      "tau": 0.09,
+      "realised": 100,
+      "summary_mean": 99.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "zero",
+      "seed": 44,
+      "tau": 0.09,
+      "realised": 101,
+      "summary_mean": 99.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "zero",
+      "seed": 45,
+      "tau": 0.09,
+      "realised": 87,
+      "summary_mean": 99.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "zero",
+      "seed": 46,
+      "tau": 0.09,
+      "realised": 98,
+      "summary_mean": 99.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "resample",
+      "seed": 42,
+      "tau": 0.09,
+      "realised": 24,
+      "summary_mean": 23.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "resample",
+      "seed": 43,
+      "tau": 0.09,
+      "realised": 27,
+      "summary_mean": 23.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "resample",
+      "seed": 44,
+      "tau": 0.09,
+      "realised": 22,
+      "summary_mean": 23.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "resample",
+      "seed": 45,
+      "tau": 0.09,
+      "realised": 22,
+      "summary_mean": 23.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "resample",
+      "seed": 46,
+      "tau": 0.09,
+      "realised": 24,
+      "summary_mean": 23.8
+    },
+    {
+      "task": "docstring",
+      "ablation": "mean",
+      "seed": 42,
+      "tau": 0.07,
+      "realised": 23,
+      "summary_mean": 23.0
+    },
+    {
+      "task": "docstring",
+      "ablation": "mean",
+      "seed": 43,
+      "tau": 0.07,
+      "realised": 23,
+      "summary_mean": 23.0
+    },
+    {
+      "task": "docstring",
+      "ablation": "mean",
+      "seed": 44,
+      "tau": 0.07,
+      "realised": 21,
+      "summary_mean": 23.0
+    },
+    {
+      "task": "docstring",
+      "ablation": "mean",
+      "seed": 45,
+      "tau": 0.07,
+      "realised": 23,
+      "summary_mean": 23.0
+    },
+    {
+      "task": "docstring",
+      "ablation": "mean",
+      "seed": 46,
+      "tau": 0.07,
+      "realised": 25,
+      "summary_mean": 23.0
+    }
+  ],
+  "summary_sha256": "eed0490613bd253a170d35345c0780a20ddd2faa47ea4bc7c6a0af8039c1ec9e"
+}

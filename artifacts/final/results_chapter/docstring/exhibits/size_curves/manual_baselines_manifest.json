@@ -1,0 +1,34 @@
+{
+  "evaluation_protocol_id": "b85175abf8516ecc77e33a5bc25fca9a80a4ab77937d33b45769dd93fabac230",
+  "temporary_historical_repair": true,
+  "sources": [
+    {
+      "task_key": "docstring",
+      "task_name": "Docstring",
+      "cache": ".prune_scores/final/benchmark/cell_docstring_gt_resample_seed42-27-07-2026_17-30-14.pkl",
+      "cache_sha256": "207eb9e49040b5595af28f91a2e44d50664db8318f9b4deefac5be8c9dc727ed",
+      "manifest": ".prune_scores/final/benchmark/cell_docstring_gt_resample_seed42-27-07-2026_17-30-14_manifest.json",
+      "manifest_sha256": "6aed675aa57c1e00cdf6b0df9b10fe6dae1e2d0192030e81f1bd7f077ba79c9a",
+      "ablation": "resample",
+      "positive_edges": 24
+    }
+  ],
+  "metrics": {
+    "ioi": [
+      "Clean KL Div",
+      "Logit Diff Percent",
+      "Correct Answer Greater Than Incorrect Percent"
+    ],
+    "gt": [
+      "Clean KL Div",
+      "Logit Diff Percent"
+    ],
+    "docstring": [
+      "Clean KL Div",
+      "Correct Answer Greater Than Incorrect Percent"
+    ]
+  },
+  "test_loader": "Explicit temporary evaluation Task (256 examples)",
+  "patch_type": "Tree Patch",
+  "selection": "all binary-positive edges in each canonical deterministic official circuit cache"
+}

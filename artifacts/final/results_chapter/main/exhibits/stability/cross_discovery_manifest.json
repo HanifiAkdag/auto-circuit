@@ -1,0 +1,3042 @@
+{
+  "section": "Results 4.3.2",
+  "generator": "experiments/thesis/results_chapter_cross_discovery.py",
+  "generator_sha256": "1d5f49ff4fbd86ba769cdc3be38cb08a6dcd4d2cb875b73bc513b119341aa997",
+  "git": {
+    "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+    "dirty": true,
+    "dirty_files": [
+      "auto_circuit/prune_algos/edge_pruning.py",
+      "experiments/thesis/results_chapter_evaluation_ablation.py",
+      "experiments/thesis/run_cell.py",
+      "tests/prune_algos/test_edge_pruning_components.py",
+      "tests/test_run_cell_identity.py",
+      "tests/prune_algos/test_edge_pruning_kl.py"
+    ]
+  },
+  "source_sha256": {
+    "manifest.json": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+    "structural.csv": "bb167900cca264967d483cf6aac45e327e849e35075f4deff49197e28827e0ff",
+    "summary.csv": "77fa8d8cb7f32b4af91d96a44640a21333696d4f11c6c16f71c6576266f446fe",
+    "functional.csv": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d"
+  },
+  "selected_rows_sha256": "572dc77ba4d3726a12a76f5eb453e29ae52ea81b391af0c32169d2e18df4528a",
+  "cache_sources": [
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:42:02",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed42-15-08-2026_05-42-02_manifest.json",
+      "manifest_sha256": "e0fb35526b47a0eb1081b28a63de7cfb18d68489c8f4ca64a5dce3497465ad14",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed42-15-08-2026_05-42-02.pkl",
+      "scores_sha256": "af9860522392cf7bbef7fe0b3352b7fd88f22e5c8354910b19267a39f496e351",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:43:30",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed43-15-08-2026_05-43-30_manifest.json",
+      "manifest_sha256": "f80e27c18883570ee291f46966c378fdfff1d9b1779b8927c658707f125f5acb",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed43-15-08-2026_05-43-30.pkl",
+      "scores_sha256": "c98011847077d8dfc74457429931d4d745adf2bf2b6e9e79918753ebd9bfabf6",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:45:03",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed44-15-08-2026_05-45-02_manifest.json",
+      "manifest_sha256": "c77e468f2502dece02f7339f2a1bd0fcd374d1f6eb2b1c6f17512c5b0d3dc558",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed44-15-08-2026_05-45-02.pkl",
+      "scores_sha256": "91f736960de500c464533647aa46f92357af8c5b2846d0c22261181a2cffe759",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:46:37",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed45-15-08-2026_05-46-37_manifest.json",
+      "manifest_sha256": "97d8317c9792302e278791d577c25d2b3a8d9820c2ead311e877bfcfc883bd88",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed45-15-08-2026_05-46-37.pkl",
+      "scores_sha256": "84cc82a078103dc104f9fc5b1bacf46c6b9ce94eb9d16b157ae20222b487251c",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:48:14",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed46-15-08-2026_05-48-14_manifest.json",
+      "manifest_sha256": "283b50aa3fcef2807c9a6ebb764489ad1d59d949428eb53ab4eb2b059102d263",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_mean_seed46-15-08-2026_05-48-14.pkl",
+      "scores_sha256": "e3289a28f747dbab8dd49f099a92b122ce70b4b8cf6ee21b13ad5ce316427bec",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:41:47",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed42-15-08-2026_05-41-47_manifest.json",
+      "manifest_sha256": "bf189c035764e294483bf418786fc24cb756422803039a9ee13db2734e3ecb8d",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed42-15-08-2026_05-41-47.pkl",
+      "scores_sha256": "08696c89b4b1be1cd4c59159861bd9a9a35ca83058c8095cf894345e4e5a9bfe",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:43:17",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed43-15-08-2026_05-43-17_manifest.json",
+      "manifest_sha256": "865312b2e13d5d7579e6200306e419f5a3c5e97da441da5eba7e712c2d3aba82",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed43-15-08-2026_05-43-17.pkl",
+      "scores_sha256": "7343f4faca1d9c767014712d8b053efe982e9e3eb1683675a04d36408b241176",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:44:46",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed44-15-08-2026_05-44-46_manifest.json",
+      "manifest_sha256": "b3bf9ef2e39fc3398437c569c520bc20d085f3241cc2252818bfc461633a0c7c",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed44-15-08-2026_05-44-46.pkl",
+      "scores_sha256": "f8c0db48dd5ca863bfd83bd7909f2d16f9631c50a208b82e904073fcb2a6c87a",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:46:21",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed45-15-08-2026_05-46-21_manifest.json",
+      "manifest_sha256": "b006f5a178498a766d1a51b9c4525338a89c2c2048513a9e45717449bd1ffedc",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed45-15-08-2026_05-46-21.pkl",
+      "scores_sha256": "0b770e44009cfdc345372db37fba3bc87409ab3de5a9e8958ee7b5d30525fdc9",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:48:00",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed46-15-08-2026_05-48-00_manifest.json",
+      "manifest_sha256": "5822d8f101e8d3c83b6a534bb1bdf31c18c29c497b097f7110c4dd864132960d",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_resample_seed46-15-08-2026_05-48-00.pkl",
+      "scores_sha256": "7329756203c64b2567b28b74b92e758722c0bf185fa69e1c020135a174895ebc",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:41:33",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed42-15-08-2026_05-41-33_manifest.json",
+      "manifest_sha256": "f5016681f2cd6b1f5f0cd646d6febaa9031b8b853f353ca1a7bd38f287e558dc",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed42-15-08-2026_05-41-33.pkl",
+      "scores_sha256": "efe05eed4116239d5f5cf4e82d5f13b8b256457fa43aedc11d79e0ab38baced2",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:43:03",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed43-15-08-2026_05-43-03_manifest.json",
+      "manifest_sha256": "b81c8b3204562884cdbf04f5d28752b26bcfb456dbadf59a4e3f20f9388b93b1",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed43-15-08-2026_05-43-03.pkl",
+      "scores_sha256": "76c2ea24160d8bf6d5c91561adf5794ba62b7c8b9039b26b39a0303829646f5f",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:44:30",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed44-15-08-2026_05-44-30_manifest.json",
+      "manifest_sha256": "ac27c816f183f85c8b810b26c76d32f0521f57715db81f5fb01e36f81a90ce84",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed44-15-08-2026_05-44-30.pkl",
+      "scores_sha256": "e47f86b9ccaa22a4fc1b1df13ff3bd715f584b1ea472ea9d07f11b076d2b518d",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:46:05",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed45-15-08-2026_05-46-05_manifest.json",
+      "manifest_sha256": "264c8a844eda629d31c05be424851c7f0a7e1e05ddaf1f47081bccb909a46561",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed45-15-08-2026_05-46-05.pkl",
+      "scores_sha256": "aa33ed6a1fe9ff49d74c68e4eeef24e16b12ee6cdf399413b1c35a56e4bf69d8",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:47:40",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed46-15-08-2026_05-47-40_manifest.json",
+      "manifest_sha256": "ca7a25fd228f5bfe2fa53b857481ff2c68b44c43756eb8dd299fa5b9474cd970",
+      "scores": ".prune_scores/final/benchmark/cell_gt_acdc_zero_seed46-15-08-2026_05-47-40.pkl",
+      "scores_sha256": "befce7afae8e85816e870961db3a393fdaa3eb586e15490aec049ff93d722123",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:48:08",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed42-14-08-2026_02-48-08_manifest.json",
+      "manifest_sha256": "0dfb75418ba2aed8534865d411af4fd419f85e9689ec5304a66de92982e90686",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed42-14-08-2026_02-48-08.pkl",
+      "scores_sha256": "a6748be8378851ffbc65aa0dd3d5a7f0fae38f2de94c752b18842f7959c5dbb2",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:56:02",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed43-14-08-2026_02-56-02_manifest.json",
+      "manifest_sha256": "ea93db36e039b3469350a3f55a735a1fef4038121d7036beb9265011b4462dcf",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed43-14-08-2026_02-56-02.pkl",
+      "scores_sha256": "57c204347b1d884277e1b58338cc1312954a1b4c72d1329db07ba32f90a8075f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:44:41",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed44-14-08-2026_03-44-41_manifest.json",
+      "manifest_sha256": "3793c4d61f8fc6c7ad014e81a1e9999447ba7e683804b3ef6f0547afb0a15601",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed44-14-08-2026_03-44-41.pkl",
+      "scores_sha256": "84ccdfc183613a619260a9bf26fdaf718e61118b60d435e32f0d8fd8e92f5ca3",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:09:20",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed45-14-08-2026_04-09-20_manifest.json",
+      "manifest_sha256": "eeaaac7245abf6da1f8acfaeae2327e47ef3d073dde5e79a4f979eb0f2ecbb60",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed45-14-08-2026_04-09-20.pkl",
+      "scores_sha256": "b4bd9ab17eec85939fe533cc89c8979af54199130c225526ab348ce9d81d537f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:15:47",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed46-14-08-2026_04-15-47_manifest.json",
+      "manifest_sha256": "1ce2868827a6bfe6b623524aece9dfc6e4834e295492a59fabf6e1648691758d",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_mean_seed46-14-08-2026_04-15-47.pkl",
+      "scores_sha256": "3bcc53b2107b70fc6aeccb9b13c98af5ff1da708c8e1f0744b0e7e3dbaebb155",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:48:22",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22_manifest.json",
+      "manifest_sha256": "a20cd215daa19d1cf7104c4469a71561ac2f9ffe5083cfed85bbd5d1001d7f28",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed42-14-08-2026_02-48-22.pkl",
+      "scores_sha256": "c05bf1c718ffd0efa4dc0f3f69290d4ae53eb027d287a3446d6eb5bedddfe59c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:55:49",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49_manifest.json",
+      "manifest_sha256": "947b0b203d4f7951b438081df8f128c9788d7988561696d12a4e74a18e713d5d",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed43-14-08-2026_02-55-49.pkl",
+      "scores_sha256": "4bdb473ee67e13544a41e6726c270730a2aaaf8264527980df569ed032f69253",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:46:50",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50_manifest.json",
+      "manifest_sha256": "ea3d6ae5955a31ef93bac066cff3c7c086ac02b03adf3ceb47edbb82bd67f735",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed44-14-08-2026_03-46-50.pkl",
+      "scores_sha256": "a1bafd17f2687139a1cf983118e96fbab74c07eb39ce2e83b07c753bd06d884f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:09:29",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29_manifest.json",
+      "manifest_sha256": "3e5769a98a969d8dcded91b93602d18dad253de036474bdc4143c088f9f7d0e7",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed45-14-08-2026_04-09-29.pkl",
+      "scores_sha256": "073601ff72584bef937a4891bb9d6c29febed92cb5e93f5b89a37cff738983d7",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:15:56",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56_manifest.json",
+      "manifest_sha256": "15561ebe7f6d6913a9de4075be0497dc750fe11799156858aadd188389700169",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_resample_seed46-14-08-2026_04-15-56.pkl",
+      "scores_sha256": "4cc7e055e881206bdbfffcc3dffef2bd9784f29889773cee36c12d1e1103d504",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:48:05",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed42-14-08-2026_02-48-05_manifest.json",
+      "manifest_sha256": "e7ba173f1006dd3375db89f1b289399c8adbb9c1d7f2202856c5fe3758566a81",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed42-14-08-2026_02-48-05.pkl",
+      "scores_sha256": "b38b2d9707a8db84e40ea19f9e7becc7d158663efb079aea551968f644c66c49",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:55:45",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed43-14-08-2026_02-55-45_manifest.json",
+      "manifest_sha256": "320d5e1595a65a1bc6cc565d1d15d1e4f5d15c3aec84799ac6df3531e8c19753",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed43-14-08-2026_02-55-45.pkl",
+      "scores_sha256": "0377323799045967b42a85556e2b3d4136ff8fc4c0a89bb7b23bbd02097e1bab",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T02:58:28",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed44-14-08-2026_02-58-28_manifest.json",
+      "manifest_sha256": "eedd1fef70140b56279b97cbe8e42b62bd917a9be90058b5c89e7fa886aca872",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed44-14-08-2026_02-58-28.pkl",
+      "scores_sha256": "4ed1b113f86cdfe3c7df727120d31c6b004b471788e2a92c0f902a34272c4f1d",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:45:58",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed45-14-08-2026_03-45-58_manifest.json",
+      "manifest_sha256": "5da1ce5af986b2483d888d32d8bfbdbd55075c34e5b7d9a17bb3b74ad3795714",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed45-14-08-2026_03-45-58.pkl",
+      "scores_sha256": "61cba9335d33168ed930a1407dd8c861ae102afad641b7cb25b931e21b7cad22",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:10:50",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed46-14-08-2026_04-10-50_manifest.json",
+      "manifest_sha256": "29b2ee63acd5310294ae2ef52dcfbfe8c8d500362a665be85b3804d61cc3b645",
+      "scores": ".prune_scores/final/benchmark/cell_gt_discogp_ep_zero_seed46-14-08-2026_04-10-50.pkl",
+      "scores_sha256": "0b48c478493d1e58465bf463a5fc7d0aaa9011e33c78046da57829c13b8193f9",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:29:00",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed42-14-08-2026_02-29-00_manifest.json",
+      "manifest_sha256": "fb8ccee37d07fa7c6715e9f1f4cce5e27a4f0397ce6b7c8d0d7dad01c517082c",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed42-14-08-2026_02-29-00.pkl",
+      "scores_sha256": "52b10b67097ba94c95022dcde68c1772660ecaffd986fed7e7e23bfc4fe2811b",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:17:20",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed43-14-08-2026_03-17-19_manifest.json",
+      "manifest_sha256": "cd4329fd99f23067bfd2bc0b95f1c6f7d5c20f4a273e7cc1dc126cf1ac55ca6e",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed43-14-08-2026_03-17-19.pkl",
+      "scores_sha256": "7d8f930c486940702dc990d0f260543731f880db1b18d777b4bd92d7d7574da7",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:42:04",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed44-14-08-2026_03-42-04_manifest.json",
+      "manifest_sha256": "04abeec60a1b079602d75ad9ffe45bf0015e323957316422a1e58823ad20fb4e",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed44-14-08-2026_03-42-04.pkl",
+      "scores_sha256": "7d93214cb0a6449b596f2515766c8d86057e696f8387c0e7accf0102c6f5ee49",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:48:33",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed45-14-08-2026_03-48-33_manifest.json",
+      "manifest_sha256": "b13f40d058de3823143536550de2e249eda6449fd643a3db79d452f3e61e0753",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed45-14-08-2026_03-48-33.pkl",
+      "scores_sha256": "a75956d7af500c956ed36418635811e7036a4a616a2a7c0e89db67f8d2a39c15",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:41:46",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed46-14-08-2026_04-41-46_manifest.json",
+      "manifest_sha256": "953398759e13fffe2ded03dc6732821a4e4617ad8b4ad6edcd8c09e811c5fb0b",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_mean_seed46-14-08-2026_04-41-46.pkl",
+      "scores_sha256": "44852d6448a7934bb6551d0e21c7f02e6a781f2261026ed79a623d2b0eb1a349",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:28:54",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed42-14-08-2026_02-28-54_manifest.json",
+      "manifest_sha256": "36e082b1c3511cdfd47feb52e2bda61dfeee5f12e19d9382cbf749d3d932f603",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed42-14-08-2026_02-28-54.pkl",
+      "scores_sha256": "c6ed1336e5ec0a37e554e40d2d5b33baf2b73b1f25bcd824d081b953cd2c67c8",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:18:59",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed43-14-08-2026_03-18-59_manifest.json",
+      "manifest_sha256": "c760b20c9937416c02df745356221b200c38130a743f01d312c73a8ce5b86318",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed43-14-08-2026_03-18-59.pkl",
+      "scores_sha256": "dcdd71abf9f4a40b043d234e4d24c29beb7607286b89c0139fde7236357f2488",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:42:26",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed44-14-08-2026_03-42-26_manifest.json",
+      "manifest_sha256": "d873d7f902e3b833a74fde40ace79297e86b03aae1c43394607ad60385635708",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed44-14-08-2026_03-42-26.pkl",
+      "scores_sha256": "d7c63a133629c40f3b3d9fe96f370c3c8e62d7dd246ae18105ea8663c5775722",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:48:44",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed45-14-08-2026_03-48-44_manifest.json",
+      "manifest_sha256": "26e6ec6208016c1e6453f04cb75a197179490144155929cc1d01d5ea49327642",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed45-14-08-2026_03-48-44.pkl",
+      "scores_sha256": "d0d25e0278506ba5e096eb5cd36c150fab59d6906fd1ab4a8de4addc4555d527",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T03:52:16",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed46-14-08-2026_03-52-16_manifest.json",
+      "manifest_sha256": "6e7c1ccf9327069fc64ee6085589a5fb604000cd8883790f6189059e7653513e",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_resample_seed46-14-08-2026_03-52-16.pkl",
+      "scores_sha256": "090edcc17fb27bb2663f3e7c221981a6f54523ef28959ef03fdfb13f8bf570fb",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:28:57",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed42-14-08-2026_02-28-57_manifest.json",
+      "manifest_sha256": "4d7855d62ebf2cccf2dd7f82e9de8bc27522fe71a5639abd6b8f91ed91c345a8",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed42-14-08-2026_02-28-57.pkl",
+      "scores_sha256": "ad43223926e0f7b1a7cf8097436d21b731f144ab3ea9f40044b79e947e7c3dd8",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:30:59",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed43-14-08-2026_02-30-59_manifest.json",
+      "manifest_sha256": "b592c842e85a24891b5c049caee8a1caf487952cbe94acbf91f946d9987789f8",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed43-14-08-2026_02-30-59.pkl",
+      "scores_sha256": "fed3b4df05d3d79fef87a53a33b5ff2cfc5f4328cd2cde5625e5927985e7319d",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:19:03",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed44-14-08-2026_03-19-03_manifest.json",
+      "manifest_sha256": "55021df75f9283a8bc17ba622098438edf4c7a91c721213e29f8625f1f5e464b",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed44-14-08-2026_03-19-03.pkl",
+      "scores_sha256": "c8be9b21f3ed186d09fe194ebb745c6c13d706e1e740c0dfe32efd77dc46f346",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:43:21",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed45-14-08-2026_03-43-21_manifest.json",
+      "manifest_sha256": "36b0617a29374e4b3a37da1098224364c5cb1ae44b8dc044154b389714ff7093",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed45-14-08-2026_03-43-21.pkl",
+      "scores_sha256": "273a3b3665cb505d1771d299255784f52cdcaa6d8280ec21ff11595b7613e4d5",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T03:50:52",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed46-14-08-2026_03-50-52_manifest.json",
+      "manifest_sha256": "3dd724f0fc4a2bf5b6119d4959db3bb6ce6572d6dfe0d58cd2a59787cce468b5",
+      "scores": ".prune_scores/final/benchmark/cell_gt_eap_zero_seed46-14-08-2026_03-50-52.pkl",
+      "scores_sha256": "865ab0b1fa57ef6e6b0569669f42b3dbe08f974c07bad5cf96d53687b348cacb",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-10-17T16:30:05",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed42_klvocabe30782d1f085-17-10-2026_16-30-05_manifest.json",
+      "manifest_sha256": "770bedb3c6016c8224fcee9c9e04b0eb00bed34eb80f80f836fe94afb25d8924",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed42_klvocabe30782d1f085-17-10-2026_16-30-05.pkl",
+      "scores_sha256": "3b08932c3495f2afe6dbcbf9425bd88c1c0307dda8b8aed8da0d92ba81b2be33",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-10-17T17:28:43",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed43_klvocabe30782d1f085-17-10-2026_17-28-43_manifest.json",
+      "manifest_sha256": "47980594b5b786e6d0180d3fd9ab4db2913abf868e43fa3b423333f571b43a3f",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed43_klvocabe30782d1f085-17-10-2026_17-28-43.pkl",
+      "scores_sha256": "a2fcdec2db2259ea893417bc26ca8659313000a30a2b04c0fdf6df7d230447bc",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-10-17T17:44:38",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed44_klvocabe30782d1f085-17-10-2026_17-44-38_manifest.json",
+      "manifest_sha256": "27e51e502686a714e985037468a2f40d4c6275bf6cb0dc43f481893726e464e2",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed44_klvocabe30782d1f085-17-10-2026_17-44-38.pkl",
+      "scores_sha256": "bfcde3844737892ba14c9b0f0db43ce79385f5c6853a6c5ecfb9ed3eb1596200",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-10-17T17:59:26",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed45_klvocabe30782d1f085-17-10-2026_17-59-26_manifest.json",
+      "manifest_sha256": "4c30ba9e7d8446414a713b17d6bf4b0b37914114371fea891a85875112bc2c0a",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed45_klvocabe30782d1f085-17-10-2026_17-59-26.pkl",
+      "scores_sha256": "3c677df235e5052673f3fa5bbcca5cf4b383a57824f474a414ecb7f410b9086e",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-10-17T18:04:48",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed46_klvocabe30782d1f085-17-10-2026_18-04-48_manifest.json",
+      "manifest_sha256": "039c2d84bc94bf085ec4eb3cded9717d76dd99d51cfaca857545f45f7c22b793",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_mean_seed46_klvocabe30782d1f085-17-10-2026_18-04-48.pkl",
+      "scores_sha256": "8dbf898901ec513c4e3ccc4d1bbc55ecc649c9151dd09617d18465cf7a999691",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-10-17T16:12:01",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00_manifest.json",
+      "manifest_sha256": "37d4018a16141b3ce6d683abde3840abea245b5e22a46861ca9a5585e0588b6d",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed42_klvocabe30782d1f085-17-10-2026_16-12-00.pkl",
+      "scores_sha256": "3f93ca0957a5f36f1ded541dba1c9e61dfd654219bc6eb6d28e42856cde36d80",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-10-17T18:38:29",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29_manifest.json",
+      "manifest_sha256": "45ed57ab05e50b8ed83b9262648c9cf3919af434cec5d53dff7ce570a7f3f996",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed43_klvocabe30782d1f085-17-10-2026_18-38-29.pkl",
+      "scores_sha256": "ecfcd314a27b6b942ada0a649720ffc37adeed94a13da0557d48f5b6ecc078cb",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-10-17T18:46:19",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19_manifest.json",
+      "manifest_sha256": "2d2f272cafd9ef25cb966f856aaf62d46baa21bcdc97ce620bc2a7cd31e7d11a",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed44_klvocabe30782d1f085-17-10-2026_18-46-19.pkl",
+      "scores_sha256": "c9ad8f3da7d55f11818c112217505391c2e9a97883ab4b9efea32f523beba1a3",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-10-17T18:55:04",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04_manifest.json",
+      "manifest_sha256": "be347b1e16deecbfde4df82776c26a014fc9eafdddc76e113e2ac76c09e08091",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed45_klvocabe30782d1f085-17-10-2026_18-55-04.pkl",
+      "scores_sha256": "4abee59c189bb07666fb7d78f7474e092b7151ca07fb9d5205f69a11d7efeb76",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-10-17T18:58:41",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41_manifest.json",
+      "manifest_sha256": "c7c9eece6b62aa5771dba3db2438aaf8c8a5c6cc17839838344a8f731a218f21",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_resample_seed46_klvocabe30782d1f085-17-10-2026_18-58-41.pkl",
+      "scores_sha256": "427f2337a985c646e08fb483d93d1c79dca2d38d25b08b21cae71f2f17431b18",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-10-17T19:04:23",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed42_klvocabe30782d1f085-17-10-2026_19-04-23_manifest.json",
+      "manifest_sha256": "8ed6b595e2cd6eba4e95910420e34883f5f90a8db269d3ad580b9c1ece833183",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed42_klvocabe30782d1f085-17-10-2026_19-04-23.pkl",
+      "scores_sha256": "297399d606c945f3e83dc730b93f7e6d83afa3994119dedeb88de5cffe8f0ee8",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-10-17T19:29:45",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed43_klvocabe30782d1f085-17-10-2026_19-29-45_manifest.json",
+      "manifest_sha256": "43eafe948d362930f80a05ea6484a667ced498be03618d02c9cc429bc80ea53e",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed43_klvocabe30782d1f085-17-10-2026_19-29-45.pkl",
+      "scores_sha256": "c72ea6a6987b37ab83d1229c1d3d4f680737ffb26de9f98f8be883942cf17497",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-10-17T19:31:50",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed44_klvocabe30782d1f085-17-10-2026_19-31-50_manifest.json",
+      "manifest_sha256": "63c7c4e3a473057f2a73c2aecc40a7c8027122fa3714690bcec05eb9199c70ac",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed44_klvocabe30782d1f085-17-10-2026_19-31-50.pkl",
+      "scores_sha256": "dee5312b1f0a582a73f8a219812714a9a463588d86d15eb76ccc3728d65e06f1",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-10-17T19:34:44",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed45_klvocabe30782d1f085-17-10-2026_19-34-44_manifest.json",
+      "manifest_sha256": "95cf5469745e7257af3c591217e84661f664663b1d4e01530d5a40fe9c1e6e4f",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed45_klvocabe30782d1f085-17-10-2026_19-34-44.pkl",
+      "scores_sha256": "331c2be83f7ad0d7632f8eb1505459434f9c35ddf0c635b016e0f4a94de528bb",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "Greater-Than",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-10-17T19:40:22",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed46_klvocabe30782d1f085-17-10-2026_19-40-22_manifest.json",
+      "manifest_sha256": "8b9ebbf68f71be0811bfed0770e8d152d6a83b3b19e4385eb93a7c6d02a2fc12",
+      "scores": ".prune_scores/final/benchmark/cell_gt_ep_zero_seed46_klvocabe30782d1f085-17-10-2026_19-40-22.pkl",
+      "scores_sha256": "0ab70b22126872ff01805a0457a5921f2aaa890dd74304e54d3212a395efa6e9",
+      "training_git": {
+        "commit": "2889253f47d236aab0269eb62e1aebc7c2a5aad2",
+        "branch": "fix/ep-gt-kl-vocabulary",
+        "dirty": true,
+        "dirty_files": [
+          "auto_circuit/prune_algos/edge_pruning.py",
+          "experiments/thesis/run_cell.py",
+          "tests/prune_algos/test_edge_pruning_components.py",
+          "tests/test_run_cell_identity.py",
+          "tests/prune_algos/test_edge_pruning_kl.py"
+        ],
+        "source_snapshot_sha256": "8cff545a5d47ac0ae489d6aa7f840b421105a346baede35f57db1080515b4302",
+        "source_snapshot_dir": "/mnt/beegfs/work/akdag/thesis/auto-circuit/.scratch/ep-gt-kl-20261017-c3wnVX/source",
+        "patch_sha256": "6011f91a70afb80a9068b94d3e63aed04a6fdc368550827360363f0fa8476103",
+        "rerun_config_sha256": "7c9a572f37d7817e252ecc87ef09d165ec057b854cb09c14798dcc6ec83aaa12"
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:41:20",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20_manifest.json",
+      "manifest_sha256": "5b37eeee974a22bf3731d68c7e2a4dcafb85e3e17d6e2b7e52af7130d2f2561b",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed42-15-08-2026_05-41-20.pkl",
+      "scores_sha256": "6c9cd2489e052e5ab848413fbd448186b7aeca3065ef5da8e08e5fe8d2d95440",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:42:50",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50_manifest.json",
+      "manifest_sha256": "c6d571c69aa56ff26e89ea77352eb370040c14eb9ea32103cf562b77e1aa195f",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed43-15-08-2026_05-42-50.pkl",
+      "scores_sha256": "05a0730f5c75140a3ccaf07f8b447993e91f05de5e430f05b58b74974ece59c0",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:44:15",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15_manifest.json",
+      "manifest_sha256": "8e4f6e24d41d95d5f028217446e1b3b7552e560c52b297c0ad3503c5a6f920dc",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed44-15-08-2026_05-44-15.pkl",
+      "scores_sha256": "5e46040f43043470bbc71e9c3260ebbf009238fe9f53960fa176d85790a137b4",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:45:50",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49_manifest.json",
+      "manifest_sha256": "e14df1eb1970dd06b119030a5503c3822212edfc54cadddd07f03c870726d816",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed45-15-08-2026_05-45-49.pkl",
+      "scores_sha256": "b6e04696b2ca3fb3ca0e9c0dee46ca70d6fc37290cc9188b6e455773add2465a",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:47:24",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24_manifest.json",
+      "manifest_sha256": "b98aa8ca1a0178a3eea45357714e83bf5fcb451f820127a184728ff233a6da5d",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_mean_seed46-15-08-2026_05-47-24.pkl",
+      "scores_sha256": "248bbb4a84fe6296999256860a11e601146b57a33f6a3975a652a7a0c1cb4861",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:41:06",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed42-15-08-2026_05-41-06_manifest.json",
+      "manifest_sha256": "42c1928d665d19b8ea81f7012062cdc0648e25401c8b2375411737762e5ad6da",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed42-15-08-2026_05-41-06.pkl",
+      "scores_sha256": "307625acc8b13a8bf2404d445c82c63bf15c41dce824dad3284a656e63f8bd9b",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:42:36",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed43-15-08-2026_05-42-36_manifest.json",
+      "manifest_sha256": "51668ba1cd32a5bb3ef22bd3b021c7d7d4e0d020ae29123e9eb543fc1147a599",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed43-15-08-2026_05-42-36.pkl",
+      "scores_sha256": "39471a52e1bee556a4a04ae18e2c673c708b09727647bd6f0a1f76c4b0a04b14",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:44:00",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed44-15-08-2026_05-44-00_manifest.json",
+      "manifest_sha256": "d51207bc27bca461500943df6fb2a86c63461442771e229a0e740e1281d9a360",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed44-15-08-2026_05-44-00.pkl",
+      "scores_sha256": "ba9ca6759456f4bb555c857cb9e5aec09fe3b45f0b72be53ecffe29956c8921e",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:45:33",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed45-15-08-2026_05-45-33_manifest.json",
+      "manifest_sha256": "61b536e52cd1ddf48eea9cac06eb3142cbb9b49a97b96367596ceaaad0e5113a",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed45-15-08-2026_05-45-33.pkl",
+      "scores_sha256": "63f0f68bcc43a1b479c91427a3e28d9e0862f1f2932f9f539b1a455c42231387",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:47:08",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed46-15-08-2026_05-47-08_manifest.json",
+      "manifest_sha256": "edcb91f70f65e5a9f5b3d1803beaa67ec5a93cd88da1a9adb03cefe70edd539b",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_resample_seed46-15-08-2026_05-47-08.pkl",
+      "scores_sha256": "fe1d7fad52430e442a14fada23c6671d6ea24d411177719cd1eb68812b648bc9",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-15T05:40:50",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed42-15-08-2026_05-40-50_manifest.json",
+      "manifest_sha256": "bb4d39c0d8226f58831adb0f4c7e6a345cd0f320188de7ae187daf68896a3fa0",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed42-15-08-2026_05-40-50.pkl",
+      "scores_sha256": "83bb8c9a1f8ffd779da8334a53633c4e361dcb556e56adc9cfb9e692ae6ccd51",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-15T05:42:21",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed43-15-08-2026_05-42-21_manifest.json",
+      "manifest_sha256": "a8ea1d0d6752201f5227f4257b4f9819d6c251517c506c5e331e3a8f401d2a0c",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed43-15-08-2026_05-42-21.pkl",
+      "scores_sha256": "b23e1172a5a13bf1c9b68be3f8d5ca2d59147b34681198667121eb2411137a20",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-15T05:43:45",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed44-15-08-2026_05-43-45_manifest.json",
+      "manifest_sha256": "822ae831ad6ebc1bd3d0b7bf1edfdf84a9f02d6df806acb30a4a71e773f06b02",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed44-15-08-2026_05-43-45.pkl",
+      "scores_sha256": "da9bd932efc7ebef41e3fe9c19838e148caced38f3eb16c7e8b3e44c352a23e0",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-15T05:45:18",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed45-15-08-2026_05-45-18_manifest.json",
+      "manifest_sha256": "478c9a3c3a4ec05ea09f09149b36d3b6f91156d4e9b4f36ed46319243cf8dcf5",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed45-15-08-2026_05-45-18.pkl",
+      "scores_sha256": "4980fddcc224a50307fffdae7187d40b423fcd1273fa2761091368866099052a",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "ACDC",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-15T05:46:53",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed46-15-08-2026_05-46-52_manifest.json",
+      "manifest_sha256": "72b316e435d2a59f36819d065462824315f1cad0d121586df63cdb3d0f447a98",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_acdc_zero_seed46-15-08-2026_05-46-52.pkl",
+      "scores_sha256": "187bb11066509657b0a2151644f90b1630eacbde66c2a21f3e4306f82eb07448",
+      "training_git": {
+        "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+        "dirty": true,
+        "dirty_files": [
+          "thesis_notes/methodology.md",
+          ".claude/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:40:47",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47_manifest.json",
+      "manifest_sha256": "cf82eb1b2a0bf8e4d73ab0d9ebf92081150897f4823d796b0c8a3277a743c042",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed42-14-08-2026_02-40-47.pkl",
+      "scores_sha256": "b39dfbd65b35e53d013b2ae4d0ae399cef56e144f3c7119ce9cd9cba2aea0347",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:48:52",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52_manifest.json",
+      "manifest_sha256": "06be28b3f114b4b2a1ac0cea6e3d3e0c31b50ed1f81c53c11b24e78011d07564",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed43-14-08-2026_02-48-52.pkl",
+      "scores_sha256": "a1afa54002f608bd972d444f6ad77c2b72e144e2a87177418d59eda26bf1e996",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:37:15",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15_manifest.json",
+      "manifest_sha256": "20d12a4401539c94425706326e114b60e2776a373a4338872debb2adb34df6ac",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed44-14-08-2026_03-37-15.pkl",
+      "scores_sha256": "831152bb77dbbcc62d4fc92dd770c0e1c7cc4850119065cdd5c32a9eee9da6e7",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:02:00",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00_manifest.json",
+      "manifest_sha256": "9e084d7bdff98adc52b1718add0e7c1ceae7135039c843268268a84766b30f71",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed45-14-08-2026_04-02-00.pkl",
+      "scores_sha256": "da18e663022ad08c97213f92747585b9bb118726518bd8a7a82a218957ba0aaa",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:08:30",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30_manifest.json",
+      "manifest_sha256": "bb027548968da3890638d26e7bbc1398db882cb35a2318692e0a825ca9549205",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_mean_seed46-14-08-2026_04-08-30.pkl",
+      "scores_sha256": "de8e8913b273773e77cde6cd09f58f593523e459be2ada3b9961ec12b5a9f6e8",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:40:58",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed42-14-08-2026_02-40-58_manifest.json",
+      "manifest_sha256": "f15633977954ec587dc48cb05e750df9caca2eb5f5496ebf9b9e028e8ae64fe4",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed42-14-08-2026_02-40-58.pkl",
+      "scores_sha256": "bf21925cf2253c1c600c0f0d965c727b0e5285aaffdc29cc9462363520412806",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:48:40",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed43-14-08-2026_02-48-40_manifest.json",
+      "manifest_sha256": "83915b2792e25b217a06f528ff445d570a13ad509627435dfff8bbc81d64c3bd",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed43-14-08-2026_02-48-40.pkl",
+      "scores_sha256": "8f2871a477e1b126f6628bbb1457bf7c2981ab0f7c58103909b8100f6eb3ac1c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:39:22",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed44-14-08-2026_03-39-22_manifest.json",
+      "manifest_sha256": "065a6f6db1c05cd5c77ff842e88d6760762e4140cf44a6b31baef1a0f4dc749c",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed44-14-08-2026_03-39-22.pkl",
+      "scores_sha256": "6b0799d79c0a764144e1e974e2054579c06a78ce3fb69e49e792088869e5cff1",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:02:09",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed45-14-08-2026_04-02-09_manifest.json",
+      "manifest_sha256": "c055a3baafc7ff524e605622fbf7d7ec57b6aef652d87964e56056ef0ffc0653",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed45-14-08-2026_04-02-09.pkl",
+      "scores_sha256": "1052a12cfdb069a225c2fa31b95545ced78cfae71c318852074172c823920dd1",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:08:44",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed46-14-08-2026_04-08-44_manifest.json",
+      "manifest_sha256": "137f53bfe2ff1f0c70528243a049d6e6b68817e6dbb68bef39f30369f1198c88",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_resample_seed46-14-08-2026_04-08-44.pkl",
+      "scores_sha256": "46ce4f5b81e9de28c27b519d5c89479b540760876518544ff17dc3a38d8ecf9f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:40:47",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed42-14-08-2026_02-40-47_manifest.json",
+      "manifest_sha256": "a862f93a50bab532b19b43817d7e7cceac0802f3bd986705f18bcc064b9ff096",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed42-14-08-2026_02-40-47.pkl",
+      "scores_sha256": "be88cc779827d7cc26881beb018c901a35cf97262948577857f2931a5fab6d2a",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:48:39",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed43-14-08-2026_02-48-39_manifest.json",
+      "manifest_sha256": "e1a8b5fd608d7c2c7be6be5f123141d27a487bd32bd188c032b3eaf9f5fc8bc3",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed43-14-08-2026_02-48-39.pkl",
+      "scores_sha256": "8d9ac5b913b1932275591544ad97e2ec2cd604f518b5560444d2c5262ee27b3f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T02:51:08",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed44-14-08-2026_02-51-08_manifest.json",
+      "manifest_sha256": "42aed54b089aabd19f28d557da10c50556dbb644a034dce9ce9215f631c163bd",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed44-14-08-2026_02-51-08.pkl",
+      "scores_sha256": "82d491b2f9965f6e0ef0ff140eed5f83b1cb0e58d0c4852a7b68f486658ff585",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:38:45",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed45-14-08-2026_03-38-45_manifest.json",
+      "manifest_sha256": "c83d4fb06c98305f694954a5119cae495d5082b9c2dcca0b14846a7e21ab3039",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed45-14-08-2026_03-38-45.pkl",
+      "scores_sha256": "2db703ee626c0e5779f84eb8d2ab3315c186083202ec74c598453303f1172f15",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "DiscoGP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:03:12",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed46-14-08-2026_04-03-12_manifest.json",
+      "manifest_sha256": "055ea23dd830ba6e61d252eb9504339969d8437381416c9f751305ff5707735f",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_discogp_ep_zero_seed46-14-08-2026_04-03-12.pkl",
+      "scores_sha256": "a4efd9852426f91b32acc269b293174ddf40dd83b120e91ac36ba4e3acd1171c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:28:21",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed42-14-08-2026_02-28-21_manifest.json",
+      "manifest_sha256": "97bf68b887902be5b7a1403df96dd46c179d2b529bf5c839c48bb43ca29ee702",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed42-14-08-2026_02-28-21.pkl",
+      "scores_sha256": "4e733c652f6f066785b53df727733e3fac4686af085e9fa1aebd6710ff8a88fe",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:16:38",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed43-14-08-2026_03-16-38_manifest.json",
+      "manifest_sha256": "d7529c4aebdc0929f21e2b4148c9eab82c15abfad1dbc697ed42ea5843853c42",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed43-14-08-2026_03-16-38.pkl",
+      "scores_sha256": "b6cd88e955a1dfcbb250eae43e9a591522823d90a66dc8f5f5aaf9bcdbf07593",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:41:23",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed44-14-08-2026_03-41-23_manifest.json",
+      "manifest_sha256": "650506d7be04c46603c1be0958281da7f69ba5ba9a5d2659ac29be298bd269c8",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed44-14-08-2026_03-41-23.pkl",
+      "scores_sha256": "1f77b62812cddd072a0df87cc0772f79799b410affa33a987b71ab716aefe35c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:47:53",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed45-14-08-2026_03-47-53_manifest.json",
+      "manifest_sha256": "950f88dee1fc8093cf9d901b20419155fbfd3d44753f80e3ec0585fefaf25b68",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed45-14-08-2026_03-47-53.pkl",
+      "scores_sha256": "eb318e7781b7f4311e3c85e0bf55400a4f2d4deeafcb3117613801cac7b89a90",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:41:01",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed46-14-08-2026_04-41-01_manifest.json",
+      "manifest_sha256": "d9145e1c2ddb46d41de5c74ef2bef69e3e07ecc028789a0530ebe6c8e878a674",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_mean_seed46-14-08-2026_04-41-01.pkl",
+      "scores_sha256": "48dde77be47eef63e5ebd535cce5203423a91021bf2160974a980a759c076030",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:28:15",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed42-14-08-2026_02-28-15_manifest.json",
+      "manifest_sha256": "12c45d84dbf15ca83fd41e13ad82c76f1fd7d2db91f8d1a3ae862b69905cb412",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed42-14-08-2026_02-28-15.pkl",
+      "scores_sha256": "30520ef6a68e5734a27ee3667105f3e482f5694a6a0984febebf4d764a0fc283",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:18:17",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed43-14-08-2026_03-18-17_manifest.json",
+      "manifest_sha256": "636e0a30864e335e9a97fa644ef31181b5d1d420eac17b7504e7ef1bf1b1d58e",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed43-14-08-2026_03-18-17.pkl",
+      "scores_sha256": "2e47434dcb9140769c5968759f7522b1b977ab9e2b44f426de89b0a4e7b1950e",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:41:44",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed44-14-08-2026_03-41-44_manifest.json",
+      "manifest_sha256": "d30f638ab76b8350cac9b63bc86278ea196070dbf154eae28e94db553d993c06",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed44-14-08-2026_03-41-44.pkl",
+      "scores_sha256": "3270b6283a62e08bb2df629ebd0e100c184647fd5d6feb1fb1f287e0b436d77f",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:48:03",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed45-14-08-2026_03-48-03_manifest.json",
+      "manifest_sha256": "654e932cb7eb83320cfbe5f2e6b1dd695d1af0576096aed47c6d79df23f224f9",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed45-14-08-2026_03-48-03.pkl",
+      "scores_sha256": "19f780e85fdd9830eee0937a65ad2e6d446e4af59365571137dbb4d36e8b936d",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T03:51:34",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed46-14-08-2026_03-51-34_manifest.json",
+      "manifest_sha256": "7ce711a8a5be97c25a703857c5675c59273afb934b8a85bd2f2f0452508b8cf9",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_resample_seed46-14-08-2026_03-51-34.pkl",
+      "scores_sha256": "405a1ebe779bd9488ff7c20b13bacb0e923ab5d8d5503c75b6168f243b8b7f0c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:28:18",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed42-14-08-2026_02-28-18_manifest.json",
+      "manifest_sha256": "6995177a1a4b36ea99031297f2015d9fd3b0011c49372b5093cafc824a48d07d",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed42-14-08-2026_02-28-18.pkl",
+      "scores_sha256": "5fae5b73ea9d05f69ebd77e12b7dc2207a9aa70f0f75b0fcdd126541e2ac5fd1",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T02:30:11",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed43-14-08-2026_02-30-11_manifest.json",
+      "manifest_sha256": "c20d59ff396d991ca3c379265328267b6533725623940e611ce3ed4ef51bd4eb",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed43-14-08-2026_02-30-11.pkl",
+      "scores_sha256": "15974a8c84776b91435eb08a130e4ef89ade6664f6a98063b2c787ff462eb974",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:18:21",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed44-14-08-2026_03-18-21_manifest.json",
+      "manifest_sha256": "95373f980e9a6875b2ba762f21468f3a0628fb8ecfd6ed29bf52945cf29348af",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed44-14-08-2026_03-18-21.pkl",
+      "scores_sha256": "387d5ca06371c98f4f826ecffeae910e8734f16d4425110b47b5e32c6fec4f58",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:42:39",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed45-14-08-2026_03-42-39_manifest.json",
+      "manifest_sha256": "6acab7ba55702c733042b8e003964d65042420fae31b9643825e361c788e97fd",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed45-14-08-2026_03-42-39.pkl",
+      "scores_sha256": "79bcee57ad91b3e5f6b8199bee2dd283a33553344a79eb932bd2394f777eeb26",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EAP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T03:50:13",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed46-14-08-2026_03-50-13_manifest.json",
+      "manifest_sha256": "44c49ce5bece0fd8d611acee405cf4a7bd31d56c6a59766169bf17da1d680074",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_eap_zero_seed46-14-08-2026_03-50-13.pkl",
+      "scores_sha256": "90b9aa6a1b4704e39b9f06d8bbce16e394adc4c083413d1cee32c7bce21c0bda",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:53:22",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed42-14-08-2026_02-53-22_manifest.json",
+      "manifest_sha256": "b17a9cef736fca1abf0ef8022b6bc7ba9c90619bd2f47502b6ca5600e866e69e",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed42-14-08-2026_02-53-22.pkl",
+      "scores_sha256": "5f68dae57871dbcf1a2ec322e6e9cf51c14d07541824c8c4773e276454f8ae01",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:17:24",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed43-14-08-2026_03-17-24_manifest.json",
+      "manifest_sha256": "f42039897522dc53e767ae1937d0617726d9e62e0b6c06857522db493f7e20df",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed43-14-08-2026_03-17-24.pkl",
+      "scores_sha256": "66c4f66b432e40fcee601e1e28d061780391979c405a34eb81d8551a42c69ff8",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:25:09",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed44-14-08-2026_03-25-09_manifest.json",
+      "manifest_sha256": "ab09bfd4e01cbec8b3ec53aa7e1a37c02e5d766a7b327d8ad740da5deca520c9",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed44-14-08-2026_03-25-09.pkl",
+      "scores_sha256": "1379e6e313b660675a72389f660ff0c421cfbc87a659857b663d735f132ccfa5",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:13:37",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed45-14-08-2026_04-13-37_manifest.json",
+      "manifest_sha256": "e5090e9cfcfafd2e04e1a6e2996324b8e1faef367fb67b7f117fbfb97a358ec4",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed45-14-08-2026_04-13-37.pkl",
+      "scores_sha256": "2c702341ee4df5ac4efdc9efa63c97a4b31a037e2864b94021c0c0f6588b0db0",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "mean",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:38:23",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed46-14-08-2026_04-38-23_manifest.json",
+      "manifest_sha256": "8d388d8bc6eb33738f05c9bd1e3b98056165dcd15787522600d00156785ede6e",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_mean_seed46-14-08-2026_04-38-23.pkl",
+      "scores_sha256": "eebe77c08d2d66a7b416dd086dedd5ed7c02d878b908312b2d0df87b85c3e204",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:53:22",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed42-14-08-2026_02-53-22_manifest.json",
+      "manifest_sha256": "92393ec765fdbd5a7833e68056fe7ff69ecbe772cc8416392fcee69d7b5bca19",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed42-14-08-2026_02-53-22.pkl",
+      "scores_sha256": "c3dc46f8efe81765074a6c070d245fd74bed4513c60224892789cbfdac956631",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:17:41",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed43-14-08-2026_03-17-41_manifest.json",
+      "manifest_sha256": "4d0df028b368f23db36444e45d74afe7c78b5317ac93968b6f6b104b6aad6f22",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed43-14-08-2026_03-17-41.pkl",
+      "scores_sha256": "0eeef5988741a21407fa5ed12f74293bcb0aab476c38295ea4c84fc1c692bfd6",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:24:53",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed44-14-08-2026_03-24-53_manifest.json",
+      "manifest_sha256": "86ccd98f984b77a49dd7f7969718fe7e6914ca63c5fde675559868be68d0a4a3",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed44-14-08-2026_03-24-53.pkl",
+      "scores_sha256": "7c712a0432249786b4a3c7c3adfe7f6646db1d8fef1493419e3bc11e89a3117d",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T04:17:02",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed45-14-08-2026_04-17-02_manifest.json",
+      "manifest_sha256": "75dd0f06b4661071a05e53be1c169c98cc3b94a8e1686ff6c70243d51ca0b1ad",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed45-14-08-2026_04-17-02.pkl",
+      "scores_sha256": "e4d9b49fcda3c2a3b44772a94856683e11920511468ecb871cce7aece8ac86a5",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "resample",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:38:52",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed46-14-08-2026_04-38-52_manifest.json",
+      "manifest_sha256": "a4ecc12a511a879c9145678f31ae6822d8d93a2b011d7712fac0e6e1de87bf87",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_resample_seed46-14-08-2026_04-38-52.pkl",
+      "scores_sha256": "642cc87ceefa0867bc8d7e31d9cf1dda21c9cc4f873184077802fd9149a46f9d",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 42,
+      "init_seed": 42,
+      "saved_at": "2026-08-14T02:54:27",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed42-14-08-2026_02-54-27_manifest.json",
+      "manifest_sha256": "eb5b36c1889b6625d194fc600921e57b263b345629865036b863f30ec7e3b4df",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed42-14-08-2026_02-54-27.pkl",
+      "scores_sha256": "a2c089dc195774a88c334dff944c91dbccfafc1397fcd03a20acfd7198fe925c",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 43,
+      "init_seed": 43,
+      "saved_at": "2026-08-14T03:18:12",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed43-14-08-2026_03-18-12_manifest.json",
+      "manifest_sha256": "86a3a9b400effb9f9099b13f9ab4726499e2bd5473e2c3b2373507016ce49891",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed43-14-08-2026_03-18-12.pkl",
+      "scores_sha256": "e9dfa013a840b13775bd95611c11393cc3bcefd6bed7b0dcf278847338465902",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 44,
+      "init_seed": 44,
+      "saved_at": "2026-08-14T03:24:55",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed44-14-08-2026_03-24-55_manifest.json",
+      "manifest_sha256": "26bb218e616dac1346a6a202aebbc9945cd46a900b9ec47df16a8efce12a6c95",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed44-14-08-2026_03-24-55.pkl",
+      "scores_sha256": "ef2baed008fb8af2a3ccd84ffdaeda247bfe3f660f9ccf8807c55a87175253c9",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 45,
+      "init_seed": 45,
+      "saved_at": "2026-08-14T03:27:54",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed45-14-08-2026_03-27-54_manifest.json",
+      "manifest_sha256": "026a5b5be8279a4197faa98a96721ba39cda9b37f104544c809d9e27e35678a7",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed45-14-08-2026_03-27-54.pkl",
+      "scores_sha256": "a009f8b195e97ae93c10db50210c817e7abc52c20a8b90a1002cc32348baf925",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    },
+    {
+      "task": "IOI",
+      "algo": "EP",
+      "discovery_ablation": "zero",
+      "data_seed": 46,
+      "init_seed": 46,
+      "saved_at": "2026-08-14T04:14:43",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed46-14-08-2026_04-14-43_manifest.json",
+      "manifest_sha256": "7af7bd93f012e01b326f15a4b284e168eefc127d76f74d2289974783e9d1daab",
+      "scores": ".prune_scores/final/benchmark/cell_ioi_ep_zero_seed46-14-08-2026_04-14-43.pkl",
+      "scores_sha256": "ca30d17ae936564dd04bb0917593779c7a230051d1dda097be205751a0bc80e7",
+      "training_git": {
+        "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+        "dirty": true,
+        "dirty_files": [
+          ".claude/",
+          ".prune_scores_cache_v3/"
+        ]
+      }
+    }
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "selection": "absolute magnitude >= float64 threshold; retain all ties",
+  "pairing": "equal dataset and PyTorch seeds, joint condition only",
+  "edge_alignment": {
+    "gt": {
+      "module_order": [
+        "blocks.0.hook_k_input",
+        "blocks.0.hook_mlp_in",
+        "blocks.0.hook_q_input",
+        "blocks.0.hook_v_input",
+        "blocks.1.hook_k_input",
+        "blocks.1.hook_mlp_in",
+        "blocks.1.hook_q_input",
+        "blocks.1.hook_v_input",
+        "blocks.10.hook_k_input",
+        "blocks.10.hook_mlp_in",
+        "blocks.10.hook_q_input",
+        "blocks.10.hook_v_input",
+        "blocks.11.hook_k_input",
+        "blocks.11.hook_mlp_in",
+        "blocks.11.hook_q_input",
+        "blocks.11.hook_resid_post",
+        "blocks.11.hook_v_input",
+        "blocks.2.hook_k_input",
+        "blocks.2.hook_mlp_in",
+        "blocks.2.hook_q_input",
+        "blocks.2.hook_v_input",
+        "blocks.3.hook_k_input",
+        "blocks.3.hook_mlp_in",
+        "blocks.3.hook_q_input",
+        "blocks.3.hook_v_input",
+        "blocks.4.hook_k_input",
+        "blocks.4.hook_mlp_in",
+        "blocks.4.hook_q_input",
+        "blocks.4.hook_v_input",
+        "blocks.5.hook_k_input",
+        "blocks.5.hook_mlp_in",
+        "blocks.5.hook_q_input",
+        "blocks.5.hook_v_input",
+        "blocks.6.hook_k_input",
+        "blocks.6.hook_mlp_in",
+        "blocks.6.hook_q_input",
+        "blocks.6.hook_v_input",
+        "blocks.7.hook_k_input",
+        "blocks.7.hook_mlp_in",
+        "blocks.7.hook_q_input",
+        "blocks.7.hook_v_input",
+        "blocks.8.hook_k_input",
+        "blocks.8.hook_mlp_in",
+        "blocks.8.hook_q_input",
+        "blocks.8.hook_v_input",
+        "blocks.9.hook_k_input",
+        "blocks.9.hook_mlp_in",
+        "blocks.9.hook_q_input",
+        "blocks.9.hook_v_input"
+      ],
+      "tensor_shapes": {
+        "blocks.0.hook_k_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_mlp_in": [
+          13
+        ],
+        "blocks.0.hook_q_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_v_input": [
+          12,
+          1
+        ],
+        "blocks.1.hook_k_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_mlp_in": [
+          26
+        ],
+        "blocks.1.hook_q_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_v_input": [
+          12,
+          14
+        ],
+        "blocks.10.hook_k_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_mlp_in": [
+          143
+        ],
+        "blocks.10.hook_q_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_v_input": [
+          12,
+          131
+        ],
+        "blocks.11.hook_k_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_mlp_in": [
+          156
+        ],
+        "blocks.11.hook_q_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_resid_post": [
+          157
+        ],
+        "blocks.11.hook_v_input": [
+          12,
+          144
+        ],
+        "blocks.2.hook_k_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_mlp_in": [
+          39
+        ],
+        "blocks.2.hook_q_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_v_input": [
+          12,
+          27
+        ],
+        "blocks.3.hook_k_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_mlp_in": [
+          52
+        ],
+        "blocks.3.hook_q_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_v_input": [
+          12,
+          40
+        ],
+        "blocks.4.hook_k_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_mlp_in": [
+          65
+        ],
+        "blocks.4.hook_q_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_v_input": [
+          12,
+          53
+        ],
+        "blocks.5.hook_k_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_mlp_in": [
+          78
+        ],
+        "blocks.5.hook_q_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_v_input": [
+          12,
+          66
+        ],
+        "blocks.6.hook_k_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_mlp_in": [
+          91
+        ],
+        "blocks.6.hook_q_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_v_input": [
+          12,
+          79
+        ],
+        "blocks.7.hook_k_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_mlp_in": [
+          104
+        ],
+        "blocks.7.hook_q_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_v_input": [
+          12,
+          92
+        ],
+        "blocks.8.hook_k_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_mlp_in": [
+          117
+        ],
+        "blocks.8.hook_q_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_v_input": [
+          12,
+          105
+        ],
+        "blocks.9.hook_k_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_mlp_in": [
+          130
+        ],
+        "blocks.9.hook_q_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_v_input": [
+          12,
+          118
+        ]
+      }
+    },
+    "ioi": {
+      "module_order": [
+        "blocks.0.hook_k_input",
+        "blocks.0.hook_mlp_in",
+        "blocks.0.hook_q_input",
+        "blocks.0.hook_v_input",
+        "blocks.1.hook_k_input",
+        "blocks.1.hook_mlp_in",
+        "blocks.1.hook_q_input",
+        "blocks.1.hook_v_input",
+        "blocks.10.hook_k_input",
+        "blocks.10.hook_mlp_in",
+        "blocks.10.hook_q_input",
+        "blocks.10.hook_v_input",
+        "blocks.11.hook_k_input",
+        "blocks.11.hook_mlp_in",
+        "blocks.11.hook_q_input",
+        "blocks.11.hook_resid_post",
+        "blocks.11.hook_v_input",
+        "blocks.2.hook_k_input",
+        "blocks.2.hook_mlp_in",
+        "blocks.2.hook_q_input",
+        "blocks.2.hook_v_input",
+        "blocks.3.hook_k_input",
+        "blocks.3.hook_mlp_in",
+        "blocks.3.hook_q_input",
+        "blocks.3.hook_v_input",
+        "blocks.4.hook_k_input",
+        "blocks.4.hook_mlp_in",
+        "blocks.4.hook_q_input",
+        "blocks.4.hook_v_input",
+        "blocks.5.hook_k_input",
+        "blocks.5.hook_mlp_in",
+        "blocks.5.hook_q_input",
+        "blocks.5.hook_v_input",
+        "blocks.6.hook_k_input",
+        "blocks.6.hook_mlp_in",
+        "blocks.6.hook_q_input",
+        "blocks.6.hook_v_input",
+        "blocks.7.hook_k_input",
+        "blocks.7.hook_mlp_in",
+        "blocks.7.hook_q_input",
+        "blocks.7.hook_v_input",
+        "blocks.8.hook_k_input",
+        "blocks.8.hook_mlp_in",
+        "blocks.8.hook_q_input",
+        "blocks.8.hook_v_input",
+        "blocks.9.hook_k_input",
+        "blocks.9.hook_mlp_in",
+        "blocks.9.hook_q_input",
+        "blocks.9.hook_v_input"
+      ],
+      "tensor_shapes": {
+        "blocks.0.hook_k_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_mlp_in": [
+          13
+        ],
+        "blocks.0.hook_q_input": [
+          12,
+          1
+        ],
+        "blocks.0.hook_v_input": [
+          12,
+          1
+        ],
+        "blocks.1.hook_k_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_mlp_in": [
+          26
+        ],
+        "blocks.1.hook_q_input": [
+          12,
+          14
+        ],
+        "blocks.1.hook_v_input": [
+          12,
+          14
+        ],
+        "blocks.10.hook_k_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_mlp_in": [
+          143
+        ],
+        "blocks.10.hook_q_input": [
+          12,
+          131
+        ],
+        "blocks.10.hook_v_input": [
+          12,
+          131
+        ],
+        "blocks.11.hook_k_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_mlp_in": [
+          156
+        ],
+        "blocks.11.hook_q_input": [
+          12,
+          144
+        ],
+        "blocks.11.hook_resid_post": [
+          157
+        ],
+        "blocks.11.hook_v_input": [
+          12,
+          144
+        ],
+        "blocks.2.hook_k_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_mlp_in": [
+          39
+        ],
+        "blocks.2.hook_q_input": [
+          12,
+          27
+        ],
+        "blocks.2.hook_v_input": [
+          12,
+          27
+        ],
+        "blocks.3.hook_k_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_mlp_in": [
+          52
+        ],
+        "blocks.3.hook_q_input": [
+          12,
+          40
+        ],
+        "blocks.3.hook_v_input": [
+          12,
+          40
+        ],
+        "blocks.4.hook_k_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_mlp_in": [
+          65
+        ],
+        "blocks.4.hook_q_input": [
+          12,
+          53
+        ],
+        "blocks.4.hook_v_input": [
+          12,
+          53
+        ],
+        "blocks.5.hook_k_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_mlp_in": [
+          78
+        ],
+        "blocks.5.hook_q_input": [
+          12,
+          66
+        ],
+        "blocks.5.hook_v_input": [
+          12,
+          66
+        ],
+        "blocks.6.hook_k_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_mlp_in": [
+          91
+        ],
+        "blocks.6.hook_q_input": [
+          12,
+          79
+        ],
+        "blocks.6.hook_v_input": [
+          12,
+          79
+        ],
+        "blocks.7.hook_k_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_mlp_in": [
+          104
+        ],
+        "blocks.7.hook_q_input": [
+          12,
+          92
+        ],
+        "blocks.7.hook_v_input": [
+          12,
+          92
+        ],
+        "blocks.8.hook_k_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_mlp_in": [
+          117
+        ],
+        "blocks.8.hook_q_input": [
+          12,
+          105
+        ],
+        "blocks.8.hook_v_input": [
+          12,
+          105
+        ],
+        "blocks.9.hook_k_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_mlp_in": [
+          130
+        ],
+        "blocks.9.hook_q_input": [
+          12,
+          118
+        ],
+        "blocks.9.hook_v_input": [
+          12,
+          118
+        ]
+      }
+    }
+  },
+  "within_ablation_cells_reproduced": 24,
+  "pairwise_rows": 120,
+  "aggregate_rows": 24,
+  "output_sha256": {
+    "cross_discovery_selected_runs.csv": "e8c093ec96e75c0c16085d3b2a318b047188cedaad766a5fce30ffa88d8d4c96",
+    "cross_discovery_pairwise.csv": "a349d1bd5ab851db93050292588f6ae8e8a9c70d0468314abb6923670a5a3865",
+    "cross_discovery_summary.csv": "a8bc0179714f3d8379cf31c7c0dbad41ac69a3e49ce964bd2730ddf036917c45",
+    "cross_discovery_table.tex": "5f135420539a910dd1183c630196cf29e8966ccaf96d287f067a634d65039a66"
+  }
+}

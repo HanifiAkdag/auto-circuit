@@ -7,7 +7,7 @@ import torch
 
 
 def derivation():
-    name = 'experiments.thesis.results_chapter_cross_discovery'
+    name = 'experiments.results_chapter_cross_discovery'
     assert importlib.util.find_spec(name) is not None, 'Cross-discovery derivation is missing'
     return __import__(name, fromlist=['select_mask'])
 
@@ -46,13 +46,20 @@ def test_tensor_alignment_ignores_dictionary_order_and_rejects_wrong_shape():
         module.flatten_scores(scores, keys, {'a': (2,), 'b': (1,)})
 
 
-def test_latest_manifest_selection_excludes_isolated_seed_conditions(tmp_path):
-    for name, saved, init in [('old', '2026-08-01', 42), ('new', '2026-09-01', 42), ('isolated', '2026-09-02', 43)]:
+def test_frozen_manifest_selection_excludes_isolated_seed_conditions(tmp_path):
+    from experiments.config import sha256
+    inputs = []
+    for name, saved, init in [('selected', '2026-08-01', 42), ('isolated', '2026-09-02', 43)]:
         (tmp_path / (name + '.pkl')).write_bytes(b'cache')
-        (tmp_path / (name + '_manifest.json')).write_text(json.dumps({
+        manifest = {
             'cell': {'task': 'ioi', 'algo': 'eap', 'ablation': 'mean', 'seed': 42, 'init_seed': init},
             'saved_at': saved, 'cache_file': name + '.pkl',
-        }))
-    records = derivation().manifest_index(tmp_path)
+        }
+        path = tmp_path / (name + '_manifest.json')
+        path.write_text(json.dumps(manifest))
+        scores = tmp_path / (name + '.pkl')
+        inputs.append({'manifest': str(path), 'manifest_sha256': sha256(path),
+                       'scores': str(scores), 'scores_sha256': sha256(scores), 'cell': manifest['cell']})
+    records = derivation().frozen_manifest_index(inputs, {'ioi'}, {'eap'}, {'mean'}, {42})
     assert len(records) == 1
-    assert records['ioi', 'eap', 'mean', 42][1].name == 'new.pkl'
+    assert records['ioi', 'eap', 'mean', 42][1].name == 'selected.pkl'

@@ -1,0 +1,38 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "section": "Results 4.3.1",
+  "source": "results/results_chapter/ep_gt_kl_20261017",
+  "source_sha256": {
+    "manifest.json": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+    "structural.csv": "bb167900cca264967d483cf6aac45e327e849e35075f4deff49197e28827e0ff",
+    "summary.csv": "77fa8d8cb7f32b4af91d96a44640a21333696d4f11c6c16f71c6576266f446fe",
+    "functional.csv": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d"
+  },
+  "source_row_counts": {
+    "summary": 64,
+    "structural": 1916
+  },
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "target_edges": {
+    "IOI": 739,
+    "Greater-Than": 235
+  },
+  "selected_cells": {
+    "joint": 24,
+    "seed_conditions": 36
+  },
+  "output_sha256": {
+    "within_ablation_selected.csv": "572dc77ba4d3726a12a76f5eb453e29ae52ea81b391af0c32169d2e18df4528a",
+    "seed_condition_selected.csv": "d375b3dc9ca4f3f03b2b711e8758be471afbb2df71cb45ebbecdf1984e8645d9",
+    "within_ablation_table.tex": "c7f09f75936c63d4799cb4e19512cf42b25a6ae9d0ea32f90e32aa0350d88f30",
+    "seed_condition_table.tex": "5dca611585a1f09acccbcfcc972c8a2fb7a02c84c9f1fb441e513510bd479d87",
+    "seed_condition_jaccard.pdf": "de4608d03e02c772d3afca70c522bccecef78b3faaa4551f13175be73c62ae5c",
+    "seed_condition_jaccard.png": "d80776b8eda8a08d92b63c09fa18b7d41783bca13dfcdb0bf14ebfbf7e03b28d"
+  }
+}

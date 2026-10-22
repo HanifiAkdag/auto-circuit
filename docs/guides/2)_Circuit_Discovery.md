@@ -1,62 +1,30 @@
-## Prepare model and data
+# Circuit discovery
+
+Once a model and loader are prepared, a discovery algorithm returns edge scores. For example, the mask-gradient algorithm can be called as follows:
 
 ```python
---8<-- "experiments/demos/circuit_discovery.py:1:31"
+from auto_circuit.prune_algos.mask_gradient import mask_gradient_prune_scores
+
+scores = mask_gradient_prune_scores(
+    model=model,
+    dataloader=train_loader,
+    official_edges=None,
+    grad_function="logit",
+    answer_function="avg_diff",
+    mask_val=0.0,
+)
 ```
 
-## Edge Attribution Patching circuit discovery
-Mask gradients are a faster way to compute Edge Attribution Patching, see the [reference
-documentation][auto_circuit.prune_algos.edge_attribution_patching] for more details.
-```python
---8<-- "experiments/demos/circuit_discovery.py:33:41"
-```
-AutoCircuit supports a range of circuit discovery methods.
+The [algorithm registry](../../auto_circuit/prune_algos/prune_algos.py) retains upstream algorithms and the EP/DiscoGP variants. Implementations include [ACDC](../../auto_circuit/prune_algos/ACDC.py), [mask-gradient EAP](../../auto_circuit/prune_algos/mask_gradient.py), [Subnetwork Probing](../../auto_circuit/prune_algos/subnetwork_probing.py), [Edge Pruning](../../auto_circuit/prune_algos/edge_pruning.py), and [DiscoGP](../../auto_circuit/prune_algos/disco_gp.py).
 
-- [Edge Attribution Patching][auto_circuit.prune_algos.mask_gradient]
-- [ACDC][auto_circuit.prune_algos.ACDC]
-- [Subnetwork Probing][auto_circuit.prune_algos.subnetwork_probing]
+Each method returns one score per edge in a `PruneScores` dictionary. `run_circuits` derives circuits by thresholding score magnitudes at requested budgets; positive and negative attribution signs are not separate circuit-selection rules. In attribution visualizations, blue/red indicate score sign and line thickness indicates magnitude.
 
-For the full set of available methods, see the
-[reference documentation][auto_circuit.prune_algos.mask_gradient].
+![IOI attribution graph](../assets/IOI_Attributions_Viz.png)
 
-## Visualize the circuit
-```python
---8<-- "experiments/demos/circuit_discovery.py:42:44"
-```
-Blue edges represent positive contributions to the output, red edges represent negative
-contributions, and the thickness of the edge represents the magnitude of the
-contribution.
+## Token-specific graphs
 
-![](../../assets/IOI_Attributions_Viz.png)
+Token-specific graphs request `return_seq_length=True` from the dataset loader and supply that sequence length to `patchable_model`. All prompts must have the same sequence length. The resulting graph distinguishes edges at different token positions.
 
-# Token specific circuit discovery
-AutoCircuit can construct a computation graph that differentiates between different
-token positions. All prompts in the dataset must have the same sequence length.
+![Token-specific IOI graph](../assets/IOI_Tokenwise_Viz.png)
 
-## Get prompt sequence length
-Set `return_seq_length=True` in
-[load_datasets_from_json][auto_circuit.data.load_datasets_from_json] to return the
-sequence length of the prompt.
-```python
---8<-- "experiments/demos/token_specific_circuit_discovery.py:16:25"
-```
-
-## Create the computation graph with token specific edges
-Set `seq_length` to the sequence length of the prompt in
-[patchable_model][auto_circuit.utils.graph_utils.patchable_model].
-```python
---8<-- "experiments/demos/token_specific_circuit_discovery.py:26:34"
-```
-
-## Edge Attribution Patching circuit discovery
-```python
---8<-- "experiments/demos/token_specific_circuit_discovery.py:35:43"
-```
-
-
-## Visualize the circuit
-```python
---8<-- "experiments/demos/token_specific_circuit_discovery.py:44:44"
-```
-
-![](../../assets/IOI_Tokenwise_Viz.png)
+Use [the registry-based pipeline](../reproduction.md) for the thesis data budgets, objectives, ablations, and evaluation protocol.

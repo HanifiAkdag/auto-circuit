@@ -1,0 +1,8 @@
+{
+  "prompts": [
+    {"clean": [1, 2, 3], "corrupt": [4, 5, 6], "answers": [7], "wrong_answers": [8]},
+    {"clean": [9, 10, 11], "corrupt": [12, 13, 14], "answers": [7], "wrong_answers": [8]},
+    {"clean": [17, 18, 19], "corrupt": [20, 21, 22], "answers": [7], "wrong_answers": [8]},
+    {"clean": [25, 26, 27], "corrupt": [28, 29, 30], "answers": [7], "wrong_answers": [8]}
+  ]
+}

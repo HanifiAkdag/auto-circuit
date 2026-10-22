@@ -1,0 +1,86 @@
+{
+  "rule": "population SD (ddof=0) across five native stability runs for density; population SD across the ten pairwise full-score Spearman similarities for Spearman",
+  "source": ".prune_scores/final/benchmark",
+  "source_manifest_count": 382,
+  "source_manifests_sha256": "e0d1d7dc3bdb16cbf3440281e02fc7a6f317f2bb87c5b18019b55599293810ad",
+  "cells": [
+    {
+      "algo": "discogp-ep",
+      "discovery_ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "density_values": [
+        0.048505738377571106,
+        0.05127573758363724,
+        0.05450740084052086,
+        0.06623372435569763,
+        0.06629528105258942
+      ],
+      "density_mean": 0.05736357644200325,
+      "density_sd": 0.0075117998837724706,
+      "spearman_values": [
+        0.3780494266758584,
+        0.38205994307632396,
+        0.36970785268631384,
+        0.3516074248546395,
+        0.3854485512559161,
+        0.36450254566681156,
+        0.3403558448102526,
+        0.37911765344201176,
+        0.3676375157638037,
+        0.3501258125069438
+      ],
+      "spearman_mean": 0.3668612570738875,
+      "spearman_sd": 0.014427205333371575,
+      "n_spearman_pairs": 10
+    },
+    {
+      "algo": "ep",
+      "discovery_ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ],
+      "density_values": [
+        0.011233880151426548,
+        0.011203102397587024,
+        0.010833769351512727,
+        0.01111076913606845,
+        0.011510879935982272
+      ],
+      "density_mean": 0.011178480194515405,
+      "density_sd": 0.0002179795169077686,
+      "spearman_values": [
+        0.21716186985742936,
+        0.19546902635926475,
+        0.19648324888414068,
+        0.177736889615307,
+        0.185009643432609,
+        0.19536859146026847,
+        0.21686835077543237,
+        0.18725716103981807,
+        0.16163270383120157,
+        0.21488056884413337
+      ],
+      "spearman_mean": 0.19478680540996046,
+      "spearman_sd": 0.01714019202158773,
+      "n_spearman_pairs": 10
+    }
+  ],
+  "registered_margins": {
+    "discogp_density": 0.0075117999,
+    "discogp_spearman": 0.0144272053,
+    "ep_density": 0.0002179795,
+    "ep_spearman": 0.017140192
+  }
+}

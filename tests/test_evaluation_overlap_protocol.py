@@ -8,7 +8,7 @@ import torch
 
 from auto_circuit.data import load_datasets_from_json
 from auto_circuit.prune_algos.prune_algos import PruneAlgo, run_prune_algos
-from experiments.thesis.run_cell import _build_task, _cache_stem
+from experiments.run_cell import _build_task, _cache_stem
 
 
 def _pool(tmp_path, duplicate=False):

@@ -1,0 +1,29 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "source": "results/results_chapter/ep_gt_kl_20261017/functional.csv",
+  "source_sha256": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+  "source_manifest": "results/results_chapter/ep_gt_kl_20261017/manifest.json",
+  "source_manifest_sha256": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+  "selection": "results/results_chapter/ep_gt_kl_20261017/exhibits/controlled_comparison/matched_quality.csv",
+  "selection_sha256": "828d0eda52df4eba2bd02188e57dca15751af38fa75a7e2a251806d8a90e039a",
+  "selection_manifest": "results/results_chapter/ep_gt_kl_20261017/exhibits/controlled_comparison/matched_quality_manifest.json",
+  "selection_manifest_sha256": "bae7d9ba13301983c2ddb5349b60c89f6a8fc51ad05cae5d3fc5e2c229aedbbc",
+  "discovery_cache_dir": ".prune_scores/final/benchmark",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "rows": 180,
+  "selection_rule": "Same selector, budget, and five circuits as the matched-quality table; only evaluation ablation varies.",
+  "outputs": {
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/crossed_evaluation_values.csv": "da20fdbb0806673a734bda6de284de91019eb37790ba93d93d49cf3a0820c1b9",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/ioi_evaluation_ablation.pdf": "37d03654dc827497bfd10081ea1de3633c68969b148f33737e428f18ac4b94c4",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/ioi_evaluation_ablation.png": "0ae1c780463d97653ce57f8ce50be35035973209638f9b7979bae924ac5ec107",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/greater_than_evaluation_ablation.pdf": "863b44b33b839ea5cebf3cee41ffa51f4b2c7ec49dd83f02009e1b163e9adef2",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/greater_than_evaluation_ablation.png": "ef85385489b4f00eff4469e535f9a35481f810fa0dc2afa04f133c43bda3a2c8",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/evaluation_ablation/appendix_tables.tex": "22039c15987cad61d06b6af7320396b233b819973862e38c3c03397fe6db2f08"
+  }
+}

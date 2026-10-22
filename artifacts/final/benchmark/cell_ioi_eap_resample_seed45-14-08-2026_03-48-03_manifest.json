@@ -1,0 +1,32 @@
+{
+  "cell": {
+    "task": "ioi",
+    "algo": "eap",
+    "algo_key": "Edge Attribution Patching [resample]",
+    "ablation": "resample",
+    "seed": 45,
+    "null_test": false
+  },
+  "cache_file": "cell_ioi_eap_resample_seed45-14-08-2026_03-48-03.pkl",
+  "saved_at": "2026-08-14T03:48:03",
+  "git": {
+    "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+    "dirty": true,
+    "dirty_files": [
+      ".claude/",
+      ".prune_scores_cache_v3/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "ablation_type": "Resample"
+  }
+}

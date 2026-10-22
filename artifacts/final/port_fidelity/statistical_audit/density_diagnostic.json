@@ -1,0 +1,343 @@
+{
+  "source": ".prune_scores/final/port_fidelity/edge_pruning",
+  "native_rule": "existing expected_l0 deterministic extraction per tensor",
+  "matched_rule": "existing magnitude threshold at k=2000, including ties",
+  "edge_count": 32491,
+  "embedding_edges": 445,
+  "rows": [
+    {
+      "arm": "port",
+      "seed": 0,
+      "native_total": 334,
+      "native_embedding": 12,
+      "native_nonembedding": 322,
+      "matched_total": 2000,
+      "matched_embedding": 48,
+      "matched_nonembedding": 1952
+    },
+    {
+      "arm": "port",
+      "seed": 1,
+      "native_total": 349,
+      "native_embedding": 14,
+      "native_nonembedding": 335,
+      "matched_total": 2001,
+      "matched_embedding": 46,
+      "matched_nonembedding": 1955
+    },
+    {
+      "arm": "port",
+      "seed": 2,
+      "native_total": 342,
+      "native_embedding": 12,
+      "native_nonembedding": 330,
+      "matched_total": 2001,
+      "matched_embedding": 58,
+      "matched_nonembedding": 1943
+    },
+    {
+      "arm": "port",
+      "seed": 3,
+      "native_total": 342,
+      "native_embedding": 14,
+      "native_nonembedding": 328,
+      "matched_total": 2000,
+      "matched_embedding": 58,
+      "matched_nonembedding": 1942
+    },
+    {
+      "arm": "port",
+      "seed": 4,
+      "native_total": 360,
+      "native_embedding": 14,
+      "native_nonembedding": 346,
+      "matched_total": 2000,
+      "matched_embedding": 56,
+      "matched_nonembedding": 1944
+    },
+    {
+      "arm": "port",
+      "seed": 5,
+      "native_total": 341,
+      "native_embedding": 16,
+      "native_nonembedding": 325,
+      "matched_total": 2001,
+      "matched_embedding": 58,
+      "matched_nonembedding": 1943
+    },
+    {
+      "arm": "port",
+      "seed": 6,
+      "native_total": 346,
+      "native_embedding": 14,
+      "native_nonembedding": 332,
+      "matched_total": 2001,
+      "matched_embedding": 60,
+      "matched_nonembedding": 1941
+    },
+    {
+      "arm": "port",
+      "seed": 7,
+      "native_total": 365,
+      "native_embedding": 14,
+      "native_nonembedding": 351,
+      "matched_total": 2001,
+      "matched_embedding": 59,
+      "matched_nonembedding": 1942
+    },
+    {
+      "arm": "port",
+      "seed": 8,
+      "native_total": 351,
+      "native_embedding": 13,
+      "native_nonembedding": 338,
+      "matched_total": 2002,
+      "matched_embedding": 56,
+      "matched_nonembedding": 1946
+    },
+    {
+      "arm": "port",
+      "seed": 9,
+      "native_total": 352,
+      "native_embedding": 12,
+      "native_nonembedding": 340,
+      "matched_total": 2003,
+      "matched_embedding": 56,
+      "matched_nonembedding": 1947
+    },
+    {
+      "arm": "port-sharedz",
+      "seed": 0,
+      "native_total": 374,
+      "native_embedding": 17,
+      "native_nonembedding": 357,
+      "matched_total": 2000,
+      "matched_embedding": 55,
+      "matched_nonembedding": 1945
+    },
+    {
+      "arm": "port-sharedz",
+      "seed": 1,
+      "native_total": 367,
+      "native_embedding": 12,
+      "native_nonembedding": 355,
+      "matched_total": 2000,
+      "matched_embedding": 49,
+      "matched_nonembedding": 1951
+    },
+    {
+      "arm": "port-sharedz",
+      "seed": 2,
+      "native_total": 374,
+      "native_embedding": 12,
+      "native_nonembedding": 362,
+      "matched_total": 2001,
+      "matched_embedding": 56,
+      "matched_nonembedding": 1945
+    },
+    {
+      "arm": "port-sharedz",
+      "seed": 3,
+      "native_total": 360,
+      "native_embedding": 14,
+      "native_nonembedding": 346,
+      "matched_total": 2000,
+      "matched_embedding": 61,
+      "matched_nonembedding": 1939
+    },
+    {
+      "arm": "port-sharedz",
+      "seed": 4,
+      "native_total": 362,
+      "native_embedding": 13,
+      "native_nonembedding": 349,
+      "matched_total": 2001,
+      "matched_embedding": 52,
+      "matched_nonembedding": 1949
+    },
+    {
+      "arm": "orig",
+      "seed": 0,
+      "native_total": 801,
+      "native_embedding": 445,
+      "native_nonembedding": 356,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 1,
+      "native_total": 810,
+      "native_embedding": 445,
+      "native_nonembedding": 365,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 2,
+      "native_total": 802,
+      "native_embedding": 445,
+      "native_nonembedding": 357,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 3,
+      "native_total": 815,
+      "native_embedding": 445,
+      "native_nonembedding": 370,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 4,
+      "native_total": 799,
+      "native_embedding": 445,
+      "native_nonembedding": 354,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 5,
+      "native_total": 801,
+      "native_embedding": 445,
+      "native_nonembedding": 356,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 6,
+      "native_total": 808,
+      "native_embedding": 445,
+      "native_nonembedding": 363,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 7,
+      "native_total": 816,
+      "native_embedding": 445,
+      "native_nonembedding": 371,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 8,
+      "native_total": 801,
+      "native_embedding": 445,
+      "native_nonembedding": 356,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig",
+      "seed": 9,
+      "native_total": 819,
+      "native_embedding": 445,
+      "native_nonembedding": 374,
+      "matched_total": 2000,
+      "matched_embedding": 445,
+      "matched_nonembedding": 1555
+    },
+    {
+      "arm": "orig-withembed",
+      "seed": 0,
+      "native_total": 394,
+      "native_embedding": 15,
+      "native_nonembedding": 379,
+      "matched_total": 2000,
+      "matched_embedding": 81,
+      "matched_nonembedding": 1919
+    },
+    {
+      "arm": "orig-withembed",
+      "seed": 1,
+      "native_total": 383,
+      "native_embedding": 14,
+      "native_nonembedding": 369,
+      "matched_total": 2000,
+      "matched_embedding": 75,
+      "matched_nonembedding": 1925
+    },
+    {
+      "arm": "orig-withembed",
+      "seed": 2,
+      "native_total": 394,
+      "native_embedding": 18,
+      "native_nonembedding": 376,
+      "matched_total": 2000,
+      "matched_embedding": 71,
+      "matched_nonembedding": 1929
+    },
+    {
+      "arm": "orig-withembed",
+      "seed": 3,
+      "native_total": 396,
+      "native_embedding": 16,
+      "native_nonembedding": 380,
+      "matched_total": 2000,
+      "matched_embedding": 88,
+      "matched_nonembedding": 1912
+    },
+    {
+      "arm": "orig-withembed",
+      "seed": 4,
+      "native_total": 395,
+      "native_embedding": 17,
+      "native_nonembedding": 378,
+      "matched_total": 2000,
+      "matched_embedding": 73,
+      "matched_nonembedding": 1927
+    }
+  ],
+  "averages": {
+    "port": {
+      "native_total": 348.2,
+      "native_embedding": 13.5,
+      "native_nonembedding": 334.7,
+      "matched_total": 2001.0,
+      "matched_embedding": 55.5,
+      "matched_nonembedding": 1945.5
+    },
+    "port-sharedz": {
+      "native_total": 367.4,
+      "native_embedding": 13.6,
+      "native_nonembedding": 353.8,
+      "matched_total": 2000.4,
+      "matched_embedding": 54.6,
+      "matched_nonembedding": 1945.8
+    },
+    "orig": {
+      "native_total": 807.2,
+      "native_embedding": 445.0,
+      "native_nonembedding": 362.2,
+      "matched_total": 2000.0,
+      "matched_embedding": 445.0,
+      "matched_nonembedding": 1555.0
+    },
+    "orig-withembed": {
+      "native_total": 392.4,
+      "native_embedding": 16.0,
+      "native_nonembedding": 376.4,
+      "matched_total": 2000.0,
+      "matched_embedding": 77.6,
+      "matched_nonembedding": 1922.4
+    }
+  }
+}

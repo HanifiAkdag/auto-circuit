@@ -1,4 +1,4 @@
-from experiments.thesis.stability_plots import (  # noqa: E402
+from experiments.stability_plots import (  # noqa: E402
     _diagonal_sd,
     _joint_only,
     _panel_points,

@@ -1,0 +1,6 @@
+task,algo,discovery_ablation,eval_ablation,measure,selector,budget_label,realised_mean,metric,n_seeds,metric_mean,metric_sd,metric_min,metric_max
+Indirect Object Identification,Manual circuit,mean,mean,faithfulness,manual,739,739,Clean KL Div,1,1.1991544961929321,0.0,1.1991544961929321,1.1991544961929321
+Indirect Object Identification,Manual circuit,mean,mean,faithfulness,manual,739,739,Logit Diff Percent,1,5.005775069859783,0.0,5.005775069859783,5.005775069859783
+Indirect Object Identification,Manual circuit,mean,mean,faithfulness,manual,739,739,Correct Answer Greater Than Incorrect Percent,1,53.515625,0.0,53.515625,53.515625
+Greaterthan,Manual circuit,resample,resample,faithfulness,manual,235,235,Clean KL Div,1,0.09533344209194183,0.0,0.09533344209194183,0.09533344209194183
+Greaterthan,Manual circuit,resample,resample,faithfulness,manual,235,235,Logit Diff Percent,1,75.35843887363849,0.0,75.35843887363849,75.35843887363849

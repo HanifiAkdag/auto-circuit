@@ -1,0 +1,44 @@
+{
+  "cell": {
+    "arm": "port-neginv",
+    "seed": 1,
+    "task": "ioi",
+    "algo": "discogp-ep",
+    "ablation": "zero"
+  },
+  "cache_file": "cell_port_neginv_seed1-10-09-2026_03-28-39.pkl",
+  "edge_density_at_threshold": 0.08411560207605362,
+  "n_edges": 32491,
+  "dataset": "port_fidelity/ioi_frozen",
+  "dataset_shuffle": false,
+  "batch_size": 64,
+  "edge_hparams": {
+    "gs_temp_edge": 1.0,
+    "logits_e_init": 1.0,
+    "lr": 0.1,
+    "lambda_sparse_init": 1.0,
+    "lambda_complete_init": 1.0,
+    "min_times_lambda_sparse": 0.01,
+    "max_times_lambda_sparse": 100.0,
+    "train_epochs": 100,
+    "n_epoch_warmup_lambda_sparse": 20,
+    "n_epoch_cooldown_lambda_sparse": 20
+  },
+  "saved_at": "2026-09-10T03:28:39",
+  "hardware": {
+    "node": "rubeus",
+    "slurm_job_id": "436417",
+    "gpu": "NVIDIA A100-SXM4-80GB"
+  },
+  "git": {
+    "commit": "2a9ee77a5cb1df49725b83a575ad59f4f8869bed",
+    "dirty": true,
+    "dirty_files": [
+      ".gitignore",
+      "experiments/experiment_utils.py",
+      "experiments/port_comparison/ep_run_cells.py",
+      "experiments/port_comparison/run_cells.py",
+      "tests/prune_algos/test_port_fidelity_split.py"
+    ]
+  }
+}

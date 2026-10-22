@@ -96,6 +96,7 @@ def test_mini_transformer_unfactorized_edges(
         separate_qkv=False,
         device=DEVICE,
     )
+    assert not fctrzd_model.cfg.use_split_qkv_input
     fctrzd_model_unpatched_out = fctrzd_model(input_batch)
     assert t.allclose(default_out, fctrzd_model_unpatched_out)
 
@@ -136,6 +137,13 @@ def test_mini_transformer_unfactorized_edges(
 
     assert not t.allclose(default_out, fctrzd_patched_out)
     assert t.allclose(fctrzd_patched_out, unfctrzd_patched_out, atol=1e-5)
+
+
+def test_split_qkv_configuration_preserved(mini_tl_transformer: tl.HookedTransformer):
+    model = deepcopy(mini_tl_transformer)
+    model.cfg.use_split_qkv_input = True
+    patched = patchable_model(model, factorized=True, separate_qkv=True, device=DEVICE)
+    assert patched.cfg.use_split_qkv_input
 
 
 # micro_model = micro_model()

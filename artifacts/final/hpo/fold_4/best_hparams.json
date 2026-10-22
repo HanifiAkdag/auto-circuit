@@ -1,0 +1,10 @@
+{
+  "e_lr": 0.11943022084945148,
+  "e_lambda_sparse_init": 1.6672205658878068,
+  "e_lambda_complete_init": 0.3352998567069518,
+  "e_max_times_lambda_sparse": 49.424801197190924,
+  "e_min_times_lambda_sparse": 0.03231893543076613,
+  "gs_temp_edge": 0.960049117493492,
+  "e_n_epoch_warmup": 23,
+  "e_n_epoch_cooldown": 30
+}

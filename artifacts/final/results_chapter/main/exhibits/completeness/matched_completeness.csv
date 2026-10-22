@@ -1,0 +1,81 @@
+task,ablation,algo,target_edges,selector,budget_label,realised_mean,metric,n_seeds,metric_mean,metric_sd
+Indirect Object Identification,zero,ACDC,739,threshold,9.0e-03,597.6,Clean KL Div,5,9.021180152893066,1.4885115203188024
+Indirect Object Identification,zero,EAP,739,top_k,739,739.0,Clean KL Div,5,7.280911159515381,0.3009868664317443
+Indirect Object Identification,zero,EP,739,top_k,739,739.0,Clean KL Div,5,7.249091529846192,2.0810669043514887
+Indirect Object Identification,zero,DiscoGP,739,top_k,739,739.0,Clean KL Div,5,6.430453872680664,0.021827158364581857
+Indirect Object Identification,zero,Random,739,top_k,739,739.0,Clean KL Div,5,3.2173558831214906,4.701196904912303
+Indirect Object Identification,zero,ACDC,739,threshold,9.0e-03,597.6,Logit Diff Percent,5,0.561496896698206,4.420717126741603
+Indirect Object Identification,zero,EAP,739,top_k,739,739.0,Logit Diff Percent,5,0.1660330119575943,2.297720932716499
+Indirect Object Identification,zero,EP,739,top_k,739,739.0,Logit Diff Percent,5,-1.1570624175721775,2.567969896486012
+Indirect Object Identification,zero,DiscoGP,739,top_k,739,739.0,Logit Diff Percent,5,0.2546430998192103,0.2023081266888843
+Indirect Object Identification,zero,Random,739,top_k,739,739.0,Logit Diff Percent,5,54.720177005203446,47.03199444833387
+Indirect Object Identification,zero,ACDC,739,threshold,9.0e-03,597.6,Correct Answer Greater Than Incorrect Percent,5,51.5625,3.787249888606507
+Indirect Object Identification,zero,EAP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,47.03125,2.25888004606265
+Indirect Object Identification,zero,EP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,48.59375,2.1338281693355725
+Indirect Object Identification,zero,DiscoGP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,48.671875,1.20017902310447
+Indirect Object Identification,zero,Random,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,73.90625,22.666215480727036
+Indirect Object Identification,resample,ACDC,739,threshold,7.0e-04,625.4,Clean KL Div,5,4.308233070373535,0.0030759209546384145
+Indirect Object Identification,resample,EAP,739,top_k,739,739.0,Clean KL Div,5,4.310426998138428,0.00764898716741449
+Indirect Object Identification,resample,EP,739,top_k,739,739.0,Clean KL Div,5,4.327908039093018,0.03899013279172936
+Indirect Object Identification,resample,DiscoGP,739,top_k,739,739.0,Clean KL Div,5,5.55856294631958,0.09027416316142041
+Indirect Object Identification,resample,Random,739,top_k,739,739.0,Clean KL Div,5,0.7290791504085063,1.363931062583681
+Indirect Object Identification,resample,ACDC,739,threshold,7.0e-04,625.4,Logit Diff Percent,5,-0.22570471747243848,0.17743031560911
+Indirect Object Identification,resample,EAP,739,top_k,739,739.0,Logit Diff Percent,5,-0.17966873040951206,0.08189219176305121
+Indirect Object Identification,resample,EP,739,top_k,739,739.0,Logit Diff Percent,5,-0.05455141468854632,0.09562886960963106
+Indirect Object Identification,resample,DiscoGP,739,top_k,739,739.0,Logit Diff Percent,5,-2.108445504842355,0.6354926000948
+Indirect Object Identification,resample,Random,739,top_k,739,739.0,Logit Diff Percent,5,75.73153153023205,48.49445234507672
+Indirect Object Identification,resample,ACDC,739,threshold,7.0e-04,625.4,Correct Answer Greater Than Incorrect Percent,5,51.328125,0.3983608994994363
+Indirect Object Identification,resample,EAP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,52.03125,0.2923169833417142
+Indirect Object Identification,resample,EP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,51.796875,0.7654655446197431
+Indirect Object Identification,resample,DiscoGP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,44.765625,2.415566380271923
+Indirect Object Identification,resample,Random,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,86.640625,23.23007168453748
+Indirect Object Identification,mean,ACDC,739,threshold,3.0e-03,888.4,Clean KL Div,5,3.732875633239746,0.06879408337419132
+Indirect Object Identification,mean,EAP,739,top_k,739,739.0,Clean KL Div,5,6.856733989715576,0.43558629225073675
+Indirect Object Identification,mean,EP,739,top_k,739,739.0,Clean KL Div,5,4.269654703140259,0.21248580440143117
+Indirect Object Identification,mean,DiscoGP,739,top_k,739,739.0,Clean KL Div,5,5.565840148925782,0.16720025485848342
+Indirect Object Identification,mean,Random,739,top_k,739,739.0,Clean KL Div,5,0.8654740825295448,1.282417407744181
+Indirect Object Identification,mean,Manual circuit,739,manual,739,739.0,Clean KL Div,1,5.863297462463379,0.0
+Indirect Object Identification,mean,ACDC,739,threshold,3.0e-03,888.4,Logit Diff Percent,5,-0.38324840187972964,0.893243336080976
+Indirect Object Identification,mean,EAP,739,top_k,739,739.0,Logit Diff Percent,5,-4.612405021354275,3.3144374010270123
+Indirect Object Identification,mean,EP,739,top_k,739,739.0,Logit Diff Percent,5,-1.4217586739071697,1.8409738836551415
+Indirect Object Identification,mean,DiscoGP,739,top_k,739,739.0,Logit Diff Percent,5,0.11513105863100667,0.46060665534038403
+Indirect Object Identification,mean,Random,739,top_k,739,739.0,Logit Diff Percent,5,67.50420388013859,49.61741265129508
+Indirect Object Identification,mean,Manual circuit,739,manual,739,739.0,Logit Diff Percent,1,-5.957510106884483,0.0
+Indirect Object Identification,mean,ACDC,739,threshold,3.0e-03,888.4,Correct Answer Greater Than Incorrect Percent,5,50.625,2.4655834121967968
+Indirect Object Identification,mean,EAP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,46.5625,2.335924435582196
+Indirect Object Identification,mean,EP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,47.109375,2.5024402153198384
+Indirect Object Identification,mean,DiscoGP,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,49.765625,3.0718130080214845
+Indirect Object Identification,mean,Random,739,top_k,739,739.0,Correct Answer Greater Than Incorrect Percent,5,81.484375,24.13493561598
+Indirect Object Identification,mean,Manual circuit,739,manual,739,739.0,Correct Answer Greater Than Incorrect Percent,1,44.53125,0.0
+Greaterthan,zero,ACDC,235,threshold,1.0e-02,251.4,Clean KL Div,5,8.738501167297363,0.7420778604687541
+Greaterthan,zero,EAP,235,top_k,235,235.0,Clean KL Div,5,9.955735015869141,0.2530536117469409
+Greaterthan,zero,EP,235,top_k,235,235.0,Clean KL Div,5,9.602579689025879,1.0874866488330828
+Greaterthan,zero,DiscoGP,235,top_k,235,235.0,Clean KL Div,5,7.882460880279541,0.4802677328537549
+Greaterthan,zero,Random,235,top_k,235,235.0,Clean KL Div,5,0.20704420506954194,0.14410309488205647
+Greaterthan,zero,ACDC,235,threshold,1.0e-02,251.4,Logit Diff Percent,5,-19.73723785956517,7.533003196635811
+Greaterthan,zero,EAP,235,top_k,235,235.0,Logit Diff Percent,5,-30.73445660726032,0.7948131392117483
+Greaterthan,zero,EP,235,top_k,235,235.0,Logit Diff Percent,5,-20.056441476146507,12.120544861315203
+Greaterthan,zero,DiscoGP,235,top_k,235,235.0,Logit Diff Percent,5,-1.5959889465420258,13.52056649794951
+Greaterthan,zero,Random,235,top_k,235,235.0,Logit Diff Percent,5,84.04743842238481,27.253907423951564
+Greaterthan,resample,ACDC,235,threshold,5.0e-04,261.2,Clean KL Div,5,2.8646803855895997,0.008137195896983416
+Greaterthan,resample,EAP,235,top_k,235,235.0,Clean KL Div,5,2.8567294120788573,0.002308510338846253
+Greaterthan,resample,EP,235,top_k,235,235.0,Clean KL Div,5,2.8922780036926268,0.019575769034309062
+Greaterthan,resample,DiscoGP,235,top_k,235,235.0,Clean KL Div,5,2.5336124897003174,0.07716953957807038
+Greaterthan,resample,Random,235,top_k,235,235.0,Clean KL Div,5,0.00444264430552721,0.004183867050033535
+Greaterthan,resample,Manual circuit,235,manual,235,235.0,Clean KL Div,1,2.894401788711548,0.0
+Greaterthan,resample,ACDC,235,threshold,5.0e-04,261.2,Logit Diff Percent,5,-32.25438408622877,0.09805140375602497
+Greaterthan,resample,EAP,235,top_k,235,235.0,Logit Diff Percent,5,-32.066275806561556,0.027521218461607277
+Greaterthan,resample,EP,235,top_k,235,235.0,Logit Diff Percent,5,-32.52876993811867,0.17747554623320144
+Greaterthan,resample,DiscoGP,235,top_k,235,235.0,Logit Diff Percent,5,-24.184371702648722,2.620335234445101
+Greaterthan,resample,Random,235,top_k,235,235.0,Logit Diff Percent,5,96.69021245613119,3.2856373564321366
+Greaterthan,resample,Manual circuit,235,manual,235,235.0,Logit Diff Percent,1,-32.9331472822144,0.0
+Greaterthan,mean,ACDC,235,threshold,7.0e-04,190.4,Clean KL Div,5,2.871836233139038,0.08677121371348517
+Greaterthan,mean,EAP,235,top_k,235,235.0,Clean KL Div,5,2.9480984210968018,0.004223161454609926
+Greaterthan,mean,EP,235,top_k,235,235.0,Clean KL Div,5,3.00155086517334,0.12716363230636973
+Greaterthan,mean,DiscoGP,235,top_k,235,235.0,Clean KL Div,5,1.7660231828689574,0.0707314062453973
+Greaterthan,mean,Random,235,top_k,235,235.0,Clean KL Div,5,0.005948737170547247,0.004613043197085721
+Greaterthan,mean,ACDC,235,threshold,7.0e-04,190.4,Logit Diff Percent,5,-32.329510243383844,1.6816025650325044
+Greaterthan,mean,EAP,235,top_k,235,235.0,Logit Diff Percent,5,-34.375782843742186,0.10139407731594251
+Greaterthan,mean,EP,235,top_k,235,235.0,Logit Diff Percent,5,-34.90384449976928,2.3669718050689865
+Greaterthan,mean,DiscoGP,235,top_k,235,235.0,Logit Diff Percent,5,-7.440904369044878,2.4557489087693254
+Greaterthan,mean,Random,235,top_k,235,235.0,Logit Diff Percent,5,96.65022762004966,3.237665666125383

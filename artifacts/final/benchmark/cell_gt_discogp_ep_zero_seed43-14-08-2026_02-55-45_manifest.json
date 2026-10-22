@@ -1,0 +1,59 @@
+{
+  "cell": {
+    "task": "gt",
+    "algo": "discogp-ep",
+    "algo_key": "DiscoGP Edge Only Paper [zero]",
+    "ablation": "zero",
+    "seed": 43,
+    "null_test": false
+  },
+  "cache_file": "cell_gt_discogp_ep_zero_seed43-14-08-2026_02-55-45.pkl",
+  "saved_at": "2026-08-14T02:55:45",
+  "git": {
+    "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+    "dirty": true,
+    "dirty_files": [
+      ".claude/",
+      ".prune_scores_cache_v3/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "use_weight_masks": false,
+    "gs_temp_weight": 0.01,
+    "logits_w_init": 1.0,
+    "w_lr": 0.1,
+    "w_lambda_sparse_init": 1.0,
+    "w_lambda_complete_init": 0.0,
+    "w_max_times_lambda_sparse": 1000.0,
+    "w_min_times_lambda_sparse": 1.0,
+    "w_train_epochs": 500,
+    "w_n_epoch_warmup": 500,
+    "w_n_epoch_cooldown": 1,
+    "use_edge_masks": true,
+    "gs_temp_edge": 1.0,
+    "logits_e_init": 1.0,
+    "e_lr": 0.1,
+    "e_lambda_sparse_init": 1.0,
+    "e_lambda_complete_init": 1.0,
+    "e_max_times_lambda_sparse": 100.0,
+    "e_min_times_lambda_sparse": 0.01,
+    "e_train_epochs": 100,
+    "e_n_epoch_warmup": 20,
+    "e_n_epoch_cooldown": 20,
+    "show_train_graph": true,
+    "hard": true,
+    "loss_mode": "answer_margin_ce",
+    "eval_callback": null,
+    "eval_every": null,
+    "ablation_type": "Zero"
+  }
+}

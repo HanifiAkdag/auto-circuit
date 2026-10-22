@@ -1,0 +1,37 @@
+{
+  "cell": {
+    "task": "gt",
+    "algo": "acdc",
+    "algo_key": "ACDC [tokenwise mean corrupt]",
+    "ablation": "mean",
+    "seed": 46,
+    "null_test": false
+  },
+  "cache_file": "cell_gt_acdc_mean_seed46-15-08-2026_05-48-14.pkl",
+  "saved_at": "2026-08-15T05:48:14",
+  "git": {
+    "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+    "dirty": true,
+    "dirty_files": [
+      "thesis_notes/methodology.md",
+      ".claude/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "merged_from": [
+    "cell_gt_acdc_mean_seed46__tb1-14-08-2026_20-27-27.pkl",
+    "cell_gt_acdc_mean_seed46__tb3-14-08-2026_20-31-04.pkl",
+    "cell_gt_acdc_mean_seed46__tb5-14-08-2026_20-31-04.pkl",
+    "cell_gt_acdc_mean_seed46__tb7-14-08-2026_20-40-43.pkl",
+    "cell_gt_acdc_mean_seed46__tb9-14-08-2026_20-47-27.pkl"
+  ],
+  "note": "tao-split ACDC partials merged by element-wise min (identical to single-process 20-tau sweep)."
+}

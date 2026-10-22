@@ -37,7 +37,7 @@ def test_docstring_generator_is_import_safe_and_reproducible(tmp_path, monkeypat
 
 
 def test_docstring_builder_selects_the_model_tokenizer(tmp_path, monkeypatch):
-    from experiments.thesis import build_evaluation_set as module
+    from experiments import build_evaluation_set as module
     class SelectedTokenizer(Exception):
         pass
     def select(name, **kwargs):
@@ -49,7 +49,7 @@ def test_docstring_builder_selects_the_model_tokenizer(tmp_path, monkeypatch):
 
 
 def test_clean_identity_rejects_shared_clean_with_different_corruption():
-    from experiments.thesis.evaluation_protocol import validate_records
+    from experiments.evaluation_protocol import validate_records
     old = [dict(clean='old', corrupt='background', answers=['a'], wrong_answers=['b'])]
     new = [dict(clean='old', corrupt='new background', answers=['a'], wrong_answers=['b'])]
     with pytest.raises(ValueError, match='clean'):
@@ -57,14 +57,14 @@ def test_clean_identity_rejects_shared_clean_with_different_corruption():
 
 
 def test_shared_corrupt_context_is_permitted_and_counted():
-    from experiments.thesis.evaluation_protocol import validate_records
+    from experiments.evaluation_protocol import validate_records
     old = [dict(clean='old', corrupt='background', answers=['a'], wrong_answers=['b'])]
     new = [dict(clean='new', corrupt='background', answers=['a'], wrong_answers=['b'])]
     assert validate_records(new, old, lambda text: tuple(text.encode()))['corrupt_overlap_rows'] == 1
 
 
 def test_token_collision_and_internal_duplicate_are_rejected():
-    from experiments.thesis.evaluation_protocol import validate_records
+    from experiments.evaluation_protocol import validate_records
     old = [dict(clean='old', corrupt='background', answers=['a'], wrong_answers=['b'])]
     new = [dict(clean='new', corrupt='new background', answers=['a'], wrong_answers=['b'])]
     with pytest.raises(ValueError, match='clean'):
@@ -74,7 +74,7 @@ def test_token_collision_and_internal_duplicate_are_rejected():
 
 
 def test_protocol_detects_changed_artifact_and_keeps_path_independent_id(tmp_path):
-    from experiments.thesis.evaluation_protocol import protocol_id, load_protocol, sha256
+    from experiments.evaluation_protocol import protocol_id, load_protocol, sha256
     data = tmp_path / 'ioi.json'
     data.write_text(json.dumps({'prompts': []}))
     value = {'schema': 1, 'purpose': 'temporary_historical_repair',

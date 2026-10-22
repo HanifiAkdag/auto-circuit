@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from experiments.thesis.run_cell import (  # noqa: E402
+from experiments.run_cell import (  # noqa: E402
     _EP_TASK_HPARAMS,
     _bind_task_hyperparams,
     _can_reuse_cache,
@@ -12,7 +12,7 @@ from experiments.thesis.run_cell import (  # noqa: E402
     _TASK_TEMPLATES,
 )
 from auto_circuit.prune_algos.prune_algos import EDGE_PRUNING_PRUNE_ALGO  # noqa: E402
-from experiments.thesis.experiment_utils import algo_hyperparams
+from experiments.experiment_utils import algo_hyperparams
 
 
 def test_joint_stem_matches_the_legacy_name():

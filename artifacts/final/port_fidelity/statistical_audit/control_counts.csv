@@ -1,0 +1,6 @@
+comparator,control,equivalent_count,inconclusive_count,new_count,old_count,study
+port,port-neginv,0,2,4,6,discogp
+orig,orig-asshipped,3,3,0,3,discogp
+port,port-neginv,0,0,6,6,ep
+port,port-negkl,2,4,0,4,ep
+port,port-nolambda,0,0,6,6,ep

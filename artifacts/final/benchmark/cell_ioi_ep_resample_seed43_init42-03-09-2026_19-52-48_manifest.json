@@ -1,0 +1,52 @@
+{
+  "cell": {
+    "task": "ioi",
+    "algo": "ep",
+    "algo_key": "Edge Pruning [resample]",
+    "ablation": "resample",
+    "seed": 43,
+    "init_seed": 42,
+    "null_test": false
+  },
+  "cache_file": "cell_ioi_ep_resample_seed43_init42-03-09-2026_19-52-48.pkl",
+  "saved_at": "2026-09-03T19:52:48",
+  "git": {
+    "commit": "23924bef50c755569e9e8b225306e075406c2826",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "hardware": {
+    "node": "remus",
+    "slurm_job_id": "431923",
+    "gpu": "NVIDIA A100-SXM4-80GB"
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "learning_rate": 0.8,
+    "lambda_learning_rate": 0.8,
+    "steps": 3000,
+    "warmup_steps": 200,
+    "target_edge_sparsity": 1.1,
+    "target_node_sparsity": 0.72,
+    "start_edge_sparsity": 0.0,
+    "start_node_sparsity": 0.0,
+    "sparsity_warmup_steps": 2500,
+    "use_node_masks": true,
+    "disable_node_loss": true,
+    "shared_mask_sample": true,
+    "show_train_graph": true,
+    "init_log_alpha": 10.0,
+    "disable_linear_regularization": false,
+    "eval_callback": null,
+    "eval_every": null,
+    "ablation_type": "Resample"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "inputs": {
+    "results/results_chapter/ep_gt_kl_20261017/functional.csv": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+    "results/results_chapter/ep_gt_kl_20261017/structural.csv": "bb167900cca264967d483cf6aac45e327e849e35075f4deff49197e28827e0ff",
+    "results/results_chapter/ep_gt_kl_20261017/manifest.json": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/stability/within_ablation_selected.csv": "572dc77ba4d3726a12a76f5eb453e29ae52ea81b391af0c32169d2e18df4528a",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/controlled_comparison/matched_quality.csv": "828d0eda52df4eba2bd02188e57dca15751af38fa75a7e2a251806d8a90e039a",
+    "results/results_chapter/ep_gt_kl_20261017/exhibits/controlled_comparison/matched_quality_manifest.json": "bae7d9ba13301983c2ddb5349b60c89f6a8fc51ad05cae5d3fc5e2c229aedbbc"
+  },
+  "selection": "Joint five-run cells; matched discovery/evaluation ablations; identical selected thresholds and budgets to quality and within-ablation tables; Random and manual excluded.",
+  "measure": "Spearman with average ranks for ties; population metric SD; descriptive across 12 cells per task/metric.",
+  "rows": 60,
+  "coefficients": 5,
+  "outputs": {
+    "structure_function_selected.csv": "f8e5ffc1a6068dc9f3ee70a00ccdae84838506a9155141220bc3f8cb6c68f520",
+    "structure_function_summary.csv": "36ef1f9ddf4f0cece91a6f03765f72023539b0b31c4e6c525774fa6207880f45",
+    "structure_function_table.tex": "a4521b95e8b26d5d240e067b2dcc247383f3aaacf05d7d0281fdcbf12bff1498"
+  }
+}

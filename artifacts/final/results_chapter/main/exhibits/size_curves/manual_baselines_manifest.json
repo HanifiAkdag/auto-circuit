@@ -1,0 +1,44 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "temporary_historical_repair": true,
+  "sources": [
+    {
+      "task_key": "ioi",
+      "task_name": "Indirect Object Identification",
+      "cache": ".prune_scores/final/benchmark/cell_ioi_gt_resample_seed42-27-07-2026_17-09-27.pkl",
+      "cache_sha256": "4c96619ff054b1f64eb1a682e419b3252e154ce9e76a694b92ea7f018f24bb96",
+      "manifest": ".prune_scores/final/benchmark/cell_ioi_gt_resample_seed42-27-07-2026_17-09-27_manifest.json",
+      "manifest_sha256": "3cd9adae6994cb674c3d2157705d9912eea62643cc0d2e9e8508666c7478b847",
+      "ablation": "mean",
+      "positive_edges": 739
+    },
+    {
+      "task_key": "gt",
+      "task_name": "Greaterthan",
+      "cache": ".prune_scores/final/benchmark/cell_gt_gt_resample_seed42-27-07-2026_17-24-25.pkl",
+      "cache_sha256": "44adc0ff65eac0b0c86a9f79b36ed4a4860fc3e8657d4ca9c1995297ac68ff7e",
+      "manifest": ".prune_scores/final/benchmark/cell_gt_gt_resample_seed42-27-07-2026_17-24-25_manifest.json",
+      "manifest_sha256": "66c9c7a1c47160f7c3a0108b31d888a1e73e20cec51e5c5c38d1a66fc31cb755",
+      "ablation": "resample",
+      "positive_edges": 235
+    }
+  ],
+  "metrics": {
+    "ioi": [
+      "Clean KL Div",
+      "Logit Diff Percent",
+      "Correct Answer Greater Than Incorrect Percent"
+    ],
+    "gt": [
+      "Clean KL Div",
+      "Logit Diff Percent"
+    ],
+    "docstring": [
+      "Clean KL Div",
+      "Correct Answer Greater Than Incorrect Percent"
+    ]
+  },
+  "test_loader": "Explicit common evaluation Task (256 examples)",
+  "patch_type": "Tree Patch",
+  "selection": "all binary-positive edges in each canonical deterministic official circuit cache"
+}

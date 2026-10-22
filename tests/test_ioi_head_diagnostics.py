@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from experiments.thesis.ioi_head_diagnostics.protocol import (
+from experiments.ioi_head_diagnostics.protocol import (
     native_mask, exact_mask, positions, make_interventions, normalized_margin,
     control_sets, replacement_sets,
 )
@@ -80,7 +80,7 @@ def test_control_matching_and_fixed_budget_pairs_are_reproducible():
 
 def test_metrics_preserve_kl_direction_and_strict_accuracy():
     import torch
-    from experiments.thesis.ioi_head_diagnostics.evaluation import output_metrics
+    from experiments.ioi_head_diagnostics.evaluation import output_metrics
     full = torch.tensor([[2., 0., -1.], [0., 0., -1.]])
     changed = torch.tensor([[0., 2., -1.], [0., 0., -1.]])
     values = output_metrics(changed, full, torch.tensor([0, 0]), torch.tensor([1, 1]))
@@ -92,7 +92,7 @@ def test_metrics_preserve_kl_direction_and_strict_accuracy():
 
 
 def test_crossed_bootstrap_keeps_paired_constant_effect():
-    from experiments.thesis.ioi_head_diagnostics.analysis import crossed_interval
+    from experiments.ioi_head_diagnostics.analysis import crossed_interval
     data = np.full((5, 16), 2.5)
     assert crossed_interval(data, draws=200) == (2.5, 2.5)
     denominator = np.arange(1, 17, dtype=float)
@@ -107,7 +107,7 @@ def test_unavailable_controls_do_not_relax_strata():
 
 
 def test_frozen_inventory_identity_ignores_file_container_but_rejects_content_changes():
-    from experiments.thesis.ioi_head_diagnostics.protocol import fingerprint, validate_identity
+    from experiments.ioi_head_diagnostics.protocol import fingerprint, validate_identity
     content = dict(schema=1, conditions=[dict(id=0, attained=3)])
     saved = dict(content, study_id=fingerprint(content), masks_file_hash='container-sha')
     validate_identity(saved)
@@ -118,7 +118,7 @@ def test_frozen_inventory_identity_ignores_file_container_but_rejects_content_ch
 
 def test_reference_checksum_rejects_changed_denominator(tmp_path):
     import json
-    from experiments.thesis.ioi_head_diagnostics.protocol import file_hash, validate_reference
+    from experiments.ioi_head_diagnostics.protocol import file_hash, validate_reference
     reference = tmp_path / 'full_reference.npz'
     prompts = tmp_path / 'prompt_positions.json'
     np.savez(reference, margin=np.array([2., 3.]))
@@ -138,8 +138,8 @@ def test_failed_observed_forward_cleans_hooks_masks_and_patch_state():
     from auto_circuit.utils.graph_utils import patchable_model
     from auto_circuit.utils.ablation_activations import src_ablations
     from auto_circuit.utils.misc import module_by_name
-    from experiments.thesis.ioi_head_diagnostics.protocol import graph_records
-    from experiments.thesis.ioi_head_diagnostics.evaluation import forward
+    from experiments.ioi_head_diagnostics.protocol import graph_records
+    from experiments.ioi_head_diagnostics.evaluation import forward
     cfg = HookedTransformerConfig(n_layers=12, n_heads=12, d_model=24, d_head=2,
         d_mlp=48, d_vocab=17, n_ctx=8, act_fn='relu', device='cpu',
         use_attn_result=True, use_attn_in=True, use_split_qkv_input=True, use_hook_mlp_in=True)
@@ -164,7 +164,7 @@ def test_failed_observed_forward_cleans_hooks_masks_and_patch_state():
 
 def test_mean_case_plans_controls_and_exact_interventions_at_each_budget():
     # Catches silently restricting causal conditions to 3000 or sharing control identities across budgets.
-    from experiments.thesis.ioi_head_diagnostics import protocol
+    from experiments.ioi_head_diagnostics import protocol
     edges = [edge('A9.9', 'A10.7.Q'), edge('MLP 0', 'A11.10.Q')]
     edges += [edge('A9.9', f'A10.{h}.Q') for h in range(6)]
     edges += [edge('MLP 0', f'A11.{h}.Q') for h in range(6)]
@@ -192,7 +192,7 @@ def test_mean_case_plans_controls_and_exact_interventions_at_each_budget():
 
 def test_primary_effects_do_not_overwrite_discovery_runs_across_budgets():
     # Catches a budget omitted from inference keys, which used to pool/overwrite different circuits.
-    from experiments.thesis.ioi_head_diagnostics import analysis
+    from experiments.ioi_head_diagnostics import analysis
     conditions, arrays, results = [], {}, {}
     for case, seed in enumerate((42, 43)):
         for budget, baseline, effect in ((739, 2., 1.), (2000, 4., 3.)):
@@ -212,7 +212,7 @@ def test_primary_effects_do_not_overwrite_discovery_runs_across_budgets():
 def test_kl_partition_detects_wrong_pair_mass_even_with_unchanged_answer_margin():
     # Catches conflating within-name preference with full-vocabulary faithfulness.
     import torch
-    from experiments.thesis.ioi_head_diagnostics.evaluation import output_metrics
+    from experiments.ioi_head_diagnostics.evaluation import output_metrics
     full = torch.log(torch.tensor([[.3, .1, .2, .4]], dtype=torch.float64))
     changed = torch.log(torch.tensor([[.6, .2, .05, .15]], dtype=torch.float64))
     values = output_metrics(changed, full, torch.tensor([0]), torch.tensor([1]))
@@ -228,7 +228,7 @@ def test_mean_output_reference_selects_actual_source_indices():
     # Catches attributing output replacement to individual corrupt activations or the wrong source order.
     import torch
     from types import SimpleNamespace
-    from experiments.thesis.ioi_head_diagnostics import evaluation
+    from experiments.ioi_head_diagnostics import evaluation
     model = SimpleNamespace(srcs=[SimpleNamespace(name='A11.10', src_idx=0),
                                  SimpleNamespace(name='A10.7', src_idx=2)])
     replacement = torch.arange(3 * 2 * 4 * 5).reshape(3, 2, 4, 5)
@@ -239,7 +239,7 @@ def test_mean_output_reference_selects_actual_source_indices():
 
 def test_exact_tie_effects_are_averaged_within_discovery_runs():
     # Catches dropping exact-size probes or treating tie resolutions as independent runs.
-    from experiments.thesis.ioi_head_diagnostics.analysis import collect_primary
+    from experiments.ioi_head_diagnostics.analysis import collect_primary
     conditions, arrays, results = [], {}, {}
     for seed, case in [(42, 0), (43, 1)]:
         for realization, effect in [(0, 1.), (1, 3.)]:
@@ -265,8 +265,8 @@ def test_exact_tie_effects_are_averaged_within_discovery_runs():
 
 
 def test_exact_endpoint_table_includes_untied_native_runs_once():
-    from experiments.thesis.ioi_head_diagnostics.analysis import exact_run_rows
-    from experiments.thesis.ioi_head_diagnostics.evaluation import METRICS
+    from experiments.ioi_head_diagnostics.analysis import exact_run_rows
+    from experiments.ioi_head_diagnostics.evaluation import METRICS
     rows = []
     for seed, phase, label, value in [(42, 'size-sensitivity', 'exact_baseline', 2.),
                                       (42, 'size-sensitivity', 'exact_baseline', 4.),
@@ -284,8 +284,8 @@ def test_exact_endpoint_table_includes_untied_native_runs_once():
 
 
 def test_exact_endpoint_export_reports_actual_intervention_sizes():
-    from experiments.thesis.ioi_head_diagnostics.analysis import exact_run_rows
-    from experiments.thesis.ioi_head_diagnostics.evaluation import METRICS
+    from experiments.ioi_head_diagnostics.analysis import exact_run_rows
+    from experiments.ioi_head_diagnostics.evaluation import METRICS
     rows = [dict(algo='acdc', seed=42, budget=2000, attained=n, phase='size-sensitivity',
                  label='exact_restore_q_both', logit_difference_percent=100.,
                  **{key: 1. for key in METRICS}) for n in (2200, 2210)]

@@ -1,0 +1,68 @@
+{
+  "attn-only-4l": {
+    "files": {
+      "config.json": {
+        "bytes": 1278,
+        "sha256": "e593cd3aa2ba5836aa0664ee888e15b2fe2c64844a403a78f9211d7eb48794cb"
+      },
+      "model_final.pth": {
+        "bytes": 220821382,
+        "sha256": "80d3c64c1e56d43566af37daff34ed83e49e1d9220f4cab45d824c55923179d2"
+      }
+    },
+    "repo_id": "NeelNanda/Attn_Only_4L512W_C4_Code",
+    "revision": "f92b3883ed8e6f34d2e15e7e69d2c361b020be42"
+  },
+  "docstring-tokenizer": {
+    "files": {
+      "special_tokens_map.json": {
+        "bytes": 81,
+        "sha256": "e86cccaa44a6163e7bc8e45e7cd0551cf2f0e0fcbca7eab61898fced871d7cc6"
+      },
+      "tokenizer.json": {
+        "bytes": 2037698,
+        "sha256": "8572c270dc08dc0501682314917ec3c71fbfe20c0c5287408a80c32cc00bdbcb"
+      },
+      "tokenizer_config.json": {
+        "bytes": 51,
+        "sha256": "990f92fd19ec5106da2747cedc1967e6133f9c158ea3e8d7a797778a5556b261"
+      }
+    },
+    "repo_id": "NeelNanda/gpt-neox-tokenizer-digits",
+    "revision": "0f6671571a20be9756b9991d978047c03b75e749"
+  },
+  "gpt2": {
+    "files": {
+      "config.json": {
+        "bytes": 665,
+        "sha256": "0daed7749b4f02b8f76240d5444551d7b08712dab4d0adb8239c56ba823bb7b4"
+      },
+      "generation_config.json": {
+        "bytes": 124,
+        "sha256": "ed0b32ac72c0f5f44a719abb2d7786ea5146c871f83717b7f2018065954de02b"
+      },
+      "merges.txt": {
+        "bytes": 456318,
+        "sha256": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5"
+      },
+      "model.safetensors": {
+        "bytes": 548105171,
+        "sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707"
+      },
+      "tokenizer.json": {
+        "bytes": 1355256,
+        "sha256": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6"
+      },
+      "tokenizer_config.json": {
+        "bytes": 26,
+        "sha256": "5e04eb606e3a1583530a42e36c2a6b6615c86f34fe77e44d9ddeb43ff940931f"
+      },
+      "vocab.json": {
+        "bytes": 1042301,
+        "sha256": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783"
+      }
+    },
+    "repo_id": "gpt2",
+    "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e"
+  }
+}

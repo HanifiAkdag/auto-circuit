@@ -1,6 +1,6 @@
 import pytest
 
-from experiments.thesis.stability_cells import (  # noqa: E402
+from experiments.stability_cells import (  # noqa: E402
     ANCHOR_SEED,
     CONDITIONS,
     DECOMP_ALGOS,

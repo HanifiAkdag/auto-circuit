@@ -1,0 +1,8 @@
+{
+  "study_id": "d168afd4e9fcdc18be9ece335a5590a1df556342050e381f23c993f76d6cb6ef",
+  "complete": true,
+  "checksums": {
+    "full_reference.npz": "d9e83a078ee1433bd28bc0fd7d24d1f88971b4341fe4f536aafa5c9e5cc2b863",
+    "prompt_positions.json": "3654747a6427af2fac8c795beaee72e74a4962418e9c32c2bdc92284be3697f9"
+  }
+}

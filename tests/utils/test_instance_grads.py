@@ -1,37 +1,43 @@
 #%%
 
 
+from copy import deepcopy
+
 import torch as t
 from transformer_lens import HookedTransformer
 
-from auto_circuit.tasks import Task
+from auto_circuit.data import load_datasets_from_json
 from auto_circuit.types import AblationType, PruneScores
 from auto_circuit.utils.ablation_activations import src_ablations
 from auto_circuit.utils.graph_utils import (
     patch_mode,
+    patchable_model,
     set_all_masks,
     set_mask_batch_size,
     train_mask_mode,
 )
+from auto_circuit.utils.misc import repo_path_to_abs_path
 from auto_circuit.utils.tensor_ops import batch_avg_answer_diff
 
 
 def test_instance_grads(mini_tl_transformer: HookedTransformer):
 
-    # create task
     batch_size = 2
-    batch_count = 1
-    task = Task(
-        key="test_eap",
-        name="test_eap",
+    train_loader, _ = load_datasets_from_json(
+        model=None,
+        path=repo_path_to_abs_path("tests/fixtures/instance_grads_prompts.json"),
+        device=next(mini_tl_transformer.parameters()).device,
+        prepend_bos=False,
         batch_size=batch_size,
-        batch_count=batch_count,
-        token_circuit=False,
-        _model_def=mini_tl_transformer,
-        _dataset_name="mini_prompts",
+        train_test_size=(2, 2),
     )
-    model = task.model
-    train_loader = task.train_loader
+    model = patchable_model(
+        deepcopy(mini_tl_transformer),
+        factorized=True,
+        slice_output="last_seq",
+        separate_qkv=True,
+        device=next(mini_tl_transformer.parameters()).device,
+    )
 
     # compute src patch out
     src_patch_out = src_ablations(

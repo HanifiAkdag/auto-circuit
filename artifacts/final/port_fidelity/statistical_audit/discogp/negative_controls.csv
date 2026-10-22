@@ -1,0 +1,13 @@
+comparator,control,detected,difference_detected,endpoint,equivalence_established,equivalent,inconclusive,p_permutation
+port,port-neginv,False,False,density,False,False,True,0.13386613386613386
+port,port-neginv,True,True,Clean KL Div,False,False,False,0.000333000333000333
+port,port-neginv,True,True,Logit Diff Percent,False,False,False,0.000333000333000333
+port,port-neginv,True,True,Answer Pair KL Div,False,False,False,0.000333000333000333
+port,port-neginv,True,True,jaccard,False,False,False,0.000333000333000333
+port,port-neginv,False,False,spearman,False,False,True,0.23243423243423245
+orig,orig-asshipped,False,False,density,False,False,True,0.8864468864468864
+orig,orig-asshipped,False,False,Clean KL Div,False,False,True,0.5807525807525807
+orig,orig-asshipped,False,False,Logit Diff Percent,False,False,True,0.6083916083916084
+orig,orig-asshipped,False,False,Answer Pair KL Div,True,True,False,0.8827838827838828
+orig,orig-asshipped,False,False,jaccard,True,True,False,0.5920745920745921
+orig,orig-asshipped,False,False,spearman,True,True,False,0.37662337662337664

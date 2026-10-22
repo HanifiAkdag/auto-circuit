@@ -7,7 +7,7 @@ import pytest
 
 
 def analysis():
-    name = 'experiments.thesis.results_chapter_structure_function'
+    name = 'experiments.results_chapter_structure_function'
     assert importlib.util.find_spec(name) is not None, 'Paired analysis module is missing'
     return importlib.import_module(name)
 

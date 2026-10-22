@@ -1,0 +1,31 @@
+comparison,detected,difference_detected,equivalence_established,inconclusive,old_detected,study
+density::port-neginv_vs_port,False,False,False,True,True,discogp
+Clean KL Div::port-neginv_vs_port,True,True,False,False,True,discogp
+Logit Diff Percent::port-neginv_vs_port,True,True,False,False,True,discogp
+Answer Pair KL Div::port-neginv_vs_port,True,True,False,False,True,discogp
+jaccard::port-neginv_vs_port,True,True,False,False,True,discogp
+spearman::port-neginv_vs_port,False,False,False,True,True,discogp
+density::orig-asshipped_vs_orig,False,False,False,True,True,discogp
+Clean KL Div::orig-asshipped_vs_orig,False,False,False,True,True,discogp
+Logit Diff Percent::orig-asshipped_vs_orig,False,False,False,True,True,discogp
+Answer Pair KL Div::orig-asshipped_vs_orig,False,False,True,False,False,discogp
+jaccard::orig-asshipped_vs_orig,False,False,True,False,False,discogp
+spearman::orig-asshipped_vs_orig,False,False,True,False,False,discogp
+density::port-neginv_vs_port,True,True,False,False,True,ep
+Clean KL Div::port-neginv_vs_port,True,True,False,False,True,ep
+Logit Diff Percent::port-neginv_vs_port,True,True,False,False,True,ep
+Answer Pair KL Div::port-neginv_vs_port,True,True,False,False,True,ep
+jaccard::port-neginv_vs_port,True,True,False,False,True,ep
+spearman::port-neginv_vs_port,True,True,False,False,True,ep
+density::port-negkl_vs_port,False,False,False,True,True,ep
+Clean KL Div::port-negkl_vs_port,False,False,False,True,True,ep
+Logit Diff Percent::port-negkl_vs_port,False,False,True,False,False,ep
+Answer Pair KL Div::port-negkl_vs_port,False,False,True,False,False,ep
+jaccard::port-negkl_vs_port,False,False,False,True,True,ep
+spearman::port-negkl_vs_port,False,False,False,True,True,ep
+density::port-nolambda_vs_port,True,True,False,False,True,ep
+Clean KL Div::port-nolambda_vs_port,True,True,False,False,True,ep
+Logit Diff Percent::port-nolambda_vs_port,True,True,False,False,True,ep
+Answer Pair KL Div::port-nolambda_vs_port,True,True,False,False,True,ep
+jaccard::port-nolambda_vs_port,True,True,False,False,True,ep
+spearman::port-nolambda_vs_port,True,True,False,False,True,ep

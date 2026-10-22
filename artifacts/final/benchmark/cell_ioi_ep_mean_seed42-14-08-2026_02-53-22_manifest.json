@@ -1,0 +1,49 @@
+{
+  "cell": {
+    "task": "ioi",
+    "algo": "ep",
+    "algo_key": "Edge Pruning [tokenwise mean corrupt]",
+    "ablation": "mean",
+    "seed": 42,
+    "null_test": false
+  },
+  "cache_file": "cell_ioi_ep_mean_seed42-14-08-2026_02-53-22.pkl",
+  "saved_at": "2026-08-14T02:53:22",
+  "git": {
+    "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+    "dirty": true,
+    "dirty_files": [
+      ".claude/",
+      ".prune_scores_cache_v3/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "learning_rate": 0.8,
+    "lambda_learning_rate": 0.8,
+    "steps": 3000,
+    "warmup_steps": 200,
+    "target_edge_sparsity": 1.1,
+    "target_node_sparsity": 0.72,
+    "start_edge_sparsity": 0.0,
+    "start_node_sparsity": 0.0,
+    "sparsity_warmup_steps": 2500,
+    "use_node_masks": true,
+    "disable_node_loss": true,
+    "shared_mask_sample": true,
+    "show_train_graph": true,
+    "init_log_alpha": 10.0,
+    "disable_linear_regularization": false,
+    "eval_callback": null,
+    "eval_every": null,
+    "ablation_type": "Tokenwise Mean Corrupt"
+  }
+}

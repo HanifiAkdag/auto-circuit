@@ -1,0 +1,334 @@
+"""Render final five-run matched-ablation size curves for all tasks.
+
+Run on a CPU compute node: srun --mem=8G python -m experiments.results_chapter_size_curves
+"""
+from __future__ import annotations
+
+import csv
+import argparse
+import hashlib
+import json
+from math import log10
+from pathlib import Path
+
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from pypdf import PdfReader, PdfWriter
+from .config import ROOT
+from .results_chapter_sources import EXPORT_ROOT, bundle, provenance_path
+
+
+SOURCE = ROOT / "artifacts/final/results_chapter/main"
+OUT = EXPORT_ROOT / 'main'
+SIZE_OUT = OUT / "size_curves"
+INSPECTION = SIZE_OUT
+ABLATIONS = ("zero", "resample", "mean")
+TASKS = {
+    "ioi": ("Indirect Object Identification", "IOI"),
+    "gt": ("Greaterthan", "Greater-Than"),
+    "docstring": ("Docstring", "Docstring"),
+}
+TASK_SLUGS = {"ioi": "ioi", "gt": "greater_than", "docstring": "docstring"}
+METHODS = ("ACDC", "EAP", "EP", "DiscoGP")
+STYLE = {
+    "ACDC": ("#009E73", "ACDC"),
+    "EAP": ("#7B2CBF", "EAP"),
+    "EP": ("#0072B2", "Edge Pruning"),
+    "DiscoGP": ("#D55E00", "DiscoGP"),
+    "Random": ("#777777", "Random circuit"),
+    "Manual circuit": ("#222222", "Manually identified circuit"),
+}
+METRICS = (("Clean KL Div", "KL divergence"),
+           ("Logit Diff Percent", "Logit difference (%)"),
+           ("Correct Answer Greater Than Incorrect Percent",
+            "Correct-over-incorrect accuracy (%)"))
+TASK_METRICS = {
+    "ioi": METRICS,
+    "gt": METRICS[:2],
+    "docstring": (METRICS[0], METRICS[2]),
+}
+MANUAL_BUDGETS = {"ioi": 739, "gt": 235, "docstring": 24}
+ALL_TASKS = dict(TASKS)
+ALL_TASK_METRICS = dict(TASK_METRICS)
+
+
+def read_csv(path):
+    with path.open(newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def validate_source_protocol(source_meta, manual_meta):
+    from .evaluation_protocol import require_same_protocol
+    require_same_protocol({**source_meta, 'evaluation_protocol_id': source_meta.get('evaluation_protocol_id', 'legacy_template')},
+                          {**manual_meta, 'evaluation_protocol_id': manual_meta.get('evaluation_protocol_id', 'legacy_template')})
+
+
+def metric_ylim(task_rows, metric):
+    """Return one y-range for every ablation column in a metric row."""
+    values = []
+    for row in task_rows:
+        if row["metric"] != metric:
+            continue
+        mean = float(row["metric_mean"])
+        sd = float(row["metric_sd"])
+        values.extend((mean - sd, mean + sd))
+    assert values, f"No values found for {metric}"
+    lower, upper = min(values), max(values)
+    if metric == "Clean KL Div":
+        lower = max(0.0, lower)
+    if metric in {"Logit Diff Percent", "Correct Answer Greater Than Incorrect Percent"}:
+        upper = max(upper, 100.0)
+    padding = max((upper - lower) * 0.06, 1e-3)
+    return [lower if lower == 0 else lower - padding, upper + padding]
+
+
+def main(source_dir=None, output_dir=None, task_keys=None):
+    global SOURCE, OUT, SIZE_OUT, INSPECTION, TASKS, TASK_METRICS
+    if source_dir is None:
+        for name, keys in (('main', ['ioi', 'gt']), ('docstring', ['docstring'])):
+            if task_keys is None or set(keys).intersection(task_keys):
+                main(source_dir=Path(bundle(name)['source_dir']),
+                     output_dir=(ROOT / output_dir if output_dir else EXPORT_ROOT) / name,
+                     task_keys=[k for k in keys if task_keys is None or k in task_keys])
+        return
+    if output_dir is None:
+        raise ValueError('An alternate source requires a separate output directory')
+    SOURCE = (ROOT / source_dir).resolve()
+    OUT = (ROOT / output_dir).resolve()
+    SIZE_OUT = INSPECTION = OUT / 'size_curves'
+    SIZE_OUT.mkdir(parents=True, exist_ok=True)
+    INSPECTION.mkdir(parents=True, exist_ok=True)
+    functional = SOURCE / "functional.csv"
+    stability_manifest = SOURCE / "manifest.json"
+    source_meta = json.loads(stability_manifest.read_text())
+    task_keys = task_keys or source_meta.get('tasks') or sorted({c['task'] for c in source_meta['cells']})
+    TASKS = {k: v for k, v in ALL_TASKS.items() if k in task_keys}
+    TASK_METRICS = {k: v for k, v in ALL_TASK_METRICS.items() if k in task_keys}
+    if not TASKS or set(task_keys) != set(TASKS):
+        raise ValueError('Specify supported task keys for size curves')
+    manual_dir = (SIZE_OUT if (SIZE_OUT / 'manual_baselines_manifest.json').is_file()
+                  else SOURCE / 'exhibits/size_curves')
+    manual_meta = json.loads((manual_dir / 'manual_baselines_manifest.json').read_text())
+    validate_source_protocol(source_meta, manual_meta)
+    assert source_meta["seeds"] == [42, 43, 44, 45, 46]
+    assert source_meta['complete']
+    all_rows = read_csv(functional)
+    manual_file = manual_dir / "manual_baselines.csv"
+    assert manual_file.exists(), "Run results_chapter_manual_baseline.py first"
+    manual_rows = read_csv(manual_file)
+    assert len(manual_rows) == sum(len(v) for v in TASK_METRICS.values())
+    rows = []
+    for task_key, (task_name, _) in TASKS.items():
+        task_metrics = TASK_METRICS[task_key]
+        rows.extend(dict(r, source_discovery_ablation=r["discovery_ablation"])
+                     for r in all_rows
+                     if r["task"] == task_name and r["algo"] in METHODS
+                     and r["condition"] == "joint" and r["measure"] == "faithfulness"
+                     and r["discovery_ablation"] == r["eval_ablation"]
+                     and r["metric"] in dict(task_metrics)
+                     and r["discovery_ablation"] in ABLATIONS)
+        rows.extend(dict(r, discovery_ablation=r["eval_ablation"],
+                         source_discovery_ablation="anchor")
+                    for r in all_rows
+                    if r["task"] == task_name and r["algo"] == "Random"
+                    and r["condition"] == "joint" and r["measure"] == "faithfulness"
+                    and r["discovery_ablation"] == "anchor"
+                    and r["eval_ablation"] in ABLATIONS
+                    and r["metric"] in dict(task_metrics))
+        rows.extend(dict(r, condition="deterministic", source_discovery_ablation="manual",
+                         metric_values=r["metric_mean"])
+                    for r in manual_rows if r["task"] == task_name)
+    assert rows and all(int(r["n_seeds"]) == (1 if r["algo"] == "Manual circuit" else 5)
+                        for r in rows)
+    for task_name, _ in TASKS.values():
+        task_rows = [r for r in rows if r["task"] == task_name]
+        seen = {(r["discovery_ablation"], r["algo"], r["metric"]) for r in task_rows}
+        task_key = next(k for k, v in TASKS.items() if v[0] == task_name)
+        task_metrics = TASK_METRICS[task_key]
+        expected = (3 * len(METHODS) + 3) * len(task_metrics)
+        expected += len(task_metrics)
+        assert len(seen) == expected
+        assert all((a, m, metric) in seen for a in ABLATIONS
+                   for m in (*METHODS, "Random") for metric, _ in task_metrics)
+        native_manual_ablation = "mean" if task_key == "ioi" else "resample"
+        assert all((native_manual_ablation, "Manual circuit", metric) in seen
+                   for metric, _ in task_metrics)
+    for r in rows:
+        r["realised_mean"] = float(r["realised_mean"])
+        r["metric_mean"] = float(r["metric_mean"])
+        r["metric_sd"] = float(r["metric_sd"])
+        assert r["realised_mean"] > 0
+        if r["algo"] == "ACDC" and r["selector"] == "threshold":
+            assert r["budget_label"]
+    order = (*METHODS, "Random", "Manual circuit")
+    rows.sort(key=lambda r: (list(TASKS).index(next(k for k, v in TASKS.items()
+                                                   if v[0] == r["task"])),
+                             ABLATIONS.index(r["discovery_ablation"]),
+                             order.index(r["algo"]), r["metric"], r["realised_mean"]))
+    fields = ["task", "algo", "discovery_ablation", "eval_ablation", "condition",
+              "source_discovery_ablation", "measure", "selector", "budget_label", "realised_mean", "metric",
+              "n_seeds", "metric_mean", "metric_sd", "metric_min", "metric_max",
+              "metric_values"]
+    with (SIZE_OUT / "size_curves.csv").open("w", newline="") as f:
+        writer = csv.DictWriter(f, fields)
+        writer.writeheader()
+        writer.writerows({k: r[k] for k in fields} for r in rows)
+
+    def render_task_figure(task_key, task_name, task_label, plot_ablations, suffix):
+        task_rows = [r for r in rows if r["task"] == task_name]
+        task_metrics = TASK_METRICS[task_key]
+        range_rows = (task_rows if len(plot_ablations) > 1 else
+                      [r for r in task_rows if r["discovery_ablation"] in plot_ablations])
+        row_ranges = {metric: metric_ylim(range_rows, metric)
+                      for metric, _ in task_metrics}
+        manual_budget = MANUAL_BUDGETS[task_key]
+        native_manual_ablation = "mean" if task_key == "ioi" else "resample"
+        horizontal_layout = len(plot_ablations) == 1
+        n_rows = 1 if horizontal_layout else len(task_metrics)
+        n_cols = len(task_metrics) if horizontal_layout else len(plot_ablations)
+        subplot_titles = ([ylabel for _, ylabel in task_metrics]
+                          if horizontal_layout else
+                          [f"{a.capitalize()} ablation" for a in plot_ablations]
+                          + [""] * ((len(task_metrics) - 1) * len(plot_ablations)))
+        fig = make_subplots(rows=n_rows, cols=n_cols,
+                            horizontal_spacing=.075,
+                            vertical_spacing=.09,
+                            subplot_titles=subplot_titles)
+        for i, (metric, ylabel) in enumerate(task_metrics):
+            for j, ablation in enumerate(plot_ablations):
+                plot_row = 1 if horizontal_layout else i + 1
+                plot_col = i + 1 if horizontal_layout else j + 1
+                for method in (*METHODS, "Random", "Manual circuit"):
+                    rr = sorted((r for r in task_rows if r["discovery_ablation"] == ablation
+                             and r["algo"] == method and r["metric"] == metric),
+                            key=lambda r: r["realised_mean"])
+                    if not rr:
+                        continue
+                    color, label = STYLE[method]
+                    x = [r["realised_mean"] for r in rr]
+                    y = [r["metric_mean"] for r in rr]
+                    if method == "Manual circuit":
+                        fig.add_trace(go.Scatter(
+                        x=x, y=y, mode="markers", name=label, legendgroup=method,
+                        showlegend=i == 0 and ablation == native_manual_ablation,
+                        marker=dict(symbol="star", size=11, color=color)),
+                            row=plot_row, col=plot_col)
+                        continue
+                    upper = [r["metric_mean"] + r["metric_sd"] for r in rr]
+                    lower = [r["metric_mean"] - r["metric_sd"] for r in rr]
+                    rgb = tuple(int(color[k:k+2], 16) for k in (1, 3, 5))
+                    fig.add_trace(go.Scatter(
+                    x=x + x[::-1], y=upper + lower[::-1], mode="lines", fill="toself",
+                    fillcolor=f"rgba({rgb[0]},{rgb[1]},{rgb[2]},0.14)",
+                    line=dict(width=0), hoverinfo="skip", showlegend=False),
+                        row=plot_row, col=plot_col)
+                    fig.add_trace(go.Scatter(
+                    x=x, y=y, mode="lines+markers", name=label,
+                    legendgroup=method, showlegend=i == 0 and j == 0,
+                    marker=dict(symbol="circle", size=4, color=color),
+                    line=dict(color=color, width=2),
+                    hovertemplate="%{x:.0f} edges<br>%{y:.3g}<extra>%{fullData.name}</extra>"
+                    ), row=plot_row, col=plot_col)
+                fig.add_vline(x=manual_budget, row=plot_row, col=plot_col, line_color="#999999",
+                          line_width=.8, line_dash="dot", layer="below")
+                if metric == "Logit Diff Percent":
+                    fig.add_hline(y=100, row=plot_row, col=plot_col, line_color="#999999",
+                              line_width=.8, line_dash="dot", layer="below")
+                x_range = [.9, log10(max(r['realised_mean'] for r in task_rows)) + .08] if task_key == 'docstring' else [.9, 4.65]
+                tick_values = [10, 100, 1000] if task_key == 'docstring' else [10, 100, 1000, 10000]
+                tick_labels = ["10", "100", "1,000"] if task_key == 'docstring' else ["10", "100", "1,000", "10,000"]
+                fig.update_xaxes(type="log", range=x_range, row=plot_row, col=plot_col,
+                             showline=True, linecolor="#666666", linewidth=.7,
+                             ticks="outside", tickvals=tick_values,
+                             ticktext=tick_labels,
+                             showticklabels=(plot_row == n_rows),
+                             showgrid=False, tickfont=dict(size=15),
+                             title_font=dict(size=15),
+                                 title_text="Circuit size (edges)" if plot_row == n_rows else None)
+                fig.update_yaxes(title_text=None if horizontal_layout else ylabel if j == 0 else None,
+                             row=plot_row, col=plot_col,
+                             range=row_ranges[metric],
+                             showline=True, linecolor="#666666", linewidth=.7,
+                             ticks="outside",
+                             showticklabels=True if horizontal_layout else plot_col == 1,
+                             gridcolor="#e4e4e4", gridwidth=.5,
+                             zeroline=False, tickfont=dict(size=15),
+                                 title_font=dict(size=14))
+        figure_width = 1060 if len(plot_ablations) == 3 else 560
+        if horizontal_layout:
+            figure_width = 1060
+            figure_height = 460
+            left_margin = 65
+            bottom_margin = 160
+            legend_y = -.32
+        else:
+            figure_height = 900 if len(task_metrics) == 3 else 700
+            left_margin = 83
+            bottom_margin = 116
+            legend_y = -.18
+        fig.update_layout(width=figure_width, height=figure_height,
+                      margin=dict(l=left_margin, r=28, t=40, b=bottom_margin),
+                      paper_bgcolor="white", plot_bgcolor="white",
+                      font=dict(family="Arial", size=15, color="#222222"),
+                      legend=dict(orientation="h", x=.5, xanchor="center", y=legend_y,
+                                  yanchor="top", font=dict(size=16), itemsizing="constant"))
+        fig.update_annotations(font=dict(size=17), yshift=4)
+        pdf_path = SIZE_OUT / f"{TASK_SLUGS[task_key]}{suffix}_size_curves.pdf"
+        fig.write_image(str(pdf_path))
+        reader = PdfReader(pdf_path)
+        if len(reader.pages) > 1:
+            assert all(not (page.extract_text() or "").strip() and not list(page.images)
+                       for page in reader.pages[1:])
+            writer = PdfWriter()
+            writer.add_page(reader.pages[0])
+            single = pdf_path.with_suffix(".single.pdf")
+            with single.open("wb") as f:
+                writer.write(f)
+            single.replace(pdf_path)
+        fig.write_image(str(INSPECTION / f"{TASK_SLUGS[task_key]}{suffix}_size_curves.png"), scale=1.4)
+        print(f"Wrote {task_label} {suffix or 'all-ablation'} size curves")
+
+    for task_key, (task_name, task_label) in TASKS.items():
+        render_task_figure(task_key, task_name, task_label, ABLATIONS, "")
+        if task_key in {"ioi", "gt"}:
+            native_ablation = "mean" if task_key == "ioi" else "resample"
+            render_task_figure(task_key, task_name, task_label, (native_ablation,), "_native")
+    manifest = {
+        "evaluation_protocol_id": source_meta.get('evaluation_protocol_id'),
+        "figures": [f"{TASK_SLUGS[k]}_size_curves.pdf" for k in TASKS],
+        "main_figures": {
+            "ioi": "ioi_native_size_curves.pdf",
+            "gt": "greater_than_native_size_curves.pdf",
+        },
+        "main_figure_ablations": {
+            "ioi": "mean",
+            "gt": "resample",
+        },
+        "tasks": {k: v[0] for k, v in TASKS.items()},
+        "metrics": {k: [m for m, _ in TASK_METRICS[k]] for k in TASKS},
+        "source": provenance_path(functional),
+        "source_sha256": hashlib.sha256(functional.read_bytes()).hexdigest(),
+        "stability_manifest": provenance_path(stability_manifest),
+        "stability_manifest_sha256": hashlib.sha256(stability_manifest.read_bytes()).hexdigest(),
+        "filters": "All tasks; four methods at joint matched discovery/evaluation; ablation-independent Random at each evaluation; official circuit marker at each task's native ablation",
+        "values": "functional.csv five-run metric_mean and population metric_sd (ddof=0); colored band is mean plus/minus 1 SD; manual is one deterministic evaluation",
+        "random_source": provenance_path(functional),
+        "manual_source": provenance_path(manual_file),
+        "manual_source_sha256": hashlib.sha256(manual_file.read_bytes()).hexdigest(),
+        "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its task's native evaluation ablation (mean for IOI, resample for Greater-Than and Docstring)",
+        "acdc": "Only recorded threshold boundaries and full-circuit point are plotted; lines connect observations without adding intermediate values",
+        "rows": len(rows), "manual_budgets": MANUAL_BUDGETS,
+        "output_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                          for p in SIZE_OUT.glob("*_size_curves.pdf")},
+    }
+    (SIZE_OUT / "size_curves_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    print(f"Wrote {len(rows)} plotted rows")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-dir', type=Path)
+    parser.add_argument('--output-dir', type=Path)
+    parser.add_argument('--tasks', nargs='+')
+    args = parser.parse_args()
+    main(args.source_dir, args.output_dir, args.tasks)

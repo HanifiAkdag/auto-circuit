@@ -1,45 +1,35 @@
+# Ablation, caching, and metrics
+
+The library supports cached prefixes, circuit evaluation, and KL measurement. The sections below describe these features; use the thesis [reproduction guide](../reproduction.md) for the complete registered workflows.
+
 ## Ablation types
-- Resample (aka. patching)
-- Zero
-- Mean (calculated over a batch or [PromptDataset][auto_circuit.data.PromptDataset])
 
-See [AblationType][auto_circuit.types.AblationType] for more details.
+[AblationType](../../auto_circuit/types.py) includes zero, paired resample, and several average-activation replacements. The thesis's mean ablation is `TOKENWISE_MEAN_CORRUPT`. [src_ablations](../../auto_circuit/utils/ablation_activations.py) computes the corresponding source activations from a batch or loader.
 
 ```python
---8<-- "experiments/demos/other_features.py:43:43"
+ablations = src_ablations(model, test_loader, AblationType.RESAMPLE)
 ```
 
-## Automatic KV caching
-When `tail_divergence` is `True`,
-[`load_datasets_from_json`][auto_circuit.data.load_datasets_from_json] automatically
-computes the KV Cache for the common prefix of all of the prompts in the dataset and
-removes the prefix from the prompts.
+## Cached prefixes
+
+With `tail_divergence=True`, [load_datasets_from_json](../../auto_circuit/data.py) computes key/value caches for the common prompt prefix and removes that prefix from the remaining prompt tokens. Pass the train/test loaders' `kv_cache` values to `patchable_model` through `kv_caches`. This keeps the library's prefix optimization available without changing the conceptual circuit evaluation.
+
+## Evaluate circuits
+
+[run_circuits](../../auto_circuit/prune.py) thresholds `PruneScores` into circuits at the requested edge counts. For example, with an already prepared model, loader, and score dictionary:
 
 ```python
---8<-- "experiments/demos/other_features.py:24:33"
+from auto_circuit.prune import run_circuits
+from auto_circuit.types import AblationType, PatchType
+
+circuit_outputs = run_circuits(
+    model=model,
+    dataloader=test_loader,
+    test_edge_counts=[100, 200],
+    prune_scores=scores,
+    patch_type=PatchType.EDGE_PATCH,
+    ablation_type=AblationType.RESAMPLE,
+)
 ```
 
-The KV Caches are stored in the `kv_cache` attribute of the
-[`PromptDataloader`][auto_circuit.data.PromptDataLoader]s. Pass the caches to the
-[`patchable_model`][auto_circuit.utils.graph_utils.patchable_model] function to use them
-automatically.
-
-```python
---8<-- "experiments/demos/other_features.py:34:42"
-```
-
-## Automatically patch multiple circuits
-To patch multiple circuits of increasing size (decreasing
-[`PruneScores`][auto_circuit.types.PruneScores]), use the
-[`run_circuits`][auto_circuit.prune.run_circuits] function.
-
-```python
---8<-- "experiments/demos/other_features.py:45:63"
-```
-
-## Measure circuit metrics
-```python
---8<-- "experiments/demos/other_features.py:64:64"
-```
-For a full list of metrics, see the
-[reference documentation][auto_circuit.metrics.prune_metrics.kl_div].
+The [pruning metric registry](../../auto_circuit/metrics/prune_metrics/prune_metrics.py) defines available metrics. [measure_kl_div](../../auto_circuit/metrics/prune_metrics/kl_div.py) compares circuit outputs with the full model. Scientific analyses also need matched input/protocol identities; the thesis [evaluation guide](../evaluation_protocol.md) describes those checks.

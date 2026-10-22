@@ -1,8 +1,9 @@
 import pytest
+from pathlib import Path
 from scipy.stats import spearmanr
 
-from experiments.thesis import results_chapter_stability as exhibits
-from experiments.thesis.results_chapter_stability import select_cell
+from experiments import results_chapter_stability as exhibits
+from experiments.results_chapter_stability import select_cell
 
 
 def _row(**changes):
@@ -55,8 +56,10 @@ def test_selected_summary_must_match_structural_row_of_same_condition():
 
 
 def _association_inputs():
-    joint = exhibits._rows(exhibits.OUTPUT / "within_ablation_selected.csv")
-    quality = exhibits._rows(exhibits.OUTPUT.parent / "controlled_comparison/matched_quality.csv")
+    from experiments.results_chapter_sources import bundle
+    source = Path(bundle()['exhibits_dir'])
+    joint = exhibits._rows(source / "stability/within_ablation_selected.csv")
+    quality = exhibits._rows(source / "controlled_comparison/matched_quality.csv")
     return joint, quality
 
 
@@ -64,8 +67,9 @@ def test_structure_function_uses_identical_selected_circuits_and_tied_ranks():
     assert callable(getattr(exhibits, "structure_function_records", None))
     selected, summary = exhibits.structure_function_records(*_association_inputs())
     assert len(selected) == 60 and len(summary) == 5
-    expected = [-0.2517482517482518, -0.8951048951048951, 0.25874125874125875,
-                -0.34265734265734266, -0.5244755244755245]
+    from experiments.results_chapter_sources import bundle
+    golden = exhibits._rows(Path(bundle()['exhibits_dir']) / 'stability/structure_function_summary.csv')
+    expected = [float(row['rho']) for row in golden]
     for row, value in zip(summary, expected):
         points = [r for r in selected if (r["task"], r["metric"]) == (row["task"], row["metric"])]
         assert row["n_cells"] == len(points) == 12
@@ -91,3 +95,25 @@ def test_structure_function_rejects_duplicate_metric_rows():
     joint, quality = _association_inputs()
     with pytest.raises(AssertionError):
         exhibits.structure_function_records(joint, quality + [quality[0]])
+
+
+def test_summary_uses_already_loaded_evaluation_task_for_reference_size(monkeypatch):
+    from types import SimpleNamespace
+    from experiments import stability_analysis as analysis
+
+    class UnloadedTask:
+        @property
+        def true_edge_count(self):
+            raise AssertionError("summary tried to load an unpinned model")
+
+    monkeypatch.setattr(analysis, "TASK_DICT", {"docstring-component": UnloadedTask()})
+    structural = [{
+        "task": "Docstring", "algo": "ep", "discovery_ablation": "zero",
+        "condition": "joint", "selector": "top_k", "budget_value": 7,
+        "budget_label": "7", "realised_mean": 7,
+    }]
+    result = analysis._summary_rows(
+        structural, [], {"Docstring": "docstring-component"},
+        evaluation_tasks={"docstring-component": SimpleNamespace(true_edge_count=7)},
+    )
+    assert result[0]["true_edge_count"] == 7

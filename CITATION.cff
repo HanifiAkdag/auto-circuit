@@ -1,25 +1,10 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "Please cite this thesis software fork as listed here. Also cite AutoCircuit and the relevant discovery method papers when using their code or methods."
+type: software
 authors:
-  - family-names: "Miller"
-    given-names: "Joseph"
-  - family-names: "Chughtai"
-    given-names: "Bilal"
-  - family-names: "Saunders"
-    given-names: "William"
-title: "Transformer Circuit Evaluation Metrics Are Not Robust"
-date-released: 2024
-url: "https://openreview.net/forum?id=zSf8PJyQb2"
-preferred-citation:
-  type: conference-paper
-  authors:
-    - family-names: "Miller"
-      given-names: "Joseph"
-    - family-names: "Chughtai"
-      given-names: "Bilal"
-    - family-names: "Saunders"
-      given-names: "William"
-  title: "Transformer Circuit Evaluation Metrics Are Not Robust"
-  collection-title: "First Conference on Language Modeling"
-  year: 2024
-  url: "https://openreview.net/forum?id=zSf8PJyQb2"
+  - family-names: "Akdag"
+    given-names: "Hanifi Ibrahim"
+title: "Circuit Discovery in AutoCircuit: Thesis Fork"
+version: "0.1.0"
+repository-code: "https://github.com/HanifiAkdag/auto-circuit"
+url: "https://github.com/HanifiAkdag/auto-circuit"

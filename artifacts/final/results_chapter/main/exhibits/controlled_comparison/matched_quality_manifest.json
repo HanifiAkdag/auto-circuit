@@ -1,0 +1,39 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "source": "results/results_chapter/ep_gt_kl_20261017/exhibits/size_curves/size_curves.csv",
+  "source_sha256": "e4fea45250789123a724c4e5adb81f5db415b88a450e93ae332ba7b7054b3a56",
+  "source_manifest": "results/results_chapter/ep_gt_kl_20261017/exhibits/size_curves/size_curves_manifest.json",
+  "source_manifest_sha256": "8c8437b271ff58844a7f64502123b0b78357e3b1b8fea41619aaf11204c38b37",
+  "tasks": [
+    "Indirect Object Identification",
+    "Greaterthan"
+  ],
+  "ablations": [
+    "zero",
+    "resample",
+    "mean"
+  ],
+  "methods": [
+    "ACDC",
+    "EAP",
+    "EP",
+    "DiscoGP"
+  ],
+  "baselines": {
+    "random": "size-matched five-run null under each evaluation ablation",
+    "manual": "deterministic native-ablation reference; IOI mean and Greater-Than resample"
+  },
+  "metrics": {
+    "Indirect Object Identification": [
+      "Clean KL Div",
+      "Logit Diff Percent",
+      "Correct Answer Greater Than Incorrect Percent"
+    ],
+    "Greaterthan": [
+      "Clean KL Div",
+      "Logit Diff Percent"
+    ]
+  },
+  "selection": "Exact task-specific target for continuous scores; nearest realised ACDC threshold boundary; joint five-run condition; matched discovery and evaluation ablation for methods and Random; deterministic native-ablation condition for Manual circuit.",
+  "rows": 80
+}

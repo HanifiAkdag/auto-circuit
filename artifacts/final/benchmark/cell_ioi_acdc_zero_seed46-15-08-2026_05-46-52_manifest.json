@@ -1,0 +1,37 @@
+{
+  "cell": {
+    "task": "ioi",
+    "algo": "acdc",
+    "algo_key": "ACDC [zero]",
+    "ablation": "zero",
+    "seed": 46,
+    "null_test": false
+  },
+  "cache_file": "cell_ioi_acdc_zero_seed46-15-08-2026_05-46-52.pkl",
+  "saved_at": "2026-08-15T05:46:53",
+  "git": {
+    "commit": "6d76e3fff030b324a149be0337e02e8874585895",
+    "dirty": true,
+    "dirty_files": [
+      "thesis_notes/methodology.md",
+      ".claude/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "merged_from": [
+    "cell_ioi_acdc_zero_seed46__tb1-15-08-2026_00-41-45.pkl",
+    "cell_ioi_acdc_zero_seed46__tb3-15-08-2026_03-10-36.pkl",
+    "cell_ioi_acdc_zero_seed46__tb5-15-08-2026_00-36-57.pkl",
+    "cell_ioi_acdc_zero_seed46__tb7-14-08-2026_22-18-14.pkl",
+    "cell_ioi_acdc_zero_seed46__tb9-15-08-2026_00-33-41.pkl"
+  ],
+  "note": "tao-split ACDC partials merged by element-wise min (identical to single-process 20-tau sweep)."
+}

@@ -193,7 +193,10 @@ class Task:
         for param in model.parameters():
             param.requires_grad = False
 
+        has_tokenizer = hasattr(model, "tokenizer") and model.tokenizer is not None
         dataset_cache_key = (
+            model_cache_key,
+            id(model.tokenizer) if has_tokenizer else None,
             self._dataset_name,
             self.batch_size,
             self.batch_count,
@@ -211,7 +214,6 @@ class Task:
             count_1 = b_count[0] if isinstance(b_count, tuple) else b_count
             bs_2 = bs[1] if isinstance(bs, tuple) else bs
             count_2 = b_count[1] if isinstance(b_count, tuple) else b_count
-            has_tokenizer = hasattr(model, "tokenizer") and model.tokenizer is not None
             train_loader, test_loader = load_datasets_from_json(
                 model=model if has_tokenizer else None,
                 path=repo_path_to_abs_path(f"datasets/{self._dataset_name}.json"),

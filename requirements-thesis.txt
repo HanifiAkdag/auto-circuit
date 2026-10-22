@@ -1,0 +1,35 @@
+# Scientific and direct dependency pins for the thesis environment (Python 3.10.20).
+# scripts/setup_environment.sh installs torch from the CUDA 13.0 wheel index first.
+torch==2.11.0+cu130
+transformer-lens==1.19.0
+transformers==4.42.0
+numpy==1.26.4
+scipy==1.15.3
+optuna==4.8.0
+plotly==6.7.0
+kaleido==0.2.1
+pypdf==6.11.0
+matplotlib==3.8.4
+einops==0.8.2
+ordered-set==4.1.0
+blobfile==3.2.0
+word2word==1.0.0
+vscode-tqdm==4.66.2
+tracr-pypi==1.0.0
+attrs==26.1.0
+datasets==4.8.4
+pandas==2.3.3
+networkx==3.4.2
+jax==0.6.2
+jaxlib==0.6.2
+chex==0.1.90
+dm-haiku==0.0.16
+jaxtyping==0.3.7
+tokenizers==0.19.1
+huggingface-hub==0.36.2
+safetensors==0.7.0
+accelerate==1.13.0
+typeguard==4.5.1
+wandb==0.26.0
+sentencepiece==0.2.1
+pytest==9.0.3

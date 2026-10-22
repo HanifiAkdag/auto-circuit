@@ -1,5 +1,5 @@
 #%%
-from experiments.thesis.faithfulness_cells import (  # noqa: E402
+from experiments.faithfulness_cells import (  # noqa: E402
     ANCHOR_ABLATION,
     ANCHOR_ALGOS,
     CELLS,

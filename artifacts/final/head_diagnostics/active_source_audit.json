@@ -1,0 +1,8 @@
+{
+  "study_id": "d168afd4e9fcdc18be9ece335a5590a1df556342050e381f23c993f76d6cb6ef",
+  "checked_endpoints": 120,
+  "unmatched_native_circuits": [],
+  "errors": [],
+  "max_absolute_difference": 0.0004930290685365435,
+  "selection_rule": "Exact retained-set comparison at requested739/2000; native top-k may differ from nominal decimal tau cutoff"
+}

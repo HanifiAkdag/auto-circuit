@@ -1,0 +1,6 @@
+task,task_label,metric,n_cells,rho
+Indirect Object Identification,IOI,Clean KL Div,12,-0.0979020979020979
+Indirect Object Identification,IOI,Logit Diff Percent,12,-0.8181818181818182
+Indirect Object Identification,IOI,Correct Answer Greater Than Incorrect Percent,12,0.32867132867132864
+Greaterthan,Greater-Than,Clean KL Div,12,-0.3776223776223776
+Greaterthan,Greater-Than,Logit Diff Percent,12,-0.5524475524475524

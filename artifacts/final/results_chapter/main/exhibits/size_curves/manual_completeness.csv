@@ -1,0 +1,6 @@
+task,algo,measure,discovery_ablation,eval_ablation,metric,budget_edges,value
+Indirect Object Identification,GT,completeness,mean,mean,Clean KL Div,739,5.863297462463379
+Indirect Object Identification,GT,completeness,mean,mean,Logit Diff Percent,739,-5.957510106884483
+Indirect Object Identification,GT,completeness,mean,mean,Correct Answer Greater Than Incorrect Percent,739,44.53125
+Greaterthan,GT,completeness,resample,resample,Clean KL Div,235,2.894401788711548
+Greaterthan,GT,completeness,resample,resample,Logit Diff Percent,235,-32.9331472822144

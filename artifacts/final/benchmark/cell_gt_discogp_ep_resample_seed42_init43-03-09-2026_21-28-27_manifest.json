@@ -1,0 +1,62 @@
+{
+  "cell": {
+    "task": "gt",
+    "algo": "discogp-ep",
+    "algo_key": "DiscoGP Edge Only Paper [resample]",
+    "ablation": "resample",
+    "seed": 42,
+    "init_seed": 43,
+    "null_test": false
+  },
+  "cache_file": "cell_gt_discogp_ep_resample_seed42_init43-03-09-2026_21-28-27.pkl",
+  "saved_at": "2026-09-03T21:28:27",
+  "git": {
+    "commit": "23924bef50c755569e9e8b225306e075406c2826",
+    "dirty": false,
+    "dirty_files": []
+  },
+  "hardware": {
+    "node": "remus",
+    "slurm_job_id": "431924",
+    "gpu": "NVIDIA A100-SXM4-80GB"
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {
+    "use_weight_masks": false,
+    "gs_temp_weight": 0.01,
+    "logits_w_init": 1.0,
+    "w_lr": 0.1,
+    "w_lambda_sparse_init": 1.0,
+    "w_lambda_complete_init": 0.0,
+    "w_max_times_lambda_sparse": 1000.0,
+    "w_min_times_lambda_sparse": 1.0,
+    "w_train_epochs": 500,
+    "w_n_epoch_warmup": 500,
+    "w_n_epoch_cooldown": 1,
+    "use_edge_masks": true,
+    "gs_temp_edge": 1.0,
+    "logits_e_init": 1.0,
+    "e_lr": 0.1,
+    "e_lambda_sparse_init": 1.0,
+    "e_lambda_complete_init": 1.0,
+    "e_max_times_lambda_sparse": 100.0,
+    "e_min_times_lambda_sparse": 0.01,
+    "e_train_epochs": 100,
+    "e_n_epoch_warmup": 20,
+    "e_n_epoch_cooldown": 20,
+    "show_train_graph": true,
+    "hard": true,
+    "loss_mode": "answer_margin_ce",
+    "eval_callback": null,
+    "eval_every": null,
+    "ablation_type": "Resample"
+  }
+}

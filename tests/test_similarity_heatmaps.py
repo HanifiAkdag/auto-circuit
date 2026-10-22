@@ -7,13 +7,13 @@ from auto_circuit.prune_algos.prune_algos import PRUNE_ALGO_DICT  # noqa: E402
 from auto_circuit.utils.graph_utils import patchable_model  # noqa: E402
 from tests.conftest import DEVICE  # noqa: E402
 
-from experiments.thesis.faithfulness_cells import (  # noqa: E402
+from experiments.faithfulness_cells import (  # noqa: E402
     ANCHOR_ALGOS,
     DISCOVERY_ABLATIONS,
     SWEPT_ALGOS,
 )
-from experiments.thesis.run_cell import _ALGO_MAP  # noqa: E402
-from experiments.thesis.similarity_heatmaps import (  # noqa: E402
+from experiments.run_cell import _ALGO_MAP  # noqa: E402
+from experiments.similarity_heatmaps import (  # noqa: E402
     _jaccard_matrix,
     collect_labeled_scores,
     save_similarity_heatmaps,

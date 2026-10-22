@@ -1,0 +1,30 @@
+{
+  "cell": {
+    "task": "ioi",
+    "algo": "random",
+    "algo_key": "Random",
+    "ablation": "resample",
+    "seed": 46,
+    "null_test": false
+  },
+  "cache_file": "cell_ioi_random_resample_seed46-14-08-2026_04-36-37.pkl",
+  "saved_at": "2026-08-14T04:36:37",
+  "git": {
+    "commit": "d27f7651443c4750091fe6294ff2f9d85fb8d32c",
+    "dirty": true,
+    "dirty_files": [
+      ".claude/",
+      ".prune_scores_cache_v3/"
+    ]
+  },
+  "data_budget": {
+    "batch_size": 64,
+    "batch_count": [
+      11,
+      4
+    ],
+    "train_examples": 704,
+    "test_examples": 256
+  },
+  "algo_hyperparams": {}
+}

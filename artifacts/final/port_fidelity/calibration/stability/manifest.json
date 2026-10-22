@@ -1,0 +1,1292 @@
+{
+  "experiment": "stability_v5_2026-09-19",
+  "started_at": "2026-09-19T18:20:58",
+  "git": {
+    "commit": "4254df7875fd4acf37e1cbdddce2214837888083",
+    "dirty": true,
+    "dirty_files": [
+      "experiments/results_chapter_manual_baseline.py",
+      "experiments/results_chapter_native_roc.py",
+      "experiments/results_chapter_size_curves.py",
+      "experiments/run_cell.py",
+      "tests/test_run_cell_identity.py",
+      "experiments/gt_ep_rerun_cells.py",
+      "experiments/results_chapter_controlled_comparison.py"
+    ]
+  },
+  "discovery_cache_dir": ".prune_scores/final/benchmark",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "conditions": [
+    "joint",
+    "data",
+    "init"
+  ],
+  "anchor_seed": 42,
+  "eval_protocol": "measures ['completeness', 'faithfulness'] x all three eval ablations, every cell",
+  "eval_data": "TASK_DICT template test_loader, identical for every seed",
+  "stability_metric": {
+    "Indirect Object Identification Component Circuit": "Logit Diff Percent",
+    "Greaterthan Component Circuit": "Logit Diff Percent",
+    "Docstring Component Circuit": "Correct Answer Percent"
+  },
+  "stable_bar": 0.8,
+  "cells": [
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "zero",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "discogp-ep",
+      "ablation": "mean",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "acdc",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "zero",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "resample",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "eap",
+      "ablation": "mean",
+      "condition": "data",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "ioi",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "gt",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "joint",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    {
+      "task": "docstring",
+      "algo": "random",
+      "ablation": "resample",
+      "condition": "init",
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    }
+  ],
+  "completed_at": "2026-09-19T21:26:49",
+  "structural_rows": 2588,
+  "functional_rows": 32112
+}

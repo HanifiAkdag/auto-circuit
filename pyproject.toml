@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "auto-circuit"
-version = "0.1.0"  # This isn't used. Version set during Github action.
-description = ""
-authors = ["UFO-101 <josephmiller101@gmail.com>"]
+version = "0.1.0"
+description = "AutoCircuit thesis fork for gradient-based circuit discovery and reproducible evaluation"
+authors = ["Hanifi Ibrahim Akdag"]
 readme = "README.md"
-packages = [{include = "auto_circuit"}]
+packages = [{include = "auto_circuit"}, {include = "experiments"}, {include = "hpo"}]
+exclude = ["**/__pycache__", "**/*.pyc", "hpo/results"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -18,6 +19,16 @@ blobfile = ">=2.0.2"
 word2word = ">=1.0.0"
 vscode-tqdm = ">=4.66.2"  # My fork of tqdm that works in VSCode
 tracr-pypi = ">=1.0.0"  # My fork of tracr that is exactly the same (but on PyPI)
+attrs = ">=23.1.0"
+numpy = ">=1.26,<2"
+datasets = ">=2.7.1"
+optuna = {version = "==4.8.0", optional = true}
+scipy = {version = "==1.15.3", optional = true}
+matplotlib = {version = "==3.8.4", optional = true}
+pypdf = {version = "==6.11.0", optional = true}
+
+[tool.poetry.extras]
+thesis = ["optuna", "scipy", "matplotlib", "pypdf"]
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.3"
@@ -28,13 +39,6 @@ pytest = "^7.4.0"
 pyright = "^1.1.350"
 ipytest = "^0.13.3"
 # torch-tb-profiler = "^0.4.1"
-
-
-[tool.poetry.group.docs.dependencies]
-mkdocs-material = "^9.5.17"
-mkdocstrings = {extras = ["python"], version = "^0.24.3"}
-mkdocs-gen-files = "^0.5.0"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

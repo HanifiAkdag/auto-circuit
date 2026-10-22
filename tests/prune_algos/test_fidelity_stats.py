@@ -16,8 +16,8 @@ REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from experiments.thesis.port_comparison import fidelity_stats  # noqa: E402
-from experiments.thesis.port_comparison.fidelity_stats import (  # noqa: E402
+from experiments.port_comparison import fidelity_stats  # noqa: E402
+from experiments.port_comparison.fidelity_stats import (  # noqa: E402
     apply_holm_to_reports,
     bootstrap_similarity_gap_ci,
     bootstrap_diff_ci,
@@ -120,6 +120,7 @@ def test_scalar_report_exposes_tost_p_value_consistent_with_interval():
     report = summarise_endpoint(a, b, delta=0.2)
     assert report["equivalent"]
     assert report["p_tost"] < 0.05
+    assert report["n_permutations"] == comb(20, 10)
 
 
 def test_interpretation_grid():
@@ -203,6 +204,13 @@ def test_seed_label_permutation_is_exact_at_the_study_size():
     assert res["exact"] == 1.0
     # Enumerating splits that contain seed 0 covers each distinct split once.
     assert res["n_permutations"] == comb(19, 9)
+
+
+def test_similarity_report_exposes_group_sizes_and_permutation_count():
+    report = summarise_similarity_endpoint(_blocked_similarity(10, 10, 0.3, 0.3),
+                                           n_a=10, delta=0.1)
+    assert report["n_a"] == report["n_b"] == 10
+    assert report["n_permutations"] == comb(19, 9)
 
 
 def test_seed_label_permutation_detects_arm_structure():

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "purpose": "active_thesis_functional_sources",
+  "integrated_on": "2026-10-17",
+  "thesis_chapters": [
+    "results.tex",
+    "appendix.tex"
+  ],
+  "integration_report": "results/results_chapter/ep_gt_kl_20261017/integration_report.md",
+  "bundles": {
+    "main": {
+      "source_dir": "results/results_chapter/ep_gt_kl_20261017",
+      "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+      "manifest_sha256": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+      "functional_sha256": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+      "structural_sha256": "bb167900cca264967d483cf6aac45e327e849e35075f4deff49197e28827e0ff",
+      "exhibits_dir": "results/results_chapter/ep_gt_kl_20261017/exhibits",
+      "evaluation_manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/datasets/evaluation/temporary_repair_20261006/manifest.json",
+      "selected_inputs": "/mnt/beegfs/work/akdag/thesis/auto-circuit/results/results_chapter/ep_gt_kl_20261017/selected_inputs.json"
+    },
+    "docstring": {
+      "source_dir": "results/results_chapter/docstring_repair_20261006",
+      "evaluation_protocol_id": "b85175abf8516ecc77e33a5bc25fca9a80a4ab77937d33b45769dd93fabac230",
+      "manifest_sha256": "b7a9b192b5de1cf1e63dcfc0b75952b5db062d2609c7b29bfd302485a7efdddb",
+      "functional_sha256": "7efb36b45e9936e39e292f298505aca227892927a90aa77bbe0f545aec403f11",
+      "structural_sha256": "91a9d4d3349c37a9c781245325867c1de4264a117bb050e41cfbf4ad66489adf",
+      "exhibits_dir": "results/results_chapter/docstring_repair_20261006/exhibits",
+      "evaluation_manifest": "/mnt/beegfs/work/akdag/thesis/auto-circuit/datasets/evaluation/docstring_repair_20261006/manifest.json",
+      "selected_inputs": "/mnt/beegfs/work/akdag/thesis/auto-circuit/results/results_chapter/complete_repair_integration_20261006/docstring_selected_inputs.json"
+    }
+  },
+  "scope": "Unchanged corrected evaluation protocol: unique fresh clean inputs excluded against both roles of each original 1000-record pool, with 176 reused Greater-Than corrupt contexts. The 39 Greater-Than Edge Pruning discoveries now use training KL normalized over 00–99 and are retained in the canonical final cache. Their functional and structural measurements and dependent exhibits supersede the historical full-vocabulary-training results. All other discovery scores and measurements, Docstring sources and IOI port-validation evidence remain unchanged."
+}

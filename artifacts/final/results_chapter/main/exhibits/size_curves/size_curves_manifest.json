@@ -1,0 +1,53 @@
+{
+  "evaluation_protocol_id": "652e35432f7987edc78f5d865eb43dd9f343df0c646c72fc83f7513d144d33b2",
+  "figures": [
+    "ioi_size_curves.pdf",
+    "greater_than_size_curves.pdf"
+  ],
+  "main_figures": {
+    "ioi": "ioi_native_size_curves.pdf",
+    "gt": "greater_than_native_size_curves.pdf"
+  },
+  "main_figure_ablations": {
+    "ioi": "mean",
+    "gt": "resample"
+  },
+  "tasks": {
+    "ioi": "Indirect Object Identification",
+    "gt": "Greaterthan"
+  },
+  "metrics": {
+    "ioi": [
+      "Clean KL Div",
+      "Logit Diff Percent",
+      "Correct Answer Greater Than Incorrect Percent"
+    ],
+    "gt": [
+      "Clean KL Div",
+      "Logit Diff Percent"
+    ]
+  },
+  "source": "results/results_chapter/ep_gt_kl_20261017/functional.csv",
+  "source_sha256": "9c6988de88c79d165e455f75ce1bf8e575c330ddd57869cb87eb726c39e7761d",
+  "stability_manifest": "results/results_chapter/ep_gt_kl_20261017/manifest.json",
+  "stability_manifest_sha256": "d9066fdb12545fbd1430c4a3606c5f5a2f85212af2a80dee1e47c5ee4e3f4de1",
+  "filters": "All tasks; four methods at joint matched discovery/evaluation; ablation-independent Random at each evaluation; official circuit marker at each task's native ablation",
+  "values": "functional.csv five-run metric_mean and population metric_sd (ddof=0); colored band is mean plus/minus 1 SD; manual is one deterministic evaluation",
+  "random_source": "results/results_chapter/ep_gt_kl_20261017/functional.csv",
+  "manual_source": "results/results_chapter/ep_gt_kl_20261017/exhibits/size_curves/manual_baselines.csv",
+  "manual_source_sha256": "881558d18a9c07d766b354b45dc1d5417b0dd8b66a2079b7ca81637b66998abf",
+  "manual_provenance": "The ablation-independent official score cache uses a resample anchor filename; the manual circuit is displayed only under its task's native evaluation ablation (mean for IOI, resample for Greater-Than and Docstring)",
+  "acdc": "Only recorded threshold boundaries and full-circuit point are plotted; lines connect observations without adding intermediate values",
+  "rows": 980,
+  "manual_budgets": {
+    "ioi": 739,
+    "gt": 235,
+    "docstring": 24
+  },
+  "output_sha256": {
+    "greater_than_native_size_curves.pdf": "6f0f1a33def7924e2d590999f52a2f06774fceb47f2f7874fc514f9efbf0d1c9",
+    "greater_than_size_curves.pdf": "3737a1695a0779dd262dce985cb85c63c1418ff42558ea0928a3724344bfbf7f",
+    "ioi_native_size_curves.pdf": "34d932d78abf1b5b63d72bb5ac4e88162db6158318b678bee3bca3a08663f5c4",
+    "ioi_size_curves.pdf": "8f49131fc6e802d672c0a07473236cbb207de32a9622429f65a4743e9726f946"
+  }
+}

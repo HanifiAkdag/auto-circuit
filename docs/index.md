@@ -1,31 +1,14 @@
-# AutoCircuit
-A library for efficient patching and automatic circuit discovery.
+# Circuit Discovery in AutoCircuit
 
-![](assets/Edge_Patching_Rounded.png)
+Start with the [repository README](../README.md) and [reproduction guide](reproduction.md).
 
-### Installation
-```
-pip install auto-circuit
-```
+- [Architecture and library interfaces](architecture.md)
+- [Evaluation protocols](evaluation_protocol.md)
+- [Selected artifacts and provenance](artifacts.md)
+- [Patching example](<guides/1)_Getting_Started.md>)
+- [Circuit discovery examples](<guides/2)_Circuit_Discovery.md>)
+- [Ablation, caching, and metrics](<guides/3)_Other_Features.md>)
+- [Patching internals](<guides/4)_How_it_Works.md>)
+- [Contributing](guides/contributing.md)
 
-## Easy and Efficient Edge Patching
-```python
---8<-- "experiments/demos/zero_ablate_an_edge.py:20:27"
-```
-
-## Different Ablation Methods
-```python
---8<-- "experiments/demos/patch_some_edges.py:33:33"
-```
-
-## Automatic Circuit Discovery
-```python
---8<-- "experiments/demos/circuit_discovery.py:33:41"
-```
-
-## Visualization
-```python
---8<-- "experiments/demos/patch_some_edges.py:49:49"
-```
-
-![](assets/Small_Circuit_Viz.png)
+The library and examples originate from [AutoCircuit](https://github.com/UFO-101/auto-circuit); this fork adds the thesis discovery and reproduction workflow.

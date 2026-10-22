@@ -67,6 +67,11 @@ def patchable_model(
         This function modifies the model, it does not return a new model.
     """
     assert not isinstance(model, PatchableModel), "Model is already patchable"
+    if factorized and separate_qkv is False and isinstance(
+        model, (HookedTransformer, AutoencoderTransformer)
+    ):
+        # Split QKV inputs bypass hook_attn_in in TransformerLens.
+        model.cfg.use_split_qkv_input = False
     nodes, srcs, dests, edge_dict, edges, seq_dim, seq_len = graph_edges(
         model, factorized, separate_qkv, seq_len
     )

@@ -1,0 +1,26 @@
+{
+  "cell": {
+    "task": "gt",
+    "algo": "gt",
+    "algo_key": "Official Circuit",
+    "ablation": "resample",
+    "seed": 42,
+    "null_test": false
+  },
+  "cache_file": "cell_gt_gt_resample_seed42-27-07-2026_17-24-25.pkl",
+  "saved_at": "2026-07-27T17:24:27",
+  "git": {
+    "commit": "79fbb1ddb6eb6178efcb35c15e9504c31413208f",
+    "dirty": true,
+    "dirty_files": [
+      "uto_circuit/prune_algos/prune_algos.py",
+      "auto_circuit/tasks.py",
+      "experiments/run_cell.py",
+      "thesis.md",
+      ".claude/",
+      "experiments/merge_acdc_partials.py",
+      "presentation/"
+    ]
+  },
+  "algo_hyperparams": {}
+}

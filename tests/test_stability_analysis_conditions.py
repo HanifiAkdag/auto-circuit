@@ -2,8 +2,8 @@ import torch as t
 
 import json  # noqa: E402
 
-from experiments.thesis.run_cell import _cache_stem  # noqa: E402
-from experiments.thesis.stability_analysis import (  # noqa: E402
+from experiments.run_cell import _cache_stem  # noqa: E402
+from experiments.stability_analysis import (  # noqa: E402
     _cell_specs,
     _effective_condition,
     _is_constant,

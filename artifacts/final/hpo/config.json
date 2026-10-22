@@ -1,0 +1,28 @@
+{
+  "algo": "DiscoGP Edge Only Paper",
+  "task": "IOI",
+  "base_cache": "task-prune-scores-12-05-2026_00-22-01.pkl",
+  "run_comparison_algos": false,
+  "outer_k": 5,
+  "inner_mode": "holdout",
+  "inner_k": 3,
+  "inner_val_frac": 0.25,
+  "cv_batch_size": null,
+  "n_trials": 50,
+  "selection_metric": "logit_diff_auc",
+  "pruner": "hyperband",
+  "min_resource": 10,
+  "reduction_factor": 3,
+  "max_epochs_cap": 100,
+  "eval_every": 10,
+  "ablation_type": [
+    "zero",
+    "resample"
+  ],
+  "eval_edge_counts": null,
+  "output_dir": "hpo/results/hpo_disco_paper_ioi_401205_2026-06-17_15-11-54",
+  "seed": 42,
+  "worker_id": 0,
+  "storage_backend": "journal",
+  "max_resource": 100
+}

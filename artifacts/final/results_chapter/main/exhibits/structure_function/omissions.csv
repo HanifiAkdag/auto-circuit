@@ -1,0 +1,61 @@
+task,algo,ablation,metric,target,omitted_seed,n_pairs,rho
+IOI,ACDC,mean,Clean KL Div,739,42,6,0.5428571428571429
+IOI,ACDC,mean,Clean KL Div,739,43,6,-0.028571428571428574
+IOI,ACDC,mean,Clean KL Div,739,44,6,-0.028571428571428574
+IOI,ACDC,mean,Clean KL Div,739,45,6,0.942857142857143
+IOI,ACDC,mean,Clean KL Div,739,46,6,-0.08571428571428573
+IOI,ACDC,mean,Correct Answer Greater Than Incorrect Percent,739,42,6,-0.2
+IOI,ACDC,mean,Correct Answer Greater Than Incorrect Percent,739,43,6,-0.14285714285714288
+IOI,ACDC,mean,Correct Answer Greater Than Incorrect Percent,739,44,6,-0.3714285714285715
+IOI,ACDC,mean,Correct Answer Greater Than Incorrect Percent,739,45,6,-0.5428571428571429
+IOI,ACDC,mean,Correct Answer Greater Than Incorrect Percent,739,46,6,0.5428571428571429
+IOI,EAP,mean,Clean KL Div,739,42,6,0.09107651110783746
+IOI,EAP,mean,Clean KL Div,739,43,6,-0.057977103565244846
+IOI,EAP,mean,Clean KL Div,739,44,6,0.8116794499134279
+IOI,EAP,mean,Clean KL Div,739,45,6,-0.08571428571428573
+IOI,EAP,mean,Clean KL Div,739,46,6,-0.2608969660436018
+IOI,EAP,mean,Correct Answer Greater Than Incorrect Percent,739,42,6,0.09107651110783746
+IOI,EAP,mean,Correct Answer Greater Than Incorrect Percent,739,43,6,0.3768511731740915
+IOI,EAP,mean,Correct Answer Greater Than Incorrect Percent,739,44,6,0.5147058823529411
+IOI,EAP,mean,Correct Answer Greater Than Incorrect Percent,739,45,6,0.23190841426097936
+IOI,EAP,mean,Correct Answer Greater Than Incorrect Percent,739,46,6,0.2898855178262242
+IOI,EP,mean,Clean KL Div,739,42,6,-0.753702346348183
+IOI,EP,mean,Clean KL Div,739,43,6,0.08696565534786728
+IOI,EP,mean,Clean KL Div,739,44,6,0.3142857142857143
+IOI,EP,mean,Clean KL Div,739,45,6,0.2571428571428572
+IOI,EP,mean,Clean KL Div,739,46,6,0.08571428571428573
+IOI,EP,mean,Correct Answer Greater Than Incorrect Percent,739,42,6,-0.40583972495671394
+IOI,EP,mean,Correct Answer Greater Than Incorrect Percent,739,43,6,-0.40583972495671394
+IOI,EP,mean,Correct Answer Greater Than Incorrect Percent,739,44,6,0.14285714285714288
+IOI,EP,mean,Correct Answer Greater Than Incorrect Percent,739,45,6,-0.7944613465542746
+IOI,EP,mean,Correct Answer Greater Than Incorrect Percent,739,46,6,-0.7714285714285715
+IOI,DiscoGP,mean,Clean KL Div,739,42,6,0.4285714285714286
+IOI,DiscoGP,mean,Clean KL Div,739,43,6,0.6571428571428573
+IOI,DiscoGP,mean,Clean KL Div,739,44,6,0.3714285714285715
+IOI,DiscoGP,mean,Clean KL Div,739,45,6,0.8285714285714287
+IOI,DiscoGP,mean,Clean KL Div,739,46,6,-0.028571428571428574
+IOI,DiscoGP,mean,Correct Answer Greater Than Incorrect Percent,739,42,6,
+IOI,DiscoGP,mean,Correct Answer Greater Than Incorrect Percent,739,43,6,
+IOI,DiscoGP,mean,Correct Answer Greater Than Incorrect Percent,739,44,6,
+IOI,DiscoGP,mean,Correct Answer Greater Than Incorrect Percent,739,45,6,
+IOI,DiscoGP,mean,Correct Answer Greater Than Incorrect Percent,739,46,6,
+Greater-Than,ACDC,resample,Clean KL Div,235,42,6,-0.48571428571428577
+Greater-Than,ACDC,resample,Clean KL Div,235,43,6,0.4285714285714286
+Greater-Than,ACDC,resample,Clean KL Div,235,44,6,-0.2
+Greater-Than,ACDC,resample,Clean KL Div,235,45,6,-0.3714285714285715
+Greater-Than,ACDC,resample,Clean KL Div,235,46,6,0.14285714285714288
+Greater-Than,EAP,resample,Clean KL Div,235,42,6,0.802377419802878
+Greater-Than,EAP,resample,Clean KL Div,235,43,6,0.24688535993934707
+Greater-Than,EAP,resample,Clean KL Div,235,44,6,-0.44136741475237473
+Greater-Than,EAP,resample,Clean KL Div,235,45,6,0.16903085094570333
+Greater-Than,EAP,resample,Clean KL Div,235,46,6,-0.44136741475237473
+Greater-Than,EP,resample,Clean KL Div,235,42,6,-0.4285714285714286
+Greater-Than,EP,resample,Clean KL Div,235,43,6,0.08571428571428573
+Greater-Than,EP,resample,Clean KL Div,235,44,6,-0.5428571428571429
+Greater-Than,EP,resample,Clean KL Div,235,45,6,0.2608969660436018
+Greater-Than,EP,resample,Clean KL Div,235,46,6,-0.028571428571428574
+Greater-Than,DiscoGP,resample,Clean KL Div,235,42,6,-0.2571428571428572
+Greater-Than,DiscoGP,resample,Clean KL Div,235,43,6,0.2571428571428572
+Greater-Than,DiscoGP,resample,Clean KL Div,235,44,6,0.5428571428571429
+Greater-Than,DiscoGP,resample,Clean KL Div,235,45,6,0.14285714285714288
+Greater-Than,DiscoGP,resample,Clean KL Div,235,46,6,0.14285714285714288

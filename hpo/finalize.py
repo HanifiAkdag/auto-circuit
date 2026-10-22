@@ -9,9 +9,9 @@ causing the refit to use a stale ``study.best_params``.
 Usage:
     python hpo/finalize.py --output-dir hpo/results/<run_dir>
 
-Resumability: if ``fold_<i>/outer_test_scores.json`` exists AND a matching
-``fold<i>_prune_scores-*.pkl`` is present in the cache folder, the fold's refit
-is skipped (cache hit). Pass ``--force-refit`` to override.
+Resumability: if ``fold_<i>/outer_test_scores.json`` and that run's
+``fold_<i>/prune_scores.pkl`` both exist, the fold's refit is skipped. Pass
+``--force-refit`` to override.
 """
 from __future__ import annotations
 
@@ -41,7 +41,6 @@ from auto_circuit.metrics.prune_metrics.prune_metrics import (
 )
 from auto_circuit.prune_algos.prune_algos import GROUND_TRUTH_PRUNE_ALGO, PRUNE_ALGO_DICT
 from auto_circuit.types import AblationType, PatchType, PruneScores, TaskPruneScores
-from auto_circuit.utils.misc import repo_path_to_abs_path, save_cache
 
 from hpo.cv_utils import kfold_prompt_loaders, register_fold_kv_caches
 from hpo.nested_cv import (
@@ -51,9 +50,6 @@ from hpo.nested_cv import (
 )
 from hpo.scoring import DEFAULT_EVAL_EDGE_COUNTS, score_all
 from hpo.search_spaces import SEARCH_SPACES
-
-CACHE_FOLDER = ".prune_scores_cache"
-
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Finalize an HPO run: refit, eval, figures")
@@ -68,25 +64,15 @@ def _parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def _cache_dir() -> Path:
-    return repo_path_to_abs_path(CACHE_FOLDER)
-
-
 def _fold_cache_path(fold_dir: Path) -> Path:
     """Per-run fold cache path (deterministic, scoped to this run's fold dir)."""
     return fold_dir / "prune_scores.pkl"
 
 
 def _find_fold_cache(fold_dir: Path, fold_idx: int) -> Optional[Path]:
-    """Per-run fold cache, else legacy shared cache (newest by mtime, not name).
-
-    The DD-MM-YYYY_HH-MM-SS suffix does not sort lexically by date.
-    """
+    """Return only this run's deterministic fold cache, if it exists."""
     per_run = _fold_cache_path(fold_dir)
-    if per_run.exists():
-        return per_run
-    matches = list(_cache_dir().glob(f"fold{fold_idx}_prune_scores-*.pkl"))
-    return max(matches, key=lambda p: p.stat().st_mtime) if matches else None
+    return per_run if per_run.exists() else None
 
 
 def main() -> None:
@@ -125,15 +111,10 @@ def main() -> None:
 
     fidelity_param = ss.fidelity_param
 
-    # Load baseline (saved by worker 0 during HPO). Prefer the per-run copy in the
-    # run dir; fall back to the legacy shared cache (newest by mtime — the
-    # DD-MM-YYYY suffix does not sort lexically by date) for old runs.
+    # Load the baseline saved by worker 0 in this HPO run.
     task_prune_scores: TaskPruneScores = defaultdict(dict)
     per_run_baseline = out_root / "baseline_prune_scores.pkl"
     baseline_path: Optional[Path] = per_run_baseline if per_run_baseline.exists() else None
-    if baseline_path is None:
-        legacy = list(_cache_dir().glob("baseline_prune_scores-*.pkl"))
-        baseline_path = max(legacy, key=lambda p: p.stat().st_mtime) if legacy else None
     if baseline_path is not None:
         loaded = t.load(baseline_path)
         task_prune_scores = defaultdict(dict, loaded)
@@ -254,7 +235,7 @@ def main() -> None:
     combined: TaskPruneScores = {
         task.key: {**task_prune_scores.get(task.key, {}), **fold_prune_scores}
     }
-    save_cache(combined, CACHE_FOLDER, "combined_prune_scores")
+    t.save(combined, out_root / "combined_prune_scores.pkl")
     print(f"[finalize] Saved combined_prune_scores.pkl with keys: {list(combined[task.key].keys())}")
 
     # ------------------------------------------------------------------

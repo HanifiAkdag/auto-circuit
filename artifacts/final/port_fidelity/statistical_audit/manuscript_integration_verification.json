@@ -1,0 +1,10 @@
+{
+  "selected_manifest_and_score_hashes_verified": 105,
+  "structural_tests_in_audit": 28,
+  "changed_p_values": 20,
+  "corrected_manuscript_cells_independently_enumerated": 6,
+  "endpoint_decisions_unchanged": true,
+  "main_descriptive_table_unchanged": true,
+  "appendix_statistics_and_controls_source_audited": true,
+  "latex_compiled": false
+}
