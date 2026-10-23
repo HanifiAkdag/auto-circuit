@@ -155,24 +155,24 @@ def discovery_header(fig, axes, height):
     for row in axes:
         for ax, discovery in zip(row, ABLATIONS):
             pos = ax.get_position()
-            fig.text((pos.x0 + pos.x1) / 2, pos.y1 + .13 / height,
+            fig.text((pos.x0 + pos.x1) / 2, pos.y1 + .10 / height,
                      f"Discovery: $\\mathbf{{{discovery.title()}}}$", ha="center", va="center",
                      fontsize=9, color="#59616B")
 
 
 def metric_heading(fig, axes, row, metric, height):
     left = axes[row, 0].get_position()
-    fig.text(.5, left.y1 + .48 / height,
+    fig.text(.5, left.y1 + .34 / height,
              ("Logit difference (%)" if metric == LD else METRIC_LABELS[metric]), ha="center", va="center", fontsize=10.5,
              weight="bold")
 
 
 def _render_figure(rows, task):
     slug, title, budget, metrics = TASKS[task]
-    height = 6.9 if len(metrics) == 3 else 5.0
+    height = 5.7 if len(metrics) == 3 else 3.9
     fig, axes = plt.subplots(len(metrics), 3, figsize=(6.6, height))
-    fig.subplots_adjust(left=.165, right=.985, bottom=.70 / height,
-                        top=1 - .73 / height, hspace=1.0, wspace=.15)
+    fig.subplots_adjust(left=.165, right=.985, bottom=.65 / height,
+                        top=1 - .60 / height, hspace=.85, wspace=.15)
     handles = [Line2D([], [], color=c, marker=m, linewidth=0, markersize=5, label=a.title())
                for a, c, m in zip(ABLATIONS, EVAL_COLORS, EVAL_MARKERS)]
     fig.text(.165, .16 / height, "Evaluation ablation", va="center", fontsize=9)
