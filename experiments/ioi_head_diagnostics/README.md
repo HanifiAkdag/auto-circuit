@@ -12,4 +12,4 @@ The study uses four methods and five mean-discovery runs. It measures baseline a
 
 The output contains `inventory.json` and `masks.npz`, per-condition records and per-prompt arrays, summary CSVs, figures, a report, and a completion marker. `complete.json` is written only after each predefined condition and alias has passed input and output checks. The per-prompt arrays retain the KL partition fields needed to reconstruct full-vocabulary KL. Exact-size subsets are randomized sensitivity checks, not native outputs; requested and attained circuit sizes remain separate.
 
-See [the reproduction guide](../../../docs/reproduction.md) for setup, registry, protocol, and SLURM details.
+See [the reproduction guide](../../docs/reproduction.md) for setup, registry, protocol, and SLURM details.
