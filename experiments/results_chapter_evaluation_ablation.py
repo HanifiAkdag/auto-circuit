@@ -11,9 +11,11 @@ import json
 from math import isclose
 from pathlib import Path
 
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from pypdf import PdfReader, PdfWriter
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import numpy as np
 from .config import ROOT, load_registry, resolve_path
 from .results_chapter_sources import EXPORT_ROOT, bundle, provenance_path
 
@@ -109,130 +111,111 @@ def select() -> list[dict[str, object]]:
     return selected
 
 
-def render_figure(rows: list[dict[str, object]], task: str) -> tuple[Path, Path]:
-    slug, title, _, metrics = TASKS[task]
-    width = 1160 if len(metrics) == 3 else 920
-    left_margin, right_margin = 215, 30
-    plot_width = width - left_margin - right_margin
-    table_left = -(left_margin - 90) / plot_width
-    group_label_x = (65 - left_margin) / plot_width
-    discovery_label_x = (25 - left_margin) / plot_width
-    font_family = "DejaVu Sans"
-    axis_tick_size = 17
-    method_label_size = 18
-    title_size = 19
-    discovery_label_size = 17
-    marker_size = 9
-    legend_size = 17
-    headings = {
-        "Clean KL Div": "KL divergence",
-        "Logit Diff Percent": "Logit difference (%)",
-        "Correct Answer Greater Than Incorrect Percent": "Correct-over-incorrect<br>accuracy (%)",
-    }
-    fig = make_subplots(rows=1, cols=len(metrics), shared_yaxes=True,
-                        horizontal_spacing=0.04,
-                        subplot_titles=[headings[metric] for metric in metrics])
-    offsets = {"zero": 0.18, "resample": 0.0, "mean": -0.18}
-    group_spacing = 6.0
-    row_y = {
-        (discovery, method): 12 - group_spacing * discovery_idx - method_idx
-        for discovery_idx, discovery in enumerate(ABLATIONS)
-        for method_idx, method in enumerate(METHODS)
-    }
-    tickvals = [row_y[(discovery, method)] for discovery in ABLATIONS for method in METHODS]
-    ticktext = [METHOD_LABELS[method] for discovery in ABLATIONS for method in METHODS]
-    ranges = {}
-    for metric in metrics:
-        values = [float(r["metric_mean"]) + sign * float(r["metric_sd"])
-                  for r in rows if r["task"] == task and r["metric"] == metric
-                  for sign in (-1, 1)]
-        lower, upper = min(values), max(values)
-        pad = max((upper - lower) * 0.07, 0.02)
-        ranges[metric] = [-pad if metric == "Clean KL Div"
-                          else (0 if metric == "Correct Answer Greater Than Incorrect Percent"
-                                else lower - pad),
-                          upper + pad]
-        if metric == "Correct Answer Greater Than Incorrect Percent":
-            ranges[metric][1] = max(100.0, ranges[metric][1])
+EVAL_COLORS = tuple(EVAL_STYLE[a][0] for a in ABLATIONS)
+EVAL_MARKERS = ("o", "D", "s")
+KL = "Clean KL Div"
+LD = "Logit Diff Percent"
+ACC = "Correct Answer Greater Than Incorrect Percent"
+LABELS = tuple(METHOD_LABELS[m] for m in METHODS)
 
-    for col, metric in enumerate(metrics, 1):
-        for evaluation in ABLATIONS:
-            group = [r for r in rows if r["task"] == task and r["metric"] == metric
-                     and r["eval_ablation"] == evaluation]
-            group.sort(key=lambda r: (-ABLATIONS.index(r["discovery_ablation"]),
-                                      -METHODS.index(r["algo"])))
-            color, symbol = EVAL_STYLE[evaluation]
-            fig.add_trace(go.Scatter(
-                x=[float(r["metric_mean"]) for r in group],
-                y=[row_y[(r["discovery_ablation"], r["algo"])] + offsets[evaluation]
-                   for r in group],
-                mode="markers", name=evaluation.capitalize(), legendgroup=evaluation,
-                showlegend=col == 1,
-                marker=dict(color=color, symbol=symbol, size=marker_size,
-                            line=dict(color="white", width=0.6)),
-                error_x=dict(type="data", array=[float(r["metric_sd"]) for r in group],
-                             symmetric=True, color=color, thickness=1.0, width=2),
-                hovertemplate="%{x:.3f}<extra>%{fullData.name} evaluation</extra>",
-            ), row=1, col=col)
+PLOT_STYLE = {"font.family": "DejaVu Sans", "font.size": 10,
+                     "text.color": "#252B33", "axes.labelcolor": "#252B33",
+                     "xtick.color": "#59616B", "ytick.color": "#252B33",
+                     "axes.edgecolor": "#C3C8CE", "axes.linewidth": .6,
+                     "pdf.fonttype": 42, "ps.fonttype": 42,
+                     "savefig.facecolor": "white"}
 
-        fig.update_xaxes(range=ranges[metric], showline=True, linecolor="#333333",
-                         linewidth=1, ticks="outside", tickfont=dict(size=axis_tick_size),
-                         showgrid=True, gridcolor="#E4E6E8", zeroline=False,
-                         row=1, col=col)
-        if task == "Indirect Object Identification" and metric == "Logit Diff Percent":
-            fig.update_xaxes(tickvals=[0, 100, 200, 300, 400], row=1, col=col)
-        fig.update_yaxes(range=[min(tickvals) - 0.65, max(tickvals) + 0.65],
-                         tickvals=tickvals, ticktext=ticktext,
-                         showticklabels=col == 1, tickfont=dict(size=method_label_size), ticks="",
-                         showgrid=False,
-                         zeroline=False, showline=False, row=1, col=col)
+def values(rows, task, metric, discovery, method):
+    group = {row["eval_ablation"]: row for row in rows
+             if row["task"] == task and row["metric"] == metric
+             and row["discovery_ablation"] == discovery and row["algo"] == method}
+    assert set(group) == set(ABLATIONS)
+    return np.asarray([(float(group[ev]["metric_mean"]), float(group[ev]["metric_sd"]))
+                       for ev in ABLATIONS]).T
 
-    # Paper coordinates keep the table bands continuous across subplot gutters.
-    for band_idx, y in enumerate(tickvals):
-        if band_idx % 2 == 0:
-            fig.add_shape(type="rect", xref="paper", yref="y",
-                          x0=table_left, x1=1, y0=y - 0.48, y1=y + 0.48,
-                          fillcolor="#F3F4F5", line_width=0, layer="below")
-    for i, discovery in enumerate(ABLATIONS):
-        y = 10.5 - group_spacing * i
-        fig.add_annotation(x=group_label_x, xref="paper", y=y, yref="y",
-                           text=f"<b>{discovery.capitalize()}</b>", textangle=-90,
-                           showarrow=False, xanchor="center", yanchor="middle",
-                           font=dict(size=discovery_label_size, color="#303030"))
 
-    for annotation in fig.layout.annotations[:len(metrics)]:
-        heading, separator, subtitle = annotation.text.partition("<br>")
-        annotation.text = f"<b>{heading}</b>{separator}{subtitle}"
-        annotation.update(font=dict(family=font_family, size=title_size, color="#222222"),
-                          y=1.085, yanchor="middle")
-    fig.add_annotation(x=discovery_label_x, xref="paper", y=0.5, yref="paper",
-                       text="<b>Discovery ablation</b>", textangle=-90, showarrow=False,
-                       xanchor="center", yanchor="middle",
-                       font=dict(size=method_label_size, color="#303030"))
-    fig.update_layout(template="simple_white", width=width,
-                      height=700, margin=dict(l=left_margin, r=right_margin, t=85, b=100),
-                      font=dict(family=font_family, color="#222222", size=legend_size),
-                      legend=dict(orientation="h", x=(width / 2 - left_margin) / plot_width,
-                                  xanchor="center", y=-0.13, yanchor="top",
-                                  title="<b>Evaluation ablation:</b> ", font=dict(size=legend_size),
-                                  title_font=dict(size=legend_size), bgcolor="rgba(0,0,0,0)"),
-                      paper_bgcolor="white", plot_bgcolor="rgba(0,0,0,0)")
+def scale(task, metric):
+    # Identical linear scales across the three discovery panels of each metric.
+    if metric == KL:
+        return ((-.55, 13), [0, 4, 8, 12]) if task == "Indirect Object Identification" else ((-1, 24), [0, 5, 10, 15, 20])
+    if metric == LD:
+        return ((-60, 450), [0, 100, 200, 300, 400]) if task == "Indirect Object Identification" else ((-65, 150), [-50, 0, 50, 100, 150])
+    return (-3, 104), [0, 25, 50, 75, 100]
+
+
+def reference(ax, metric, vertical):
+    if metric != LD:
+        return
+    draw = ax.axvline if vertical else ax.axhline
+    draw(0, color="#AFB5BD", linewidth=.7, zorder=0)
+    draw(100, color="#77818C", linewidth=.9, linestyle=(0, (3, 3)), zorder=0)
+
+
+def discovery_header(fig, axes, height):
+    for row in axes:
+        for ax, discovery in zip(row, ABLATIONS):
+            pos = ax.get_position()
+            fig.text((pos.x0 + pos.x1) / 2, pos.y1 + .13 / height,
+                     f"Discovery: $\\mathbf{{{discovery.title()}}}$", ha="center", va="center",
+                     fontsize=9, color="#59616B")
+
+
+def metric_heading(fig, axes, row, metric, height):
+    left = axes[row, 0].get_position()
+    fig.text(.5, left.y1 + .48 / height,
+             ("Logit difference (%)" if metric == LD else METRIC_LABELS[metric]), ha="center", va="center", fontsize=10.5,
+             weight="bold")
+
+
+def _render_figure(rows, task):
+    slug, title, budget, metrics = TASKS[task]
+    height = 6.9 if len(metrics) == 3 else 5.0
+    fig, axes = plt.subplots(len(metrics), 3, figsize=(6.6, height))
+    fig.subplots_adjust(left=.165, right=.985, bottom=.70 / height,
+                        top=1 - .73 / height, hspace=1.0, wspace=.15)
+    handles = [Line2D([], [], color=c, marker=m, linewidth=0, markersize=5, label=a.title())
+               for a, c, m in zip(ABLATIONS, EVAL_COLORS, EVAL_MARKERS)]
+    fig.text(.165, .16 / height, "Evaluation ablation", va="center", fontsize=9)
+    fig.legend(handles=handles, loc="center left", bbox_to_anchor=(.43, .16 / height),
+               ncol=3, frameon=False, fontsize=9, handletextpad=.4,
+               handlelength=1, columnspacing=1.2, borderaxespad=0)
+    discovery_header(fig, axes, height)
+    for r, metric in enumerate(metrics):
+        metric_heading(fig, axes, r, metric, height)
+        limits, ticks = scale(task, metric)
+        for c, discovery in enumerate(ABLATIONS):
+            ax = axes[r, c]
+            for y in range(4):
+                if y % 2 == 0:
+                    ax.axhspan(y-.47, y+.47, facecolor="#F4F6F8", zorder=-2)
+            for m, method in enumerate(METHODS):
+                av, sd = values(rows, task, metric, discovery, method)
+                for e in range(3):
+                    assert limits[0] <= av[e]-sd[e] <= av[e]+sd[e] <= limits[1], (task, metric, av, sd)
+                    ax.errorbar(av[e], m + (e-1)*.245, xerr=sd[e], fmt=EVAL_MARKERS[e],
+                                color=EVAL_COLORS[e], ms=4.3, elinewidth=.9, capsize=2,
+                                capthick=.8, markeredgecolor="white", markeredgewidth=.5, zorder=3)
+            reference(ax, metric, True)
+            ax.set(xlim=limits, xticks=ticks, ylim=(3.57, -.57), yticks=range(4))
+            ax.set_yticklabels(LABELS if c == 0 else [""]*4, fontsize=9)
+            ax.tick_params(axis="y", length=0, pad=8)
+            ax.tick_params(axis="x", labelsize=9, length=3, pad=4)
+            ax.set_axisbelow(True)
+            ax.grid(axis="x", color="#E5E8EC", linewidth=.5)
+            for spine in ("top", "right", "left"):
+                ax.spines[spine].set_visible(False)
     pdf = IMAGES / f"{slug}_evaluation_ablation.pdf"
     png = OUT / f"{slug}_evaluation_ablation.png"
-    exported = OUT / f"{slug}_evaluation_ablation_export.pdf"
-    fig.write_image(str(exported))
-    pages = PdfReader(exported).pages
-    assert len(pages) in (1, 2)
-    if len(pages) == 2:
-        assert not pages[1].extract_text() and len(pages[1].get_contents().get_data()) < 500
-    writer = PdfWriter()
-    writer.add_page(pages[0])
-    with pdf.open("wb") as handle:
-        writer.write(handle)
-    exported.unlink()
-    fig.write_image(str(png), scale=1.4)
+    fig.savefig(pdf)
+    fig.savefig(png, dpi=190)
+    plt.close(fig)
     return pdf, png
 
+
+
+def render_figure(rows, task):
+    with plt.rc_context(PLOT_STYLE):
+        return _render_figure(rows, task)
 
 def fmt(metric: str, row: dict[str, object]) -> str:
     mean, sd = float(row["metric_mean"]), float(row["metric_sd"])
