@@ -298,7 +298,7 @@ def main(registry=None, output_root=None):
                 mean_rows.append({"task": task, "method": method,
                                   "discovery_ablation": ablation,
                                   "n_seeds": len(aucs), "auc_mean": float(np.mean(aucs)),
-                                  "auc_sd": float(np.std(aucs, ddof=1))})
+                                  "auc_sd": float(np.std(aucs, ddof=0)), "sd_ddof": 0})
                 if ablation == native:
                     arr = np.stack(curve_values)
                     plotted.append({"task": task, "method": method,
@@ -320,7 +320,7 @@ def main(registry=None, output_root=None):
     write_csv(roc_out / "manual_circuit_auc_per_seed.csv", auc_rows,
               ["task", "method", "discovery_ablation", "seed", "auc", "cache_file"])
     write_csv(roc_out / "manual_circuit_auc.csv", mean_rows,
-              ["task", "method", "discovery_ablation", "n_seeds", "auc_mean", "auc_sd"])
+              ["task", "method", "discovery_ablation", "n_seeds", "auc_mean", "auc_sd", "sd_ddof"])
     write_csv(roc_out / "manual_native_roc_per_seed.csv", seed_curves,
               ["task", "method", "discovery_ablation", "seed", "fpr", "tpr"])
     write_csv(roc_out / "manual_native_roc_plotted.csv", plotted,
@@ -339,7 +339,8 @@ def main(registry=None, output_root=None):
         "seeds": list(SEEDS),
         "candidate_edges": "all entries of each PruneScores tensor, aligned by module name and tensor shape",
         "score": "absolute edge score", "labels": "positive iff deterministic official-circuit cache score is 1",
-        "auc": "Mann-Whitney probability; scipy average ranks give half credit for ties; sample SD (ddof=1)",
+        "auc": "Mann-Whitney probability; scipy average ranks give half credit for ties; population SD (ddof=0)",
+        "sd_convention": "population", "sd_ddof": 0,
         "roc": "all distinct scores, tied blocks together; linear interpolation at the highest TPR on 1001 common FPR points; average and five-run min-max",
         "all_tied_auc": exact_auc(np.array([True, False, True, False]), np.ones(4)),
         "independent_auc_check": trusted_check,

@@ -217,14 +217,14 @@ def summarize(output):
         means = data.mean(1)
         low, high = crossed_interval(data)
         summary.append(dict(algo=algo, budget=budget, label=label, metric=metric, n_runs=len(values),
-                            average=float(means.mean()), sample_sd=float(means.std(ddof=1)) if len(values)>1 else 0.,
+                            average=float(means.mean()), population_sd=float(means.std(ddof=0)), sd_ddof=0,
                             ci_low=low, ci_high=high, positive_runs=int((means>0).sum()),
                             negative_runs=int((means<0).sum()), values=';'.join(map(str, means))))
         if metric == 'margin':
             low, high = crossed_interval(data, denominator=full['margin'])
             percent = 100 * means / full['margin'].mean()
             summary.append(dict(algo=algo, budget=budget, label=label, metric='logit_difference_percent_points', n_runs=len(values),
-                                average=float(percent.mean()), sample_sd=float(percent.std(ddof=1)) if len(values)>1 else 0.,
+                                average=float(percent.mean()), population_sd=float(percent.std(ddof=0)), sd_ddof=0,
                                 ci_low=low, ci_high=high, positive_runs=int((means>0).sum()), negative_runs=int((means<0).sum()),
                                 values=';'.join(map(str, percent))))
     write_csv(output / 'paired_effects.csv', effects)
@@ -234,7 +234,8 @@ def summarize(output):
     atomic_json(output / 'complete.json', dict(study_id=manifest['study_id'], complete=True,
                 predefined_conditions=len(manifest['conditions']), verified_conditions=len(results),
                 source_unchanged=True, full_model_margin=float(full['margin'].mean()),
-                n_prompts=256, n_discovery_runs=5, ablation='mean', budgets=manifest['budgets']))
+                n_prompts=256, n_discovery_runs=5, ablation='mean', budgets=manifest['budgets'],
+                descriptive_sd_convention='population', descriptive_sd_ddof=0))
     print('Complete study verified:', len(results), 'conditions', flush=True)
 
 
@@ -335,7 +336,7 @@ def report(output, manifest, rows, summary, full):
            f'Full-model average raw margin: {full["margin"].mean():.6f}. Percentages use this denominator, not per-prompt ratios.', '']
     for budget in manifest['budgets']:
         lines += [f'## Native mean circuits at requested {budget:,} edges', '',
-                  '| Method | Attained size range | Logit difference % (average ± sample SD) | Q restoration % | NNM mean-output replacement % | NNM outputs retained |',
+                  '| Method | Attained size range | Logit difference % (average ± population SD) | Q restoration % | NNM mean-output replacement % | NNM outputs retained |',
                   '|---|---:|---:|---:|---:|---:|']
         for algo in NAMES:
             selected=[r for r in rows if r['algo']==algo and r['budget']==budget and r['phase']!='size-sensitivity']
@@ -344,7 +345,7 @@ def report(output, manifest, rows, summary, full):
             q=np.mean([r['logit_difference_percent'] for r in selected if r['label']=='restore_q_both'])
             o=np.mean([r['logit_difference_percent'] for r in selected if r['label']=='drop_nnm_out'])
             retained=sum(r['retained_10_7'] and r['retained_11_10'] for r in base)
-            lines.append(f'| {NAMES[algo]} | {min(r["attained"] for r in base)}–{max(r["attained"] for r in base)} | {vals.mean():.2f} ± {vals.std(ddof=1):.2f} | {q:.2f} | {o:.2f} | {retained}/5 |')
+            lines.append(f'| {NAMES[algo]} | {min(r["attained"] for r in base)}–{max(r["attained"] for r in base)} | {vals.mean():.2f} ± {vals.std(ddof=0):.2f} | {q:.2f} | {o:.2f} | {retained}/5 |')
         lines += ['', '| Method | Baseline KL | Q restoration KL | NNM output replacement KL | Pair mass KL | Within-pair KL | Remaining-vocabulary KL |', '|---|---:|---:|---:|---:|---:|---:|---:|']
         for algo in NAMES:
             selected=[r for r in rows if r['algo']==algo and r['budget']==budget and r['phase']!='size-sensitivity']

@@ -4,6 +4,7 @@ import copy
 import csv
 import json
 import shutil
+import statistics
 from pathlib import Path
 
 import pytest
@@ -70,11 +71,19 @@ def test_native_auc_and_acdc_boundaries_match_frozen_sources(tmp_path, monkeypat
         expected = list(csv.DictReader(handle))
     keys = ('task', 'method', 'discovery_ablation')
     expected = {tuple(row[key] for key in keys): row for row in expected}
+    with reference.with_name('manual_circuit_auc_per_seed.csv').open(newline='') as handle:
+        per_seed = list(csv.DictReader(handle))
     for row in actual:
-        source = expected[tuple(row[key] for key in keys)]
+        identity = tuple(row[key] for key in keys)
+        source = expected[identity]
+        group = [r for r in per_seed if tuple(r[key] for key in keys) == identity]
+        assert sorted(int(r['seed']) for r in group) == [42, 43, 44, 45, 46]
         assert float(row['auc_mean']) == pytest.approx(float(source['auc_mean']), abs=1e-12)
-        assert float(row['auc_sd']) == pytest.approx(float(source['auc_sd']), abs=1e-12)
+        assert row['sd_ddof'] == '0'
+        assert float(row['auc_sd']) == pytest.approx(
+            statistics.pstdev(float(r['auc']) for r in group), abs=1e-12)
     meta = json.loads((tmp_path / 'native_roc/manual_native_roc_manifest.json').read_text())
+    assert meta['sd_ddof'] == 0 and meta['sd_convention'] == 'population'
     assert len(meta['acdc_selected_boundary_check']) == 45
     assert len(meta['summary_sha256']) == 2
 
